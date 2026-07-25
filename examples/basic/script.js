@@ -9,11 +9,14 @@ window.BS = BS;
 //BS.setAllConsoleLevelFlags({ log: false });
 //BS.setConsoleLevelFlagsForType("PressureDataManager", { log: true });
 
-BS.setConsoleLevelFlagsForType("DisplayManager", { log: true });
+BS.setConsoleLevelFlagsForType("Device", { log: false });
+BS.setConsoleLevelFlagsForType("DisplayManager", { log: false });
 BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
 BS.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
 BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: false });
 BS.setConsoleLevelFlagsForType("BaseServer", { log: false });
+// BS.setConsoleLevelFlagsForType("FileTransferManager", { log: true });
+// BS.setConsoleLevelFlagsForType("BaseClient", { log: true });
 // BS.setConsoleLevelFlagsForType("Device", { log: true });
 
 // GET DEVICES
@@ -989,7 +992,7 @@ toggleFileTransferButton.addEventListener("click", async () => {
   if (currentDevice.fileTransferStatus == "idle") {
     if (fileTransferDirection == "send") {
       if (fileType == "tflite") {
-        await currentDevice.setTfliteName(file.name.replaceAll(".tflite", ""));
+        currentDevice.setTfliteName(file.name.replaceAll(".tflite", ""), false);
       }
       currentDevice.sendFile(fileType, file);
     } else {

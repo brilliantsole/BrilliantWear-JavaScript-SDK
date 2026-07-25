@@ -1437,7 +1437,7 @@ class Device {
         }
         break;
       case "tflite":
-        // TODO: - use litert
+        this.#tfliteManager.onIsReady();
         break;
       default:
         break;
@@ -1507,6 +1507,9 @@ class Device {
 
   // TFLITE
   #tfliteManager = new TfliteManager();
+  private get _tfliteManager() {
+    return this.#tfliteManager;
+  }
 
   get isTfliteAvailable() {
     return this.fileTypes.includes("tflite");
@@ -1520,7 +1523,8 @@ class Device {
 
   async sendTfliteConfiguration(configuration: TfliteFileConfiguration) {
     configuration.fileType = "tflite";
-    await this.#tfliteManager.sendConfiguration(configuration, false);
+    _console.log("sendTfliteConfiguration", configuration);
+    this.#tfliteManager.sendConfiguration(configuration, false);
     const didSendFile = await this.#fileTransferManager.send(
       configuration.fileType,
       configuration.file,
@@ -2285,7 +2289,6 @@ class Device {
   }
 
   get displayManager() {
-    this.#assertDisplayIsAvailable();
     // return this.#displayManager as DisplayManagerInterface;
     return this.#displayManager;
   }

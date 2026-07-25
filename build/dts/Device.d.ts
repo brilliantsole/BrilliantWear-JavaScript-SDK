@@ -81,13 +81,13 @@ declare class Device {
     get getBatteryCurrent(): () => Promise<void>;
     get name(): string;
     get setName(): (newName: string) => Promise<void>;
-    get type(): "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "generic";
+    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses";
     get setType(): (newType: DeviceType) => Promise<void>;
     get isInsole(): boolean;
     get isGlove(): boolean;
     get isGlasses(): boolean;
     get isGeneric(): boolean;
-    get side(): "left" | "right";
+    get side(): "right" | "left";
     get mtu(): number;
     get sensorTypes(): SensorType[];
     get continuousSensorTypes(): ("pressure" | "acceleration" | "gravity" | "linearAcceleration" | "gyroscope" | "magnetometer" | "gameRotation" | "rotation" | "orientation" | "barometer" | "light")[];
@@ -128,7 +128,7 @@ declare class Device {
     get numberOfButtons(): number;
     get hasTouches(): boolean;
     get numberOfTouches(): number;
-    get vibrationLocations(): ("left" | "right" | "front" | "rear")[];
+    get vibrationLocations(): ("right" | "left" | "front" | "rear")[];
     get hasVibration(): boolean;
     get triggerVibration(): {
         (vibrationConfiguration: VibrationConfiguration, sendImmediately?: boolean): Promise<void>;
@@ -145,8 +145,9 @@ declare class Device {
     get fileHeaderLength(): number | undefined;
     sendFile(fileType: FileType, file: FileLike): Promise<boolean>;
     receiveFile(fileType: FileType): Promise<boolean>;
-    get fileTransferStatus(): "idle" | "sending" | "receiving";
+    get fileTransferStatus(): "sending" | "receiving" | "idle";
     cancelFileTransfer(): void;
+    private get _tfliteManager();
     get isTfliteAvailable(): boolean;
     get tfliteName(): string;
     get setTfliteName(): (newName: string, sendImmediately?: boolean) => Promise<void>;

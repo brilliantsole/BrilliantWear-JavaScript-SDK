@@ -15,7 +15,7 @@ import {
 import { valueToUInt8ArrayBuffer } from "./utils/ArrayBufferUtils.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
 
-const _console = createConsole("TfliteManager", { log: false });
+const _console = createConsole("TfliteManager", { log: true });
 
 export const TfliteMessageTypes = [
   "getTfliteName",
@@ -341,8 +341,12 @@ class TfliteManager {
   #updateIsReady(isReady: boolean) {
     _console.log({ isReady });
     this.#isReady = isReady;
-    this.#dispatchEvent("tfliteIsReady", { tfliteIsReady: isReady });
-    if (isReady) {
+    this.onIsReady();
+  }
+  onIsReady() {
+    _console.log("onIsReady");
+    this.#dispatchEvent("tfliteIsReady", { tfliteIsReady: this.isReady });
+    if (this.isReady) {
       this.onParseFile({
         fileType: "tflite",
         name: this.name,
@@ -615,17 +619,21 @@ class TfliteManager {
       sensorTypes,
       classes,
     } = this.configuration;
+
     this.setClasses(classes);
-    this.setTask(task, false);
-    if (captureDelay != undefined) {
-      this.setCaptureDelay(captureDelay, false);
-    }
-    this.setSampleRate(sampleRate, false);
-    if (threshold != undefined) {
-      this.setThreshold(threshold, false);
-    }
-    this.setSensorTypes(sensorTypes, false);
-    await this.setName(name, sendImmediately);
+
+    const promises = [
+      this.setTask(task, false),
+      captureDelay != undefined
+        ? this.setCaptureDelay(captureDelay, false)
+        : null,
+      this.setSampleRate(sampleRate, false),
+      threshold != undefined ? this.setThreshold(threshold, false) : null,
+      this.setSensorTypes(sensorTypes, false),
+      this.setName(name, sendImmediately),
+    ].filter(Boolean);
+
+    await Promise.all(promises);
   }
 
   clear() {

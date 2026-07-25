@@ -85,6 +85,7 @@ declare class TfliteManager {
     get sensorTypes(): ("pressure" | "linearAcceleration" | "gyroscope" | "magnetometer" | "camera" | "microphone")[];
     setSensorTypes(newSensorTypes: SensorType[], sendImmediately?: boolean): Promise<void>;
     get isReady(): boolean;
+    onIsReady(): void;
     get captureDelay(): number;
     setCaptureDelay(newCaptureDelay: number, sendImmediately: boolean): Promise<void>;
     get threshold(): number;

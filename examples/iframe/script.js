@@ -3,7 +3,7 @@ window.BS = BS;
 
 // BS.setConsoleLevelFlagsForType("DisplayManager", { log: false });
 // BS.setConsoleLevelFlagsForType("DeviceManager", { log: true });
-BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
+// BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
 // BS.setConsoleLevelFlagsForType("WebBluetoothConnectionManager", { log: true });
 // BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: true });
 // BS.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
@@ -365,7 +365,7 @@ const createIframeContainer = (src) => {
 
   iframeContainers.appendChild(iframeContainer);
 };
-createIframeContainer("../display-text");
+// createIframeContainer("../display-text");
 // createIframeContainer("../display-wireframe");
 // createIframeContainer("../display-midi");
 // createIframeContainer("../display-prompt");

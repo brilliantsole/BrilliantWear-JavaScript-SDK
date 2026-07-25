@@ -923,15 +923,21 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     const fileTransferMetaData: DeviceMessage[] = [];
     switch (fileConfiguration.fileType) {
       case "tflite":
-        fileTransferMetaData.push(
-          this.#createDeviceMessage(device, "setTfliteTask"),
-        );
-        fileTransferMetaData.push(
-          this.#createDeviceMessage(device, "setTfliteSensorTypes"),
-        );
-        fileTransferMetaData.push(
-          this.#createDeviceMessage(device, "setTfliteName"),
-        );
+        if (device.latestConnectionMessages.has("setTfliteTask")) {
+          fileTransferMetaData.push(
+            this.#createDeviceMessage(device, "setTfliteTask"),
+          );
+        }
+        if (device.latestConnectionMessages.has("setTfliteSensorTypes")) {
+          fileTransferMetaData.push(
+            this.#createDeviceMessage(device, "setTfliteSensorTypes"),
+          );
+        }
+        if (device.latestConnectionMessages.has("setTfliteName")) {
+          fileTransferMetaData.push(
+            this.#createDeviceMessage(device, "setTfliteName"),
+          );
+        }
         break;
       case "spriteSheet":
         fileTransferMetaData.push(
@@ -2249,7 +2255,10 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                   if (isComplete) {
                     switch (fileType) {
                       case "tflite":
-                        // TODO
+                        {
+                          // @ts-expect-error
+                          device._tfliteManager.onIsReady();
+                        }
                         break;
                       case "spriteSheet":
                         {
