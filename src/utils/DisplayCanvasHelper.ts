@@ -4406,8 +4406,6 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
         // @ts-expect-error
         this.deviceDisplayManager!._pendingSelectedSpriteSheetIndex
       ) {
-        // @ts-expect-error
-        this.deviceDisplayManager!._pendingSelectedSpriteSheetIndex = undefined;
         await this.selectSpriteSheet(spriteSheet.name, true, true);
       }
     } else {
@@ -4489,10 +4487,28 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
     sendImmediately?: boolean,
     isSending?: boolean,
   ) {
+    _console.log("selectSpriteSheet", {
+      spriteSheetName,
+      sendImmediately,
+      isSending,
+    });
     this.assertLoadedSpriteSheet(spriteSheetName);
     const differences = this.#contextStateHelper.update({
       spriteSheetName,
     });
+
+    if (
+      isSending &&
+      // @ts-expect-error
+      this.deviceDisplayManager!._pendingSelectedSpriteSheetIndex != undefined
+    ) {
+      _console.log(
+        // @ts-expect-error
+        `clearing _pendingSelectedSpriteSheetIndex #${this.deviceDisplayManager!._pendingSelectedSpriteSheetIndex}`,
+      );
+      // @ts-expect-error
+      this.deviceDisplayManager!._pendingSelectedSpriteSheetIndex = undefined;
+    }
 
     if (this.device?.isConnected && !this.#ignoreDevice) {
       await this.deviceDisplayManager!.selectSpriteSheet(

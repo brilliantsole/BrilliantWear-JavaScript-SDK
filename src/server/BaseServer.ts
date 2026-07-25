@@ -1549,7 +1549,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     client: ServerClient,
     deviceMessages: DeviceMessage[],
   ) {
-    _console.log("#onDoneReceivingFileFromClient", device);
+    _console.log("#onDoneReceivingFileFromClient", { device, client });
 
     this.#appendClientSentFileConfigurations(device, client);
 
@@ -2288,11 +2288,6 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
 
                   if (isComplete && isClientSendingToSelf) {
                     _console.log("client done sending file to self");
-                    this.#onDoneReceivingFileFromClient(
-                      device,
-                      client,
-                      deviceMessages,
-                    );
 
                     switch (fileType) {
                       case "tflite":
@@ -2315,6 +2310,12 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                         }
                         break;
                     }
+
+                    this.#onDoneReceivingFileFromClient(
+                      device,
+                      client,
+                      deviceMessages,
+                    );
                   }
 
                   if (deviceMessages.length > 0) {

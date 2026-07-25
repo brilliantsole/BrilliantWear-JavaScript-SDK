@@ -3772,14 +3772,6 @@ class DisplayManager implements DisplayManagerInterface {
     const isSameSpriteSheet = await promise;
 
     _console.log({ isSameSpriteSheet });
-
-    if (!this.displayCanvasHelper) {
-      const spriteSheetIndex = this.spriteSheetIndices[spriteSheet.name];
-      if (spriteSheetIndex == this._pendingSelectedSpriteSheetIndex) {
-        this._pendingSelectedSpriteSheetIndex = undefined;
-        await this.selectSpriteSheet(spriteSheet.name, true, true);
-      }
-    }
   }
   connectionType?: ConnectionType;
   get isClientConnectionType() {
@@ -3863,8 +3855,19 @@ class DisplayManager implements DisplayManagerInterface {
     isSending?: boolean,
     displayCanvasHelper?: DisplayCanvasHelper,
   ) {
-    _console.log("selecting", { spriteSheetName, sendImmediately, isSending });
+    _console.log("selectSpriteSheet", {
+      spriteSheetName,
+      sendImmediately,
+      isSending,
+    });
     this.assertLoadedSpriteSheet(spriteSheetName);
+
+    if (isSending && this._pendingSelectedSpriteSheetIndex != undefined) {
+      _console.log(
+        `clearing _pendingSelectedSpriteSheetIndex #${this._pendingSelectedSpriteSheetIndex}`,
+      );
+      this._pendingSelectedSpriteSheetIndex = undefined;
+    }
 
     const spriteSheetIndex = this.spriteSheetIndices[spriteSheetName];
     const partialState: PartialDisplayContextState = { spriteSheetName };
@@ -4231,17 +4234,25 @@ class DisplayManager implements DisplayManagerInterface {
     _console.log(
       `finished uploading "${this.#pendingSpriteSheetName!}" spriteSheet at spriteSheetIndex #${spriteSheetIndex}`,
     );
-    this.#dispatchEvent("displaySpriteSheetUploadComplete", {
-      spriteSheetName: this.#pendingSpriteSheetName!,
-      spriteSheet: this.#pendingSpriteSheet!,
-    });
+    const spriteSheet = this.#pendingSpriteSheet!;
 
+    this.#dispatchEvent("displaySpriteSheetUploadComplete", {
+      spriteSheet,
+      spriteSheetName: spriteSheet.name,
+    });
     this.onParseFile({
       fileType: "spriteSheet",
-      spriteSheet: this.#pendingSpriteSheet!,
+      spriteSheet,
       spriteSheetIndex,
     });
     this.#pendingSpriteSheet = undefined;
+
+    if (!this.displayCanvasHelper) {
+      const spriteSheetIndex = this.spriteSheetIndices[spriteSheet.name];
+      if (spriteSheetIndex == this._pendingSelectedSpriteSheetIndex) {
+        this.selectSpriteSheet(spriteSheet.name, true, true);
+      }
+    }
   }
 
   // MESSAGE

@@ -1354,9 +1354,22 @@ export async function runDisplayContextCommand(
     case "drawSprite":
       {
         const { offsetX, offsetY, spriteIndex } = command;
-        const spriteName =
-          displayManager.getSelectedSpriteSheet(isSending)?.sprites[spriteIndex]
-            .name!;
+        const selectedSpriteSheet =
+          displayManager.getSelectedSpriteSheet(isSending)!;
+        if (!selectedSpriteSheet) {
+          _console.warn(
+            `no selectedSpriteSheet found (isSending: ${isSending}) - skipping command`,
+          );
+          return;
+        }
+        const sprite = selectedSpriteSheet.sprites[spriteIndex];
+        if (!sprite) {
+          _console.warn(
+            `no sprite found for spriteIndex #${spriteIndex} in spriteSheet "${selectedSpriteSheet.name}" (isSending: ${isSending}) - skipping`,
+          );
+          return;
+        }
+        const spriteName = sprite.name;
         await displayManager.drawSprite(
           offsetX,
           offsetY,

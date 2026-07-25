@@ -2,6 +2,7 @@ import * as BS from "../../build/brilliantsole.module.js";
 
 BS.setConsoleLevelFlagsForType("WindowManagerClient", { log: true });
 BS.setConsoleLevelFlagsForType("BaseClient", { log: true });
+BS.setConsoleLevelFlagsForType("DisplayManagerInterface", { log: false });
 
 /** @typedef {(device: BS.Device)=>void} DeviceCallback */
 /** @typedef {(device: BS.Device)=>boolean} DeviceFilterCallback */
