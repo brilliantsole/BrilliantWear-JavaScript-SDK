@@ -2257,7 +2257,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                       case "tflite":
                         {
                           // @ts-expect-error
-                          device._tfliteManager.onIsReady();
+                          device._tfliteManager.onFileConfiguration(
+                            fileConfiguration!,
+                          );
                         }
                         break;
                       case "spriteSheet":

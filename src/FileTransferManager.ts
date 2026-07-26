@@ -18,6 +18,7 @@ const _console = createConsole("FileTransferManager", { log: true });
 
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
+export { emptyHeaderDataView };
 
 export const FileTransferMessageTypes = [
   "getFileTypes",

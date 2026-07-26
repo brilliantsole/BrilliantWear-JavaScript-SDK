@@ -88,7 +88,7 @@ declare class CameraManager {
     set sensorRate(newSensorRate: number);
     buildCameraData(): ArrayBuffer;
     get cameraConfiguration(): CameraConfiguration;
-    get availableCameraConfigurationTypes(): ("brightness" | "resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "saturation" | "contrast" | "sharpness")[];
+    get availableCameraConfigurationTypes(): ("resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "brightness" | "saturation" | "contrast" | "sharpness")[];
     get cameraConfigurationRanges(): CameraConfigurationRanges;
     setCameraConfiguration(newCameraConfiguration: CameraConfiguration, sendImmediately?: boolean): Promise<void>;
     static AssertValidCameraConfigurationType(cameraConfigurationType: CameraConfigurationType): void;

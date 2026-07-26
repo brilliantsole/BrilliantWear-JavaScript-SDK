@@ -117,7 +117,7 @@ export function serializeSpriteSheet(
       (encodedSpriteNamesLength, encodedSpriteName) =>
         encodedSpriteNamesLength + encodedSpriteName.byteLength,
       0,
-    ); // nameLengths
+    ); // namesLength
     _console.log({ headerLength });
     headerDataView = new DataView(new ArrayBuffer(headerLength));
     _console.log("created headerDataView", headerDataView);

@@ -1439,7 +1439,7 @@ class Device {
         }
         break;
       case "tflite":
-        this.#tfliteManager.onIsReady();
+        this.#tfliteManager.onFileConfiguration(fileConfiguration);
         break;
       default:
         break;

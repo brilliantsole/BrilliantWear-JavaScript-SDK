@@ -10,10 +10,16 @@ import Device, { SendMessagesCallback } from "./Device.ts";
 import autoBind from "auto-bind";
 import {
   BaseFileConfiguration,
+  ExtendedFileConfiguration,
+  FileOrBlob,
   OnParseFileCallback,
   SendFileCallback,
 } from "./FileTransferManager.ts";
-import { valueToUInt8ArrayBuffer } from "./utils/ArrayBufferUtils.ts";
+import {
+  concatenateArrayBuffers,
+  getFileBuffer,
+  valueToUInt8ArrayBuffer,
+} from "./utils/ArrayBufferUtils.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
 
 const _console = createConsole("TfliteManager", { log: true });
@@ -103,6 +109,107 @@ export interface TfliteFileConfiguration extends BaseFileConfiguration {
   captureDelay?: number;
   threshold?: number;
   classes?: string[];
+}
+
+export function serializeTfliteFileHeader(
+  fileConfiguration: TfliteFileConfiguration,
+) {
+  _console.log("serializeTfliteFileHeader", fileConfiguration);
+  const { classes } = fileConfiguration;
+  if (!classes || classes.length == 0) {
+    return;
+  }
+
+  const encodedClasses = classes.map((_class) => textEncoder.encode(_class));
+  _console.log("encodedClasses", encodedClasses);
+
+  // [headerLength, numberOfClasses, classNameOffsets, ...classNames]
+
+  let headerLength = 0;
+  headerLength += 2; // headerLength
+  headerLength += 1; // numberOfClasses
+  headerLength += 2 * classes.length; // nameOffsets
+  headerLength += encodedClasses.reduce(
+    (encodedClassLength, encodedClass) =>
+      encodedClassLength + encodedClass.byteLength,
+    0,
+  ); // classesLength
+  _console.log({ headerLength });
+  const headerDataView = new DataView(new ArrayBuffer(headerLength));
+  _console.log("created headerDataView", headerDataView);
+
+  let offset = 0;
+  headerDataView.setUint16(offset, headerLength, true);
+  offset += 2;
+
+  headerDataView.setUint8(offset++, classes.length);
+
+  let classOffset = offset + 2 * classes.length;
+  for (const encodedClass of encodedClasses) {
+    _console.log("encodedClass", encodedClass);
+    headerDataView.setUint16(offset, classOffset, true);
+    offset += 2;
+    _console.log("before", { classOffset });
+    for (const value of encodedClass) {
+      headerDataView.setUint8(classOffset++, value);
+    }
+    _console.log("after", { classOffset });
+  }
+
+  _console.log("serialized headerDataView", headerDataView);
+
+  return headerDataView;
+}
+export function parseTfliteFileHeader(
+  fileConfiguration: ExtendedFileConfiguration,
+) {
+  _console.log("parseTfliteFileHeader", fileConfiguration);
+  const dataView = new DataView(fileConfiguration.buffer);
+  let offset = 0;
+
+  const headerLength = dataView.getUint16(offset, true);
+  offset += 2;
+
+  if (headerLength == 0) {
+    return;
+  }
+
+  const numberOfClasses = dataView.getUint8(offset++);
+  _console.log({ numberOfClasses });
+
+  const classes: string[] = [];
+
+  for (
+    let classNameIndex = 0;
+    classNameIndex < numberOfClasses;
+    classNameIndex++
+  ) {
+    const isLast = classNameIndex == numberOfClasses - 1;
+
+    _console.log("parsing", { classNameIndex, isLast });
+
+    const classNameOffset = dataView.getUint16(offset, true);
+    _console.log({ classNameOffset });
+    offset += 2;
+
+    const nextClassOffset = isLast
+      ? headerLength
+      : dataView.getUint16(offset, true);
+    const classNameLength = nextClassOffset - classNameOffset;
+    _console.log({ nextClassOffset, classNameLength });
+
+    const _class = textDecoder.decode(
+      dataView.buffer.slice(classNameOffset, classNameOffset + classNameLength),
+    );
+    _console.log({ _class });
+
+    classes.push(_class);
+  }
+  _console.log("classes", classes);
+
+  offset = headerLength;
+
+  Object.assign(fileConfiguration, { classes });
 }
 
 class TfliteManager {
@@ -344,6 +451,16 @@ class TfliteManager {
   #updateIsReady(isReady: boolean) {
     _console.log({ isReady });
     this.#isReady = isReady;
+    this.onIsReady();
+  }
+  onFileConfiguration(fileConfiguration: ExtendedFileConfiguration) {
+    _console.log("onFileConfiguration", fileConfiguration);
+    parseTfliteFileHeader(fileConfiguration);
+    // @ts-expect-error
+    if (fileConfiguration.classes) {
+      // @ts-expect-error
+      this.setClasses(fileConfiguration.classes);
+    }
     this.onIsReady();
   }
   onIsReady() {
@@ -600,7 +717,7 @@ class TfliteManager {
   get configuration() {
     return this.#configuration;
   }
-  async sendConfiguration(
+  async #sendConfiguration(
     configuration: TfliteFileConfiguration,
     sendImmediately?: boolean,
   ) {
@@ -674,8 +791,12 @@ class TfliteManager {
   async uploadModel(configuration: TfliteFileConfiguration) {
     configuration.fileType = "tflite";
     _console.log("uploadModel", configuration);
-    this.sendConfiguration(configuration, false);
-    this.sendFile(configuration.fileType, configuration.file);
+    this.#sendConfiguration(configuration, false);
+    const header = serializeTfliteFileHeader(configuration);
+    const includesHeader = Boolean(header);
+    const fileBufferWithoutHeader = await getFileBuffer(configuration.file);
+    const fileBuffer = concatenateArrayBuffers(header, fileBufferWithoutHeader);
+    this.sendFile(configuration.fileType, fileBuffer, includesHeader);
   }
 }
 

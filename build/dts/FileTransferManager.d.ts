@@ -5,6 +5,8 @@ import { ConnectionType } from "./connection/BaseConnectionManager.ts";
 import { TfliteFileConfiguration } from "./TfliteManager.ts";
 import { DisplaySpriteSheetFileConfiguration } from "./DisplayManager.ts";
 import { CameraImageFileConfiguration } from "./CameraManager.ts";
+declare const emptyHeaderDataView: DataView<ArrayBuffer>;
+export { emptyHeaderDataView };
 export declare const FileTransferMessageTypes: readonly ["getFileTypes", "maxFileLength", "getFileType", "setFileType", "getFileLength", "setFileLength", "getFileChecksum", "setFileChecksum", "setFileTransferCommand", "fileTransferStatus", "getFileBlock", "setFileBlock", "fileBytesTransferred"];
 export type FileTransferMessageType = (typeof FileTransferMessageTypes)[number];
 export declare const FileTypes: readonly ["tflite", "wifiServerCert", "wifiServerKey", "spriteSheet", "cameraImage"];
@@ -111,7 +113,7 @@ declare class FileTransferManager {
     get type(): "cameraImage" | "tflite" | "wifiServerCert" | "wifiServerKey" | "spriteSheet" | undefined;
     get length(): number;
     get checksum(): number;
-    get status(): "sending" | "receiving" | "idle";
+    get status(): "idle" | "sending" | "receiving";
     parseMessage(messageType: FileTransferMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     send(type: FileType, file: FileLike, includesHeader?: boolean): Promise<boolean | undefined>;
     get pendingBufferWithHeader(): ArrayBuffer | undefined;

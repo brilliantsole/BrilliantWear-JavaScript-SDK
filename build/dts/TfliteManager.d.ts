@@ -1,7 +1,7 @@
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import { SensorType } from "./sensor/SensorDataManager.ts";
 import Device, { SendMessagesCallback } from "./Device.ts";
-import { BaseFileConfiguration, OnParseFileCallback, SendFileCallback } from "./FileTransferManager.ts";
+import { BaseFileConfiguration, ExtendedFileConfiguration, OnParseFileCallback, SendFileCallback } from "./FileTransferManager.ts";
 export declare const TfliteMessageTypes: readonly ["getTfliteName", "setTfliteName", "getTfliteTask", "setTfliteTask", "getTfliteSampleRate", "setTfliteSampleRate", "getTfliteSensorTypes", "setTfliteSensorTypes", "tfliteIsReady", "getTfliteCaptureDelay", "setTfliteCaptureDelay", "getTfliteThreshold", "setTfliteThreshold", "getTfliteInferencingEnabled", "setTfliteInferencingEnabled", "tfliteInference"];
 export type TfliteMessageType = (typeof TfliteMessageTypes)[number];
 export declare const TfliteEventTypes: readonly ["getTfliteName", "setTfliteName", "getTfliteTask", "setTfliteTask", "getTfliteSampleRate", "setTfliteSampleRate", "getTfliteSensorTypes", "setTfliteSensorTypes", "tfliteIsReady", "getTfliteCaptureDelay", "setTfliteCaptureDelay", "getTfliteThreshold", "setTfliteThreshold", "getTfliteInferencingEnabled", "setTfliteInferencingEnabled", "tfliteInference"];
@@ -62,6 +62,8 @@ export interface TfliteFileConfiguration extends BaseFileConfiguration {
     threshold?: number;
     classes?: string[];
 }
+export declare function serializeTfliteFileHeader(fileConfiguration: TfliteFileConfiguration): DataView<ArrayBuffer> | undefined;
+export declare function parseTfliteFileHeader(fileConfiguration: ExtendedFileConfiguration): void;
 declare class TfliteManager {
     #private;
     constructor();
@@ -69,8 +71,8 @@ declare class TfliteManager {
     sendFile: SendFileCallback;
     onParseFile: OnParseFileCallback;
     eventDispatcher: TfliteEventDispatcher;
-    get addEventListenter(): <T extends "*" | "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference">(type: T, listener: (event: import("./utils/EventDispatcher.ts").ListenerEvent<Device, "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference", TfliteEventMessages, T>) => void, options?: import("./utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "*" | "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference">(type: T, listener: (event: import("./utils/EventDispatcher.ts").ListenerEvent<Device, "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference", TfliteEventMessages, T>) => void) => void;
+    get addEventListenter(): <T extends "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference" | "*">(type: T, listener: (event: import("./utils/EventDispatcher.ts").ListenerEvent<Device, "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference", TfliteEventMessages, T>) => void, options?: import("./utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference" | "*">(type: T, listener: (event: import("./utils/EventDispatcher.ts").ListenerEvent<Device, "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference", TfliteEventMessages, T>) => void) => void;
     get waitForEvent(): <T extends "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference">(type: T, options?: {
         immediate?: boolean;
     }) => Promise<import("./utils/EventDispatcher.ts").ListenerEvent<Device, "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference", TfliteEventMessages, T>>;
@@ -86,6 +88,7 @@ declare class TfliteManager {
     get sensorTypes(): ("pressure" | "linearAcceleration" | "gyroscope" | "magnetometer" | "camera" | "microphone")[];
     setSensorTypes(newSensorTypes: SensorType[], sendImmediately?: boolean): Promise<void>;
     get isReady(): boolean;
+    onFileConfiguration(fileConfiguration: ExtendedFileConfiguration): void;
     onIsReady(): void;
     get captureDelay(): number;
     setCaptureDelay(newCaptureDelay: number, sendImmediately: boolean): Promise<void>;
@@ -98,7 +101,6 @@ declare class TfliteManager {
     disableInferencing(): Promise<void>;
     parseMessage(messageType: TfliteMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     get configuration(): TfliteFileConfiguration | undefined;
-    sendConfiguration(configuration: TfliteFileConfiguration, sendImmediately?: boolean): Promise<void>;
     clear(): void;
     requestRequiredInformation(): void;
     uploadModel(configuration: TfliteFileConfiguration): Promise<void>;
