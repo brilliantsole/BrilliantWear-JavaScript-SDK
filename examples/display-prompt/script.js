@@ -1837,7 +1837,7 @@ const speechDetectionTfliteConfiguration = {
 };
 const uploadSpeechDetectionModel = () => {
   console.log("uploadSpeechDetectionModel");
-  device.sendTfliteConfiguration(speechDetectionTfliteConfiguration);
+  device.uploadTfliteModel(speechDetectionTfliteConfiguration);
   uploadSpeechDetectionModelButton.disabled;
 };
 const uploadSpeechDetectionModelButton = document.getElementById(

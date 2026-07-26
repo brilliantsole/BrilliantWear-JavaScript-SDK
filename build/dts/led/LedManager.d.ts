@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "../Device.ts";
+import Device, { SendMessagesCallback } from "../Device.ts";
 import EventDispatcher from "../utils/EventDispatcher.ts";
 import { DisplayColorRGB, DisplayColorRGBOrString } from "../utils/DisplayUtils.ts";
 export declare const LedTypes: readonly ["digitalSingle", "analogSingle", "digitalRGB", "analogRGB"];
@@ -29,7 +29,7 @@ export interface LedEventMessages {
         led: Led;
     };
 }
-export type SendLedMessageCallback = SendMessageCallback<LedMessageType>;
+export type SendLedMessagesCallback = SendMessagesCallback<LedMessageType>;
 export type LedEventDispatcher = EventDispatcher<Device, LedEventType, LedEventMessages>;
 interface LedColorConfiguration {
     index: number;
@@ -43,7 +43,7 @@ export type LedConfiguration = LedColorConfiguration | LedBrightnessConfiguratio
 declare class LedManager {
     #private;
     constructor();
-    sendMessage: SendLedMessageCallback;
+    sendMessages: SendLedMessagesCallback;
     eventDispatcher: LedEventDispatcher;
     get waitForEvent(): <T extends "getLedInformation" | "setLeds" | "clearLeds" | "setLed">(type: T, options?: {
         immediate?: boolean;

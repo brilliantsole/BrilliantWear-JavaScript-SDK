@@ -17,7 +17,7 @@ import { ConnectionManager } from "./connection/ConnectionManager.ts";
 import { isInBrowser, isInNode } from "./utils/environment.ts";
 import WebBluetoothConnectionManager from "./connection/bluetooth/WebBluetoothConnectionManager.ts";
 import SensorConfigurationManager, {
-  SendSensorConfigurationMessageCallback,
+  SendSensorConfigurationMessagesCallback,
   SensorConfiguration,
   SensorConfigurationEventDispatcher,
   SensorConfigurationEventMessages,
@@ -42,7 +42,7 @@ import SensorDataManager, {
   RequiredSensorMetaDataMessageTypes,
 } from "./sensor/SensorDataManager.ts";
 import VibrationManager, {
-  SendVibrationMessageCallback,
+  SendVibrationMessagesCallback,
   VibrationConfiguration,
   VibrationEventDispatcher,
   VibrationEventTypes,
@@ -53,7 +53,7 @@ import FileTransferManager, {
   FileTransferEventTypes,
   FileTransferEventMessages,
   FileTransferEventDispatcher,
-  SendFileTransferMessageCallback,
+  SendFileTransferMessagesCallback,
   FileTransferMessageTypes,
   FileTransferMessageType,
   FileType,
@@ -68,7 +68,7 @@ import TfliteManager, {
   TfliteEventTypes,
   TfliteEventMessages,
   TfliteEventDispatcher,
-  SendTfliteMessageCallback,
+  SendTfliteMessagesCallback,
   TfliteMessageTypes,
   TfliteMessageType,
   TfliteSensorTypes,
@@ -97,7 +97,7 @@ import InformationManager, {
   InformationMessageType,
   InformationMessageTypes,
   InformationEventMessages,
-  SendInformationMessageCallback,
+  SendInformationMessagesCallback,
 } from "./InformationManager.ts";
 import { FileLike } from "./utils/ArrayBufferUtils.ts";
 import CameraManager, {
@@ -107,7 +107,7 @@ import CameraManager, {
   CameraMessageType,
   CameraMessageTypes,
   RequiredCameraMessageTypes,
-  SendCameraMessageCallback,
+  SendCameraMessagesCallback,
 } from "./CameraManager.ts";
 import MicrophoneManager, {
   MicrophoneEventDispatcher,
@@ -116,7 +116,7 @@ import MicrophoneManager, {
   MicrophoneMessageType,
   MicrophoneMessageTypes,
   RequiredMicrophoneMessageTypes,
-  SendMicrophoneMessageCallback,
+  SendMicrophoneMessagesCallback,
 } from "./MicrophoneManager.ts";
 import DisplayManager, {
   DisplayEventDispatcher,
@@ -125,11 +125,11 @@ import DisplayManager, {
   DisplayMessageType,
   DisplayMessageTypes,
   RequiredDisplayMessageTypes,
-  SendDisplayMessageCallback,
+  SendDisplayMessagesCallback,
 } from "./DisplayManager.ts";
 import WifiManager, {
   RequiredWifiMessageTypes,
-  SendWifiMessageCallback,
+  SendWifiMessagesCallback,
   WifiEventDispatcher,
   WifiEventMessages,
   WifiEventTypes,
@@ -148,7 +148,7 @@ import LedManager, {
   LedEventTypes,
   LedMessageType,
   LedMessageTypes,
-  SendLedMessageCallback,
+  SendLedMessagesCallback,
 } from "./led/LedManager.ts";
 
 const _console = createConsole("Device", { log: false });
@@ -198,7 +198,7 @@ export interface DeviceEventMessages
   };
 }
 
-export type SendMessageCallback<MessageType extends string> = (
+export type SendMessagesCallback<MessageType extends string> = (
   messages?: { type: MessageType; data?: ArrayBuffer }[],
   sendImmediately?: boolean,
 ) => Promise<void>;
@@ -262,13 +262,13 @@ class Device {
     this.#deviceInformationManager.eventDispatcher = this
       .#eventDispatcher as DeviceInformationEventDispatcher;
 
-    this._informationManager.sendMessage = this
-      .sendTxMessages as SendInformationMessageCallback;
+    this._informationManager.sendMessages = this
+      .sendTxMessages as SendInformationMessagesCallback;
     this._informationManager.eventDispatcher = this
       .#eventDispatcher as InformationEventDispatcher;
 
-    this.#sensorConfigurationManager.sendMessage = this
-      .sendTxMessages as SendSensorConfigurationMessageCallback;
+    this.#sensorConfigurationManager.sendMessages = this
+      .sendTxMessages as SendSensorConfigurationMessagesCallback;
     this.#sensorConfigurationManager.eventDispatcher = this
       .#eventDispatcher as SensorConfigurationEventDispatcher;
 
@@ -276,42 +276,44 @@ class Device {
       .#eventDispatcher as SensorDataEventDispatcher &
       SensorMetaDataEventDispatcher;
 
-    this.#vibrationManager.sendMessage = this
-      .sendTxMessages as SendVibrationMessageCallback;
+    this.#vibrationManager.sendMessages = this
+      .sendTxMessages as SendVibrationMessagesCallback;
     this.#vibrationManager.eventDispatcher = this
       .#eventDispatcher as VibrationEventDispatcher;
 
-    this.#tfliteManager.sendMessage = this
-      .sendTxMessages as SendTfliteMessageCallback;
+    this.#tfliteManager.sendMessages = this
+      .sendTxMessages as SendTfliteMessagesCallback;
     this.#tfliteManager.eventDispatcher = this
       .#eventDispatcher as TfliteEventDispatcher;
+    this.#tfliteManager.sendFile = this.#fileTransferManager
+      .send as SendFileCallback;
     this.#tfliteManager.onParseFile = this.#fileTransferManager
       .onParseFile as OnParseFileCallback;
 
-    this.#fileTransferManager.sendMessage = this
-      .sendTxMessages as SendFileTransferMessageCallback;
+    this.#fileTransferManager.sendMessages = this
+      .sendTxMessages as SendFileTransferMessagesCallback;
     this.#fileTransferManager.eventDispatcher = this
       .#eventDispatcher as FileTransferEventDispatcher;
     this.#fileTransferManager.onFileConfiguration =
       this.#onFileConfiguration.bind(this) as OnFileConfigurationCallback;
 
-    this.#wifiManager.sendMessage = this
-      .sendTxMessages as SendWifiMessageCallback;
+    this.#wifiManager.sendMessages = this
+      .sendTxMessages as SendWifiMessagesCallback;
     this.#wifiManager.eventDispatcher = this
       .#eventDispatcher as WifiEventDispatcher;
 
-    this.#cameraManager.sendMessage = this
-      .sendTxMessages as SendCameraMessageCallback;
+    this.#cameraManager.sendMessages = this
+      .sendTxMessages as SendCameraMessagesCallback;
     this.#cameraManager.eventDispatcher = this
       .#eventDispatcher as CameraEventDispatcher;
 
-    this.#microphoneManager.sendMessage = this
-      .sendTxMessages as SendMicrophoneMessageCallback;
+    this.#microphoneManager.sendMessages = this
+      .sendTxMessages as SendMicrophoneMessagesCallback;
     this.#microphoneManager.eventDispatcher = this
       .#eventDispatcher as MicrophoneEventDispatcher;
 
-    this.#displayManager.sendMessage = this
-      .sendTxMessages as SendDisplayMessageCallback;
+    this.#displayManager.sendMessages = this
+      .sendTxMessages as SendDisplayMessagesCallback;
     this.#displayManager.eventDispatcher = this
       .#eventDispatcher as DisplayEventDispatcher;
     this.#displayManager.sendFile = this.#fileTransferManager
@@ -319,12 +321,12 @@ class Device {
     this.#displayManager.onParseFile = this.#fileTransferManager
       .onParseFile as OnParseFileCallback;
 
-    this.#ledManager.sendMessage = this
-      .sendTxMessages as SendLedMessageCallback;
+    this.#ledManager.sendMessages = this
+      .sendTxMessages as SendLedMessagesCallback;
     this.#ledManager.eventDispatcher = this
       .#eventDispatcher as LedEventDispatcher;
 
-    this.#firmwareManager.sendMessage = this
+    this.#firmwareManager.sendMessages = this
       .sendSmpMessage as SendSmpMessageCallback;
     this.#firmwareManager.eventDispatcher = this
       .#eventDispatcher as FirmwareEventDispatcher;
@@ -1458,21 +1460,6 @@ class Device {
       return true;
     });
   }
-  get fileLength() {
-    return this.#fileTransferManager.length;
-  }
-  get fileChecksum() {
-    return this.#fileTransferManager.checksum;
-  }
-  get fileType() {
-    return this.#fileTransferManager.type;
-  }
-  get fileBytesTransferred() {
-    return this.#fileTransferManager.bytesTransferred;
-  }
-  get fileHeaderLength() {
-    return this.#fileTransferManager.headerLength;
-  }
 
   async sendFile(fileType: FileType, file: FileLike) {
     _console.assertWithError(
@@ -1521,23 +1508,8 @@ class Device {
     return this.#tfliteManager.setName;
   }
 
-  async sendTfliteConfiguration(configuration: TfliteFileConfiguration) {
-    configuration.fileType = "tflite";
-    _console.log("sendTfliteConfiguration", configuration);
-    this.#tfliteManager.sendConfiguration(configuration, false);
-    const didSendFile = await this.#fileTransferManager.send(
-      configuration.fileType,
-      configuration.file,
-    );
-    _console.log({ didSendFile });
-    if (!didSendFile) {
-      this.#sendTxMessages();
-      if (this.tfliteIsReady) {
-        this.#dispatchEvent("tfliteIsReady", {
-          tfliteIsReady: this.tfliteIsReady,
-        });
-      }
-    }
+  get uploadTfliteModel() {
+    return this.#tfliteManager.uploadModel;
   }
 
   get tfliteClasses() {

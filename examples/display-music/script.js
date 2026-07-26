@@ -1330,7 +1330,7 @@ fetch("./kickStompTap.tflite")
 
 insoleDevice.addEventListener("connected", () => {
   if (insoleDevice.isInsole) {
-    insoleDevice.sendTfliteConfiguration(tfliteConfiguration);
+    insoleDevice.uploadTfliteModel(tfliteConfiguration);
   } else {
     console.error(`expected insole, got ${insoleDevice.type}`);
     insoleDevice.disconnect();

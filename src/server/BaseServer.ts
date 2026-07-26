@@ -2351,70 +2351,74 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                 device._onRemoteConnectionMessageSent(messageType, dataView);
                 return;
               } else {
-                if (isDeviceConnectedDirectly) {
-                  const { fileBytesTransferred } = device;
-                  const fileHeaderLength =
-                    device._fileTransferManager.indirectSentBlocks.length == 0
-                      ? dataView.getUint16(0, true)
-                      : device.fileHeaderLength!;
+                const fileBytesTransferred =
+                  device._fileTransferManager.bytesTransferred;
+                const fileHeaderLength =
+                  device._fileTransferManager.indirectSentBlocks.length == 0
+                    ? dataView.getUint16(0, true)
+                    : device._fileTransferManager.headerLength!;
 
-                  const headerBytesRemaining = Math.max(
-                    0,
-                    fileHeaderLength - fileBytesTransferred,
-                  );
-                  const didSendHeader = headerBytesRemaining == 0;
-                  _console.log({
-                    fileBytesTransferred,
-                    fileHeaderLength,
-                    headerBytesRemaining,
-                    didSendHeader,
-                  });
+                const headerBytesRemaining = Math.max(
+                  0,
+                  fileHeaderLength - fileBytesTransferred,
+                );
+                const didSendHeader = headerBytesRemaining == 0;
+                _console.log({
+                  fileBytesTransferred,
+                  fileHeaderLength,
+                  headerBytesRemaining,
+                  didSendHeader,
+                });
 
-                  const data = message.data as DataView;
+                const data = message.data as DataView;
 
-                  const nonHeaderData = data.buffer.slice(headerBytesRemaining);
-                  _console.log("nonHeaderData", nonHeaderData);
+                const nonHeaderData = data.buffer.slice(headerBytesRemaining);
+                _console.log("nonHeaderData", nonHeaderData);
 
-                  if (nonHeaderData.byteLength > 0) {
+                if (
+                  nonHeaderData.byteLength > 0 ||
+                  !isDeviceConnectedDirectly
+                ) {
+                  if (isDeviceConnectedDirectly) {
                     _console.log("relaying nonHeaderData", nonHeaderData);
                     message.data = nonHeaderData;
-                    device.addEventListener(
-                      "fileBytesTransferred",
-                      (event) => {
-                        let { bytesTransferred } = event.message;
-
-                        bytesTransferred += device.fileHeaderLength!;
-                        _console.log(
-                          `relaying bytesTransferred ${bytesTransferred} (+${device.fileHeaderLength!})`,
-                        );
-
-                        const fileBytesTransferredDeviceMessage =
-                          this.#createDeviceMessage(
-                            device,
-                            "fileBytesTransferred",
-                            valueToUInt32DataView(bytesTransferred, true),
-                          );
-
-                        this.sendToClient(
-                          client,
-                          this.#createDeviceServerMessage(
-                            device,
-                            fileBytesTransferredDeviceMessage,
-                          ),
-                        );
-                      },
-                      { once: true },
-                    );
-                  } else {
-                    _console.log(
-                      "nonHeaderData is empty - parsing client file block locally",
-                    );
-                    device._onRemoteConnectionMessageSent(
-                      messageType,
-                      dataView,
-                    );
-                    return;
                   }
+                  device.addEventListener(
+                    "fileBytesTransferred",
+                    (event) => {
+                      let { bytesTransferred } = event.message;
+
+                      if (isDeviceConnectedDirectly) {
+                        bytesTransferred +=
+                          device._fileTransferManager.headerLength!;
+                      }
+                      _console.log(
+                        `relaying bytesTransferred ${bytesTransferred} (+${device._fileTransferManager.headerLength!})`,
+                      );
+
+                      const fileBytesTransferredDeviceMessage =
+                        this.#createDeviceMessage(
+                          device,
+                          "fileBytesTransferred",
+                          valueToUInt32DataView(bytesTransferred, true),
+                        );
+
+                      this.sendToClient(
+                        client,
+                        this.#createDeviceServerMessage(
+                          device,
+                          fileBytesTransferredDeviceMessage,
+                        ),
+                      );
+                    },
+                    { once: true },
+                  );
+                } else {
+                  _console.log(
+                    "nonHeaderData is empty - parsing client file block locally",
+                  );
+                  device._onRemoteConnectionMessageSent(messageType, dataView);
+                  return;
                 }
               }
               sentToDevice = true;

@@ -1,8 +1,8 @@
 import * as BS from "../../build/brilliantsole.module.js";
 window.BS = BS;
 
-BS.setConsoleLevelFlagsForType("DisplayManager", { log: true });
-BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
+// BS.setConsoleLevelFlagsForType("DisplayManager", { log: true });
+// BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
 // BS.setConsoleLevelFlagsForType("DisplayContextState", { log: true });
 // BS.setConsoleLevelFlagsForType("Device", { log: true });
 
@@ -606,7 +606,7 @@ glovesIframe.addEventListener("load", () => {
   gloveIframe.style.height = "100%";
   gloveIframe.scrollIntoView();
 
-  glovesIframe.contentWindow.setIsCursorEnabled(true);
+  // glovesIframe.contentWindow.setIsCursorEnabled(true);
 });
 
 window.movementScalar = 1;
@@ -1329,7 +1329,7 @@ const setMode = (newMode) => {
 };
 scene.addEventListener("loaded", () => {
   setTimeout(() => {
-    setMode("glove");
+    setMode("punch");
   });
 });
 

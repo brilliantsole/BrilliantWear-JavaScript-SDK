@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import {
   concatenateArrayBuffers,
   valueToUInt8ArrayBuffer,
@@ -317,8 +317,8 @@ export type DisplayEventDispatcher = EventDispatcher<
   DisplayEventType,
   DisplayEventMessages
 >;
-export type SendDisplayMessageCallback =
-  SendMessageCallback<DisplayMessageType>;
+export type SendDisplayMessagesCallback =
+  SendMessagesCallback<DisplayMessageType>;
 
 export const MinSpriteSheetNameLength = 1;
 export const MaxSpriteSheetNameLength = 30;
@@ -356,7 +356,7 @@ class DisplayManager implements DisplayManagerInterface {
     autoBind(this);
   }
 
-  sendMessage!: SendDisplayMessageCallback;
+  sendMessages!: SendDisplayMessagesCallback;
 
   eventDispatcher!: DisplayEventDispatcher;
   get #dispatchEvent() {
@@ -371,7 +371,7 @@ class DisplayManager implements DisplayManagerInterface {
     const messages = RequiredDisplayMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, false);
+    this.sendMessages(messages, false);
   }
 
   // IS DISPLAY AVAILABLE
@@ -505,7 +505,7 @@ class DisplayManager implements DisplayManagerInterface {
     _console.log(`setting command "${command}"`);
     const commandEnum = DisplayCommands.indexOf(command);
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "displayCommand",
@@ -676,7 +676,7 @@ class DisplayManager implements DisplayManagerInterface {
     );
 
     const promise = this.waitForEvent("getDisplayBrightness");
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setDisplayBrightness", data: newDisplayBrightnessData }],
       sendImmediately,
     );
@@ -803,7 +803,7 @@ class DisplayManager implements DisplayManagerInterface {
           data,
           contextCommandBufferCommands,
         );
-        await this.sendMessage(
+        await this.sendMessages(
           [{ type: "displayContextCommands", data }],
           true,
         );
@@ -3627,7 +3627,7 @@ class DisplayManager implements DisplayManagerInterface {
     _console.log({ setSpriteSheetNameData });
 
     const promise = this.waitForEvent("getDisplaySpriteSheetName");
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setDisplaySpriteSheetName",

@@ -1,5 +1,5 @@
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import { createConsole } from "./utils/Console.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
@@ -56,15 +56,15 @@ export type InformationEventDispatcher = EventDispatcher<
   InformationEventType,
   InformationEventMessages
 >;
-export type SendInformationMessageCallback =
-  SendMessageCallback<InformationMessageType>;
+export type SendInformationMessagesCallback =
+  SendMessagesCallback<InformationMessageType>;
 
 class InformationManager {
   constructor() {
     autoBind(this);
   }
 
-  sendMessage!: SendInformationMessageCallback;
+  sendMessages!: SendInformationMessagesCallback;
 
   eventDispatcher!: InformationEventDispatcher;
   get #dispatchEvent() {
@@ -94,7 +94,7 @@ class InformationManager {
   async getBatteryCurrent() {
     _console.log("getting battery current...");
     const promise = this.waitForEvent("getBatteryCurrent");
-    this.sendMessage([{ type: "getBatteryCurrent" }]);
+    this.sendMessages([{ type: "getBatteryCurrent" }]);
     await promise;
   }
   #updateBatteryCurrent(updatedBatteryCurrent: number) {
@@ -140,7 +140,7 @@ class InformationManager {
     _console.log({ setNameData });
 
     const promise = this.waitForEvent("getName");
-    this.sendMessage([{ type: "setName", data: setNameData.buffer }]);
+    this.sendMessages([{ type: "setName", data: setNameData.buffer }]);
     await promise;
   }
 
@@ -176,7 +176,7 @@ class InformationManager {
   async setType(newType: DeviceType) {
     this.#assertValidDeviceType(newType);
     const promise = this.waitForEvent("getType");
-    this.sendMessage([
+    this.sendMessages([
       { type: "setType", data: enumToArrayBuffer(DeviceTypes, newType) },
     ]);
     await promise;
@@ -274,7 +274,7 @@ class InformationManager {
     const dataView = new DataView(new ArrayBuffer(8));
     dataView.setBigUint64(0, BigInt(now), true);
     const promise = this.waitForEvent("getCurrentTime");
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setCurrentTime", data: dataView.buffer }],
       sendImmediately,
     );

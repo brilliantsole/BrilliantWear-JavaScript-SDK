@@ -1,5 +1,5 @@
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 export declare const DeviceTypes: readonly ["leftInsole", "rightInsole", "leftGlove", "rightGlove", "glasses", "generic"];
 export type DeviceType = (typeof DeviceTypes)[number];
@@ -35,11 +35,11 @@ export interface InformationEventMessages {
     };
 }
 export type InformationEventDispatcher = EventDispatcher<Device, InformationEventType, InformationEventMessages>;
-export type SendInformationMessageCallback = SendMessageCallback<InformationMessageType>;
+export type SendInformationMessagesCallback = SendMessagesCallback<InformationMessageType>;
 declare class InformationManager {
     #private;
     constructor();
-    sendMessage: SendInformationMessageCallback;
+    sendMessages: SendInformationMessagesCallback;
     eventDispatcher: InformationEventDispatcher;
     get waitForEvent(): <T extends "isCharging" | "getBatteryCurrent" | "getMtu" | "getId" | "getName" | "setName" | "getType" | "setType" | "getCurrentTime" | "setCurrentTime">(type: T, options?: {
         immediate?: boolean;
@@ -51,7 +51,7 @@ declare class InformationManager {
     get name(): string;
     updateName(updatedName: string): void;
     setName(newName: string): Promise<void>;
-    get type(): "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "generic";
+    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses";
     get typeEnum(): number;
     updateType(updatedType: DeviceType): void;
     setType(newType: DeviceType): Promise<void>;

@@ -6,11 +6,12 @@ import { arrayWithoutDuplicates } from "./utils/ArrayUtils.ts";
 import { SensorRateStep } from "./sensor/SensorConfigurationManager.ts";
 import { parseTimestamp } from "./utils/MathUtils.ts";
 import { SensorType } from "./sensor/SensorDataManager.ts";
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import autoBind from "auto-bind";
 import {
   BaseFileConfiguration,
   OnParseFileCallback,
+  SendFileCallback,
 } from "./FileTransferManager.ts";
 import { valueToUInt8ArrayBuffer } from "./utils/ArrayBufferUtils.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
@@ -80,7 +81,8 @@ export type TfliteEventDispatcher = EventDispatcher<
   TfliteEventType,
   TfliteEventMessages
 >;
-export type SendTfliteMessageCallback = SendMessageCallback<TfliteMessageType>;
+export type SendTfliteMessagesCallback =
+  SendMessagesCallback<TfliteMessageType>;
 
 export const TfliteSensorTypes = [
   "pressure",
@@ -108,7 +110,8 @@ class TfliteManager {
     autoBind(this);
   }
 
-  sendMessage!: SendTfliteMessageCallback;
+  sendMessages!: SendTfliteMessagesCallback;
+  sendFile!: SendFileCallback;
   onParseFile!: OnParseFileCallback;
 
   #assertValidTask(task: TfliteTask) {
@@ -170,7 +173,7 @@ class TfliteManager {
     const promise = this.waitForEvent("getTfliteName");
 
     const setNameData = textEncoder.encode(newName);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setTfliteName", data: setNameData.buffer }],
       sendImmediately,
     );
@@ -203,7 +206,7 @@ class TfliteManager {
 
     const promise = this.waitForEvent("getTfliteTask");
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setTfliteTask",
@@ -248,7 +251,7 @@ class TfliteManager {
 
     const dataView = new DataView(new ArrayBuffer(2));
     dataView.setUint16(0, newSampleRate, true);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setTfliteSampleRate", data: dataView.buffer }],
       sendImmediately,
     );
@@ -316,7 +319,7 @@ class TfliteManager {
       .map((sensorType) => SensorTypes.indexOf(sensorType))
       .sort();
     _console.log(newSensorTypes, newSensorTypeEnums);
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setTfliteSensorTypes",
@@ -389,7 +392,7 @@ class TfliteManager {
 
     const dataView = new DataView(new ArrayBuffer(2));
     dataView.setUint16(0, newCaptureDelay, true);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setTfliteCaptureDelay", data: dataView.buffer }],
       sendImmediately,
     );
@@ -426,7 +429,7 @@ class TfliteManager {
 
     const dataView = new DataView(new ArrayBuffer(4));
     dataView.setFloat32(0, newThreshold, true);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setTfliteThreshold", data: dataView.buffer }],
       sendImmediately,
     );
@@ -468,7 +471,7 @@ class TfliteManager {
 
     const promise = this.waitForEvent("getTfliteInferencingEnabled");
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setTfliteInferencingEnabled",
@@ -665,7 +668,14 @@ class TfliteManager {
     const messages = RequiredTfliteMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, false);
+    this.sendMessages(messages, false);
+  }
+
+  async uploadModel(configuration: TfliteFileConfiguration) {
+    configuration.fileType = "tflite";
+    _console.log("uploadModel", configuration);
+    this.sendConfiguration(configuration, false);
+    this.sendFile(configuration.fileType, configuration.file);
   }
 }
 

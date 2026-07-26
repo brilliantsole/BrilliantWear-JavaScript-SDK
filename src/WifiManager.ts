@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import { valueToUInt8ArrayBuffer } from "./utils/ArrayBufferUtils.ts";
 import { createConsole } from "./utils/Console.ts";
 import { isInNode } from "./utils/environment.ts";
@@ -54,14 +54,14 @@ export type WifiEventDispatcher = EventDispatcher<
   WifiEventType,
   WifiEventMessages
 >;
-export type SendWifiMessageCallback = SendMessageCallback<WifiMessageType>;
+export type SendWifiMessagesCallback = SendMessagesCallback<WifiMessageType>;
 
 class WifiManager {
   constructor() {
     autoBind(this);
   }
 
-  sendMessage!: SendWifiMessageCallback;
+  sendMessages!: SendWifiMessagesCallback;
 
   eventDispatcher!: WifiEventDispatcher;
   get #dispatchEvent() {
@@ -76,7 +76,7 @@ class WifiManager {
     const messages = RequiredWifiMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, false);
+    this.sendMessages(messages, false);
   }
 
   // PROPERTIES
@@ -130,7 +130,7 @@ class WifiManager {
     _console.log({ setWifiSSIDData });
 
     const promise = this.waitForEvent("getWifiSSID");
-    this.sendMessage([{ type: "setWifiSSID", data: setWifiSSIDData.buffer }]);
+    this.sendMessages([{ type: "setWifiSSID", data: setWifiSSIDData.buffer }]);
     await promise;
   }
 
@@ -168,7 +168,7 @@ class WifiManager {
     _console.log({ setWifiPasswordData });
 
     const promise = this.waitForEvent("getWifiPassword");
-    this.sendMessage([
+    this.sendMessages([
       { type: "setWifiPassword", data: setWifiPasswordData.buffer },
     ]);
     await promise;
@@ -201,7 +201,7 @@ class WifiManager {
 
     const promise = this.waitForEvent("getWifiConnectionEnabled");
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setWifiConnectionEnabled",

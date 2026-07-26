@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import { createConsole } from "./utils/Console.ts";
 import { isInBrowser, isInNode } from "./utils/environment.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
@@ -141,7 +141,8 @@ export type CameraEventDispatcher = EventDispatcher<
   CameraEventType,
   CameraEventMessages
 >;
-export type SendCameraMessageCallback = SendMessageCallback<CameraMessageType>;
+export type SendCameraMessagesCallback =
+  SendMessagesCallback<CameraMessageType>;
 
 export interface CameraImageFileConfiguration extends BaseFileConfiguration {
   fileType: "cameraImage";
@@ -152,7 +153,7 @@ class CameraManager {
     autoBind(this);
   }
 
-  sendMessage!: SendCameraMessageCallback;
+  sendMessages!: SendCameraMessagesCallback;
 
   eventDispatcher!: CameraEventDispatcher;
   get #dispatchEvent() {
@@ -167,7 +168,7 @@ class CameraManager {
     const messages = RequiredCameraMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, sendImmediately);
+    this.sendMessages(messages, sendImmediately);
   }
 
   // CAMERA STATUS
@@ -216,7 +217,7 @@ class CameraManager {
     const promise = this.waitForEvent("cameraStatus");
     _console.log(`setting command "${command}"`);
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "cameraCommand",
@@ -610,7 +611,7 @@ class CameraManager {
     _console.log({ setCameraConfigurationData });
 
     const promise = this.waitForEvent("getCameraConfiguration");
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setCameraConfiguration",

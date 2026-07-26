@@ -111,6 +111,7 @@ const availableDeviceContainerTemplate = document.getElementById(
 );
 BS.DeviceManager.addEventListener("availableDevice", (event) => {
   const { availableDevice: device } = event.message;
+  console.log("availableDevice", device);
 
   const availableDeviceContainer = availableDeviceContainerTemplate.content
     .cloneNode(true)
@@ -366,11 +367,10 @@ const createIframeContainer = (src) => {
   iframeContainers.appendChild(iframeContainer);
 };
 // createIframeContainer("../display-text");
-// createIframeContainer("../display-wireframe");
+createIframeContainer("../display-wireframe");
 // createIframeContainer("../display-midi");
 // createIframeContainer("../display-prompt");
 // createIframeContainer();
-createIframeContainer();
 window.createIframeContainer = createIframeContainer;
 
 BS.ServerManager.clientSensorConfigurationToDeviceGuardManager.add(

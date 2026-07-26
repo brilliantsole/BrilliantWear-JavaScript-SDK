@@ -133,7 +133,7 @@ for (let i = 0; i < 2; i++) {
     if (device.type != "generic") {
       return;
     }
-    device.sendTfliteConfiguration(kickConfiguration);
+    device.uploadTfliteModel(kickConfiguration);
   });
 
   // FILE TRANSFER

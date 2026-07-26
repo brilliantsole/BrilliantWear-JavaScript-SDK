@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 export declare const MinWifiSSIDLength = 1;
 export declare const MaxWifiSSIDLength = 32;
@@ -30,11 +30,11 @@ export interface WifiEventMessages {
     };
 }
 export type WifiEventDispatcher = EventDispatcher<Device, WifiEventType, WifiEventMessages>;
-export type SendWifiMessageCallback = SendMessageCallback<WifiMessageType>;
+export type SendWifiMessagesCallback = SendMessagesCallback<WifiMessageType>;
 declare class WifiManager {
     #private;
     constructor();
-    sendMessage: SendWifiMessageCallback;
+    sendMessages: SendWifiMessagesCallback;
     eventDispatcher: WifiEventDispatcher;
     get waitForEvent(): <T extends "isWifiAvailable" | "getWifiSSID" | "setWifiSSID" | "getWifiPassword" | "setWifiPassword" | "getWifiConnectionEnabled" | "setWifiConnectionEnabled" | "isWifiConnected" | "ipAddress" | "isWifiSecure">(type: T, options?: {
         immediate?: boolean;

@@ -57,7 +57,7 @@ export type FirmwareEventDispatcher = EventDispatcher<
 >;
 
 class FirmwareManager {
-  sendMessage!: SendSmpMessageCallback;
+  sendMessages!: SendSmpMessageCallback;
 
   constructor() {
     this.#assignMcuManagerCallbacks();
@@ -151,7 +151,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("firmwareImages");
 
     _console.log("getting firmware image state...");
-    this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageState()).buffer);
+    this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageState()).buffer);
 
     await promise;
   }
@@ -175,7 +175,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("smp");
 
     _console.log("testing firmware image...");
-    this.sendMessage(
+    this.sendMessages(
       Uint8Array.from(
         this.#mcuManager.cmdImageTest(this.#images[imageIndex].hash),
       ).buffer,
@@ -189,7 +189,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("smp");
 
     _console.log("erasing image...");
-    this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageErase()).buffer);
+    this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageErase()).buffer);
 
     this.#updateStatus("erasing");
 
@@ -208,7 +208,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("smp");
 
     _console.log("confirming image...");
-    this.sendMessage(
+    this.sendMessages(
       Uint8Array.from(
         this.#mcuManager.cmdImageConfirm(this.#images[imageIndex].hash),
       ).buffer,
@@ -223,7 +223,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("smp");
 
     _console.log("sending echo...");
-    this.sendMessage(Uint8Array.from(this.#mcuManager.smpEcho(string)).buffer);
+    this.sendMessages(Uint8Array.from(this.#mcuManager.smpEcho(string)).buffer);
 
     await promise;
   }
@@ -232,7 +232,7 @@ class FirmwareManager {
     const promise = this.waitForEvent("smp");
 
     _console.log("resetting...");
-    this.sendMessage(Uint8Array.from(this.#mcuManager.cmdReset()).buffer);
+    this.sendMessages(Uint8Array.from(this.#mcuManager.cmdReset()).buffer);
 
     await promise;
   }
@@ -340,7 +340,7 @@ class FirmwareManager {
 
   #onMcuImageUploadNext({ packet }: { packet: number[] }) {
     _console.log("onMcuImageUploadNext");
-    this.sendMessage(Uint8Array.from(packet).buffer);
+    this.sendMessages(Uint8Array.from(packet).buffer);
   }
   #onMcuImageUploadProgress({ percentage }: { percentage: number }) {
     const progress = percentage / 100;

@@ -1,5 +1,5 @@
 import { VibrationWaveformEffect } from "./VibrationWaveformEffects.ts";
-import Device, { SendMessageCallback } from "../Device.ts";
+import Device, { SendMessagesCallback } from "../Device.ts";
 import EventDispatcher from "../utils/EventDispatcher.ts";
 export declare const VibrationLocations: readonly ["front", "rear", "left", "right"];
 export type VibrationLocation = (typeof VibrationLocations)[number];
@@ -45,19 +45,19 @@ export interface VibrationWaveformConfiguration extends BaseVibrationConfigurati
     segments: VibrationWaveformSegment[];
 }
 export type VibrationConfiguration = VibrationWaveformEffectConfiguration | VibrationWaveformConfiguration;
-export type SendVibrationMessageCallback = SendMessageCallback<VibrationMessageType>;
+export type SendVibrationMessagesCallback = SendMessagesCallback<VibrationMessageType>;
 export type VibrationEventDispatcher = EventDispatcher<Device, VibrationEventType, VibrationEventMessages>;
 declare class VibrationManager {
     #private;
     constructor();
-    sendMessage: SendVibrationMessageCallback;
+    sendMessages: SendVibrationMessagesCallback;
     eventDispatcher: VibrationEventDispatcher;
     get waitForEvent(): <T extends "getVibrationLocations" | "triggerVibration">(type: T, options?: {
         immediate?: boolean;
     }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<Device, "getVibrationLocations" | "triggerVibration", VibrationEventMessages, T>>;
     triggerVibration(vibrationConfiguration: VibrationConfiguration, sendImmediately?: boolean): Promise<void>;
     triggerVibration(vibrationConfigurations: VibrationConfiguration[], sendImmediately?: boolean): Promise<void>;
-    get vibrationLocations(): ("left" | "right" | "front" | "rear")[];
+    get vibrationLocations(): ("right" | "left" | "front" | "rear")[];
     parseMessage(messageType: VibrationMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
 }
 export default VibrationManager;

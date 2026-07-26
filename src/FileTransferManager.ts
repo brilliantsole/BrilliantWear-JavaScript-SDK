@@ -5,7 +5,7 @@ import {
   getFileBuffer,
 } from "./utils/ArrayBufferUtils.ts";
 import { FileLike } from "./utils/ArrayBufferUtils.ts";
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import autoBind from "auto-bind";
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
@@ -152,8 +152,8 @@ export type FileTransferEventDispatcher = EventDispatcher<
   FileTransferEventType,
   FileTransferEventMessages
 >;
-export type SendFileTransferMessageCallback =
-  SendMessageCallback<FileTransferMessageType>;
+export type SendFileTransferMessagesCallback =
+  SendMessagesCallback<FileTransferMessageType>;
 
 export type SendFileCallback = (
   fileType: FileType,
@@ -173,7 +173,7 @@ class FileTransferManager {
   constructor() {
     autoBind(this);
   }
-  sendMessage!: SendFileTransferMessageCallback;
+  sendMessages!: SendFileTransferMessagesCallback;
 
   eventDispatcher!: FileTransferEventDispatcher;
   get addEventListener() {
@@ -310,7 +310,7 @@ class FileTransferManager {
       });
     }
 
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setFileType", data: enumToArrayBuffer(FileTypes, newType) }],
       sendImmediately,
     );
@@ -371,7 +371,7 @@ class FileTransferManager {
 
     const dataView = new DataView(new ArrayBuffer(4));
     dataView.setUint32(0, newLength, true);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setFileLength", data: dataView.buffer }],
       sendImmediately,
     );
@@ -430,7 +430,7 @@ class FileTransferManager {
 
     const dataView = new DataView(new ArrayBuffer(4));
     dataView.setUint32(0, newChecksum, true);
-    this.sendMessage(
+    this.sendMessages(
       [{ type: "setFileChecksum", data: dataView.buffer }],
       sendImmediately,
     );
@@ -468,7 +468,7 @@ class FileTransferManager {
     }
 
     _console.log(`setting command ${command}`);
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setFileTransferCommand",
@@ -607,7 +607,7 @@ class FileTransferManager {
         const dataView = new DataView(new ArrayBuffer(4));
         dataView.setUint32(0, bytesReceived, true);
         _console.log("sending fileBytesTransferred", { bytesReceived });
-        await this.sendMessage([
+        await this.sendMessages([
           { type: "fileBytesTransferred", data: dataView.buffer },
         ]);
       } else {
@@ -733,7 +733,7 @@ class FileTransferManager {
     promises.push(this.#setCommand("startSend", false));
     promises.push(this.waitForEvent("fileTransferStatus"));
 
-    this.sendMessage();
+    this.sendMessages();
 
     await Promise.all(promises);
 
@@ -937,7 +937,7 @@ class FileTransferManager {
 
     if (!isComplete) {
       this.#bytesTransferred = offset + slicedBuffer.byteLength;
-      await this.sendMessage([{ type: "setFileBlock", data: slicedBuffer }]);
+      await this.sendMessages([{ type: "setFileBlock", data: slicedBuffer }]);
     }
   }
 
@@ -1165,7 +1165,7 @@ class FileTransferManager {
     const messages = RequiredFileTransferMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, false);
+    this.sendMessages(messages, false);
   }
 
   clear() {

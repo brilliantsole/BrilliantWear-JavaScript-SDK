@@ -4,7 +4,7 @@ import SensorDataManager, {
   SensorType,
 } from "./SensorDataManager.ts";
 import EventDispatcher from "../utils/EventDispatcher.ts";
-import Device, { SendMessageCallback } from "../Device.ts";
+import Device, { SendMessagesCallback } from "../Device.ts";
 import autoBind from "../../node_modules/auto-bind/index.js";
 
 const _console = createConsole("SensorConfigurationManager", { log: false });
@@ -35,8 +35,8 @@ export type SensorConfigurationEventDispatcher = EventDispatcher<
   SensorConfigurationEventMessages
 >;
 
-export type SendSensorConfigurationMessageCallback =
-  SendMessageCallback<SensorConfigurationMessageType>;
+export type SendSensorConfigurationMessagesCallback =
+  SendMessagesCallback<SensorConfigurationMessageType>;
 
 export function parseSensorConfiguration(
   dataView: DataView<ArrayBuffer>,
@@ -113,7 +113,7 @@ class SensorConfigurationManager {
     autoBind(this);
   }
 
-  sendMessage!: SendSensorConfigurationMessageCallback;
+  sendMessages!: SendSensorConfigurationMessagesCallback;
 
   eventDispatcher!: SensorConfigurationEventDispatcher;
   get addEventListener() {
@@ -191,7 +191,7 @@ class SensorConfigurationManager {
     _console.log({ setSensorConfigurationData });
 
     const promise = this.waitForEvent("getSensorConfiguration");
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "setSensorConfiguration",

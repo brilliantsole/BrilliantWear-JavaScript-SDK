@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import { createConsole } from "./utils/Console.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import autoBind from "auto-bind";
@@ -105,15 +105,15 @@ export type MicrophoneEventDispatcher = EventDispatcher<
   MicrophoneEventType,
   MicrophoneEventMessages
 >;
-export type SendMicrophoneMessageCallback =
-  SendMessageCallback<MicrophoneMessageType>;
+export type SendMicrophoneMessagesCallback =
+  SendMessagesCallback<MicrophoneMessageType>;
 
 class MicrophoneManager {
   constructor() {
     autoBind(this);
   }
 
-  sendMessage!: SendMicrophoneMessageCallback;
+  sendMessages!: SendMicrophoneMessagesCallback;
 
   eventDispatcher!: MicrophoneEventDispatcher;
   get #dispatchEvent() {
@@ -128,7 +128,7 @@ class MicrophoneManager {
     const messages = RequiredMicrophoneMessageTypes.map((messageType) => ({
       type: messageType,
     }));
-    this.sendMessage(messages, false);
+    this.sendMessages(messages, false);
   }
 
   // MICROPHONE STATUS
@@ -167,7 +167,7 @@ class MicrophoneManager {
     const promise = this.waitForEvent("microphoneStatus");
     _console.log(`setting command "${command}"`);
 
-    this.sendMessage(
+    this.sendMessages(
       [
         {
           type: "microphoneCommand",
@@ -401,7 +401,7 @@ class MicrophoneManager {
     _console.log({ setMicrophoneConfigurationData });
 
     const promise = this.waitForEvent("getMicrophoneConfiguration");
-    this.sendMessage([
+    this.sendMessages([
       {
         type: "setMicrophoneConfiguration",
         data: setMicrophoneConfigurationData.buffer,

@@ -1,6 +1,6 @@
 import { createConsole } from "../utils/Console.ts";
 import { concatenateArrayBuffers } from "../utils/ArrayBufferUtils.ts";
-import Device, { SendMessageCallback } from "../Device.ts";
+import Device, { SendMessagesCallback } from "../Device.ts";
 import autoBind from "auto-bind";
 import EventDispatcher from "../utils/EventDispatcher.ts";
 import {
@@ -67,7 +67,7 @@ export interface LedEventMessages {
   };
 }
 
-export type SendLedMessageCallback = SendMessageCallback<LedMessageType>;
+export type SendLedMessagesCallback = SendMessagesCallback<LedMessageType>;
 
 export type LedEventDispatcher = EventDispatcher<
   Device,
@@ -91,7 +91,7 @@ class LedManager {
   constructor() {
     autoBind(this);
   }
-  sendMessage!: SendLedMessageCallback;
+  sendMessages!: SendLedMessagesCallback;
 
   eventDispatcher!: LedEventDispatcher;
   get #dispatchEvent() {
@@ -284,7 +284,7 @@ class LedManager {
       }
     });
 
-    await this.sendMessage(
+    await this.sendMessages(
       [{ type: "setLeds", data: setLedsData }],
       sendImmediately,
     );
@@ -296,7 +296,7 @@ class LedManager {
   async clearLeds(sendImmediately?: boolean) {
     _console.log("clearLeds");
     this.#pendingColors = this.#leds.map(() => blackColor);
-    await this.sendMessage([{ type: "clearLeds" }], sendImmediately);
+    await this.sendMessages([{ type: "clearLeds" }], sendImmediately);
   }
 
   // MESSAGE

@@ -3,7 +3,7 @@ window.BS = BS;
 console.log({ BS });
 //BS.setAllConsoleLevelFlags({ log: false });
 
-BS.setConsoleLevelFlagsForType("Device", { log: true });
+// BS.setConsoleLevelFlagsForType("Device", { log: true });
 
 /** @typedef {import("../utils/three/three.module.min").Vector2} TVector2 */
 /** @typedef {import("../utils/three/three.module.min").Vector3} TVector3 */

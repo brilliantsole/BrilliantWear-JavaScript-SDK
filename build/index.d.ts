@@ -1302,14 +1302,14 @@ interface FileTransferEventMessages {
     };
 }
 type FileTransferEventDispatcher = EventDispatcher<Device, FileTransferEventType, FileTransferEventMessages>;
-type SendFileTransferMessageCallback = SendMessageCallback<FileTransferMessageType>;
+type SendFileTransferMessagesCallback = SendMessagesCallback<FileTransferMessageType>;
 type SendFileCallback = (fileType: FileType, file: FileLike, includesHeader?: boolean) => Promise<boolean>;
 type OnParseFileCallback = (fileConfiguration: Partial<FileConfiguration>) => Promise<void>;
 type OnFileConfigurationCallback = (fileConfiguration: ExtendedFileConfiguration) => Promise<void>;
 declare class FileTransferManager {
     #private;
     constructor();
-    sendMessage: SendFileTransferMessageCallback;
+    sendMessages: SendFileTransferMessagesCallback;
     eventDispatcher: FileTransferEventDispatcher;
     get addEventListener(): <T extends "*" | "getFileTypes" | "maxFileLength" | "getFileType" | "setFileType" | "getFileLength" | "setFileLength" | "getFileChecksum" | "setFileChecksum" | "setFileTransferCommand" | "fileTransferStatus" | "getFileBlock" | "setFileBlock" | "fileBytesTransferred" | "fileTransferProgress" | "fileTransferComplete" | "fileReceived" | "fileSent">(type: T, listener: (event: ListenerEvent<Device, "getFileTypes" | "maxFileLength" | "getFileType" | "setFileType" | "getFileLength" | "setFileLength" | "getFileChecksum" | "setFileChecksum" | "setFileTransferCommand" | "fileTransferStatus" | "getFileBlock" | "setFileBlock" | "fileBytesTransferred" | "fileTransferProgress" | "fileTransferComplete" | "fileReceived" | "fileSent", FileTransferEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
     get removeEventListener(): <T extends "*" | "getFileTypes" | "maxFileLength" | "getFileType" | "setFileType" | "getFileLength" | "setFileLength" | "getFileChecksum" | "setFileChecksum" | "setFileTransferCommand" | "fileTransferStatus" | "getFileBlock" | "setFileBlock" | "fileBytesTransferred" | "fileTransferProgress" | "fileTransferComplete" | "fileReceived" | "fileSent">(type: T, listener: (event: ListenerEvent<Device, "getFileTypes" | "maxFileLength" | "getFileType" | "setFileType" | "getFileLength" | "setFileLength" | "getFileChecksum" | "setFileChecksum" | "setFileTransferCommand" | "fileTransferStatus" | "getFileBlock" | "setFileBlock" | "fileBytesTransferred" | "fileTransferProgress" | "fileTransferComplete" | "fileReceived" | "fileSent", FileTransferEventMessages, T>) => void) => void;
@@ -1700,7 +1700,7 @@ interface DisplayEventMessages {
     };
 }
 type DisplayEventDispatcher = EventDispatcher<Device, DisplayEventType, DisplayEventMessages>;
-type SendDisplayMessageCallback = SendMessageCallback<DisplayMessageType>;
+type SendDisplayMessagesCallback = SendMessagesCallback<DisplayMessageType>;
 declare const MinSpriteSheetNameLength = 1;
 declare const MaxSpriteSheetNameLength = 30;
 type DisplayBitmap = {
@@ -1717,7 +1717,7 @@ interface DisplaySpriteSheetFileConfiguration extends ExtendedFileConfiguration 
 declare class DisplayManager implements DisplayManagerInterface {
     #private;
     constructor();
-    sendMessage: SendDisplayMessageCallback;
+    sendMessages: SendDisplayMessagesCallback;
     eventDispatcher: DisplayEventDispatcher;
     get waitForEvent(): <T extends "isDisplayAvailable" | "displayStatus" | "displayInformation" | "displayCommand" | "getDisplayBrightness" | "setDisplayBrightness" | "displayContextCommands" | "displayReady" | "getDisplaySpriteSheetName" | "setDisplaySpriteSheetName" | "displaySpriteSheetIndex" | "displayContextState" | "displayColor" | "displayColorOpacity" | "displayOpacity" | "displaySpriteSheetUploadStart" | "displaySpriteSheetUploadProgress" | "displaySpriteSheetUploadComplete">(type: T, options?: {
         immediate?: boolean;
@@ -2414,7 +2414,7 @@ interface DeviceEventMessages extends ConnectionStatusEventMessages, DeviceInfor
         dataView: DataView<ArrayBuffer>;
     };
 }
-type SendMessageCallback<MessageType extends string> = (messages?: {
+type SendMessagesCallback<MessageType extends string> = (messages?: {
     type: MessageType;
     data?: ArrayBuffer;
 }[], sendImmediately?: boolean) => Promise<void>;
@@ -2523,11 +2523,6 @@ declare class Device {
     get fileTypes(): ("cameraImage" | "tflite" | "wifiServerCert" | "wifiServerKey" | "spriteSheet")[];
     get maxFileLength(): number;
     get validFileTypes(): ("cameraImage" | "tflite" | "wifiServerCert" | "wifiServerKey" | "spriteSheet")[];
-    get fileLength(): number;
-    get fileChecksum(): number;
-    get fileType(): "cameraImage" | "tflite" | "wifiServerCert" | "wifiServerKey" | "spriteSheet" | undefined;
-    get fileBytesTransferred(): number;
-    get fileHeaderLength(): number | undefined;
     sendFile(fileType: FileType, file: FileLike): Promise<boolean>;
     receiveFile(fileType: FileType): Promise<boolean>;
     get fileTransferStatus(): "sending" | "receiving" | "idle";
@@ -2536,7 +2531,7 @@ declare class Device {
     get isTfliteAvailable(): boolean;
     get tfliteName(): string;
     get setTfliteName(): (newName: string, sendImmediately?: boolean) => Promise<void>;
-    sendTfliteConfiguration(configuration: TfliteFileConfiguration): Promise<void>;
+    get uploadTfliteModel(): (configuration: TfliteFileConfiguration) => Promise<void>;
     get tfliteClasses(): string[] | undefined;
     get setTfliteClasses(): (newClasses?: string[]) => void;
     get tfliteTask(): "classification" | "regression";

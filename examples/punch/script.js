@@ -167,7 +167,7 @@ onCurrentDevice((device) => {
         return;
       }
       console.log("sending tflite");
-      device.sendTfliteConfiguration(punchConfiguration);
+      device.uploadTfliteModel(punchConfiguration);
     },
     { immediate: true },
   );

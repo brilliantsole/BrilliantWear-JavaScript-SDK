@@ -691,7 +691,7 @@ class FileTransferManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get addEventListener() {
         return this.eventDispatcher.addEventListener;
@@ -803,7 +803,7 @@ class FileTransferManager {
                 }, { signal: abortController.signal });
             });
         }
-        this.sendMessage([{ type: "setFileType", data: enumToArrayBuffer(FileTypes, newType) }], sendImmediately);
+        this.sendMessages([{ type: "setFileType", data: enumToArrayBuffer(FileTypes, newType) }], sendImmediately);
         await promise;
     }
     #length = 0;
@@ -849,7 +849,7 @@ class FileTransferManager {
         }
         const dataView = new DataView(new ArrayBuffer(4));
         dataView.setUint32(0, newLength, true);
-        this.sendMessage([{ type: "setFileLength", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setFileLength", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     #checksum = 0;
@@ -894,7 +894,7 @@ class FileTransferManager {
         }
         const dataView = new DataView(new ArrayBuffer(4));
         dataView.setUint32(0, newChecksum, true);
-        this.sendMessage([{ type: "setFileChecksum", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setFileChecksum", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     async #setCommand(command, sendImmediately) {
@@ -917,7 +917,7 @@ class FileTransferManager {
             });
         }
         _console$V.log(`setting command ${command}`);
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setFileTransferCommand",
                 data: enumToArrayBuffer(FileTransferCommands, command),
@@ -1030,7 +1030,7 @@ class FileTransferManager {
                 const dataView = new DataView(new ArrayBuffer(4));
                 dataView.setUint32(0, bytesReceived, true);
                 _console$V.log("sending fileBytesTransferred", { bytesReceived });
-                await this.sendMessage([
+                await this.sendMessages([
                     { type: "fileBytesTransferred", data: dataView.buffer },
                 ]);
             }
@@ -1130,7 +1130,7 @@ class FileTransferManager {
         promises.push(this.#setChecksum(checksum, false));
         promises.push(this.#setCommand("startSend", false));
         promises.push(this.waitForEvent("fileTransferStatus"));
-        this.sendMessage();
+        this.sendMessages();
         await Promise.all(promises);
         if (this.#pendingBufferWithHeader != fileBufferWithHeader) {
             _console$V.log("file uploaded early - exiting");
@@ -1293,7 +1293,7 @@ class FileTransferManager {
         });
         if (!isComplete) {
             this.#bytesTransferred = offset + slicedBuffer.byteLength;
-            await this.sendMessage([{ type: "setFileBlock", data: slicedBuffer }]);
+            await this.sendMessages([{ type: "setFileBlock", data: slicedBuffer }]);
         }
     }
     #createFile(buffer) {
@@ -1456,7 +1456,7 @@ class FileTransferManager {
         const messages = RequiredFileTransferMessageTypes.map((messageType) => ({
             type: messageType,
         }));
-        this.sendMessage(messages, false);
+        this.sendMessages(messages, false);
     }
     clear() {
         this.#receivedBlocks.length = 0;
@@ -2691,7 +2691,7 @@ class CameraManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -2704,7 +2704,7 @@ class CameraManager {
         const messages = RequiredCameraMessageTypes.map((messageType) => ({
             type: messageType,
         }));
-        this.sendMessage(messages, sendImmediately);
+        this.sendMessages(messages, sendImmediately);
     }
     #cameraStatus;
     get cameraStatus() {
@@ -2743,7 +2743,7 @@ class CameraManager {
         _console$N.log(`sending camera command "${command}"`);
         const promise = this.waitForEvent("cameraStatus");
         _console$N.log(`setting command "${command}"`);
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "cameraCommand",
                 data: enumToArrayBuffer(CameraCommands, command),
@@ -3062,7 +3062,7 @@ class CameraManager {
         const setCameraConfigurationData = this.#createData(newCameraConfiguration);
         _console$N.log({ setCameraConfigurationData });
         const promise = this.waitForEvent("getCameraConfiguration");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setCameraConfiguration",
                 data: setCameraConfigurationData.buffer,
@@ -3401,7 +3401,7 @@ class MicrophoneManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -3414,7 +3414,7 @@ class MicrophoneManager {
         const messages = RequiredMicrophoneMessageTypes.map((messageType) => ({
             type: messageType,
         }));
-        this.sendMessage(messages, false);
+        this.sendMessages(messages, false);
     }
     #microphoneStatus;
     get microphoneStatus() {
@@ -3444,7 +3444,7 @@ class MicrophoneManager {
         _console$M.log(`sending microphone command "${command}"`);
         const promise = this.waitForEvent("microphoneStatus");
         _console$M.log(`setting command "${command}"`);
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "microphoneCommand",
                 data: enumToArrayBuffer(MicrophoneCommands, command),
@@ -3610,7 +3610,7 @@ class MicrophoneManager {
         const setMicrophoneConfigurationData = this.#createData(newMicrophoneConfiguration);
         _console$M.log({ setMicrophoneConfigurationData });
         const promise = this.waitForEvent("getMicrophoneConfiguration");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setMicrophoneConfiguration",
                 data: setMicrophoneConfigurationData.buffer,
@@ -4125,7 +4125,7 @@ class SensorConfigurationManager {
     constructor() {
         autoBind(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get addEventListener() {
         return this.eventDispatcher.addEventListener;
@@ -4183,7 +4183,7 @@ class SensorConfigurationManager {
         const setSensorConfigurationData = serializeSensorConfiguration(newSensorConfiguration, this.availableSensorTypes);
         _console$J.log({ setSensorConfigurationData });
         const promise = this.waitForEvent("getSensorConfiguration");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setSensorConfiguration",
                 data: setSensorConfigurationData.buffer,
@@ -4294,7 +4294,8 @@ class TfliteManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
+    sendFile;
     onParseFile;
     #assertValidTask(task) {
         _console$I.assertEnumWithError(TfliteTasks, task);
@@ -4345,7 +4346,7 @@ class TfliteManager {
         }
         const promise = this.waitForEvent("getTfliteName");
         const setNameData = textEncoder.encode(newName);
-        this.sendMessage([{ type: "setTfliteName", data: setNameData.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setTfliteName", data: setNameData.buffer }], sendImmediately);
         await promise;
     }
     #task;
@@ -4371,7 +4372,7 @@ class TfliteManager {
             return;
         }
         const promise = this.waitForEvent("getTfliteTask");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setTfliteTask",
                 data: enumToArrayBuffer(TfliteTasks, newTask),
@@ -4406,7 +4407,7 @@ class TfliteManager {
         const promise = this.waitForEvent("getTfliteSampleRate");
         const dataView = new DataView(new ArrayBuffer(2));
         dataView.setUint16(0, newSampleRate, true);
-        this.sendMessage([{ type: "setTfliteSampleRate", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setTfliteSampleRate", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     static AssertValidSensorType(sensorType) {
@@ -4461,7 +4462,7 @@ class TfliteManager {
             .map((sensorType) => SensorTypes.indexOf(sensorType))
             .sort();
         _console$I.log(newSensorTypes, newSensorTypeEnums);
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setTfliteSensorTypes",
                 data: Uint8Array.from(newSensorTypeEnums).buffer,
@@ -4526,7 +4527,7 @@ class TfliteManager {
         const promise = this.waitForEvent("getTfliteCaptureDelay");
         const dataView = new DataView(new ArrayBuffer(2));
         dataView.setUint16(0, newCaptureDelay, true);
-        this.sendMessage([{ type: "setTfliteCaptureDelay", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setTfliteCaptureDelay", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     #threshold;
@@ -4553,7 +4554,7 @@ class TfliteManager {
         const promise = this.waitForEvent("getTfliteThreshold");
         const dataView = new DataView(new ArrayBuffer(4));
         dataView.setFloat32(0, newThreshold, true);
-        this.sendMessage([{ type: "setTfliteThreshold", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setTfliteThreshold", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     #inferencingEnabled;
@@ -4583,7 +4584,7 @@ class TfliteManager {
             return;
         }
         const promise = this.waitForEvent("getTfliteInferencingEnabled");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setTfliteInferencingEnabled",
                 data: valueToUInt8ArrayBuffer(Number(newInferencingEnabled)),
@@ -4734,7 +4735,13 @@ class TfliteManager {
         const messages = RequiredTfliteMessageTypes.map((messageType) => ({
             type: messageType,
         }));
-        this.sendMessage(messages, false);
+        this.sendMessages(messages, false);
+    }
+    async uploadModel(configuration) {
+        configuration.fileType = "tflite";
+        _console$I.log("uploadModel", configuration);
+        this.sendConfiguration(configuration, false);
+        this.sendFile(configuration.fileType, configuration.file);
     }
 }
 
@@ -4864,7 +4871,7 @@ class InformationManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -4889,7 +4896,7 @@ class InformationManager {
     async getBatteryCurrent() {
         _console$G.log("getting battery current...");
         const promise = this.waitForEvent("getBatteryCurrent");
-        this.sendMessage([{ type: "getBatteryCurrent" }]);
+        this.sendMessages([{ type: "getBatteryCurrent" }]);
         await promise;
     }
     #updateBatteryCurrent(updatedBatteryCurrent) {
@@ -4926,7 +4933,7 @@ class InformationManager {
         const setNameData = textEncoder.encode(newName);
         _console$G.log({ setNameData });
         const promise = this.waitForEvent("getName");
-        this.sendMessage([{ type: "setName", data: setNameData.buffer }]);
+        this.sendMessages([{ type: "setName", data: setNameData.buffer }]);
         await promise;
     }
     #type;
@@ -4952,7 +4959,7 @@ class InformationManager {
     async setType(newType) {
         this.#assertValidDeviceType(newType);
         const promise = this.waitForEvent("getType");
-        this.sendMessage([
+        this.sendMessages([
             { type: "setType", data: enumToArrayBuffer(DeviceTypes, newType) },
         ]);
         await promise;
@@ -5034,7 +5041,7 @@ class InformationManager {
         const dataView = new DataView(new ArrayBuffer(8));
         dataView.setBigUint64(0, BigInt(now), true);
         const promise = this.waitForEvent("getCurrentTime");
-        this.sendMessage([{ type: "setCurrentTime", data: dataView.buffer }], sendImmediately);
+        this.sendMessages([{ type: "setCurrentTime", data: dataView.buffer }], sendImmediately);
         await promise;
     }
     parseMessage(messageType, dataView, isSending) {
@@ -5239,7 +5246,7 @@ class VibrationManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -5436,7 +5443,7 @@ class VibrationManager {
             _console$F.log("empty triggerVibrationData");
             return;
         }
-        await this.sendMessage([{ type: "triggerVibration", data: triggerVibrationData }], sendImmediately);
+        await this.sendMessages([{ type: "triggerVibration", data: triggerVibrationData }], sendImmediately);
     }
     #vibrationLocations = [];
     get vibrationLocations() {
@@ -5500,7 +5507,7 @@ class WifiManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -5513,7 +5520,7 @@ class WifiManager {
         const messages = RequiredWifiMessageTypes.map((messageType) => ({
             type: messageType,
         }));
-        this.sendMessage(messages, false);
+        this.sendMessages(messages, false);
     }
     #isWifiAvailable = false;
     get isWifiAvailable() {
@@ -5553,7 +5560,7 @@ class WifiManager {
         const setWifiSSIDData = textEncoder.encode(newWifiSSID);
         _console$E.log({ setWifiSSIDData });
         const promise = this.waitForEvent("getWifiSSID");
-        this.sendMessage([{ type: "setWifiSSID", data: setWifiSSIDData.buffer }]);
+        this.sendMessages([{ type: "setWifiSSID", data: setWifiSSIDData.buffer }]);
         await promise;
     }
     #wifiPassword = "";
@@ -5581,7 +5588,7 @@ class WifiManager {
         const setWifiPasswordData = textEncoder.encode(newWifiPassword);
         _console$E.log({ setWifiPasswordData });
         const promise = this.waitForEvent("getWifiPassword");
-        this.sendMessage([
+        this.sendMessages([
             { type: "setWifiPassword", data: setWifiPasswordData.buffer },
         ]);
         await promise;
@@ -5605,7 +5612,7 @@ class WifiManager {
             return;
         }
         const promise = this.waitForEvent("getWifiConnectionEnabled");
-        this.sendMessage([
+        this.sendMessages([
             {
                 type: "setWifiConnectionEnabled",
                 data: valueToUInt8ArrayBuffer(Number(newWifiConnectionEnabled)),
@@ -13987,7 +13994,7 @@ let DisplayManager = (() => {
         constructor() {
             autoBind$1(this);
         }
-        sendMessage = __runInitializers(this, _instanceExtraInitializers);
+        sendMessages = __runInitializers(this, _instanceExtraInitializers);
         eventDispatcher;
         get #dispatchEvent() {
             return this.eventDispatcher.dispatchEvent;
@@ -14000,7 +14007,7 @@ let DisplayManager = (() => {
             const messages = RequiredDisplayMessageTypes.map((messageType) => ({
                 type: messageType,
             }));
-            this.sendMessage(messages, false);
+            this.sendMessages(messages, false);
         }
         #isAvailable = false;
         get isAvailable() {
@@ -14099,7 +14106,7 @@ let DisplayManager = (() => {
             const promise = this.waitForEvent("displayStatus");
             _console$u.log(`setting command "${command}"`);
             const commandEnum = DisplayCommands.indexOf(command);
-            this.sendMessage([
+            this.sendMessages([
                 {
                     type: "displayCommand",
                     data: valueToUInt8ArrayBuffer(commandEnum),
@@ -14222,7 +14229,7 @@ let DisplayManager = (() => {
             const newDisplayBrightnessEnum = DisplayBrightnesses.indexOf(newDisplayBrightness);
             const newDisplayBrightnessData = valueToUInt8ArrayBuffer(newDisplayBrightnessEnum);
             const promise = this.waitForEvent("getDisplayBrightness");
-            this.sendMessage([{ type: "setDisplayBrightness", data: newDisplayBrightnessData }], sendImmediately);
+            this.sendMessages([{ type: "setDisplayBrightness", data: newDisplayBrightnessData }], sendImmediately);
             await promise;
         }
         getMaxCommandDataLength(single) {
@@ -14299,7 +14306,7 @@ let DisplayManager = (() => {
                 if (contextCommandBuffers.length > 0) {
                     const data = concatenateArrayBuffers(contextCommandBuffers);
                     _console$u.log("sending displayContextCommands buffers", contextCommandBuffers.slice(), data, contextCommandBufferCommands);
-                    await this.sendMessage([{ type: "displayContextCommands", data }], true);
+                    await this.sendMessages([{ type: "displayContextCommands", data }], true);
                 }
                 this.#isSendingContextCommands = false;
             }
@@ -15701,7 +15708,7 @@ let DisplayManager = (() => {
             const setSpriteSheetNameData = textEncoder.encode(spriteSheetName);
             _console$u.log({ setSpriteSheetNameData });
             const promise = this.waitForEvent("getDisplaySpriteSheetName");
-            this.sendMessage([
+            this.sendMessages([
                 {
                     type: "setDisplaySpriteSheetName",
                     data: setSpriteSheetNameData.buffer,
@@ -16184,7 +16191,7 @@ class LedManager {
     constructor() {
         autoBind$1(this);
     }
-    sendMessage;
+    sendMessages;
     eventDispatcher;
     get #dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -16333,7 +16340,7 @@ class LedManager {
                 _console$t.log("redundant color - skipping");
             }
         });
-        await this.sendMessage([{ type: "setLeds", data: setLedsData }], sendImmediately);
+        await this.sendMessages([{ type: "setLeds", data: setLedsData }], sendImmediately);
     }
     async setLed(ledConfiguration, sendImmediately) {
         _console$t.log("setLed", ledConfiguration, { sendImmediately });
@@ -16342,7 +16349,7 @@ class LedManager {
     async clearLeds(sendImmediately) {
         _console$t.log("clearLeds");
         this.#pendingColors = this.#leds.map(() => blackColor);
-        await this.sendMessage([{ type: "clearLeds" }], sendImmediately);
+        await this.sendMessages([{ type: "clearLeds" }], sendImmediately);
     }
     parseMessage(messageType, dataView, isSending) {
         _console$t.log({ messageType, isSending }, dataView);
@@ -17873,7 +17880,7 @@ const FirmwareStatuses = [
     "erasing",
 ];
 class FirmwareManager {
-    sendMessage;
+    sendMessages;
     constructor() {
         this.#assignMcuManagerCallbacks();
         autoBind$1(this);
@@ -17941,7 +17948,7 @@ class FirmwareManager {
     async getImages() {
         const promise = this.waitForEvent("firmwareImages");
         _console$m.log("getting firmware image state...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageState()).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageState()).buffer);
         await promise;
     }
     async testImage(imageIndex = 1) {
@@ -17961,14 +17968,14 @@ class FirmwareManager {
         }
         const promise = this.waitForEvent("smp");
         _console$m.log("testing firmware image...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageTest(this.#images[imageIndex].hash)).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageTest(this.#images[imageIndex].hash)).buffer);
         await promise;
     }
     async eraseImage() {
         this.#assertImages();
         const promise = this.waitForEvent("smp");
         _console$m.log("erasing image...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageErase()).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageErase()).buffer);
         this.#updateStatus("erasing");
         await promise;
         await this.getImages();
@@ -17982,20 +17989,20 @@ class FirmwareManager {
         }
         const promise = this.waitForEvent("smp");
         _console$m.log("confirming image...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.cmdImageConfirm(this.#images[imageIndex].hash)).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.cmdImageConfirm(this.#images[imageIndex].hash)).buffer);
         await promise;
     }
     async echo(string) {
         _console$m.assertTypeWithError(string, "string");
         const promise = this.waitForEvent("smp");
         _console$m.log("sending echo...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.smpEcho(string)).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.smpEcho(string)).buffer);
         await promise;
     }
     async reset() {
         const promise = this.waitForEvent("smp");
         _console$m.log("resetting...");
-        this.sendMessage(Uint8Array.from(this.#mcuManager.cmdReset()).buffer);
+        this.sendMessages(Uint8Array.from(this.#mcuManager.cmdReset()).buffer);
         await promise;
     }
     #mtu;
@@ -18065,7 +18072,7 @@ class FirmwareManager {
     }
     #onMcuImageUploadNext({ packet }) {
         _console$m.log("onMcuImageUploadNext");
-        this.sendMessage(Uint8Array.from(packet).buffer);
+        this.sendMessages(Uint8Array.from(packet).buffer);
     }
     #onMcuImageUploadProgress({ percentage }) {
         const progress = percentage / 100;
@@ -18689,45 +18696,47 @@ class Device {
         autoBind$1(this);
         this.#deviceInformationManager.eventDispatcher = this
             .#eventDispatcher;
-        this._informationManager.sendMessage = this
+        this._informationManager.sendMessages = this
             .sendTxMessages;
         this._informationManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#sensorConfigurationManager.sendMessage = this
+        this.#sensorConfigurationManager.sendMessages = this
             .sendTxMessages;
         this.#sensorConfigurationManager.eventDispatcher = this
             .#eventDispatcher;
         this.#sensorDataManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#vibrationManager.sendMessage = this
+        this.#vibrationManager.sendMessages = this
             .sendTxMessages;
         this.#vibrationManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#tfliteManager.sendMessage = this
+        this.#tfliteManager.sendMessages = this
             .sendTxMessages;
         this.#tfliteManager.eventDispatcher = this
             .#eventDispatcher;
+        this.#tfliteManager.sendFile = this.#fileTransferManager
+            .send;
         this.#tfliteManager.onParseFile = this.#fileTransferManager
             .onParseFile;
-        this.#fileTransferManager.sendMessage = this
+        this.#fileTransferManager.sendMessages = this
             .sendTxMessages;
         this.#fileTransferManager.eventDispatcher = this
             .#eventDispatcher;
         this.#fileTransferManager.onFileConfiguration =
             this.#onFileConfiguration.bind(this);
-        this.#wifiManager.sendMessage = this
+        this.#wifiManager.sendMessages = this
             .sendTxMessages;
         this.#wifiManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#cameraManager.sendMessage = this
+        this.#cameraManager.sendMessages = this
             .sendTxMessages;
         this.#cameraManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#microphoneManager.sendMessage = this
+        this.#microphoneManager.sendMessages = this
             .sendTxMessages;
         this.#microphoneManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#displayManager.sendMessage = this
+        this.#displayManager.sendMessages = this
             .sendTxMessages;
         this.#displayManager.eventDispatcher = this
             .#eventDispatcher;
@@ -18735,11 +18744,11 @@ class Device {
             .send;
         this.#displayManager.onParseFile = this.#fileTransferManager
             .onParseFile;
-        this.#ledManager.sendMessage = this
+        this.#ledManager.sendMessages = this
             .sendTxMessages;
         this.#ledManager.eventDispatcher = this
             .#eventDispatcher;
-        this.#firmwareManager.sendMessage = this
+        this.#firmwareManager.sendMessages = this
             .sendSmpMessage;
         this.#firmwareManager.eventDispatcher = this
             .#eventDispatcher;
@@ -19595,7 +19604,7 @@ class Device {
     }
     #fileTransferManager = new FileTransferManager();
     async #onFileConfiguration(fileConfiguration) {
-        console.log("#onFileConfiguration", fileConfiguration);
+        _console$i.log("#onFileConfiguration", fileConfiguration);
         const { fileType, buffer, direction } = fileConfiguration;
         switch (fileType) {
             case "cameraImage":
@@ -19639,21 +19648,6 @@ class Device {
             return true;
         });
     }
-    get fileLength() {
-        return this.#fileTransferManager.length;
-    }
-    get fileChecksum() {
-        return this.#fileTransferManager.checksum;
-    }
-    get fileType() {
-        return this.#fileTransferManager.type;
-    }
-    get fileBytesTransferred() {
-        return this.#fileTransferManager.bytesTransferred;
-    }
-    get fileHeaderLength() {
-        return this.#fileTransferManager.headerLength;
-    }
     async sendFile(fileType, file) {
         _console$i.assertWithError(this.validFileTypes.includes(fileType), `invalid fileType ${fileType}`);
         const promise = this.waitForEvent("fileTransferComplete");
@@ -19692,20 +19686,8 @@ class Device {
     get setTfliteName() {
         return this.#tfliteManager.setName;
     }
-    async sendTfliteConfiguration(configuration) {
-        configuration.fileType = "tflite";
-        _console$i.log("sendTfliteConfiguration", configuration);
-        this.#tfliteManager.sendConfiguration(configuration, false);
-        const didSendFile = await this.#fileTransferManager.send(configuration.fileType, configuration.file);
-        _console$i.log({ didSendFile });
-        if (!didSendFile) {
-            this.#sendTxMessages();
-            if (this.tfliteIsReady) {
-                this.#dispatchEvent("tfliteIsReady", {
-                    tfliteIsReady: this.tfliteIsReady,
-                });
-            }
-        }
+    get uploadTfliteModel() {
+        return this.#tfliteManager.uploadModel;
     }
     get tfliteClasses() {
         return this.#tfliteManager.classes;
@@ -23023,38 +23005,42 @@ class BaseServer {
                             return;
                         }
                         else {
-                            if (isDeviceConnectedDirectly) {
-                                const { fileBytesTransferred } = device;
-                                const fileHeaderLength = device._fileTransferManager.indirectSentBlocks.length == 0
-                                    ? dataView.getUint16(0, true)
-                                    : device.fileHeaderLength;
-                                const headerBytesRemaining = Math.max(0, fileHeaderLength - fileBytesTransferred);
-                                const didSendHeader = headerBytesRemaining == 0;
-                                _console$b.log({
-                                    fileBytesTransferred,
-                                    fileHeaderLength,
-                                    headerBytesRemaining,
-                                    didSendHeader,
-                                });
-                                const data = message.data;
-                                const nonHeaderData = data.buffer.slice(headerBytesRemaining);
-                                _console$b.log("nonHeaderData", nonHeaderData);
-                                if (nonHeaderData.byteLength > 0) {
+                            const fileBytesTransferred = device._fileTransferManager.bytesTransferred;
+                            const fileHeaderLength = device._fileTransferManager.indirectSentBlocks.length == 0
+                                ? dataView.getUint16(0, true)
+                                : device._fileTransferManager.headerLength;
+                            const headerBytesRemaining = Math.max(0, fileHeaderLength - fileBytesTransferred);
+                            const didSendHeader = headerBytesRemaining == 0;
+                            _console$b.log({
+                                fileBytesTransferred,
+                                fileHeaderLength,
+                                headerBytesRemaining,
+                                didSendHeader,
+                            });
+                            const data = message.data;
+                            const nonHeaderData = data.buffer.slice(headerBytesRemaining);
+                            _console$b.log("nonHeaderData", nonHeaderData);
+                            if (nonHeaderData.byteLength > 0 ||
+                                !isDeviceConnectedDirectly) {
+                                if (isDeviceConnectedDirectly) {
                                     _console$b.log("relaying nonHeaderData", nonHeaderData);
                                     message.data = nonHeaderData;
-                                    device.addEventListener("fileBytesTransferred", (event) => {
-                                        let { bytesTransferred } = event.message;
-                                        bytesTransferred += device.fileHeaderLength;
-                                        _console$b.log(`relaying bytesTransferred ${bytesTransferred} (+${device.fileHeaderLength})`);
-                                        const fileBytesTransferredDeviceMessage = this.#createDeviceMessage(device, "fileBytesTransferred", valueToUInt32DataView(bytesTransferred, true));
-                                        this.sendToClient(client, this.#createDeviceServerMessage(device, fileBytesTransferredDeviceMessage));
-                                    }, { once: true });
                                 }
-                                else {
-                                    _console$b.log("nonHeaderData is empty - parsing client file block locally");
-                                    device._onRemoteConnectionMessageSent(messageType, dataView);
-                                    return;
-                                }
+                                device.addEventListener("fileBytesTransferred", (event) => {
+                                    let { bytesTransferred } = event.message;
+                                    if (isDeviceConnectedDirectly) {
+                                        bytesTransferred +=
+                                            device._fileTransferManager.headerLength;
+                                    }
+                                    _console$b.log(`relaying bytesTransferred ${bytesTransferred} (+${device._fileTransferManager.headerLength})`);
+                                    const fileBytesTransferredDeviceMessage = this.#createDeviceMessage(device, "fileBytesTransferred", valueToUInt32DataView(bytesTransferred, true));
+                                    this.sendToClient(client, this.#createDeviceServerMessage(device, fileBytesTransferredDeviceMessage));
+                                }, { once: true });
+                            }
+                            else {
+                                _console$b.log("nonHeaderData is empty - parsing client file block locally");
+                                device._onRemoteConnectionMessageSent(messageType, dataView);
+                                return;
                             }
                         }
                         sentToDevice = true;

@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 export declare const MicrophoneSensorTypes: readonly ["microphone"];
 export type MicrophoneSensorType = (typeof MicrophoneSensorTypes)[number];
@@ -51,11 +51,11 @@ export interface MicrophoneEventMessages {
     stopRecordingMicrophone: {};
 }
 export type MicrophoneEventDispatcher = EventDispatcher<Device, MicrophoneEventType, MicrophoneEventMessages>;
-export type SendMicrophoneMessageCallback = SendMessageCallback<MicrophoneMessageType>;
+export type SendMicrophoneMessagesCallback = SendMessagesCallback<MicrophoneMessageType>;
 declare class MicrophoneManager {
     #private;
     constructor();
-    sendMessage: SendMicrophoneMessageCallback;
+    sendMessages: SendMicrophoneMessagesCallback;
     eventDispatcher: MicrophoneEventDispatcher;
     get waitForEvent(): <T extends "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "startRecordingMicrophone" | "stopRecordingMicrophone" | "microphoneRecording">(type: T, options?: {
         immediate?: boolean;

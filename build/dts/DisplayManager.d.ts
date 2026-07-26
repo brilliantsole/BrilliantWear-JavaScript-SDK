@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import { Vector2 } from "./utils/MathUtils.ts";
 import { DisplayScaleDirection, DisplayColorRGB, DisplayCropDirection, DisplayColorRGBOrString } from "./utils/DisplayUtils.ts";
@@ -128,7 +128,7 @@ export interface DisplayEventMessages {
     };
 }
 export type DisplayEventDispatcher = EventDispatcher<Device, DisplayEventType, DisplayEventMessages>;
-export type SendDisplayMessageCallback = SendMessageCallback<DisplayMessageType>;
+export type SendDisplayMessagesCallback = SendMessagesCallback<DisplayMessageType>;
 export declare const MinSpriteSheetNameLength = 1;
 export declare const MaxSpriteSheetNameLength = 30;
 export type DisplayBitmap = {
@@ -145,7 +145,7 @@ export interface DisplaySpriteSheetFileConfiguration extends ExtendedFileConfigu
 declare class DisplayManager implements DisplayManagerInterface {
     #private;
     constructor();
-    sendMessage: SendDisplayMessageCallback;
+    sendMessages: SendDisplayMessagesCallback;
     eventDispatcher: DisplayEventDispatcher;
     get waitForEvent(): <T extends "isDisplayAvailable" | "displayStatus" | "displayInformation" | "displayCommand" | "getDisplayBrightness" | "setDisplayBrightness" | "displayContextCommands" | "displayReady" | "getDisplaySpriteSheetName" | "setDisplaySpriteSheetName" | "displaySpriteSheetIndex" | "displayContextState" | "displayColor" | "displayColorOpacity" | "displayOpacity" | "displaySpriteSheetUploadStart" | "displaySpriteSheetUploadProgress" | "displaySpriteSheetUploadComplete">(type: T, options?: {
         immediate?: boolean;
@@ -170,7 +170,7 @@ declare class DisplayManager implements DisplayManagerInterface {
         width: number;
         height: number;
     };
-    get type(): "generic" | "none" | "monocularLeft" | "monocularRight" | "binocular";
+    get type(): "none" | "generic" | "monocularLeft" | "monocularRight" | "binocular";
     get brightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
     setBrightness(newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
     getMaxCommandDataLength(single?: boolean): number;

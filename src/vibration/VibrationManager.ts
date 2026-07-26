@@ -4,7 +4,7 @@ import {
   VibrationWaveformEffects,
 } from "./VibrationWaveformEffects.ts";
 import { concatenateArrayBuffers } from "../utils/ArrayBufferUtils.ts";
-import Device, { SendMessageCallback } from "../Device.ts";
+import Device, { SendMessagesCallback } from "../Device.ts";
 import autoBind from "auto-bind";
 import EventDispatcher from "../utils/EventDispatcher.ts";
 
@@ -69,8 +69,8 @@ export type VibrationConfiguration =
   | VibrationWaveformEffectConfiguration
   | VibrationWaveformConfiguration;
 
-export type SendVibrationMessageCallback =
-  SendMessageCallback<VibrationMessageType>;
+export type SendVibrationMessagesCallback =
+  SendMessagesCallback<VibrationMessageType>;
 
 export type VibrationEventDispatcher = EventDispatcher<
   Device,
@@ -82,7 +82,7 @@ class VibrationManager {
   constructor() {
     autoBind(this);
   }
-  sendMessage!: SendVibrationMessageCallback;
+  sendMessages!: SendVibrationMessagesCallback;
 
   eventDispatcher!: VibrationEventDispatcher;
   get #dispatchEvent() {
@@ -400,7 +400,7 @@ class VibrationManager {
       _console.log("empty triggerVibrationData");
       return;
     }
-    await this.sendMessage(
+    await this.sendMessages(
       [{ type: "triggerVibration", data: triggerVibrationData }],
       sendImmediately,
     );

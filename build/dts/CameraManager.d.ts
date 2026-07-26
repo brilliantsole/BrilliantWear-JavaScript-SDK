@@ -1,4 +1,4 @@
-import Device, { SendMessageCallback } from "./Device.ts";
+import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
 import { BaseFileConfiguration } from "./FileTransferManager.ts";
 export declare const CameraSensorTypes: readonly ["camera"];
@@ -65,14 +65,14 @@ export interface CameraEventMessages {
     stopRecordingCamera: {};
 }
 export type CameraEventDispatcher = EventDispatcher<Device, CameraEventType, CameraEventMessages>;
-export type SendCameraMessageCallback = SendMessageCallback<CameraMessageType>;
+export type SendCameraMessagesCallback = SendMessagesCallback<CameraMessageType>;
 export interface CameraImageFileConfiguration extends BaseFileConfiguration {
     fileType: "cameraImage";
 }
 declare class CameraManager {
     #private;
     constructor();
-    sendMessage: SendCameraMessageCallback;
+    sendMessages: SendCameraMessagesCallback;
     eventDispatcher: CameraEventDispatcher;
     get waitForEvent(): <T extends "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "cameraImage" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture">(type: T, options?: {
         immediate?: boolean;
@@ -88,7 +88,7 @@ declare class CameraManager {
     set sensorRate(newSensorRate: number);
     buildCameraData(): ArrayBuffer;
     get cameraConfiguration(): CameraConfiguration;
-    get availableCameraConfigurationTypes(): ("resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "brightness" | "saturation" | "contrast" | "sharpness")[];
+    get availableCameraConfigurationTypes(): ("brightness" | "resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "saturation" | "contrast" | "sharpness")[];
     get cameraConfigurationRanges(): CameraConfigurationRanges;
     setCameraConfiguration(newCameraConfiguration: CameraConfiguration, sendImmediately?: boolean): Promise<void>;
     static AssertValidCameraConfigurationType(cameraConfigurationType: CameraConfigurationType): void;
