@@ -70,10 +70,10 @@ export interface BaseServerClientDeviceDisplayContextCommandGuardManagerArg {
     displayContextCommand: DisplayContextCommand;
     server: Server;
 }
-export interface BaseServerClientDeviceVibrationConfigurationsGuardManagerArg {
+export interface BaseServerClientDeviceVibrationConfigurationGuardManagerArg {
     device: Device;
     client: ServerClient;
-    vibrationConfigurations: VibrationConfiguration[];
+    vibrationConfiguration: VibrationConfiguration;
     server: Server;
 }
 export interface BaseServerClientDeviceFileGuardManagerArg {
@@ -87,9 +87,9 @@ declare class ServerManager {
     static readonly shared: ServerManager;
     constructor();
     get servers(): Server[];
-    get addEventListener(): <T extends "server*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "servers" | "*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "servers", ServerManagerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "server*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "servers" | "*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "servers", ServerManagerEventMessages, T>) => void) => void;
-    get removeEventListeners(): <T extends "server*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "servers" | "*">(type: T) => void;
+    get addEventListener(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientDisconnected" | "servers">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "server*" | "serverClientConnected" | "serverClientDisconnected" | "servers", ServerManagerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientDisconnected" | "servers">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "server*" | "serverClientConnected" | "serverClientDisconnected" | "servers", ServerManagerEventMessages, T>) => void) => void;
+    get removeEventListeners(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientDisconnected" | "servers">(type: T) => void;
     private broadcast;
     clientToServerGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
     serverToClientGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
@@ -99,7 +99,7 @@ declare class ServerManager {
     clientSensorConfigurationToDeviceGuardManager: GuardManager<[BaseServerClientDeviceSensorConfigurationGuardManagerArg]>;
     clientDisplayContextCommandToDeviceGuardManager: GuardManager<[BaseServerClientDeviceDisplayContextCommandGuardManagerArg]>;
     deviceDisplayContextCommandToClientGuardManager: GuardManager<[BaseServerClientDeviceDisplayContextCommandGuardManagerArg]>;
-    clientVibrationConfigurationToDeviceGuardManager: GuardManager<[BaseServerClientDeviceVibrationConfigurationsGuardManagerArg]>;
+    clientVibrationConfigurationToDeviceGuardManager: GuardManager<[BaseServerClientDeviceVibrationConfigurationGuardManagerArg]>;
     deviceFileToClientGuardManager: GuardManager<[BaseServerClientDeviceFileGuardManagerArg]>;
 }
 declare const _default: ServerManager;

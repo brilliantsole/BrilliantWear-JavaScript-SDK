@@ -187,3 +187,15 @@ export function quaternionToEulerYXZ(q: Quaternion): Euler {
     roll: eulerZ,
   };
 }
+
+export function getSetBitIndices(mask: number): number[] {
+  const indices: number[] = [];
+
+  while (mask) {
+    const bit = mask & -mask; // isolate lowest set bit
+    indices.push(Math.log2(bit));
+    mask &= mask - 1; // clear lowest set bit
+  }
+
+  return indices;
+}

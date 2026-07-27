@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>WebXR 2 | BrilliantSole JavaScript SDK</title>
+    <title>WebXR 2 | BrilliantWear JavaScript SDK</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <script src="../utils/aframe/aframe-master.min.js"></script>
@@ -58,7 +58,7 @@
       <a href="../../">home</a>
     </nav>
 
-    <h1>WebXR 2 | BrilliantSole JavaScript SDK</h1>
+    <h1>WebXR 2 | BrilliantWear JavaScript SDK</h1>
 
     <template id="connectToDeviceTemplate">
       <div class="connectToDevice">
@@ -684,7 +684,7 @@
         "position",
         `${Math.random() * goombasTestSize - goombasTestSize / 2} 1.1 ${
           Math.random() * goombasTestSize - goombasTestSize / 2 - 0.5
-        }`
+        }`,
       );
       goomba.setAttribute("rotation", `0 ${Math.random() * 360} 0`);
       scene.appendChild(goomba);
@@ -746,13 +746,13 @@
 
         relativeMatrix.multiplyMatrices(
           inverseRelativeMatrix,
-          goomba.el.object3D.matrixWorld
+          goomba.el.object3D.matrixWorld,
         );
 
         relativeMatrix.decompose(
           relativePosition,
           relativeQuaternion,
-          relativeScale
+          relativeScale,
         );
 
         const transform = {
@@ -794,7 +794,7 @@
 
         const localMatrix = new THREE.Matrix4();
         const referenceMatrix = new THREE.Matrix4().copy(
-          anchor.object3D.matrixWorld
+          anchor.object3D.matrixWorld,
         );
         const worldMatrix = new THREE.Matrix4();
 
@@ -813,7 +813,7 @@
           localMatrix.compose(
             relativePosition,
             relativeQuaternion,
-            relativeScale
+            relativeScale,
           );
           worldMatrix.multiplyMatrices(referenceMatrix, localMatrix);
           worldMatrix.decompose(worldPosition, worldQuaternion, worldScale);
@@ -839,7 +839,7 @@
               goomba.components["goomba"].setPhysicsEnabled(true);
               goomba.components["goomba"].setStatus("falling");
             },
-            { once: true }
+            { once: true },
           );
           scene.appendChild(goomba);
         });
@@ -854,7 +854,7 @@
         loadEntities();
         anchor.setAttribute("visible", "true");
       },
-      { once: true }
+      { once: true },
     );
     if (localStorage.getItem(persistEntitiesKey) != undefined) {
       persistEntitiesCheckbox.checked = true;
@@ -878,8 +878,8 @@
         intervalId = setInterval(() => {
           worldMeshes = Array.from(
             scene.querySelectorAll(
-              "[data-world-mesh][mixin='realWorldMeshMixin']"
-            )
+              "[data-world-mesh][mixin='realWorldMeshMixin']",
+            ),
           );
           if (worldMeshes.length > 0) {
             console.log("worldMeshes", worldMeshes);
@@ -903,8 +903,8 @@
         intervalId = setInterval(() => {
           planeMeshes = Array.from(
             scene.querySelectorAll(
-              "[data-world-mesh][mixin='realWorldPlaneMixin']"
-            )
+              "[data-world-mesh][mixin='realWorldPlaneMixin']",
+            ),
           );
           if (planeMeshes.length > 0) {
             console.log("planeMeshes", planeMeshes);
@@ -931,7 +931,7 @@
             const similarMesh = worldMeshes
               .filter(
                 (worldMesh) =>
-                  worldMesh.dataset.worldMesh == planeMesh.dataset.worldMesh
+                  worldMesh.dataset.worldMesh == planeMesh.dataset.worldMesh,
               )
               .find((worldMesh) => {
                 const obbA = worldMesh.components["my-obb-collider"].obb;
@@ -961,7 +961,7 @@
           });
 
         planeMeshes = planeMeshes.filter(
-          (planeMesh) => !planeMesh.shouldRemove
+          (planeMesh) => !planeMesh.shouldRemove,
         );
 
         if (useShadows) {
@@ -977,7 +977,7 @@
       () => {
         fixWorldMeshes();
       },
-      { once: true }
+      { once: true },
     );
   </script>
 

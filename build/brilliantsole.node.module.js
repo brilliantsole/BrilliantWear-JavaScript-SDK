@@ -637,7 +637,7 @@ function valueToUInt32DataView(value, littleEndian) {
 }
 
 var _a$7;
-const _console$V = createConsole("FileTransferManager", { log: true });
+const _console$V = createConsole("FileTransferManager", { log: false });
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
 const FileTransferMessageTypes = [
@@ -1599,6 +1599,15 @@ function quaternionToEulerYXZ(q) {
         heading: eulerY,
         roll: eulerZ,
     };
+}
+function getSetBitIndices(mask) {
+    const indices = [];
+    while (mask) {
+        const bit = mask & -mask;
+        indices.push(Math.log2(bit));
+        mask &= mask - 1;
+    }
+    return indices;
 }
 
 const initialRange = { min: Infinity, max: -Infinity, span: 0 };
@@ -5343,6 +5352,309 @@ const MaxVibrationWaveformEffectSegmentDelay = 1270;
 const MaxVibrationWaveformEffectSegmentLoopCount = 3;
 const MaxNumberOfVibrationWaveformSegments = 20;
 const MaxVibrationWaveformEffectSequenceLoopCount = 6;
+function assertNonEmptyArray(array) {
+    _console$F.assertWithError(Array.isArray(array), "passed non-array");
+    _console$F.assertWithError(array.length > 0, "passed empty array");
+}
+function verifyLocations(locations) {
+    assertNonEmptyArray(locations);
+    locations.forEach((location) => {
+        _console$F.assertEnumWithError(VibrationLocations, location);
+    });
+}
+function verifyWaveformEffect(waveformEffect) {
+    _console$F.assertEnumWithError(VibrationWaveformEffects, waveformEffect);
+}
+function serializeVibrationLocations(locations) {
+    verifyLocations(locations);
+    let locationsBitmask = 0;
+    locations.forEach((location) => {
+        const locationIndex = VibrationLocations.indexOf(location);
+        locationsBitmask |= 1 << locationIndex;
+    });
+    _console$F.log({ locationsBitmask });
+    _console$F.assertWithError(locationsBitmask > 0, `locationsBitmask must not be zero`);
+    return locationsBitmask;
+}
+function verifyWaveformEffectSegmentLoopCount(waveformEffectSegmentLoopCount) {
+    _console$F.assertRangeWithError("waveformEffectSegmentLoopCount", waveformEffectSegmentLoopCount, 0, MaxVibrationWaveformEffectSegmentLoopCount);
+}
+function verifyWaveformEffectSegment(waveformEffectSegment) {
+    if (waveformEffectSegment.effect != undefined) {
+        const waveformEffect = waveformEffectSegment.effect;
+        verifyWaveformEffect(waveformEffect);
+    }
+    else if (waveformEffectSegment.delay != undefined) {
+        const { delay } = waveformEffectSegment;
+        _console$F.assertWithError(delay >= 0, `delay must be 0ms or greater (got ${delay})`);
+        _console$F.assertWithError(delay <= MaxVibrationWaveformEffectSegmentDelay, `delay must be ${MaxVibrationWaveformEffectSegmentDelay}ms or less (got ${delay})`);
+    }
+    else {
+        throw Error("no effect or delay found in waveformEffectSegment");
+    }
+    if (waveformEffectSegment.loopCount != undefined) {
+        const { loopCount } = waveformEffectSegment;
+        verifyWaveformEffectSegmentLoopCount(loopCount);
+    }
+}
+function verifyWaveformEffectSegments(waveformEffectSegments) {
+    _console$F.assertRangeWithError("waveformEffectSegments.length", waveformEffectSegments.length, 0, MaxNumberOfVibrationWaveformEffectSegments);
+    waveformEffectSegments.forEach((waveformEffectSegment) => {
+        verifyWaveformEffectSegment(waveformEffectSegment);
+    });
+}
+function verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount) {
+    _console$F.assertRangeWithError("waveformEffectSequenceLoopCount", waveformEffectSequenceLoopCount, 0, MaxVibrationWaveformEffectSequenceLoopCount);
+}
+function verifyWaveformSegments(waveformSegments) {
+    _console$F.assertRangeWithError("waveformSegments.length", waveformSegments.length, 0, MaxNumberOfVibrationWaveformSegments);
+    waveformSegments.forEach((waveformSegment) => {
+        verifyWaveformSegment(waveformSegment);
+    });
+}
+function verifyWaveformSegment(waveformSegment) {
+    _console$F.assertRangeWithError("waveformSegment.amplitude", waveformSegment.amplitude, 0, 1);
+    _console$F.assertRangeWithError("waveformSegment.duration", waveformSegment.duration, 0, MaxVibrationWaveformSegmentDuration);
+}
+function serializeVibration(locations, vibrationType, dataView) {
+    _console$F.assertWithError(dataView?.byteLength > 0, "no data received");
+    const locationsBitmask = serializeVibrationLocations(locations);
+    _console$F.assertEnumWithError(VibrationTypes, vibrationType);
+    const vibrationTypeIndex = VibrationTypes.indexOf(vibrationType);
+    _console$F.log({ locationsBitmask, vibrationTypeIndex, dataView });
+    const data = concatenateArrayBuffers(locationsBitmask, vibrationTypeIndex, dataView.byteLength, dataView);
+    _console$F.log({ data });
+    return data;
+}
+function serializeVibrationWaveformSegments(locations, waveformSegments) {
+    verifyWaveformSegments(waveformSegments);
+    const dataView = new DataView(new ArrayBuffer(waveformSegments.length * 2));
+    waveformSegments.forEach((waveformSegment, index) => {
+        dataView.setUint8(index * 2, Math.floor(waveformSegment.amplitude * 127));
+        dataView.setUint8(index * 2 + 1, Math.floor(waveformSegment.duration / 10));
+    });
+    _console$F.log({ dataView });
+    return serializeVibration(locations, "waveform", dataView);
+}
+function serializeVibrationWaveformEffectSegments(locations, waveformEffectSegments, waveformEffectSequenceLoopCount = 0) {
+    verifyWaveformEffectSegments(waveformEffectSegments);
+    verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount);
+    let dataArray = [];
+    let byteOffset = 0;
+    const hasAtLeast1WaveformEffectWithANonzeroLoopCount = waveformEffectSegments.some((waveformEffectSegment) => {
+        const { loopCount } = waveformEffectSegment;
+        return loopCount != undefined && loopCount > 0;
+    });
+    const includeAllWaveformEffectSegments = hasAtLeast1WaveformEffectWithANonzeroLoopCount ||
+        waveformEffectSequenceLoopCount != 0;
+    for (let index = 0; index < waveformEffectSegments.length ||
+        (includeAllWaveformEffectSegments &&
+            index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
+        const waveformEffectSegment = waveformEffectSegments[index] || {
+            effect: "none",
+        };
+        if (waveformEffectSegment.effect != undefined) {
+            const waveformEffect = waveformEffectSegment.effect;
+            dataArray[byteOffset++] =
+                VibrationWaveformEffects.indexOf(waveformEffect);
+        }
+        else if (waveformEffectSegment.delay != undefined) {
+            const { delay } = waveformEffectSegment;
+            dataArray[byteOffset++] = (1 << 7) | Math.floor(delay / 10);
+        }
+        else {
+            throw Error("invalid waveformEffectSegment");
+        }
+    }
+    const includeAllWaveformEffectSegmentLoopCounts = waveformEffectSequenceLoopCount != 0;
+    for (let index = 0; index < waveformEffectSegments.length ||
+        (includeAllWaveformEffectSegmentLoopCounts &&
+            index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
+        const waveformEffectSegmentLoopCount = waveformEffectSegments[index]?.loopCount || 0;
+        if (index == 0 || index == 4) {
+            dataArray[byteOffset] = 0;
+        }
+        const bitOffset = 2 * (index % 4);
+        dataArray[byteOffset] |= waveformEffectSegmentLoopCount << bitOffset;
+        if (index == 3 || index == 7) {
+            byteOffset++;
+        }
+    }
+    if (waveformEffectSequenceLoopCount != 0) {
+        dataArray[byteOffset++] = waveformEffectSequenceLoopCount;
+    }
+    const dataView = new DataView(Uint8Array.from(dataArray).buffer);
+    _console$F.log({ dataArray, dataView });
+    return serializeVibration(locations, "waveformEffect", dataView);
+}
+function serializeVibrationConfigurations(vibrationConfigurations, allLocations = VibrationLocations) {
+    let triggerVibrationData;
+    vibrationConfigurations.forEach((vibrationConfiguration) => {
+        const { type } = vibrationConfiguration;
+        let { locations } = vibrationConfiguration;
+        locations = locations || allLocations.slice();
+        locations = locations.filter((location) => allLocations.includes(location));
+        let arrayBuffer;
+        switch (type) {
+            case "waveformEffect":
+                {
+                    const { segments, loopCount } = vibrationConfiguration;
+                    if (segments.length == 0) {
+                        _console$F.log("no segments");
+                        return;
+                    }
+                    arrayBuffer = serializeVibrationWaveformEffectSegments(locations, segments, loopCount);
+                }
+                break;
+            case "waveform":
+                {
+                    const { segments } = vibrationConfiguration;
+                    if (segments.length == 0) {
+                        _console$F.log("no segments");
+                        return;
+                    }
+                    arrayBuffer = serializeVibrationWaveformSegments(locations, segments);
+                }
+                break;
+            default:
+                throw Error(`invalid vibration type "${type}"`);
+        }
+        _console$F.log({ type, arrayBuffer });
+        if (arrayBuffer.byteLength == 0) {
+            _console$F.log("empty arrayBuffer");
+            return;
+        }
+        triggerVibrationData = concatenateArrayBuffers(triggerVibrationData, arrayBuffer);
+    });
+    return triggerVibrationData ?? new ArrayBuffer(0);
+}
+function parseVibrationWaveformSegments(dataView) {
+    _console$F.log("parseVibrationWaveformSegments", dataView);
+    const parsedVibrationWaveformSegments = [];
+    let offset = 0;
+    while (offset < dataView.byteLength) {
+        const amplitude = dataView.getUint8(offset) / 127;
+        const duration = dataView.getUint8(offset + 1) * 10;
+        const parsedVibrationWaveformSegment = {
+            amplitude,
+            duration,
+        };
+        _console$F.log("parsedVibrationWaveformSegment", parsedVibrationWaveformSegment);
+        parsedVibrationWaveformSegments.push(parsedVibrationWaveformSegment);
+        offset += 2;
+    }
+    _console$F.log("parsedVibrationWaveformSegments", parsedVibrationWaveformSegments);
+    return parsedVibrationWaveformSegments;
+}
+function parseVibrationWaveformEffectSegments(dataView) {
+    _console$F.log("parseVibrationWaveformSegments", dataView);
+    const parsedVibrationWaveformEffectSegments = [];
+    let offset = 0;
+    for (let index = 0; index < MaxNumberOfVibrationWaveformEffectSegments; index++) {
+        if (offset < dataView.byteLength) {
+            const rawValue = dataView.getUint8(offset++);
+            const isDelay = rawValue & (1 << 7);
+            let effect;
+            let delay;
+            if (isDelay) {
+                delay = rawValue * 10;
+            }
+            else {
+                effect = VibrationWaveformEffects[rawValue];
+                _console$F.assertEnumWithError(VibrationWaveformEffects, effect);
+            }
+            _console$F.log({ rawValue, isDelay, effect, delay });
+            const parsedVibrationWaveformEffectSegment = {
+                effect,
+                delay,
+            };
+            _console$F.log("parsedVibrationWaveformEffectSegments", parsedVibrationWaveformEffectSegments);
+            parsedVibrationWaveformEffectSegments.push(parsedVibrationWaveformEffectSegment);
+        }
+    }
+    for (let index = 0; index < 2; index++) {
+        if (offset < dataView.byteLength) {
+            const rawValue = dataView.getUint8(offset++);
+            const segmentIndexOffset = index == 0 ? 0 : 4;
+            for (let baseSegmentIndex = 0; baseSegmentIndex < 4; baseSegmentIndex++) {
+                const segmentIndex = segmentIndexOffset + baseSegmentIndex;
+                const loopCount = (rawValue >> (baseSegmentIndex * 2)) & 0b11;
+                parsedVibrationWaveformEffectSegments[segmentIndex].loopCount =
+                    loopCount;
+            }
+        }
+    }
+    _console$F.log("parsedVibrationWaveformEffectSegments", parsedVibrationWaveformEffectSegments);
+    return parsedVibrationWaveformEffectSegments;
+}
+function parseVibrationConfiguration(dataView, vibrationType) {
+    _console$F.log("parseVibrationConfiguration", dataView, { vibrationType });
+    let parsedVibrationConfiguration;
+    switch (vibrationType) {
+        case "waveformEffect":
+            parsedVibrationConfiguration = {
+                type: "waveformEffect",
+                segments: parseVibrationWaveformEffectSegments(dataView),
+            };
+            if (dataView.byteLength ==
+                MaxNumberOfVibrationWaveformEffectSegments + 3) {
+                parsedVibrationConfiguration.loopCount = dataView.getUint8(dataView.byteLength - 1);
+            }
+            break;
+        case "waveform":
+            parsedVibrationConfiguration = {
+                type: "waveform",
+                segments: parseVibrationWaveformSegments(dataView),
+            };
+            break;
+    }
+    _console$F.log("parsedVibrationConfiguration", parsedVibrationConfiguration);
+    return parsedVibrationConfiguration;
+}
+function parseVibrationConfigurations(dataView) {
+    _console$F.log("parseVibrationConfigurations", dataView);
+    const parsedVibrationConfigurations = [];
+    let offset = 0;
+    while (offset < dataView.byteLength) {
+        const locationBitmask = dataView.getUint8(offset++);
+        const locations = parseVibrationLocationBitmask(locationBitmask);
+        const vibrationTypeEnum = dataView.getUint8(offset++);
+        const vibrationType = VibrationTypes[vibrationTypeEnum];
+        const payload = dataView.getUint8(offset++);
+        const finalOffset = offset + payload;
+        _console$F.log({
+            locationBitmask,
+            locations,
+            vibrationTypeEnum,
+            vibrationType,
+            payload,
+            finalOffset,
+        });
+        _console$F.assertEnumWithError(VibrationTypes, vibrationType);
+        _console$F.assertWithError(finalOffset <= dataView.byteLength, `finalOffset ${finalOffset} too large (max ${dataView.byteLength})`);
+        const parsedVibrationConfiguration = parseVibrationConfiguration(new DataView(dataView.buffer.slice(offset, offset + payload)), vibrationType);
+        parsedVibrationConfiguration.locations = locations;
+        parsedVibrationConfigurations.push(parsedVibrationConfiguration);
+        offset += payload;
+    }
+    _console$F.log("parsedVibrationConfigurations", parsedVibrationConfigurations);
+    return parsedVibrationConfigurations;
+}
+function parseVibrationLocations(dataView) {
+    _console$F.log("parseVibrationLocations", dataView);
+    const vibrationLocations = Array.from(new Uint8Array(dataView.buffer))
+        .map((index) => VibrationLocations[index])
+        .filter(Boolean);
+    return vibrationLocations;
+}
+function parseVibrationLocationBitmask(bitmask) {
+    _console$F.log("parseVibrationLocationBitmask", { bitmask });
+    const bitIndices = getSetBitIndices(bitmask);
+    const parsedVibrationLocations = bitIndices.map((bitIndex) => VibrationLocations[bitIndex]);
+    parsedVibrationLocations.forEach((location) => _console$F.assertEnumWithError(VibrationLocations, location));
+    _console$F.log({ bitIndices, parsedVibrationLocations });
+    return parsedVibrationLocations;
+}
 class VibrationManager {
     constructor() {
         autoBind$1(this);
@@ -5355,141 +5667,6 @@ class VibrationManager {
     get waitForEvent() {
         return this.eventDispatcher.waitForEvent;
     }
-    #verifyLocations(locations) {
-        this.#assertNonEmptyArray(locations);
-        locations.forEach((location) => {
-            _console$F.assertEnumWithError(VibrationLocations, location);
-        });
-    }
-    #createLocationsBitmask(locations) {
-        this.#verifyLocations(locations);
-        let locationsBitmask = 0;
-        locations.forEach((location) => {
-            const locationIndex = VibrationLocations.indexOf(location);
-            locationsBitmask |= 1 << locationIndex;
-        });
-        _console$F.log({ locationsBitmask });
-        _console$F.assertWithError(locationsBitmask > 0, `locationsBitmask must not be zero`);
-        return locationsBitmask;
-    }
-    #assertNonEmptyArray(array) {
-        _console$F.assertWithError(Array.isArray(array), "passed non-array");
-        _console$F.assertWithError(array.length > 0, "passed empty array");
-    }
-    #verifyWaveformEffect(waveformEffect) {
-        _console$F.assertEnumWithError(VibrationWaveformEffects, waveformEffect);
-    }
-    #verifyWaveformEffectSegment(waveformEffectSegment) {
-        if (waveformEffectSegment.effect != undefined) {
-            const waveformEffect = waveformEffectSegment.effect;
-            this.#verifyWaveformEffect(waveformEffect);
-        }
-        else if (waveformEffectSegment.delay != undefined) {
-            const { delay } = waveformEffectSegment;
-            _console$F.assertWithError(delay >= 0, `delay must be 0ms or greater (got ${delay})`);
-            _console$F.assertWithError(delay <= MaxVibrationWaveformEffectSegmentDelay, `delay must be ${MaxVibrationWaveformEffectSegmentDelay}ms or less (got ${delay})`);
-        }
-        else {
-            throw Error("no effect or delay found in waveformEffectSegment");
-        }
-        if (waveformEffectSegment.loopCount != undefined) {
-            const { loopCount } = waveformEffectSegment;
-            this.#verifyWaveformEffectSegmentLoopCount(loopCount);
-        }
-    }
-    #verifyWaveformEffectSegmentLoopCount(waveformEffectSegmentLoopCount) {
-        _console$F.assertRangeWithError("waveformEffectSegmentLoopCount", waveformEffectSegmentLoopCount, 0, MaxVibrationWaveformEffectSegmentLoopCount);
-    }
-    #verifyWaveformEffectSegments(waveformEffectSegments) {
-        _console$F.assertRangeWithError("waveformEffectSegments.length", waveformEffectSegments.length, 0, MaxNumberOfVibrationWaveformEffectSegments);
-        waveformEffectSegments.forEach((waveformEffectSegment) => {
-            this.#verifyWaveformEffectSegment(waveformEffectSegment);
-        });
-    }
-    #verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount) {
-        _console$F.assertRangeWithError("waveformEffectSequenceLoopCount", waveformEffectSequenceLoopCount, 0, MaxVibrationWaveformEffectSequenceLoopCount);
-    }
-    #verifyWaveformSegment(waveformSegment) {
-        _console$F.assertRangeWithError("waveformSegment.amplitude", waveformSegment.amplitude, 0, 1);
-        _console$F.assertRangeWithError("waveformSegment.duration", waveformSegment.duration, 0, MaxVibrationWaveformSegmentDuration);
-    }
-    #verifyWaveformSegments(waveformSegments) {
-        _console$F.assertRangeWithError("waveformSegments.length", waveformSegments.length, 0, MaxNumberOfVibrationWaveformSegments);
-        waveformSegments.forEach((waveformSegment) => {
-            this.#verifyWaveformSegment(waveformSegment);
-        });
-    }
-    #createWaveformEffectsData(locations, waveformEffectSegments, waveformEffectSequenceLoopCount = 0) {
-        this.#verifyWaveformEffectSegments(waveformEffectSegments);
-        this.#verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount);
-        let dataArray = [];
-        let byteOffset = 0;
-        const hasAtLeast1WaveformEffectWithANonzeroLoopCount = waveformEffectSegments.some((waveformEffectSegment) => {
-            const { loopCount } = waveformEffectSegment;
-            return loopCount != undefined && loopCount > 0;
-        });
-        const includeAllWaveformEffectSegments = hasAtLeast1WaveformEffectWithANonzeroLoopCount ||
-            waveformEffectSequenceLoopCount != 0;
-        for (let index = 0; index < waveformEffectSegments.length ||
-            (includeAllWaveformEffectSegments &&
-                index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
-            const waveformEffectSegment = waveformEffectSegments[index] || {
-                effect: "none",
-            };
-            if (waveformEffectSegment.effect != undefined) {
-                const waveformEffect = waveformEffectSegment.effect;
-                dataArray[byteOffset++] =
-                    VibrationWaveformEffects.indexOf(waveformEffect);
-            }
-            else if (waveformEffectSegment.delay != undefined) {
-                const { delay } = waveformEffectSegment;
-                dataArray[byteOffset++] = (1 << 7) | Math.floor(delay / 10);
-            }
-            else {
-                throw Error("invalid waveformEffectSegment");
-            }
-        }
-        const includeAllWaveformEffectSegmentLoopCounts = waveformEffectSequenceLoopCount != 0;
-        for (let index = 0; index < waveformEffectSegments.length ||
-            (includeAllWaveformEffectSegmentLoopCounts &&
-                index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
-            const waveformEffectSegmentLoopCount = waveformEffectSegments[index]?.loopCount || 0;
-            if (index == 0 || index == 4) {
-                dataArray[byteOffset] = 0;
-            }
-            const bitOffset = 2 * (index % 4);
-            dataArray[byteOffset] |= waveformEffectSegmentLoopCount << bitOffset;
-            if (index == 3 || index == 7) {
-                byteOffset++;
-            }
-        }
-        if (waveformEffectSequenceLoopCount != 0) {
-            dataArray[byteOffset++] = waveformEffectSequenceLoopCount;
-        }
-        const dataView = new DataView(Uint8Array.from(dataArray).buffer);
-        _console$F.log({ dataArray, dataView });
-        return this.#createData(locations, "waveformEffect", dataView);
-    }
-    #createWaveformData(locations, waveformSegments) {
-        this.#verifyWaveformSegments(waveformSegments);
-        const dataView = new DataView(new ArrayBuffer(waveformSegments.length * 2));
-        waveformSegments.forEach((waveformSegment, index) => {
-            dataView.setUint8(index * 2, Math.floor(waveformSegment.amplitude * 127));
-            dataView.setUint8(index * 2 + 1, Math.floor(waveformSegment.duration / 10));
-        });
-        _console$F.log({ dataView });
-        return this.#createData(locations, "waveform", dataView);
-    }
-    #createData(locations, vibrationType, dataView) {
-        _console$F.assertWithError(dataView?.byteLength > 0, "no data received");
-        const locationsBitmask = this.#createLocationsBitmask(locations);
-        _console$F.assertEnumWithError(VibrationTypes, vibrationType);
-        const vibrationTypeIndex = VibrationTypes.indexOf(vibrationType);
-        _console$F.log({ locationsBitmask, vibrationTypeIndex, dataView });
-        const data = concatenateArrayBuffers(locationsBitmask, vibrationTypeIndex, dataView.byteLength, dataView);
-        _console$F.log({ data });
-        return data;
-    }
     async triggerVibration(vibrationConfigurations, sendImmediately = true) {
         if (!Array.isArray(vibrationConfigurations)) {
             vibrationConfigurations = [vibrationConfigurations];
@@ -5498,44 +5675,7 @@ class VibrationManager {
             _console$F.log("empty vibrationConfigurations");
             return;
         }
-        let triggerVibrationData;
-        vibrationConfigurations.forEach((vibrationConfiguration) => {
-            const { type } = vibrationConfiguration;
-            let { locations } = vibrationConfiguration;
-            locations = locations || this.vibrationLocations.slice();
-            locations = locations.filter((location) => this.vibrationLocations.includes(location));
-            let arrayBuffer;
-            switch (type) {
-                case "waveformEffect":
-                    {
-                        const { segments, loopCount } = vibrationConfiguration;
-                        if (segments.length == 0) {
-                            _console$F.log("no segments");
-                            return;
-                        }
-                        arrayBuffer = this.#createWaveformEffectsData(locations, segments, loopCount);
-                    }
-                    break;
-                case "waveform":
-                    {
-                        const { segments } = vibrationConfiguration;
-                        if (segments.length == 0) {
-                            _console$F.log("no segments");
-                            return;
-                        }
-                        arrayBuffer = this.#createWaveformData(locations, segments);
-                    }
-                    break;
-                default:
-                    throw Error(`invalid vibration type "${type}"`);
-            }
-            _console$F.log({ type, arrayBuffer });
-            if (arrayBuffer.byteLength == 0) {
-                _console$F.log("empty arrayBuffer");
-                return;
-            }
-            triggerVibrationData = concatenateArrayBuffers(triggerVibrationData, arrayBuffer);
-        });
+        const triggerVibrationData = serializeVibrationConfigurations(vibrationConfigurations, this.vibrationLocations);
         if (!triggerVibrationData) {
             _console$F.log("no triggerVibrationData");
             return;
@@ -5558,10 +5698,7 @@ class VibrationManager {
         });
     }
     #parseVibrationLocations(dataView) {
-        _console$F.log("parseVibrationLocations", dataView);
-        const vibrationLocations = Array.from(new Uint8Array(dataView.buffer))
-            .map((index) => VibrationLocations[index])
-            .filter(Boolean);
+        const vibrationLocations = parseVibrationLocations(dataView);
         this.#onVibrationLocations(vibrationLocations);
     }
     parseMessage(messageType, dataView, isSending) {
@@ -21680,7 +21817,7 @@ const DisplayCanvasHelperManagerEventTypes = [
     ...DisplayCanvasHelperManagerDisplayCanvasHelperEventTypes,
     ...BaseDisplayCanvasHelperManagerEventTypes,
 ];
-let DisplayCanvasHelperManager = (() => {
+let DisplayCanvasHelperManager$1 = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -21754,7 +21891,7 @@ let DisplayCanvasHelperManager = (() => {
     });
     return _classThis;
 })();
-var DisplayCanvasHelperManager$1 = DisplayCanvasHelperManager.shared;
+var DisplayCanvasHelperManager = DisplayCanvasHelperManager$1.shared;
 
 var _a$1;
 const RequiredDeviceInformationMessageTypes = [
@@ -21808,7 +21945,7 @@ class BaseServer {
         _console$b.assertWithError(scanner, "no scanner defined");
         addEventListeners(scanner, this.#boundScannerListeners);
         addEventListeners(DeviceManager, this.#boundDeviceManagerListeners);
-        addEventListeners(DisplayCanvasHelperManager$1, this.#boundDisplayCanvasHelperManagerEventListeners);
+        addEventListeners(DisplayCanvasHelperManager, this.#boundDisplayCanvasHelperManagerEventListeners);
         addEventListeners(this, this.#boundServerListeners);
         _a$1.OnServer(this);
     }
@@ -22429,11 +22566,11 @@ class BaseServer {
             server: this,
         });
     }
-    #allowClientVibrationConfigurationToDevice(device, client, vibrationConfigurations) {
+    #allowClientVibrationConfigurationToDevice(device, client, vibrationConfiguration) {
         return ServerManager_default.clientVibrationConfigurationToDeviceGuardManager.evaluate({
             device,
             client,
-            vibrationConfigurations,
+            vibrationConfiguration,
             server: this,
         });
     }
@@ -22901,6 +23038,23 @@ class BaseServer {
                                 return;
                             }
                         }
+                    }
+                    break;
+                case "triggerVibration":
+                    if (!ServerManager_default.clientVibrationConfigurationToDeviceGuardManager
+                        .isEmpty) {
+                        _console$b.log("trimming vibrationConfigurations...");
+                        const vibrationConfigurations = parseVibrationConfigurations(dataView);
+                        _console$b.log("vibrationConfigurations", vibrationConfigurations);
+                        const filteredVibrationConfigurations = vibrationConfigurations.filter((vibrationConfiguration) => this.#allowClientVibrationConfigurationToDevice(device, client, vibrationConfiguration));
+                        _console$b.log("filteredVibrationConfigurations", filteredVibrationConfigurations);
+                        const serializedFilteredVibrationConfigurations = serializeVibrationConfigurations(filteredVibrationConfigurations);
+                        _console$b.log("serializedFilteredVibrationConfigurations", serializedFilteredVibrationConfigurations);
+                        if (serializedFilteredVibrationConfigurations.byteLength == 0) {
+                            _console$b.log("empty serializedFilteredVibrationConfigurations - skipping");
+                            return;
+                        }
+                        message.data = serializedFilteredVibrationConfigurations;
                     }
                     break;
                 case "displayContextCommands":

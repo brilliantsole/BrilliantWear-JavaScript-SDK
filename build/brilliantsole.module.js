@@ -647,7 +647,7 @@ function valueToUInt32DataView(value, littleEndian) {
 }
 
 var _a$7;
-const _console$V = createConsole("FileTransferManager", { log: true });
+const _console$V = createConsole("FileTransferManager", { log: false });
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
 const FileTransferMessageTypes = [
@@ -1613,6 +1613,15 @@ function quaternionToEulerYXZ(q) {
         heading: eulerY,
         roll: eulerZ,
     };
+}
+function getSetBitIndices(mask) {
+    const indices = [];
+    while (mask) {
+        const bit = mask & -mask;
+        indices.push(Math.log2(bit));
+        mask &= mask - 1;
+    }
+    return indices;
 }
 
 const initialRange = { min: Infinity, max: -Infinity, span: 0 };
@@ -5401,6 +5410,309 @@ const MaxVibrationWaveformEffectSegmentDelay = 1270;
 const MaxVibrationWaveformEffectSegmentLoopCount = 3;
 const MaxNumberOfVibrationWaveformSegments = 20;
 const MaxVibrationWaveformEffectSequenceLoopCount = 6;
+function assertNonEmptyArray(array) {
+    _console$F.assertWithError(Array.isArray(array), "passed non-array");
+    _console$F.assertWithError(array.length > 0, "passed empty array");
+}
+function verifyLocations(locations) {
+    assertNonEmptyArray(locations);
+    locations.forEach((location) => {
+        _console$F.assertEnumWithError(VibrationLocations, location);
+    });
+}
+function verifyWaveformEffect(waveformEffect) {
+    _console$F.assertEnumWithError(VibrationWaveformEffects, waveformEffect);
+}
+function serializeVibrationLocations(locations) {
+    verifyLocations(locations);
+    let locationsBitmask = 0;
+    locations.forEach((location) => {
+        const locationIndex = VibrationLocations.indexOf(location);
+        locationsBitmask |= 1 << locationIndex;
+    });
+    _console$F.log({ locationsBitmask });
+    _console$F.assertWithError(locationsBitmask > 0, `locationsBitmask must not be zero`);
+    return locationsBitmask;
+}
+function verifyWaveformEffectSegmentLoopCount(waveformEffectSegmentLoopCount) {
+    _console$F.assertRangeWithError("waveformEffectSegmentLoopCount", waveformEffectSegmentLoopCount, 0, MaxVibrationWaveformEffectSegmentLoopCount);
+}
+function verifyWaveformEffectSegment(waveformEffectSegment) {
+    if (waveformEffectSegment.effect != undefined) {
+        const waveformEffect = waveformEffectSegment.effect;
+        verifyWaveformEffect(waveformEffect);
+    }
+    else if (waveformEffectSegment.delay != undefined) {
+        const { delay } = waveformEffectSegment;
+        _console$F.assertWithError(delay >= 0, `delay must be 0ms or greater (got ${delay})`);
+        _console$F.assertWithError(delay <= MaxVibrationWaveformEffectSegmentDelay, `delay must be ${MaxVibrationWaveformEffectSegmentDelay}ms or less (got ${delay})`);
+    }
+    else {
+        throw Error("no effect or delay found in waveformEffectSegment");
+    }
+    if (waveformEffectSegment.loopCount != undefined) {
+        const { loopCount } = waveformEffectSegment;
+        verifyWaveformEffectSegmentLoopCount(loopCount);
+    }
+}
+function verifyWaveformEffectSegments(waveformEffectSegments) {
+    _console$F.assertRangeWithError("waveformEffectSegments.length", waveformEffectSegments.length, 0, MaxNumberOfVibrationWaveformEffectSegments);
+    waveformEffectSegments.forEach((waveformEffectSegment) => {
+        verifyWaveformEffectSegment(waveformEffectSegment);
+    });
+}
+function verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount) {
+    _console$F.assertRangeWithError("waveformEffectSequenceLoopCount", waveformEffectSequenceLoopCount, 0, MaxVibrationWaveformEffectSequenceLoopCount);
+}
+function verifyWaveformSegments(waveformSegments) {
+    _console$F.assertRangeWithError("waveformSegments.length", waveformSegments.length, 0, MaxNumberOfVibrationWaveformSegments);
+    waveformSegments.forEach((waveformSegment) => {
+        verifyWaveformSegment(waveformSegment);
+    });
+}
+function verifyWaveformSegment(waveformSegment) {
+    _console$F.assertRangeWithError("waveformSegment.amplitude", waveformSegment.amplitude, 0, 1);
+    _console$F.assertRangeWithError("waveformSegment.duration", waveformSegment.duration, 0, MaxVibrationWaveformSegmentDuration);
+}
+function serializeVibration(locations, vibrationType, dataView) {
+    _console$F.assertWithError(dataView?.byteLength > 0, "no data received");
+    const locationsBitmask = serializeVibrationLocations(locations);
+    _console$F.assertEnumWithError(VibrationTypes, vibrationType);
+    const vibrationTypeIndex = VibrationTypes.indexOf(vibrationType);
+    _console$F.log({ locationsBitmask, vibrationTypeIndex, dataView });
+    const data = concatenateArrayBuffers(locationsBitmask, vibrationTypeIndex, dataView.byteLength, dataView);
+    _console$F.log({ data });
+    return data;
+}
+function serializeVibrationWaveformSegments(locations, waveformSegments) {
+    verifyWaveformSegments(waveformSegments);
+    const dataView = new DataView(new ArrayBuffer(waveformSegments.length * 2));
+    waveformSegments.forEach((waveformSegment, index) => {
+        dataView.setUint8(index * 2, Math.floor(waveformSegment.amplitude * 127));
+        dataView.setUint8(index * 2 + 1, Math.floor(waveformSegment.duration / 10));
+    });
+    _console$F.log({ dataView });
+    return serializeVibration(locations, "waveform", dataView);
+}
+function serializeVibrationWaveformEffectSegments(locations, waveformEffectSegments, waveformEffectSequenceLoopCount = 0) {
+    verifyWaveformEffectSegments(waveformEffectSegments);
+    verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount);
+    let dataArray = [];
+    let byteOffset = 0;
+    const hasAtLeast1WaveformEffectWithANonzeroLoopCount = waveformEffectSegments.some((waveformEffectSegment) => {
+        const { loopCount } = waveformEffectSegment;
+        return loopCount != undefined && loopCount > 0;
+    });
+    const includeAllWaveformEffectSegments = hasAtLeast1WaveformEffectWithANonzeroLoopCount ||
+        waveformEffectSequenceLoopCount != 0;
+    for (let index = 0; index < waveformEffectSegments.length ||
+        (includeAllWaveformEffectSegments &&
+            index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
+        const waveformEffectSegment = waveformEffectSegments[index] || {
+            effect: "none",
+        };
+        if (waveformEffectSegment.effect != undefined) {
+            const waveformEffect = waveformEffectSegment.effect;
+            dataArray[byteOffset++] =
+                VibrationWaveformEffects.indexOf(waveformEffect);
+        }
+        else if (waveformEffectSegment.delay != undefined) {
+            const { delay } = waveformEffectSegment;
+            dataArray[byteOffset++] = (1 << 7) | Math.floor(delay / 10);
+        }
+        else {
+            throw Error("invalid waveformEffectSegment");
+        }
+    }
+    const includeAllWaveformEffectSegmentLoopCounts = waveformEffectSequenceLoopCount != 0;
+    for (let index = 0; index < waveformEffectSegments.length ||
+        (includeAllWaveformEffectSegmentLoopCounts &&
+            index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
+        const waveformEffectSegmentLoopCount = waveformEffectSegments[index]?.loopCount || 0;
+        if (index == 0 || index == 4) {
+            dataArray[byteOffset] = 0;
+        }
+        const bitOffset = 2 * (index % 4);
+        dataArray[byteOffset] |= waveformEffectSegmentLoopCount << bitOffset;
+        if (index == 3 || index == 7) {
+            byteOffset++;
+        }
+    }
+    if (waveformEffectSequenceLoopCount != 0) {
+        dataArray[byteOffset++] = waveformEffectSequenceLoopCount;
+    }
+    const dataView = new DataView(Uint8Array.from(dataArray).buffer);
+    _console$F.log({ dataArray, dataView });
+    return serializeVibration(locations, "waveformEffect", dataView);
+}
+function serializeVibrationConfigurations(vibrationConfigurations, allLocations = VibrationLocations) {
+    let triggerVibrationData;
+    vibrationConfigurations.forEach((vibrationConfiguration) => {
+        const { type } = vibrationConfiguration;
+        let { locations } = vibrationConfiguration;
+        locations = locations || allLocations.slice();
+        locations = locations.filter((location) => allLocations.includes(location));
+        let arrayBuffer;
+        switch (type) {
+            case "waveformEffect":
+                {
+                    const { segments, loopCount } = vibrationConfiguration;
+                    if (segments.length == 0) {
+                        _console$F.log("no segments");
+                        return;
+                    }
+                    arrayBuffer = serializeVibrationWaveformEffectSegments(locations, segments, loopCount);
+                }
+                break;
+            case "waveform":
+                {
+                    const { segments } = vibrationConfiguration;
+                    if (segments.length == 0) {
+                        _console$F.log("no segments");
+                        return;
+                    }
+                    arrayBuffer = serializeVibrationWaveformSegments(locations, segments);
+                }
+                break;
+            default:
+                throw Error(`invalid vibration type "${type}"`);
+        }
+        _console$F.log({ type, arrayBuffer });
+        if (arrayBuffer.byteLength == 0) {
+            _console$F.log("empty arrayBuffer");
+            return;
+        }
+        triggerVibrationData = concatenateArrayBuffers(triggerVibrationData, arrayBuffer);
+    });
+    return triggerVibrationData ?? new ArrayBuffer(0);
+}
+function parseVibrationWaveformSegments(dataView) {
+    _console$F.log("parseVibrationWaveformSegments", dataView);
+    const parsedVibrationWaveformSegments = [];
+    let offset = 0;
+    while (offset < dataView.byteLength) {
+        const amplitude = dataView.getUint8(offset) / 127;
+        const duration = dataView.getUint8(offset + 1) * 10;
+        const parsedVibrationWaveformSegment = {
+            amplitude,
+            duration,
+        };
+        _console$F.log("parsedVibrationWaveformSegment", parsedVibrationWaveformSegment);
+        parsedVibrationWaveformSegments.push(parsedVibrationWaveformSegment);
+        offset += 2;
+    }
+    _console$F.log("parsedVibrationWaveformSegments", parsedVibrationWaveformSegments);
+    return parsedVibrationWaveformSegments;
+}
+function parseVibrationWaveformEffectSegments(dataView) {
+    _console$F.log("parseVibrationWaveformSegments", dataView);
+    const parsedVibrationWaveformEffectSegments = [];
+    let offset = 0;
+    for (let index = 0; index < MaxNumberOfVibrationWaveformEffectSegments; index++) {
+        if (offset < dataView.byteLength) {
+            const rawValue = dataView.getUint8(offset++);
+            const isDelay = rawValue & (1 << 7);
+            let effect;
+            let delay;
+            if (isDelay) {
+                delay = rawValue * 10;
+            }
+            else {
+                effect = VibrationWaveformEffects[rawValue];
+                _console$F.assertEnumWithError(VibrationWaveformEffects, effect);
+            }
+            _console$F.log({ rawValue, isDelay, effect, delay });
+            const parsedVibrationWaveformEffectSegment = {
+                effect,
+                delay,
+            };
+            _console$F.log("parsedVibrationWaveformEffectSegments", parsedVibrationWaveformEffectSegments);
+            parsedVibrationWaveformEffectSegments.push(parsedVibrationWaveformEffectSegment);
+        }
+    }
+    for (let index = 0; index < 2; index++) {
+        if (offset < dataView.byteLength) {
+            const rawValue = dataView.getUint8(offset++);
+            const segmentIndexOffset = index == 0 ? 0 : 4;
+            for (let baseSegmentIndex = 0; baseSegmentIndex < 4; baseSegmentIndex++) {
+                const segmentIndex = segmentIndexOffset + baseSegmentIndex;
+                const loopCount = (rawValue >> (baseSegmentIndex * 2)) & 0b11;
+                parsedVibrationWaveformEffectSegments[segmentIndex].loopCount =
+                    loopCount;
+            }
+        }
+    }
+    _console$F.log("parsedVibrationWaveformEffectSegments", parsedVibrationWaveformEffectSegments);
+    return parsedVibrationWaveformEffectSegments;
+}
+function parseVibrationConfiguration(dataView, vibrationType) {
+    _console$F.log("parseVibrationConfiguration", dataView, { vibrationType });
+    let parsedVibrationConfiguration;
+    switch (vibrationType) {
+        case "waveformEffect":
+            parsedVibrationConfiguration = {
+                type: "waveformEffect",
+                segments: parseVibrationWaveformEffectSegments(dataView),
+            };
+            if (dataView.byteLength ==
+                MaxNumberOfVibrationWaveformEffectSegments + 3) {
+                parsedVibrationConfiguration.loopCount = dataView.getUint8(dataView.byteLength - 1);
+            }
+            break;
+        case "waveform":
+            parsedVibrationConfiguration = {
+                type: "waveform",
+                segments: parseVibrationWaveformSegments(dataView),
+            };
+            break;
+    }
+    _console$F.log("parsedVibrationConfiguration", parsedVibrationConfiguration);
+    return parsedVibrationConfiguration;
+}
+function parseVibrationConfigurations(dataView) {
+    _console$F.log("parseVibrationConfigurations", dataView);
+    const parsedVibrationConfigurations = [];
+    let offset = 0;
+    while (offset < dataView.byteLength) {
+        const locationBitmask = dataView.getUint8(offset++);
+        const locations = parseVibrationLocationBitmask(locationBitmask);
+        const vibrationTypeEnum = dataView.getUint8(offset++);
+        const vibrationType = VibrationTypes[vibrationTypeEnum];
+        const payload = dataView.getUint8(offset++);
+        const finalOffset = offset + payload;
+        _console$F.log({
+            locationBitmask,
+            locations,
+            vibrationTypeEnum,
+            vibrationType,
+            payload,
+            finalOffset,
+        });
+        _console$F.assertEnumWithError(VibrationTypes, vibrationType);
+        _console$F.assertWithError(finalOffset <= dataView.byteLength, `finalOffset ${finalOffset} too large (max ${dataView.byteLength})`);
+        const parsedVibrationConfiguration = parseVibrationConfiguration(new DataView(dataView.buffer.slice(offset, offset + payload)), vibrationType);
+        parsedVibrationConfiguration.locations = locations;
+        parsedVibrationConfigurations.push(parsedVibrationConfiguration);
+        offset += payload;
+    }
+    _console$F.log("parsedVibrationConfigurations", parsedVibrationConfigurations);
+    return parsedVibrationConfigurations;
+}
+function parseVibrationLocations(dataView) {
+    _console$F.log("parseVibrationLocations", dataView);
+    const vibrationLocations = Array.from(new Uint8Array(dataView.buffer))
+        .map((index) => VibrationLocations[index])
+        .filter(Boolean);
+    return vibrationLocations;
+}
+function parseVibrationLocationBitmask(bitmask) {
+    _console$F.log("parseVibrationLocationBitmask", { bitmask });
+    const bitIndices = getSetBitIndices(bitmask);
+    const parsedVibrationLocations = bitIndices.map((bitIndex) => VibrationLocations[bitIndex]);
+    parsedVibrationLocations.forEach((location) => _console$F.assertEnumWithError(VibrationLocations, location));
+    _console$F.log({ bitIndices, parsedVibrationLocations });
+    return parsedVibrationLocations;
+}
 class VibrationManager {
     constructor() {
         autoBind(this);
@@ -5413,141 +5725,6 @@ class VibrationManager {
     get waitForEvent() {
         return this.eventDispatcher.waitForEvent;
     }
-    #verifyLocations(locations) {
-        this.#assertNonEmptyArray(locations);
-        locations.forEach((location) => {
-            _console$F.assertEnumWithError(VibrationLocations, location);
-        });
-    }
-    #createLocationsBitmask(locations) {
-        this.#verifyLocations(locations);
-        let locationsBitmask = 0;
-        locations.forEach((location) => {
-            const locationIndex = VibrationLocations.indexOf(location);
-            locationsBitmask |= 1 << locationIndex;
-        });
-        _console$F.log({ locationsBitmask });
-        _console$F.assertWithError(locationsBitmask > 0, `locationsBitmask must not be zero`);
-        return locationsBitmask;
-    }
-    #assertNonEmptyArray(array) {
-        _console$F.assertWithError(Array.isArray(array), "passed non-array");
-        _console$F.assertWithError(array.length > 0, "passed empty array");
-    }
-    #verifyWaveformEffect(waveformEffect) {
-        _console$F.assertEnumWithError(VibrationWaveformEffects, waveformEffect);
-    }
-    #verifyWaveformEffectSegment(waveformEffectSegment) {
-        if (waveformEffectSegment.effect != undefined) {
-            const waveformEffect = waveformEffectSegment.effect;
-            this.#verifyWaveformEffect(waveformEffect);
-        }
-        else if (waveformEffectSegment.delay != undefined) {
-            const { delay } = waveformEffectSegment;
-            _console$F.assertWithError(delay >= 0, `delay must be 0ms or greater (got ${delay})`);
-            _console$F.assertWithError(delay <= MaxVibrationWaveformEffectSegmentDelay, `delay must be ${MaxVibrationWaveformEffectSegmentDelay}ms or less (got ${delay})`);
-        }
-        else {
-            throw Error("no effect or delay found in waveformEffectSegment");
-        }
-        if (waveformEffectSegment.loopCount != undefined) {
-            const { loopCount } = waveformEffectSegment;
-            this.#verifyWaveformEffectSegmentLoopCount(loopCount);
-        }
-    }
-    #verifyWaveformEffectSegmentLoopCount(waveformEffectSegmentLoopCount) {
-        _console$F.assertRangeWithError("waveformEffectSegmentLoopCount", waveformEffectSegmentLoopCount, 0, MaxVibrationWaveformEffectSegmentLoopCount);
-    }
-    #verifyWaveformEffectSegments(waveformEffectSegments) {
-        _console$F.assertRangeWithError("waveformEffectSegments.length", waveformEffectSegments.length, 0, MaxNumberOfVibrationWaveformEffectSegments);
-        waveformEffectSegments.forEach((waveformEffectSegment) => {
-            this.#verifyWaveformEffectSegment(waveformEffectSegment);
-        });
-    }
-    #verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount) {
-        _console$F.assertRangeWithError("waveformEffectSequenceLoopCount", waveformEffectSequenceLoopCount, 0, MaxVibrationWaveformEffectSequenceLoopCount);
-    }
-    #verifyWaveformSegment(waveformSegment) {
-        _console$F.assertRangeWithError("waveformSegment.amplitude", waveformSegment.amplitude, 0, 1);
-        _console$F.assertRangeWithError("waveformSegment.duration", waveformSegment.duration, 0, MaxVibrationWaveformSegmentDuration);
-    }
-    #verifyWaveformSegments(waveformSegments) {
-        _console$F.assertRangeWithError("waveformSegments.length", waveformSegments.length, 0, MaxNumberOfVibrationWaveformSegments);
-        waveformSegments.forEach((waveformSegment) => {
-            this.#verifyWaveformSegment(waveformSegment);
-        });
-    }
-    #createWaveformEffectsData(locations, waveformEffectSegments, waveformEffectSequenceLoopCount = 0) {
-        this.#verifyWaveformEffectSegments(waveformEffectSegments);
-        this.#verifyWaveformEffectSequenceLoopCount(waveformEffectSequenceLoopCount);
-        let dataArray = [];
-        let byteOffset = 0;
-        const hasAtLeast1WaveformEffectWithANonzeroLoopCount = waveformEffectSegments.some((waveformEffectSegment) => {
-            const { loopCount } = waveformEffectSegment;
-            return loopCount != undefined && loopCount > 0;
-        });
-        const includeAllWaveformEffectSegments = hasAtLeast1WaveformEffectWithANonzeroLoopCount ||
-            waveformEffectSequenceLoopCount != 0;
-        for (let index = 0; index < waveformEffectSegments.length ||
-            (includeAllWaveformEffectSegments &&
-                index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
-            const waveformEffectSegment = waveformEffectSegments[index] || {
-                effect: "none",
-            };
-            if (waveformEffectSegment.effect != undefined) {
-                const waveformEffect = waveformEffectSegment.effect;
-                dataArray[byteOffset++] =
-                    VibrationWaveformEffects.indexOf(waveformEffect);
-            }
-            else if (waveformEffectSegment.delay != undefined) {
-                const { delay } = waveformEffectSegment;
-                dataArray[byteOffset++] = (1 << 7) | Math.floor(delay / 10);
-            }
-            else {
-                throw Error("invalid waveformEffectSegment");
-            }
-        }
-        const includeAllWaveformEffectSegmentLoopCounts = waveformEffectSequenceLoopCount != 0;
-        for (let index = 0; index < waveformEffectSegments.length ||
-            (includeAllWaveformEffectSegmentLoopCounts &&
-                index < MaxNumberOfVibrationWaveformEffectSegments); index++) {
-            const waveformEffectSegmentLoopCount = waveformEffectSegments[index]?.loopCount || 0;
-            if (index == 0 || index == 4) {
-                dataArray[byteOffset] = 0;
-            }
-            const bitOffset = 2 * (index % 4);
-            dataArray[byteOffset] |= waveformEffectSegmentLoopCount << bitOffset;
-            if (index == 3 || index == 7) {
-                byteOffset++;
-            }
-        }
-        if (waveformEffectSequenceLoopCount != 0) {
-            dataArray[byteOffset++] = waveformEffectSequenceLoopCount;
-        }
-        const dataView = new DataView(Uint8Array.from(dataArray).buffer);
-        _console$F.log({ dataArray, dataView });
-        return this.#createData(locations, "waveformEffect", dataView);
-    }
-    #createWaveformData(locations, waveformSegments) {
-        this.#verifyWaveformSegments(waveformSegments);
-        const dataView = new DataView(new ArrayBuffer(waveformSegments.length * 2));
-        waveformSegments.forEach((waveformSegment, index) => {
-            dataView.setUint8(index * 2, Math.floor(waveformSegment.amplitude * 127));
-            dataView.setUint8(index * 2 + 1, Math.floor(waveformSegment.duration / 10));
-        });
-        _console$F.log({ dataView });
-        return this.#createData(locations, "waveform", dataView);
-    }
-    #createData(locations, vibrationType, dataView) {
-        _console$F.assertWithError(dataView?.byteLength > 0, "no data received");
-        const locationsBitmask = this.#createLocationsBitmask(locations);
-        _console$F.assertEnumWithError(VibrationTypes, vibrationType);
-        const vibrationTypeIndex = VibrationTypes.indexOf(vibrationType);
-        _console$F.log({ locationsBitmask, vibrationTypeIndex, dataView });
-        const data = concatenateArrayBuffers(locationsBitmask, vibrationTypeIndex, dataView.byteLength, dataView);
-        _console$F.log({ data });
-        return data;
-    }
     async triggerVibration(vibrationConfigurations, sendImmediately = true) {
         if (!Array.isArray(vibrationConfigurations)) {
             vibrationConfigurations = [vibrationConfigurations];
@@ -5556,44 +5733,7 @@ class VibrationManager {
             _console$F.log("empty vibrationConfigurations");
             return;
         }
-        let triggerVibrationData;
-        vibrationConfigurations.forEach((vibrationConfiguration) => {
-            const { type } = vibrationConfiguration;
-            let { locations } = vibrationConfiguration;
-            locations = locations || this.vibrationLocations.slice();
-            locations = locations.filter((location) => this.vibrationLocations.includes(location));
-            let arrayBuffer;
-            switch (type) {
-                case "waveformEffect":
-                    {
-                        const { segments, loopCount } = vibrationConfiguration;
-                        if (segments.length == 0) {
-                            _console$F.log("no segments");
-                            return;
-                        }
-                        arrayBuffer = this.#createWaveformEffectsData(locations, segments, loopCount);
-                    }
-                    break;
-                case "waveform":
-                    {
-                        const { segments } = vibrationConfiguration;
-                        if (segments.length == 0) {
-                            _console$F.log("no segments");
-                            return;
-                        }
-                        arrayBuffer = this.#createWaveformData(locations, segments);
-                    }
-                    break;
-                default:
-                    throw Error(`invalid vibration type "${type}"`);
-            }
-            _console$F.log({ type, arrayBuffer });
-            if (arrayBuffer.byteLength == 0) {
-                _console$F.log("empty arrayBuffer");
-                return;
-            }
-            triggerVibrationData = concatenateArrayBuffers(triggerVibrationData, arrayBuffer);
-        });
+        const triggerVibrationData = serializeVibrationConfigurations(vibrationConfigurations, this.vibrationLocations);
         if (!triggerVibrationData) {
             _console$F.log("no triggerVibrationData");
             return;
@@ -5616,10 +5756,7 @@ class VibrationManager {
         });
     }
     #parseVibrationLocations(dataView) {
-        _console$F.log("parseVibrationLocations", dataView);
-        const vibrationLocations = Array.from(new Uint8Array(dataView.buffer))
-            .map((index) => VibrationLocations[index])
-            .filter(Boolean);
+        const vibrationLocations = parseVibrationLocations(dataView);
         this.#onVibrationLocations(vibrationLocations);
     }
     parseMessage(messageType, dataView, isSending) {
@@ -35335,7 +35472,7 @@ const DeviceManagerEventTypes = [
     ...DeviceManagerDeviceEventTypes,
     ...BaseDeviceManagerEventTypes,
 ];
-let DeviceManager = (() => {
+let DeviceManager$1 = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -35689,7 +35826,7 @@ let DeviceManager = (() => {
     });
     return _classThis;
 })();
-var DeviceManager$1 = DeviceManager.shared;
+var DeviceManager = DeviceManager$1.shared;
 
 var _a$2;
 const _console$g = createConsole("BaseScanner", { log: false });
@@ -35887,12 +36024,12 @@ class NullScanner extends BaseScanner {
 }
 
 const _console$f = createConsole("Scanner", { log: false });
-let scanner;
+let scanner$1;
 {
     _console$f.log("Scanner not available");
-    scanner = new NullScanner();
+    scanner$1 = new NullScanner();
 }
-var scanner$1 = scanner;
+var scanner = scanner$1;
 
 const _console$e = createConsole("DisplayCanvasHelperManager", { log: false });
 function getDisplayCanvasHelperManagerDisplayCanvasHelperEventTypes(displayCanvasHelperEventType) {
@@ -36034,9 +36171,9 @@ class BaseServer {
     }
     static OnServer;
     constructor() {
-        _console$d.assertWithError(scanner$1, "no scanner defined");
-        addEventListeners(scanner$1, this.#boundScannerListeners);
-        addEventListeners(DeviceManager$1, this.#boundDeviceManagerListeners);
+        _console$d.assertWithError(scanner, "no scanner defined");
+        addEventListeners(scanner, this.#boundScannerListeners);
+        addEventListeners(DeviceManager, this.#boundDeviceManagerListeners);
         addEventListeners(DisplayCanvasHelperManager, this.#boundDisplayCanvasHelperManagerEventListeners);
         addEventListeners(this, this.#boundServerListeners);
         _a$1.OnServer(this);
@@ -36117,7 +36254,7 @@ class BaseServer {
         _console$d.log(`currently have ${this.clients.length} clients`);
         if (this.clients.length == 0 &&
             this.clearSensorConfigurationsWhenNoClients) {
-            DeviceManager$1.connectedDevices.forEach((device) => {
+            DeviceManager.connectedDevices.forEach((device) => {
                 device.clearSensorConfiguration();
                 device.setTfliteInferencingEnabled(false);
             });
@@ -36149,7 +36286,7 @@ class BaseServer {
     get #isScanningAvailableMessage() {
         return createServerMessage({
             type: "isScanningAvailable",
-            data: scanner$1.isScanningAvailable,
+            data: scanner.isScanningAvailable,
         });
     }
     #onScannerIsScanning(event) {
@@ -36158,7 +36295,7 @@ class BaseServer {
     get #isScanningMessage() {
         return createServerMessage({
             type: "isScanning",
-            data: scanner$1.isScanning,
+            data: scanner.isScanning,
         });
     }
     #onScannerDiscoveredDevice(event) {
@@ -36184,9 +36321,9 @@ class BaseServer {
         });
     }
     get #discoveredDevicesMessage() {
-        const serverMessages = scanner$1.discoveredDevicesArray
+        const serverMessages = scanner.discoveredDevicesArray
             .filter((discoveredDevice) => {
-            const existingConnectedDevice = DeviceManager$1.connectedDevices.find((device) => device.bluetoothId == discoveredDevice.bluetoothId);
+            const existingConnectedDevice = DeviceManager.connectedDevices.find((device) => device.bluetoothId == discoveredDevice.bluetoothId);
             return !existingConnectedDevice;
         })
             .map((discoveredDevice) => {
@@ -36198,7 +36335,7 @@ class BaseServer {
         return createServerMessage({
             type: "connectedDevices",
             data: JSON.stringify({
-                connectedDevices: DeviceManager$1.connectedDevices.map((device) => device.bluetoothId),
+                connectedDevices: DeviceManager.connectedDevices.map((device) => device.bluetoothId),
             }),
         });
     }
@@ -36658,11 +36795,11 @@ class BaseServer {
             server: this,
         });
     }
-    #allowClientVibrationConfigurationToDevice(device, client, vibrationConfigurations) {
+    #allowClientVibrationConfigurationToDevice(device, client, vibrationConfiguration) {
         return ServerManager_default.clientVibrationConfigurationToDeviceGuardManager.evaluate({
             device,
             client,
-            vibrationConfigurations,
+            vibrationConfiguration,
             server: this,
         });
     }
@@ -36712,10 +36849,10 @@ class BaseServer {
                 }
                 break;
             case "startScan":
-                scanner$1.startScan();
+                scanner.startScan();
                 break;
             case "stopScan":
-                scanner$1.stopScan();
+                scanner.stopScan();
                 break;
             case "discoveredDevices":
                 if (this.#allowServerToClient(client, "discoveredDevices")) {
@@ -36733,12 +36870,12 @@ class BaseServer {
                     else {
                         _console$d.log(`connecting to device with id ${deviceId}...`);
                     }
-                    const device = DeviceManager$1.availableDevices.find((device) => device.bluetoothId == deviceId);
+                    const device = DeviceManager.availableDevices.find((device) => device.bluetoothId == deviceId);
                     if (device) {
                         device.connect({ type: connectionType, reconnect: true });
                     }
                     else {
-                        scanner$1.connectToDevice(deviceId, connectionType);
+                        scanner.connectToDevice(deviceId, connectionType);
                     }
                 }
                 break;
@@ -36748,8 +36885,8 @@ class BaseServer {
                     if (!deviceId) {
                         break;
                     }
-                    let device = DeviceManager$1.availableDevices.find((device) => device.bluetoothId == deviceId);
-                    device = device ?? scanner$1.devices[deviceId];
+                    let device = DeviceManager.availableDevices.find((device) => device.bluetoothId == deviceId);
+                    device = device ?? scanner.devices[deviceId];
                     if (!device) {
                         _console$d.error(`no device found with id ${deviceId}`);
                         break;
@@ -36772,7 +36909,7 @@ class BaseServer {
                     if (!deviceId) {
                         break;
                     }
-                    const device = DeviceManager$1.connectedDevices.find((device) => device.bluetoothId == deviceId);
+                    const device = DeviceManager.connectedDevices.find((device) => device.bluetoothId == deviceId);
                     if (!device) {
                         _console$d.error(`no device found with id ${deviceId}`);
                         break;
@@ -36796,7 +36933,7 @@ class BaseServer {
                     if (!deviceId) {
                         break;
                     }
-                    const device = DeviceManager$1.connectedDevices.find((device) => device.bluetoothId == deviceId);
+                    const device = DeviceManager.connectedDevices.find((device) => device.bluetoothId == deviceId);
                     if (!device) {
                         _console$d.error(`no device found with id ${deviceId}`);
                         break;
@@ -37130,6 +37267,23 @@ class BaseServer {
                                 return;
                             }
                         }
+                    }
+                    break;
+                case "triggerVibration":
+                    if (!ServerManager_default.clientVibrationConfigurationToDeviceGuardManager
+                        .isEmpty) {
+                        _console$d.log("trimming vibrationConfigurations...");
+                        const vibrationConfigurations = parseVibrationConfigurations(dataView);
+                        _console$d.log("vibrationConfigurations", vibrationConfigurations);
+                        const filteredVibrationConfigurations = vibrationConfigurations.filter((vibrationConfiguration) => this.#allowClientVibrationConfigurationToDevice(device, client, vibrationConfiguration));
+                        _console$d.log("filteredVibrationConfigurations", filteredVibrationConfigurations);
+                        const serializedFilteredVibrationConfigurations = serializeVibrationConfigurations(filteredVibrationConfigurations);
+                        _console$d.log("serializedFilteredVibrationConfigurations", serializedFilteredVibrationConfigurations);
+                        if (serializedFilteredVibrationConfigurations.byteLength == 0) {
+                            _console$d.log("empty serializedFilteredVibrationConfigurations - skipping");
+                            return;
+                        }
+                        message.data = serializedFilteredVibrationConfigurations;
                     }
                     break;
                 case "displayContextCommands":
@@ -37508,7 +37662,7 @@ class GuardManager {
     }
 }
 
-const _console$b = createConsole("ServerManager", { log: false });
+const _console$c = createConsole("ServerManager", { log: false });
 function getServerManagerServerEventTypes(serverEventType) {
     return ["server"].map((prefix) => `${prefix}${capitalizeFirstCharacter(serverEventType)}`);
 }
@@ -37549,10 +37703,10 @@ let ServerManager = (() => {
             [wildcardEventType]: this.#onServerEvent.bind(this),
         };
         #onServer(server) {
-            _console$b.log("onServer", server);
+            _console$c.log("onServer", server);
             addEventListeners(server, this.#boundServerEventListeners);
             if (!this.#servers.includes(server)) {
-                _console$b.log("server", server);
+                _console$c.log("server", server);
                 this.#servers.push(server);
                 this.#dispatchEvent("server", { server });
                 this.#dispatchEvent("servers", {
@@ -37562,7 +37716,7 @@ let ServerManager = (() => {
         }
         #onServerEvent(serverEvent) {
             const { type: serverEventType, target: server, message } = serverEvent;
-            _console$b.log("onServerEvent", serverEvent);
+            _console$c.log("onServerEvent", serverEvent);
             this.#dispatchEvent(wildcardServerEventType, {
                 ...message,
                 server: server,
@@ -37592,7 +37746,7 @@ let ServerManager = (() => {
             if (arrayBuffer.byteLength == 0) {
                 return;
             }
-            _console$b.log("broadcast", arrayBuffer, {
+            _console$c.log("broadcast", arrayBuffer, {
                 clients,
                 excludeClients,
                 isWrapped,
@@ -37616,7 +37770,7 @@ let ServerManager = (() => {
 })();
 var ServerManager_default = ServerManager.shared;
 
-const _console$c = createConsole("ClientConnectionManager", { log: false });
+const _console$b = createConsole("ClientConnectionManager", { log: false });
 [
     ...DeviceInformationTypes,
     "batteryLevel",
@@ -37638,9 +37792,9 @@ class ClientConnectionManager extends BaseConnectionManager {
         return this.#bluetoothId;
     }
     set bluetoothId(newBluetoothId) {
-        _console$c.assertTypeWithError(newBluetoothId, "string");
+        _console$b.assertTypeWithError(newBluetoothId, "string");
         if (this.#bluetoothId == newBluetoothId) {
-            _console$c.log("redundant bluetoothId assignment");
+            _console$b.log("redundant bluetoothId assignment");
             return;
         }
         this.#bluetoothId = newBluetoothId;
@@ -37650,13 +37804,13 @@ class ClientConnectionManager extends BaseConnectionManager {
         return this.#isConnected;
     }
     set isConnected(newIsConnected) {
-        _console$c.assertTypeWithError(newIsConnected, "boolean");
+        _console$b.assertTypeWithError(newIsConnected, "boolean");
         if (this.#isConnected == newIsConnected) {
-            _console$c.log("redundant newIsConnected assignment", newIsConnected);
+            _console$b.log("redundant newIsConnected assignment", newIsConnected);
             return;
         }
         this.#isConnected = newIsConnected;
-        _console$c.log({ isConnected: this.isConnected });
+        _console$b.log({ isConnected: this.isConnected });
         this.status = this.#isConnected ? "connected" : "notConnected";
         if (this.isConnected) {
             this.#requestDeviceInformation();
@@ -37712,27 +37866,27 @@ class ClientConnectionManager extends BaseConnectionManager {
     }
     #didRequestDeviceInformation = false;
     #requestDeviceInformation() {
-        _console$c.log("requestDeviceInformation");
+        _console$b.log("requestDeviceInformation");
         if (this.#didRequestDeviceInformation == false) {
             this.sendRequiredDeviceInformationMessage();
             this.#didRequestDeviceInformation = true;
         }
         else {
-            _console$c.log("already requested deviceInformation");
+            _console$b.log("already requested deviceInformation");
         }
     }
     onClientMessage(dataView) {
-        _console$c.log({ dataView });
+        _console$b.log({ dataView });
         parseMessage(dataView, DeviceEventTypes, this.#onClientMessageCallback.bind(this), null, true);
         this.onMessagesReceived();
     }
     #onClientMessageCallback(messageType, dataView) {
         let byteOffset = 0;
-        _console$c.log({ messageType }, dataView);
+        _console$b.log({ messageType }, dataView);
         switch (messageType) {
             case "isConnected":
                 const isConnected = Boolean(dataView.getUint8(byteOffset++));
-                _console$c.log({ isConnected });
+                _console$b.log({ isConnected });
                 this.isConnected = isConnected;
                 break;
             case "rx":
@@ -37746,7 +37900,7 @@ class ClientConnectionManager extends BaseConnectionManager {
 }
 
 var _a;
-const _console$4 = createConsole("BaseClient", { log: false });
+const _console$a = createConsole("BaseClient", { log: false });
 const ClientConnectionStatuses = [
     "notConnected",
     "connecting",
@@ -37802,17 +37956,17 @@ class BaseClient {
         return this.#eventDispatcher.waitForEvent;
     }
     assertConnection() {
-        _console$4.assertWithError(this.isConnected, "notConnected");
+        _console$a.assertWithError(this.isConnected, "notConnected");
     }
     assertDisconnection() {
-        _console$4.assertWithError(this.isDisconnected, "not disconnected");
+        _console$a.assertWithError(this.isDisconnected, "not disconnected");
     }
     static _reconnectOnDisconnection = true;
     static get ReconnectOnDisconnection() {
         return this._reconnectOnDisconnection;
     }
     static set ReconnectOnDisconnection(newReconnectOnDisconnection) {
-        _console$4.assertTypeWithError(newReconnectOnDisconnection, "boolean");
+        _console$a.assertTypeWithError(newReconnectOnDisconnection, "boolean");
         this._reconnectOnDisconnection = newReconnectOnDisconnection;
     }
     _reconnectOnDisconnection = this.baseConstructor.ReconnectOnDisconnection;
@@ -37820,7 +37974,7 @@ class BaseClient {
         return this._reconnectOnDisconnection;
     }
     set reconnectOnDisconnection(newReconnectOnDisconnection) {
-        _console$4.assertTypeWithError(newReconnectOnDisconnection, "boolean");
+        _console$a.assertTypeWithError(newReconnectOnDisconnection, "boolean");
         this._reconnectOnDisconnection = newReconnectOnDisconnection;
     }
     #_connectionStatus = "notConnected";
@@ -37828,8 +37982,8 @@ class BaseClient {
         return this.#_connectionStatus;
     }
     set _connectionStatus(newConnectionStatus) {
-        _console$4.assertTypeWithError(newConnectionStatus, "string");
-        _console$4.log({ newConnectionStatus });
+        _console$a.assertTypeWithError(newConnectionStatus, "string");
+        _console$a.log({ newConnectionStatus });
         if (this.#_connectionStatus == newConnectionStatus) {
             return;
         }
@@ -37861,7 +38015,7 @@ class BaseClient {
         return _a.#RequiredMessageTypes;
     }
     _sendRequiredMessages() {
-        _console$4.log("sending required messages", this.#requiredMessageTypes);
+        _console$a.log("sending required messages", this.#requiredMessageTypes);
         this.sendServerMessage(...this.#requiredMessageTypes);
     }
     #receivedMessageTypes = [];
@@ -37869,49 +38023,49 @@ class BaseClient {
         if (this.connectionStatus != "connecting") {
             return;
         }
-        _console$4.log("checking if fully connected...");
+        _console$a.log("checking if fully connected...");
         if (!this.#receivedMessageTypes.includes("isScanningAvailable")) {
-            _console$4.log("not fully connected - didn't receive isScanningAvailable");
+            _console$a.log("not fully connected - didn't receive isScanningAvailable");
             return;
         }
         if (this.isScanningAvailable) {
             if (!this.#receivedMessageTypes.includes("isScanning")) {
-                _console$4.log("not fully connected - didn't receive isScanning");
+                _console$a.log("not fully connected - didn't receive isScanning");
                 return;
             }
         }
-        _console$4.log("fully connected");
+        _console$a.log("fully connected");
         this._connectionStatus = "connected";
     }
     parseMessage(dataView) {
-        _console$4.log("parseMessage", { dataView });
+        _console$a.log("parseMessage", { dataView });
         parseMessage(dataView, ServerMessageTypes, this.#parseMessageCallback.bind(this), null, true);
         this.#checkIfFullyConnected();
     }
     #parseMessageCallback(messageType, dataView) {
         let byteOffset = 0;
-        _console$4.log({ messageType }, dataView);
+        _console$a.log({ messageType }, dataView);
         switch (messageType) {
             case "isScanningAvailable":
                 {
                     const isScanningAvailable = Boolean(dataView.getUint8(byteOffset++));
-                    _console$4.log({ isScanningAvailable });
+                    _console$a.log({ isScanningAvailable });
                     this.#isScanningAvailable = isScanningAvailable;
                 }
                 break;
             case "isScanning":
                 {
                     const isScanning = Boolean(dataView.getUint8(byteOffset++));
-                    _console$4.log({ isScanning });
+                    _console$a.log({ isScanning });
                     this.#isScanning = isScanning;
                 }
                 break;
             case "discoveredDevice":
                 {
                     const { string: discoveredDeviceString } = parseStringFromDataView(dataView, byteOffset);
-                    _console$4.log({ discoveredDeviceString });
+                    _console$a.log({ discoveredDeviceString });
                     const discoveredDevice = JSON.parse(discoveredDeviceString);
-                    _console$4.log({ discoveredDevice });
+                    _console$a.log({ discoveredDevice });
                     this.onDiscoveredDevice(discoveredDevice);
                 }
                 break;
@@ -37927,9 +38081,9 @@ class BaseClient {
                         break;
                     }
                     const { string: connectedBluetoothDeviceIdStrings } = parseStringFromDataView(dataView, byteOffset);
-                    _console$4.log({ connectedBluetoothDeviceIdStrings });
+                    _console$a.log({ connectedBluetoothDeviceIdStrings });
                     const connectedBluetoothDeviceIds = JSON.parse(connectedBluetoothDeviceIdStrings).connectedDevices;
-                    _console$4.log({ connectedBluetoothDeviceIds });
+                    _console$a.log({ connectedBluetoothDeviceIds });
                     this.onConnectedBluetoothDeviceIds(connectedBluetoothDeviceIds);
                 }
                 break;
@@ -37941,14 +38095,14 @@ class BaseClient {
                     if (!device) {
                         device = this.onConnectedBluetoothDeviceIds([bluetoothId])[0];
                     }
-                    _console$4.assertWithError(device, `no device found for id ${bluetoothId}`);
+                    _console$a.assertWithError(device, `no device found for id ${bluetoothId}`);
                     const connectionManager = device.connectionManager;
                     const _dataView = sliceDataView(dataView, byteOffset);
                     connectionManager.onClientMessage(_dataView);
                 }
                 break;
             default:
-                _console$4.error(`uncaught messageType "${messageType}"`);
+                _console$a.error(`uncaught messageType "${messageType}"`);
                 break;
         }
         if (this.connectionStatus == "connecting") {
@@ -37960,7 +38114,7 @@ class BaseClient {
         return this.#_isScanningAvailable;
     }
     set #isScanningAvailable(newIsAvailable) {
-        _console$4.assertTypeWithError(newIsAvailable, "boolean");
+        _console$a.assertTypeWithError(newIsAvailable, "boolean");
         this.#_isScanningAvailable = newIsAvailable;
         this.#dispatchEvent("isScanningAvailable", {
             isScanningAvailable: this.isScanningAvailable,
@@ -37974,7 +38128,7 @@ class BaseClient {
     }
     #assertIsScanningAvailable() {
         this.assertConnection();
-        _console$4.assertWithError(this.isScanningAvailable, "scanning is not available");
+        _console$a.assertWithError(this.isScanningAvailable, "scanning is not available");
     }
     requestIsScanningAvailable() {
         this.sendServerMessage("isScanningAvailable");
@@ -37984,7 +38138,7 @@ class BaseClient {
         return this.#_isScanning;
     }
     set #isScanning(newIsScanning) {
-        _console$4.assertTypeWithError(newIsScanning, "boolean");
+        _console$a.assertTypeWithError(newIsScanning, "boolean");
         this.#_isScanning = newIsScanning;
         this.#dispatchEvent("isScanning", { isScanning: this.isScanning });
     }
@@ -37995,10 +38149,10 @@ class BaseClient {
         this.sendServerMessage("isScanning");
     }
     #assertIsScanning() {
-        _console$4.assertWithError(this.isScanning, "is not scanning");
+        _console$a.assertWithError(this.isScanning, "is not scanning");
     }
     #assertIsNotScanning() {
-        _console$4.assertWithError(!this.isScanning, "is already scanning");
+        _console$a.assertWithError(!this.isScanning, "is already scanning");
     }
     startScan() {
         this.#assertIsNotScanning();
@@ -38022,7 +38176,7 @@ class BaseClient {
         return this.#discoveredDevices;
     }
     onDiscoveredDevice(discoveredDevice) {
-        _console$4.log({ discoveredDevice });
+        _console$a.log({ discoveredDevice });
         this.#discoveredDevices[discoveredDevice.bluetoothId] = discoveredDevice;
         this.#dispatchEvent("discoveredDevice", { discoveredDevice });
     }
@@ -38030,13 +38184,13 @@ class BaseClient {
         this.sendServerMessage({ type: "discoveredDevices" });
     }
     #onExpiredDiscoveredDevice(bluetoothId) {
-        _console$4.log({ expiredBluetoothDeviceId: bluetoothId });
+        _console$a.log({ expiredBluetoothDeviceId: bluetoothId });
         const discoveredDevice = this.#discoveredDevices[bluetoothId];
         if (!discoveredDevice) {
-            _console$4.warn(`no discoveredDevice found with id "${bluetoothId}"`);
+            _console$a.warn(`no discoveredDevice found with id "${bluetoothId}"`);
             return;
         }
-        _console$4.log({ expiredDiscoveredDevice: discoveredDevice });
+        _console$a.log({ expiredDiscoveredDevice: discoveredDevice });
         delete this.#discoveredDevices[bluetoothId];
         this.#dispatchEvent("expiredDiscoveredDevice", { discoveredDevice });
     }
@@ -38045,7 +38199,7 @@ class BaseClient {
     }
     requestConnectionToDevice(bluetoothId, connectionType) {
         this.assertConnection();
-        _console$4.assertTypeWithError(bluetoothId, "string");
+        _console$a.assertTypeWithError(bluetoothId, "string");
         const device = this.#getOrCreateDevice(bluetoothId);
         if (device.connectionStatus == "notConnected") {
             if (connectionType) {
@@ -38094,12 +38248,12 @@ class BaseClient {
         return device;
     }
     onConnectedBluetoothDeviceIds(bluetoothIds) {
-        _console$4.log({ bluetoothIds });
+        _console$a.log({ bluetoothIds });
         return bluetoothIds.map((bluetoothId) => {
             const device = this.#getOrCreateDevice(bluetoothId);
             const connectionManager = device.connectionManager;
             connectionManager.isConnected = true;
-            DeviceManager$1._checkDeviceAvailability(device);
+            DeviceManager._checkDeviceAvailability(device);
             return device;
         });
     }
@@ -38108,9 +38262,9 @@ class BaseClient {
     }
     requestDisconnectionFromDevice(bluetoothId) {
         this.assertConnection();
-        _console$4.assertTypeWithError(bluetoothId, "string");
+        _console$a.assertTypeWithError(bluetoothId, "string");
         const device = this.devices[bluetoothId];
-        _console$4.assertWithError(device, `no device found with id ${bluetoothId}`);
+        _console$a.assertWithError(device, `no device found with id ${bluetoothId}`);
         device.disconnect();
         return device;
     }
@@ -38132,7 +38286,7 @@ class BaseClient {
 }
 _a = BaseClient;
 
-const _console$a = createConsole("ClientManager", { log: false });
+const _console$9 = createConsole("ClientManager", { log: false });
 function getClientManagerClientEventTypes(clientEventType) {
     return ["client"].map((prefix) => `${prefix}${capitalizeFirstCharacter(clientEventType)}`);
 }
@@ -38173,10 +38327,10 @@ let ClientManager = (() => {
             [wildcardEventType]: this.#onClientEvent.bind(this),
         };
         #onClient(client) {
-            _console$a.log("onClient", client);
+            _console$9.log("onClient", client);
             addEventListeners(client, this.#boundClientEventListeners);
             if (!this.#clients.includes(client)) {
-                _console$a.log("client", client);
+                _console$9.log("client", client);
                 this.#clients.push(client);
                 this.#dispatchEvent("client", { client });
                 this.#dispatchEvent("clients", {
@@ -38186,7 +38340,7 @@ let ClientManager = (() => {
         }
         #onClientEvent(clientEvent) {
             const { type: clientEventType, target: client, message } = clientEvent;
-            _console$a.log("onClientEvent", clientEvent);
+            _console$9.log("onClientEvent", clientEvent);
             this.#dispatchEvent(wildcardClientEventType, {
                 ...message,
                 client: client,
@@ -38217,22 +38371,22 @@ let ClientManager = (() => {
 })();
 var ClientManager_default = ClientManager.shared;
 
-const _console$9 = createConsole("WindowManagerUtils", { log: false });
+const _console$8 = createConsole("WindowManagerUtils", { log: false });
 const WindowManagerMessageTypes = [
     "ping",
     "pong",
     "serverMessage",
 ];
 function createWindowManagerMessage(...messages) {
-    _console$9.log("createWindowManagerMessage", ...messages);
+    _console$8.log("createWindowManagerMessage", ...messages);
     return createMessage(WindowManagerMessageTypes, true, ...messages);
 }
 const windowManagerMessageKey = "BrilliantWear";
 const windowManagerPingMessage = createWindowManagerMessage("ping");
 const windowManagerPongMessage = createWindowManagerMessage("pong");
 
-const _console$8 = createConsole("WindowServer", { log: false });
-let WindowServer = (() => {
+const _console$7 = createConsole("WindowServer", { log: false });
+let WindowServer$1 = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -38273,12 +38427,12 @@ let WindowServer = (() => {
         };
         #onWindowManagerServerClientConnected(event) {
             const { client } = event.message;
-            _console$8.log("onWindowManagerServerClientConnected", client);
+            _console$7.log("onWindowManagerServerClientConnected", client);
             this.dispatchEvent("clientConnected", { client });
         }
         #onWindowManagerServerClientDisconnected(event) {
             const { client } = event.message;
-            _console$8.log("onWindowManagerServerClientDisconnected", client);
+            _console$7.log("onWindowManagerServerClientDisconnected", client);
             this.dispatchEvent("clientDisconnected", { client });
         }
         static {
@@ -38287,9 +38441,9 @@ let WindowServer = (() => {
     };
     return WindowServer = _classThis;
 })();
-var WindowServer$1 = WindowServer.shared;
+var WindowServer = WindowServer$1.shared;
 
-const _console$7 = createConsole("WindowManagerServer", { log: false });
+const _console$6 = createConsole("WindowManagerServer", { log: false });
 const WindowManagerServerEventTypes = [
     "clientConnected",
     "clientDisconnected",
@@ -38326,7 +38480,7 @@ let WindowManagerServer = (() => {
         }
         removeAllEventListeners() {
             this.#eventDispatcher.removeAllEventListeners();
-            WindowServer$1.init();
+            WindowServer.init();
         }
         static shared;
         constructor() {
@@ -38368,10 +38522,10 @@ let WindowManagerServer = (() => {
         }
         #sendToClient(client, arrayBuffer) {
             if (arrayBuffer.byteLength == 0) {
-                _console$7.log("nothing to send to client");
+                _console$6.log("nothing to send to client");
                 return false;
             }
-            _console$7.log("sendToClient", client, arrayBuffer);
+            _console$6.log("sendToClient", client, arrayBuffer);
             const { messageChannel, iframe, didSendMessagePort } = client;
             if (messageChannel && didSendMessagePort) {
                 messageChannel.port1.postMessage(arrayBuffer, {
@@ -38407,7 +38561,7 @@ let WindowManagerServer = (() => {
             if (event.source == window.parent) {
                 return;
             }
-            _console$7.log("onWindowMessage", event);
+            _console$6.log("onWindowMessage", event);
             const data = event.data[windowManagerMessageKey];
             if (!data) {
                 return;
@@ -38420,7 +38574,7 @@ let WindowManagerServer = (() => {
             if (!client) {
                 const iframe = this.#iframes.find((iframe) => iframe.contentWindow == event.source);
                 if (!iframe) {
-                    _console$7.error("no iframe found for event", event);
+                    _console$6.error("no iframe found for event", event);
                     return;
                 }
                 client = await this.#createClient(iframe);
@@ -38428,24 +38582,24 @@ let WindowManagerServer = (() => {
                     return;
                 }
             }
-            _console$7.log("onWindowMessage", client, data);
+            _console$6.log("onWindowMessage", client, data);
             const dataView = new DataView(data);
-            _console$7.log(`received ${dataView.byteLength} bytes via window`, dataView.buffer);
+            _console$6.log(`received ${dataView.byteLength} bytes via window`, dataView.buffer);
             this.#parseWindowManagerClientMessage(client, dataView);
         }
         async #waitForClientToLoad(client) {
-            _console$7.log("waitForClientToLoad", client);
+            _console$6.log("waitForClientToLoad", client);
             await this.#waitForiframeToLoad(client.iframe);
         }
         async #waitForiframeToLoad(iframe) {
-            _console$7.log("waitForiframeToLoad", iframe);
+            _console$6.log("waitForiframeToLoad", iframe);
             await new Promise((resolve) => {
                 if (iframe.contentDocument?.readyState === "complete") {
-                    _console$7.log("iframe complete");
+                    _console$6.log("iframe complete");
                     resolve();
                 }
                 else {
-                    _console$7.log("waiting for iframe to load...");
+                    _console$6.log("waiting for iframe to load...");
                     iframe.addEventListener("load", () => resolve(), { once: true });
                 }
             });
@@ -38462,7 +38616,7 @@ let WindowManagerServer = (() => {
             return client;
         }
         #destroyClient(client) {
-            _console$7.log("onClientDisconnected", client);
+            _console$6.log("onClientDisconnected", client);
             const { messageChannel } = client;
             if (messageChannel) {
                 messageChannel.port1.close();
@@ -38484,22 +38638,22 @@ let WindowManagerServer = (() => {
         #iframes = [];
         #onIframeAdded(iframe) {
             if (this.#iframes.includes(iframe)) {
-                _console$7.log("redundant iframe added", iframe);
+                _console$6.log("redundant iframe added", iframe);
                 return;
             }
-            _console$7.log("iframe added", iframe);
+            _console$6.log("iframe added", iframe);
             this.#iframes.push(iframe);
         }
         #onIframeRemoved(iframe) {
             if (!this.#iframes.includes(iframe)) {
                 return;
             }
-            _console$7.log("iframe removed", iframe);
+            _console$6.log("iframe removed", iframe);
             this.#iframes.splice(this.#iframes.indexOf(iframe));
             removeEventListeners(iframe, this.#boundIframeEventListeners);
             const client = this.#getClientByiFrame(iframe);
             if (!client) {
-                _console$7.error("no client found for iframe", iframe);
+                _console$6.error("no client found for iframe", iframe);
                 return;
             }
             this.#destroyClient(client);
@@ -38508,17 +38662,17 @@ let WindowManagerServer = (() => {
             load: this.#onIframeLoad.bind(this),
         };
         #onIframeLoad(event) {
-            _console$7.log("onIframeLoad", event);
+            _console$6.log("onIframeLoad", event);
             const iframe = event.currentTarget;
             const client = this.#getClientByiFrame(iframe);
             if (!client) {
                 return;
             }
-            _console$7.log("onIframeLoad client", client);
+            _console$6.log("onIframeLoad client", client);
             this.#destroyClient(client);
         }
         #createMessageChannel(client) {
-            _console$7.log("createMessageChannel", client);
+            _console$6.log("createMessageChannel", client);
             const messageChannel = new MessageChannel();
             addEventListeners(messageChannel.port1, this.#boundMessageChannelPortEventListeners);
             messageChannel.port1.start();
@@ -38532,16 +38686,16 @@ let WindowManagerServer = (() => {
             const port = event.currentTarget;
             const client = this.#getClientByMessagePort(port);
             if (!client) {
-                _console$7.error("no client found for port", port);
+                _console$6.error("no client found for port", port);
                 return;
             }
             const arrayBuffer = event.data;
             const dataView = new DataView(arrayBuffer);
-            _console$7.log(`received ${dataView.byteLength} bytes via port`, dataView.buffer, client);
+            _console$6.log(`received ${dataView.byteLength} bytes via port`, dataView.buffer, client);
             this.#parseWindowManagerClientMessage(client, dataView);
         }
         #parseWindowManagerClientMessage(client, dataView) {
-            _console$7.log("parseWindowManagerClientMessage", client, dataView);
+            _console$6.log("parseWindowManagerClientMessage", client, dataView);
             const clientContext = {
                 responseMessages: [],
                 client,
@@ -38551,11 +38705,11 @@ let WindowManagerServer = (() => {
             };
             parseMessage(dataView, WindowManagerMessageTypes, this.#onClientMessage.bind(this), clientContext, true);
             client.transfer = clientContext.transfer;
-            WindowServer$1.sendClientContext(clientContext);
+            WindowServer.sendClientContext(clientContext);
         }
         #onClientMessage(messageType, dataView, clientContext) {
             const { responseMessages, transfer, client, localBroadcastMessages, broadcastMessages, } = clientContext;
-            _console$7.log("onClientMessage", { messageType }, clientContext);
+            _console$6.log("onClientMessage", { messageType }, clientContext);
             switch (messageType) {
                 case "ping":
                     this.#createMessageChannel(client);
@@ -38565,7 +38719,7 @@ let WindowManagerServer = (() => {
                 case "pong":
                     break;
                 case "serverMessage":
-                    const _clientContext = WindowServer$1.parseClientMessage(client, dataView);
+                    const _clientContext = WindowServer.parseClientMessage(client, dataView);
                     if (_clientContext) {
                         if (_clientContext.responseMessages.length > 0) {
                             responseMessages.push(createWindowManagerMessage({
@@ -38588,7 +38742,7 @@ let WindowManagerServer = (() => {
                     }
                     break;
                 default:
-                    _console$7.error(`uncaught messageType "${messageType}"`);
+                    _console$6.error(`uncaught messageType "${messageType}"`);
                     break;
             }
         }
@@ -38596,9 +38750,9 @@ let WindowManagerServer = (() => {
     return _classThis;
 })();
 var WindowManagerServer_default = WindowManagerServer.shared;
-WindowServer$1.init();
+WindowServer.init();
 
-const _console$6 = createConsole("WindowManagerClient", { log: false });
+const _console$5 = createConsole("WindowManagerClient", { log: false });
 const WindowManagerClientConnectionStatuses = [
     "notConnected",
     "connecting",
@@ -38611,7 +38765,7 @@ const WindowManagerClientEventTypes = [
     "isConnected",
     "serverMessage",
 ];
-let WindowManagerClient = (() => {
+let WindowManagerClient$1 = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -38662,7 +38816,7 @@ let WindowManagerClient = (() => {
             if (event.source != window.parent) {
                 return;
             }
-            _console$6.log("onWindowMessage", event);
+            _console$5.log("onWindowMessage", event);
             const arrayBuffer = event.data[windowManagerMessageKey];
             if (!arrayBuffer) {
                 return;
@@ -38671,9 +38825,9 @@ let WindowManagerClient = (() => {
             if (ports?.length > 0) {
                 this.#onMessagePort(ports[0]);
             }
-            _console$6.log("onWindowMessage", arrayBuffer, ports);
+            _console$5.log("onWindowMessage", arrayBuffer, ports);
             const dataView = new DataView(arrayBuffer);
-            _console$6.log(`received ${dataView.byteLength} bytes`, dataView.buffer);
+            _console$5.log(`received ${dataView.byteLength} bytes`, dataView.buffer);
             this.#parseWindowManagerMessage(dataView);
         }
         #port;
@@ -38686,7 +38840,7 @@ let WindowManagerClient = (() => {
                 this.#port.close();
             }
             this.#port = port;
-            _console$6.log("port", this.#port);
+            _console$5.log("port", this.#port);
             addEventListeners(this.#port, this.#boundMessageChannelPortEventListeners);
             this.#port.start();
         }
@@ -38694,22 +38848,22 @@ let WindowManagerClient = (() => {
             message: this.#onMessagePortMessage.bind(this),
         };
         #onMessagePortMessage(event) {
-            _console$6.log("onMessagePortMessage", event);
+            _console$5.log("onMessagePortMessage", event);
             const port = event.currentTarget;
             if (this.#port != port) {
-                _console$6.error("received message from wrong port");
+                _console$5.error("received message from wrong port");
                 return;
             }
             const arrayBuffer = event.data;
             const dataView = new DataView(arrayBuffer);
-            _console$6.log(`received ${dataView.byteLength} bytes`, dataView.buffer);
+            _console$5.log(`received ${dataView.byteLength} bytes`, dataView.buffer);
             this.#parseWindowManagerMessage(dataView);
         }
         #parseWindowManagerMessage(dataView) {
             parseMessage(dataView, WindowManagerMessageTypes, this.#onWindowManagerMessage.bind(this), null, true);
         }
         #onWindowManagerMessage(messageType, dataView) {
-            _console$6.log("#onWindowManagerMessage", { messageType }, dataView);
+            _console$5.log("#onWindowManagerMessage", { messageType }, dataView);
             switch (messageType) {
                 case "ping":
                     this.#pong();
@@ -38721,7 +38875,7 @@ let WindowManagerClient = (() => {
                     this.#dispatchEvent("serverMessage", { dataView });
                     break;
                 default:
-                    _console$6.error(`uncaught messageType "${messageType}"`);
+                    _console$5.error(`uncaught messageType "${messageType}"`);
                     break;
             }
         }
@@ -38730,8 +38884,8 @@ let WindowManagerClient = (() => {
             return this.#connectionStatus;
         }
         set connectionStatus(newConnectionStatus) {
-            _console$6.assertTypeWithError(newConnectionStatus, "string");
-            _console$6.log({ newConnectionStatus });
+            _console$5.assertTypeWithError(newConnectionStatus, "string");
+            _console$5.log({ newConnectionStatus });
             if (this.#connectionStatus == newConnectionStatus) {
                 return;
             }
@@ -38754,13 +38908,13 @@ let WindowManagerClient = (() => {
             return !this.isConnected;
         }
         #assertConnection() {
-            _console$6.assertWithError(this.isConnected, "notConnected");
+            _console$5.assertWithError(this.isConnected, "notConnected");
         }
         #assertDisconnection() {
-            _console$6.assertWithError(this.isDisconnected, "not disconnected");
+            _console$5.assertWithError(this.isDisconnected, "not disconnected");
         }
         connect() {
-            _console$6.log("connect");
+            _console$5.log("connect");
             this.#ping();
         }
         disconnect() {
@@ -38776,7 +38930,7 @@ let WindowManagerClient = (() => {
             if (message != windowManagerPingMessage) {
                 this.#assertConnection();
             }
-            _console$6.log("sendMessage", message, { transfer });
+            _console$5.log("sendMessage", message, { transfer });
             if (this.#port) {
                 this.#port.postMessage(message, { transfer });
             }
@@ -38787,23 +38941,23 @@ let WindowManagerClient = (() => {
             }
         }
         sendMessage(...messages) {
-            _console$6.log("sendMessage", ...messages);
+            _console$5.log("sendMessage", ...messages);
             this.#sendMessage(createWindowManagerMessage(...messages));
         }
         #ping() {
-            _console$6.log("#ping");
+            _console$5.log("#ping");
             this.#sendMessage(windowManagerPingMessage);
         }
         #pong() {
-            _console$6.log("#pong");
+            _console$5.log("#pong");
             this.#sendMessage(windowManagerPongMessage);
         }
     });
     return _classThis;
 })();
-var WindowManagerClient$1 = WindowManagerClient.shared;
+var WindowManagerClient = WindowManagerClient$1.shared;
 
-const _console$5 = createConsole("WindowClient", { log: false });
+const _console$4 = createConsole("WindowClient", { log: false });
 let WindowClient = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
@@ -38823,25 +38977,25 @@ let WindowClient = (() => {
         static shared;
         constructor() {
             super();
-            addEventListeners(WindowManagerClient$1, this.#boundWindowEventListeners);
+            addEventListeners(WindowManagerClient, this.#boundWindowEventListeners);
         }
         #boundWindowEventListeners = {
             connectionStatus: this.#onWindowManagerClientConnectionStatus.bind(this),
             serverMessage: this.#onWindowManagerClientServerMessage.bind(this),
         };
         #onWindowManagerClientConnectionStatus(event) {
-            _console$5.log("onWindowManagerClientConnectionStatus", event.message.connectionStatus);
+            _console$4.log("onWindowManagerClientConnectionStatus", event.message.connectionStatus);
             this._sendRequiredMessages();
         }
         #onWindowManagerClientServerMessage(event) {
-            _console$5.log("onWindowManagerClientServerMessage", event.message.dataView);
+            _console$4.log("onWindowManagerClientServerMessage", event.message.dataView);
             this.parseMessage(event.message.dataView);
         }
         get isConnected() {
-            return WindowManagerClient$1.isConnected;
+            return WindowManagerClient.isConnected;
         }
         get isDisconnected() {
-            return WindowManagerClient$1.isDisconnected;
+            return WindowManagerClient.isDisconnected;
         }
         connect() {
             this.#onConnectionCommand();
@@ -38859,8 +39013,8 @@ let WindowClient = (() => {
             throw new Error("WindowClient connection is automatic");
         }
         sendServerMessage(...messages) {
-            _console$5.log("sendServerMessage", messages);
-            WindowManagerClient$1.sendMessage({
+            _console$4.log("sendServerMessage", messages);
+            WindowManagerClient.sendMessage({
                 type: "serverMessage",
                 data: createServerMessage(...messages),
             });
@@ -39234,7 +39388,7 @@ class DevicePair {
         return this.#gloves;
     }
     static {
-        DeviceManager$1.addEventListener("deviceConnected", (event) => {
+        DeviceManager.addEventListener("deviceConnected", (event) => {
             const { device } = event.message;
             if (device.isInsole) {
                 this.#insoles.assignDevice(device);
@@ -39302,7 +39456,7 @@ const ConnectionManagers = [
 ];
 
 const Servers = [
-    WindowServer,
+    WindowServer$1,
 ];
 
 const Clients = [
@@ -39449,5 +39603,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager_default as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ContinuousSensorTypes, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, RangeHelper, RangeHelper2, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
+export { CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager_default as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ContinuousSensorTypes, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, RangeHelper, RangeHelper2, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
 //# sourceMappingURL=brilliantsole.module.js.map

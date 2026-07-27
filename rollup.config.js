@@ -13,7 +13,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 const production = !process.env.ROLLUP_WATCH;
 
 const name = "BS";
-const input = "src/BS.ts";
+const input = "src/index.ts";
 
 function header() {
   return {
@@ -180,7 +180,7 @@ const builds = [
     ...defaultBuild,
   },
   {
-    input: "./build/dts/BS.d.ts",
+    input: "./build/dts/index.d.ts",
     output: [{ file: "build/index.d.ts", format: "es" }],
     plugins: [
       removeLines("browser"),
@@ -217,7 +217,7 @@ const builds = [
     ...defaultBuild,
   },
   {
-    input: "./build/dts/BS.d.ts",
+    input: "./build/dts/index.d.ts",
     output: [{ file: "build/index.node.d.ts", format: "es" }],
     external: nodeExternal,
     plugins: [

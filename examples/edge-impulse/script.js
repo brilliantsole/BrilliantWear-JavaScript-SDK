@@ -956,7 +956,7 @@ function remoteManagementHelloMessage() {
       version: 3,
       apiKey: apiKey,
       deviceId: getDeviceId(),
-      deviceType: "BrilliantSole",
+      deviceType: "BrilliantWear",
       connection: "ip",
       sensors: sensorCombinations.map((sensorCombination) => {
         switch (sensorCombination) {
@@ -1225,7 +1225,7 @@ async function uploadData(values, sensors) {
     signature: emptySignature,
     payload: {
       device_name: getDeviceId(),
-      device_type: "BrilliantSole",
+      device_type: "BrilliantWear",
       interval_ms: samplingInterval,
       sensors,
       values,

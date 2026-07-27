@@ -139,10 +139,10 @@ export interface BaseServerClientDeviceDisplayContextCommandGuardManagerArg {
   server: Server;
 }
 
-export interface BaseServerClientDeviceVibrationConfigurationsGuardManagerArg {
+export interface BaseServerClientDeviceVibrationConfigurationGuardManagerArg {
   device: Device;
   client: ServerClient;
-  vibrationConfigurations: VibrationConfiguration[];
+  vibrationConfiguration: VibrationConfiguration;
   server: Server;
 }
 
@@ -273,7 +273,7 @@ class ServerManager {
   >();
 
   clientVibrationConfigurationToDeviceGuardManager = new GuardManager<
-    [BaseServerClientDeviceVibrationConfigurationsGuardManagerArg]
+    [BaseServerClientDeviceVibrationConfigurationGuardManagerArg]
   >();
 
   deviceFileToClientGuardManager = new GuardManager<

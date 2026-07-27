@@ -89,7 +89,11 @@ import {
   ShowDisplayContextCommandType,
   ShowDisplayContextCommandTypes,
 } from "../utils/DisplayContextCommand.ts";
-import { VibrationConfiguration } from "../vibration/VibrationManager.ts";
+import {
+  parseVibrationConfigurations,
+  serializeVibrationConfigurations,
+  VibrationConfiguration,
+} from "../vibration/VibrationManager.ts";
 
 const RequiredDeviceInformationMessageTypes: ConnectionMessageType[] = [
   ...DeviceInformationTypes,
@@ -1202,14 +1206,14 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   #allowClientVibrationConfigurationToDevice(
     device: Device,
     client: ServerClient,
-    vibrationConfigurations: VibrationConfiguration[],
+    vibrationConfiguration: VibrationConfiguration,
   ) {
     return ServerManager.clientVibrationConfigurationToDeviceGuardManager.evaluate(
       {
         device,
         // @ts-expect-error
         client,
-        vibrationConfigurations,
+        vibrationConfiguration,
         // @ts-expect-error
         server: this,
       },
@@ -1984,6 +1988,47 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                   message = getSensorConfigurationMessage;
                 }
               }
+            }
+            break;
+          case "triggerVibration":
+            if (
+              !ServerManager.clientVibrationConfigurationToDeviceGuardManager
+                .isEmpty
+            ) {
+              _console.log("trimming vibrationConfigurations...");
+              const vibrationConfigurations =
+                parseVibrationConfigurations(dataView);
+              _console.log("vibrationConfigurations", vibrationConfigurations);
+
+              const filteredVibrationConfigurations =
+                vibrationConfigurations.filter((vibrationConfiguration) =>
+                  this.#allowClientVibrationConfigurationToDevice(
+                    device,
+                    client,
+                    vibrationConfiguration,
+                  ),
+                );
+              _console.log(
+                "filteredVibrationConfigurations",
+                filteredVibrationConfigurations,
+              );
+
+              const serializedFilteredVibrationConfigurations =
+                serializeVibrationConfigurations(
+                  filteredVibrationConfigurations,
+                );
+              _console.log(
+                "serializedFilteredVibrationConfigurations",
+                serializedFilteredVibrationConfigurations,
+              );
+
+              if (serializedFilteredVibrationConfigurations.byteLength == 0) {
+                _console.log(
+                  "empty serializedFilteredVibrationConfigurations - skipping",
+                );
+                return;
+              }
+              message.data = serializedFilteredVibrationConfigurations;
             }
             break;
           case "displayContextCommands":

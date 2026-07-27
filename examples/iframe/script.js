@@ -396,6 +396,13 @@ BS.ServerManager.clientDisplayContextCommandToDeviceGuardManager.add(
   },
 );
 
+BS.ServerManager.clientVibrationConfigurationToDeviceGuardManager.add(
+  ({ client, message, vibrationConfiguration }) => {
+    console.log("allow vibrationConfiguration?", vibrationConfiguration);
+    return true;
+  },
+);
+
 const generateSpriteSheet = (name, length) => {
   /** @type {BS.DisplaySpriteSheet} */
   const spriteSheet = {
