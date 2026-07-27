@@ -89,6 +89,7 @@ import {
   ShowDisplayContextCommandType,
   ShowDisplayContextCommandTypes,
 } from "../utils/DisplayContextCommand.ts";
+import { VibrationConfiguration } from "../vibration/VibrationManager.ts";
 
 const RequiredDeviceInformationMessageTypes: ConnectionMessageType[] = [
   ...DeviceInformationTypes,
@@ -978,12 +979,19 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       .set(fileConfiguration, fileTransferMetaData);
 
     this.clients.forEach((client) => {
-      // FILL - use guard to check whether to send file
-      this.#sendDeviceFileConfigurationToClient(
-        device,
-        fileConfiguration,
-        client,
-      );
+      if (
+        this.#allowDeviceFileToClientGuardManager(
+          device,
+          client,
+          fileConfiguration,
+        )
+      ) {
+        this.#sendDeviceFileConfigurationToClient(
+          device,
+          fileConfiguration,
+          client,
+        );
+      }
     });
   }
 
@@ -1190,6 +1198,36 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         server: this,
       },
     );
+  }
+  #allowClientVibrationConfigurationToDevice(
+    device: Device,
+    client: ServerClient,
+    vibrationConfigurations: VibrationConfiguration[],
+  ) {
+    return ServerManager.clientVibrationConfigurationToDeviceGuardManager.evaluate(
+      {
+        device,
+        // @ts-expect-error
+        client,
+        vibrationConfigurations,
+        // @ts-expect-error
+        server: this,
+      },
+    );
+  }
+  #allowDeviceFileToClientGuardManager(
+    device: Device,
+    client: ServerClient,
+    fileConfiguration: ExtendedFileConfiguration,
+  ) {
+    return ServerManager.deviceFileToClientGuardManager.evaluate({
+      device,
+      // @ts-expect-error
+      client,
+      fileConfiguration,
+      // @ts-expect-error
+      server: this,
+    });
   }
 
   protected parseClientMessage(
@@ -1413,14 +1451,22 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
 
           for (const [device, map] of [...this.#clientSentFileConfigurations]) {
             for (const [fileConfiguration, _] of [...map]) {
-              const _messages = this.#sendDeviceFileConfigurationToClient(
-                device,
-                fileConfiguration,
-                client,
-                false,
-              );
-              if (_messages) {
-                messages.push(..._messages);
+              if (
+                this.#allowDeviceFileToClientGuardManager(
+                  device,
+                  client,
+                  fileConfiguration,
+                )
+              ) {
+                const _messages = this.#sendDeviceFileConfigurationToClient(
+                  device,
+                  fileConfiguration,
+                  client,
+                  false,
+                );
+                if (_messages) {
+                  messages.push(..._messages);
+                }
               }
             }
           }
@@ -1688,8 +1734,16 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           const metadata = map.get(client)!;
           const { sent, initiated } = metadata;
           if (!sent && !initiated) {
-            _console.log("found nextFileConfiguration", _fileConfiguration);
-            nextFileConfiguration = _fileConfiguration;
+            if (
+              this.#allowDeviceFileToClientGuardManager(
+                device,
+                client,
+                _fileConfiguration,
+              )
+            ) {
+              _console.log("found nextFileConfiguration", _fileConfiguration);
+              nextFileConfiguration = _fileConfiguration;
+            }
             break;
           }
         }

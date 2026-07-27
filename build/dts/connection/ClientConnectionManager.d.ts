@@ -1,7 +1,7 @@
 import BaseConnectionManager, { ClientConnectionType } from "./BaseConnectionManager.ts";
 import { ClientDeviceMessage } from "../server/ServerUtils.ts";
 import BaseClient from "../server/BaseClient.ts";
-import { DiscoveredDevice } from "../BS.ts";
+import { DiscoveredDevice } from "../scanner/BaseScanner.ts";
 export type SendClientMessageCallback = (...messages: ClientDeviceMessage[]) => void;
 export type SendClientConnectMessageCallback = (connectionType?: ClientConnectionType) => void;
 declare class ClientConnectionManager extends BaseConnectionManager {

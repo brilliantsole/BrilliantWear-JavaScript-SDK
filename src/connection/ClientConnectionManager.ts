@@ -10,7 +10,7 @@ import { DeviceInformationTypes } from "../DeviceInformationManager.ts";
 import { DeviceEventType } from "../Device.ts";
 import { ClientDeviceMessage } from "../server/ServerUtils.ts";
 import BaseClient from "../server/BaseClient.ts";
-import { DiscoveredDevice } from "../BS.ts";
+import { DiscoveredDevice } from "../scanner/BaseScanner.ts";
 
 const _console = createConsole("ClientConnectionManager", { log: false });
 

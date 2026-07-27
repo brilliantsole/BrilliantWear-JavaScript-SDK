@@ -23,7 +23,7 @@ import {
   ScannerEventTypes,
 } from "../scanner/BaseScanner.ts";
 import ClientConnectionManager from "../connection/ClientConnectionManager.ts";
-import { DeviceManager } from "../BS.ts";
+import DeviceManager from "../DeviceManager.ts";
 import {
   ClientConnectionType,
   ConnectionTypes,

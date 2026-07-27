@@ -21,7 +21,7 @@ import { defaultEuler, Euler, Vector2 } from "../utils/MathUtils.ts";
 export type PressureSensorPosition = Vector2;
 
 import { CenterOfPressure } from "../utils/CenterOfPressureHelper.ts";
-import { isTensorFlowAvailable } from "../BS.ts";
+import { isTensorFlowAvailable } from "../utils/Tensorflow.ts";
 import Device from "../Device.ts";
 import EventDispatcher from "../utils/EventDispatcher.ts";
 import autoBind from "auto-bind";
@@ -131,7 +131,7 @@ class PressureSensorDataManager {
     }
     _console.assertWithError(
       !this.#eventDispatcher,
-      "eventDispatcher already defined"
+      "eventDispatcher already defined",
     );
     this.#eventDispatcher = eventDispatcher;
     this.#centerOfPressureModel.eventDispatcher =
@@ -171,7 +171,7 @@ class PressureSensorDataManager {
 
     this.#sensorRangeHelpers = createArray(
       this.numberOfSensors,
-      () => new RangeHelper()
+      () => new RangeHelper(),
     );
     this.resetRange();
   }
@@ -268,17 +268,17 @@ class PressureSensorDataManager {
 
   saveCalibrationModel(
     handlerOrURL: tf.io.IOHandler | string,
-    config?: tf.io.SaveConfig
+    config?: tf.io.SaveConfig,
   ) {
     return this.#centerOfPressureModel.saveModel(handlerOrURL, config);
   }
   loadCalibrationModel(
     pathOrIOHandlerOrFileList: string | tf.io.IOHandler | FileList,
-    options?: tf.io.LoadOptions
+    options?: tf.io.LoadOptions,
   ) {
     return this.#centerOfPressureModel.loadModel(
       pathOrIOHandlerOrFileList,
-      options
+      options,
     );
   }
 
@@ -336,7 +336,7 @@ class PressureSensorDataManager {
   parseData(
     dataView: DataView<ArrayBuffer>,
     scalar: number,
-    timestamp: number
+    timestamp: number,
   ) {
     const pressureData: PressureData = {
       sensors: [],

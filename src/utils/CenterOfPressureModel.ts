@@ -3,7 +3,8 @@ import { createConsole } from "./Console.ts";
 /** NODE_START */ import * as tf from "@tensorflow/tfjs"; /** NODE_END */
 import { isTensorFlowAvailable } from "./Tensorflow.ts";
 
-import { Euler, PressureData } from "../BS.ts";
+import { Euler } from "../utils/MathUtils.ts";
+import { PressureData } from "../sensor/PressureSensorDataManager.ts";
 import { clamp } from "./MathUtils.ts";
 import { PressureSensorEventDispatcher } from "../sensor/PressureSensorDataManager.ts";
 import autoBind from "auto-bind";
@@ -72,7 +73,7 @@ class CenterOfPressureModel {
           units: Math.round(this.numberOfSensors * hiddenUnitScalar),
           activation: "relu",
           inputShape: isFirst ? [this.numberOfSensors] : undefined,
-        })
+        }),
       );
     });
 
@@ -126,7 +127,7 @@ class CenterOfPressureModel {
     }
     return this.#data.outputs.some((_outputs) => {
       const differences = outputs.map(
-        (value, index) => value - _outputs[index]
+        (value, index) => value - _outputs[index],
       );
       let differencesSquareSum = 0;
       differences.forEach((difference) => {
@@ -298,7 +299,7 @@ class CenterOfPressureModel {
 
   async saveModel(
     handlerOrURL: tf.io.IOHandler | string,
-    config?: tf.io.SaveConfig
+    config?: tf.io.SaveConfig,
   ) {
     if (!isTensorFlowAvailable()) {
       return false;
@@ -322,7 +323,7 @@ class CenterOfPressureModel {
   }
   async loadModel(
     pathOrIOHandlerOrFileList: string | tf.io.IOHandler | FileList,
-    options?: tf.io.LoadOptions
+    options?: tf.io.LoadOptions,
   ) {
     if (!isTensorFlowAvailable()) {
       return false;
@@ -367,7 +368,7 @@ class CenterOfPressureModel {
 
         if (weights.length != loadedWeights.length) {
           throw Error(
-            `weight count mismatch in layer ${i} (${this.model.layers[i].name})`
+            `weight count mismatch in layer ${i} (${this.model.layers[i].name})`,
           );
         }
 

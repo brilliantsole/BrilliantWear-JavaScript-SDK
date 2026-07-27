@@ -823,7 +823,7 @@ class FileTransferManager {
     return this.#pendingBufferWithHeader;
   }
   onFileConfiguration!: OnFileConfigurationCallback;
-  async onParseFile<T extends BaseFileConfiguration>(
+  async onParseFile<T extends FileConfiguration>(
     partialFileConfiguration: Partial<T>,
   ) {
     _console.log("onParseFile", partialFileConfiguration);
@@ -857,6 +857,7 @@ class FileTransferManager {
       const fileType = partialFileConfiguration.fileType!;
       const indirectly = false;
 
+      // @ts-expect-error
       fileConfiguration = {
         ...partialFileConfiguration,
         fileType,

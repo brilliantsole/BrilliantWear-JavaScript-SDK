@@ -26,6 +26,13 @@ import GuardManager from "../utils/GuardManager.ts";
 import { DeviceMessage, ServerMessage } from "./ServerUtils.ts";
 import Device from "../Device.ts";
 import { DisplayContextCommand } from "../utils/DisplayContextCommand.ts";
+import { VibrationConfiguration } from "../vibration/VibrationManager.ts";
+import {
+  ExtendedFileConfiguration,
+  FileConfiguration,
+  FileTransferDirection,
+  FileType,
+} from "../FileTransferManager.ts";
 
 const _console = createConsole("ServerManager", { log: false });
 
@@ -129,6 +136,20 @@ export interface BaseServerClientDeviceDisplayContextCommandGuardManagerArg {
   device: Device;
   client: ServerClient;
   displayContextCommand: DisplayContextCommand;
+  server: Server;
+}
+
+export interface BaseServerClientDeviceVibrationConfigurationsGuardManagerArg {
+  device: Device;
+  client: ServerClient;
+  vibrationConfigurations: VibrationConfiguration[];
+  server: Server;
+}
+
+export interface BaseServerClientDeviceFileGuardManagerArg {
+  device: Device;
+  client: ServerClient;
+  fileConfiguration: ExtendedFileConfiguration;
   server: Server;
 }
 
@@ -250,8 +271,14 @@ class ServerManager {
   deviceDisplayContextCommandToClientGuardManager = new GuardManager<
     [BaseServerClientDeviceDisplayContextCommandGuardManagerArg]
   >();
-  // FILL - guard for fileTransfer
-  // TODO: - guard for vibration
+
+  clientVibrationConfigurationToDeviceGuardManager = new GuardManager<
+    [BaseServerClientDeviceVibrationConfigurationsGuardManagerArg]
+  >();
+
+  deviceFileToClientGuardManager = new GuardManager<
+    [BaseServerClientDeviceFileGuardManagerArg]
+  >();
 }
 
 export default ServerManager.shared;

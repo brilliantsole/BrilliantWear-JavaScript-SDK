@@ -7,7 +7,7 @@ import {
 import { CenterOfPressure } from "../utils/CenterOfPressureHelper.ts";
 import { Side, Sides } from "../InformationManager.ts";
 import { DeviceEventMap } from "../Device.ts";
-import { RangeHelper } from "../BS.ts";
+import RangeHelper from "../utils/RangeHelper.ts";
 
 const _console = createConsole("DevicePairPressureSensorDataManager", {
   log: false,
@@ -66,7 +66,7 @@ class DevicePairPressureSensorDataManager {
     const now = Date.now();
     const hasBothSides = Sides.every((side) => side in this.#rawPressure);
     const bothSidesAreRecent = Sides.every(
-      (side) => now - this.#pressureTimestamps[side]! < 500
+      (side) => now - this.#pressureTimestamps[side]! < 500,
     );
     return hasBothSides && bothSidesAreRecent;
   }
@@ -98,7 +98,7 @@ class DevicePairPressureSensorDataManager {
     });
     pressureData.normalizedSum +=
       this.#normalizedSumRangeHelper.updateAndGetNormalization(
-        pressureData.scaledSum
+        pressureData.scaledSum,
       );
 
     if (numberOfSidesWithCenter == 2) {
@@ -154,7 +154,7 @@ class DevicePairPressureSensorDataManager {
 
       pressureData.normalizedCenter =
         this.#centerOfPressureHelper.updateAndGetNormalization(
-          pressureData.center
+          pressureData.center,
         );
     }
 

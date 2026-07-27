@@ -1,5 +1,6 @@
 /** NODE_START */ import * as tf from "@tensorflow/tfjs"; /** NODE_END */
-import { Euler, PressureData } from "../BS.ts";
+import { Euler } from "../utils/MathUtils.ts";
+import { PressureData } from "../sensor/PressureSensorDataManager.ts";
 import { PressureSensorEventDispatcher } from "../sensor/PressureSensorDataManager.ts";
 export type CenterOfPressureModelData = {
     inputs: number[][];
