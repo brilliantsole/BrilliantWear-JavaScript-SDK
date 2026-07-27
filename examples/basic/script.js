@@ -968,11 +968,15 @@ onCurrentDevice(() => {
 const fileTransferProgress = document.getElementById("fileTransferProgress");
 
 onCurrentDevice(() => {
-  currentDevice.addEventListener("fileTransferProgress", (event) => {
-    const progress = event.message.progress;
-    console.log({ progress }, { immediate: true });
-    fileTransferProgress.value = progress == 1 ? 0 : progress;
-  });
+  currentDevice.addEventListener(
+    "fileTransferProgress",
+    (event) => {
+      const progress = event.message.progress;
+      console.log({ progress });
+      fileTransferProgress.value = progress == 1 ? 0 : progress;
+    },
+    { immediate: true },
+  );
 });
 onCurrentDevice(() => {
   currentDevice.addEventListener(

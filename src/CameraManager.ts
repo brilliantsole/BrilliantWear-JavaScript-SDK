@@ -5,12 +5,17 @@ import EventDispatcher from "./utils/EventDispatcher.ts";
 import autoBind from "auto-bind";
 import { enumToArrayBuffer, parseMessage } from "./utils/ParseUtils.ts";
 import { concatenateArrayBuffers } from "./utils/ArrayBufferUtils.ts";
+import {
+  BaseFileConfiguration,
+  emptyHeaderDataView,
+  ExtendedFileConfiguration,
+  OnParseFileCallback,
+} from "./FileTransferManager.ts";
 
 /** NODE_START */
 import sharp from "sharp";
 import { spawn } from "child_process";
 import fs from "fs/promises";
-import { BaseFileConfiguration } from "./FileTransferManager.ts";
 /** NODE_END */
 
 const _console = createConsole("CameraManager", { log: false });
@@ -146,6 +151,7 @@ export type SendCameraMessagesCallback =
 
 export interface CameraImageFileConfiguration extends BaseFileConfiguration {
   fileType: "cameraImage";
+  cameraImage: CameraImage;
 }
 
 class CameraManager {
@@ -154,6 +160,7 @@ class CameraManager {
   }
 
   sendMessages!: SendCameraMessagesCallback;
+  onParseFile!: OnParseFileCallback;
 
   eventDispatcher!: CameraEventDispatcher;
   get #dispatchEvent() {
@@ -496,7 +503,7 @@ class CameraManager {
       return concatenateArrayBuffers(footerDataView, this.#footerData);
     }
   }
-  buildCameraData() {
+  buildCameraMetaData() {
     const cameraData = [
       this.#buildHeaderCameraData(),
       this.#buildFooterCameraData(),
@@ -926,6 +933,18 @@ class CameraManager {
     if (this.isRecording) {
       this.stopRecording();
     }
+  }
+
+  async onFileConfiguration(fileConfiguration: ExtendedFileConfiguration) {
+    _console.log("onFileConfiguration", fileConfiguration);
+    const dataView = new DataView(
+      fileConfiguration.buffer.slice(emptyHeaderDataView.byteLength),
+    );
+    this.parseMessage("cameraData", dataView);
+    const { message: cameraImage } = await this.waitForEvent("cameraImage", {
+      immediate: true,
+    });
+    this.onParseFile({ fileType: "cameraImage", cameraImage });
   }
 }
 

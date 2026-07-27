@@ -306,6 +306,8 @@ class Device {
       .sendTxMessages as SendCameraMessagesCallback;
     this.#cameraManager.eventDispatcher = this
       .#eventDispatcher as CameraEventDispatcher;
+    this.#cameraManager.onParseFile = this.#fileTransferManager
+      .onParseFile as OnParseFileCallback;
 
     this.#microphoneManager.sendMessages = this
       .sendTxMessages as SendMicrophoneMessagesCallback;
@@ -1408,9 +1410,7 @@ class Device {
     switch (fileType) {
       case "cameraImage":
         if (direction == "receiving") {
-          const dataView = new DataView(buffer);
-          this.#cameraManager.parseMessage("cameraData", dataView);
-          this.#fileTransferManager.onParseFile({ fileType: "cameraImage" });
+          this.#cameraManager.onFileConfiguration(fileConfiguration);
         }
         break;
       case "spriteSheet":
@@ -1711,10 +1711,10 @@ class Device {
 
   // CAMERA
   #cameraManager = new CameraManager();
-
-  private get _buildCameraData() {
-    return this.#cameraManager.buildCameraData;
+  private get _cameraManager() {
+    return this.#cameraManager;
   }
+
   get hasCamera() {
     return this.sensorTypes.includes("camera");
   }

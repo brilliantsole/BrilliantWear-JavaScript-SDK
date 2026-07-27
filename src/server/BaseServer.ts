@@ -445,7 +445,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   #boundDeviceListeners: BoundDeviceEventListeners = {
     connectionMessage: this.#onDeviceConnectionMessage.bind(this),
     displayContextCommands: this.#onDeviceDisplayContextCommands.bind(this),
-    fileSent: this.#onDeviceFileSent.bind(this),
+    fileTransferComplete: this.#onDeviceFileTransferComplete.bind(this),
+    fileTransferStatus: this.#onDeviceFileTransferStatus.bind(this),
   };
 
   #isClientBusyReceivingFileFromSelf(client: ServerClient, device?: Device) {
@@ -529,7 +530,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         return {
           type: "cameraData",
           // @ts-expect-error
-          data: dataView ?? device._buildCameraData(),
+          data: dataView ?? device._cameraManager.buildCameraMetaData(),
         };
         break;
       case "displayContextCommands":
@@ -758,6 +759,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                 {
                   _console.log("client done sending file to device");
                   this.#clientsSendingToDevice.delete(device);
+                  // TODO: - necessary?
                   // if (false) {
                   //   const _deviceMessages = this.#onDoneTransferringFile(
                   //     device,
@@ -844,7 +846,11 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         }
         break;
       case "fileBytesTransferred":
-        _console.log("skipping fileBytesTransferred");
+      case "getFileBlock":
+      case "getFileLength":
+      case "getFileChecksum":
+      case "getFileType":
+        _console.log(`skipping messageType "${messageType}"`);
         return;
         break;
       default:
@@ -898,13 +904,32 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     // @ts-expect-error
     ServerManager.broadcast(deviceServerMessage, undefined, undefined, false);
   }
-  #onDeviceFileSent(deviceEvent: DeviceEventMap["fileSent"]) {
+  #onDeviceFileTransferStatus(
+    deviceEvent: DeviceEventMap["fileTransferStatus"],
+  ) {
+    if (this.clients.length == 0) {
+      return;
+    }
+    const { target: device, message } = deviceEvent;
+    const { fileTransferStatus } = message;
+
+    _console.log("#onDeviceFileTransferStatus", device, { fileTransferStatus });
+
+    switch (fileTransferStatus) {
+      case "idle":
+        this.#onDoneTransferringFile(device);
+        break;
+    }
+  }
+  #onDeviceFileTransferComplete(
+    deviceEvent: DeviceEventMap["fileTransferComplete"],
+  ) {
     if (this.clients.length == 0) {
       return;
     }
 
     const { target: device, message } = deviceEvent;
-    _console.log("#onDeviceFileSent", message);
+    _console.log("#onDeviceFileTransferComplete", message);
     if (!device.isConnected) {
       _console.warn("device isn't connected");
       return;
@@ -943,6 +968,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         fileTransferMetaData.push(
           this.#createDeviceMessage(device, "setDisplaySpriteSheetName"),
         );
+        break;
+      case "cameraImage":
         break;
     }
     this.#clientFileConfigurationMetaData
@@ -1721,6 +1748,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           deviceMessages.push(tfliteIsReadyDeviceMessage);
         }
         break;
+      case "cameraImage":
+        break;
       default:
         _console.log(`uncaught fileType "${fileConfiguration.fileType}"`);
         break;
@@ -1750,6 +1779,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     switch (fileConfiguration.fileType) {
       case "tflite":
       case "spriteSheet":
+      case "cameraImage":
         break;
       default:
         _console.log(`not sending fileType "${fileConfiguration.fileType}"`);

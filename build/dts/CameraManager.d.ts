@@ -1,6 +1,6 @@
 import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
-import { BaseFileConfiguration } from "./FileTransferManager.ts";
+import { BaseFileConfiguration, ExtendedFileConfiguration, OnParseFileCallback } from "./FileTransferManager.ts";
 export declare const CameraSensorTypes: readonly ["camera"];
 export type CameraSensorType = (typeof CameraSensorTypes)[number];
 export declare const CameraCommands: readonly ["focus", "takePicture", "stop", "sleep", "wake"];
@@ -68,11 +68,13 @@ export type CameraEventDispatcher = EventDispatcher<Device, CameraEventType, Cam
 export type SendCameraMessagesCallback = SendMessagesCallback<CameraMessageType>;
 export interface CameraImageFileConfiguration extends BaseFileConfiguration {
     fileType: "cameraImage";
+    cameraImage: CameraImage;
 }
 declare class CameraManager {
     #private;
     constructor();
     sendMessages: SendCameraMessagesCallback;
+    onParseFile: OnParseFileCallback;
     eventDispatcher: CameraEventDispatcher;
     get waitForEvent(): <T extends "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "cameraImage" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture">(type: T, options?: {
         immediate?: boolean;
@@ -86,9 +88,9 @@ declare class CameraManager {
     wake(): Promise<void>;
     get sensorRate(): number;
     set sensorRate(newSensorRate: number);
-    buildCameraData(): ArrayBuffer;
+    buildCameraMetaData(): ArrayBuffer;
     get cameraConfiguration(): CameraConfiguration;
-    get availableCameraConfigurationTypes(): ("resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "brightness" | "saturation" | "contrast" | "sharpness")[];
+    get availableCameraConfigurationTypes(): ("brightness" | "resolution" | "qualityFactor" | "shutter" | "gain" | "redGain" | "greenGain" | "blueGain" | "autoWhiteBalanceEnabled" | "autoGainEnabled" | "exposure" | "autoExposureEnabled" | "autoExposureLevel" | "saturation" | "contrast" | "sharpness")[];
     get cameraConfigurationRanges(): CameraConfigurationRanges;
     setCameraConfiguration(newCameraConfiguration: CameraConfiguration, sendImmediately?: boolean): Promise<void>;
     static AssertValidCameraConfigurationType(cameraConfigurationType: CameraConfigurationType): void;
@@ -102,5 +104,6 @@ declare class CameraManager {
     set autoPicture(newAutoPicture: boolean);
     parseMessage(messageType: CameraMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     clear(): void;
+    onFileConfiguration(fileConfiguration: ExtendedFileConfiguration): Promise<void>;
 }
 export default CameraManager;

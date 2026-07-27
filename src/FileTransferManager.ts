@@ -517,6 +517,9 @@ class FileTransferManager {
     if (this.#isRequestingReceive && this.status != "receiving") {
       this.#isRequestingReceive = false;
     }
+    if (this.status == "receiving" && this.type == "cameraImage") {
+      this.#isRequestingReceive = true;
+    }
   }
   #assertIsIdle() {
     _console.assertWithError(this.#status == "idle", "status is not idle");
@@ -531,18 +534,26 @@ class FileTransferManager {
   async #parseFileBlock(dataView: DataView<ArrayBuffer>, isSending?: boolean) {
     _console.log("parseFileBlock", dataView, { isSending });
 
-    if (this.isClientConnectionType && this.#receivedBlocks.length == 0) {
-      const headerLength = dataView.getUint16(0, true);
-      _console.log({ headerLength });
-      this.#headerLength = headerLength;
+    if (this.#receivedBlocks.length == 0) {
+      if (this.isClientConnectionType) {
+        const headerLength = dataView.getUint16(0, true);
+        _console.log({ headerLength });
+        this.#headerLength = headerLength;
+      } else {
+        this.#receivedBlocks.push(emptyHeaderDataView.buffer);
+        this.#headerLength = emptyHeaderDataView.byteLength;
+      }
     }
 
     this.#receivedBlocks.push(dataView.buffer);
 
-    const bytesReceived = this.#receivedBlocks.reduce(
+    let bytesReceived = this.#receivedBlocks.reduce(
       (sum, arrayBuffer) => (sum += arrayBuffer.byteLength),
       0,
     );
+    if (!this.isClientConnectionType) {
+      bytesReceived -= emptyHeaderDataView.byteLength;
+    }
     this.#bytesTransferred = bytesReceived;
 
     const length = this.isClientConnectionType
