@@ -112,6 +112,7 @@ export interface CameraImage {
   arrayBuffer: ArrayBuffer;
   timestamp: number;
   latency: number;
+  isFile?: boolean;
 }
 export interface CameraImageFrame extends CameraImage {
   duration: number;
@@ -281,13 +282,13 @@ class CameraManager {
     this.#sensorRate = newSensorRate;
     _console.log({ sensorRate: this.sensorRate });
   }
-  #parseCameraData(dataView: DataView<ArrayBuffer>) {
-    _console.log("parsing camera data", dataView);
+  #parseCameraData(dataView: DataView<ArrayBuffer>, isFile?: boolean) {
+    _console.log("parsing camera data", dataView, { isFile });
     parseMessage(
       dataView,
       CameraDataTypes,
       this.#onCameraData.bind(this),
-      null,
+      { isFile },
       true,
     );
   }
@@ -300,7 +301,7 @@ class CameraManager {
     clearTimeout(this.#buildImageTimeout);
     this.#buildImageTimeout = undefined;
   }
-  #setBuildImageTimeout() {
+  #setBuildImageTimeout(isFile?: boolean) {
     this.#clearBuildImageTimeout();
     if (this.sensorRate == 0) {
       return;
@@ -317,15 +318,17 @@ class CameraManager {
         now: _now,
         span: _now - now,
       });
-      this.#buildImage();
+      this.#buildImage(isFile);
       this.#buildImageTimeout = undefined;
     }, timeoutInterval);
   }
   #onCameraData(
     cameraDataType: CameraDataType,
     dataView: DataView<ArrayBuffer>,
+    context = { isFile: false },
   ) {
-    _console.log({ cameraDataType, dataView });
+    const { isFile } = context;
+    _console.log("#onCameraData", { cameraDataType, dataView, isFile });
     this.#clearBuildImageTimeout();
     switch (cameraDataType) {
       case "headerSize":
@@ -366,10 +369,10 @@ class CameraManager {
         if (this.#imageProgress == 1) {
           _console.log("finished getting image data");
           if (this.#headerProgress == 1 && this.#footerProgress == 1) {
-            this.#buildImage();
+            this.#buildImage(isFile);
           }
         } else {
-          this.#setBuildImageTimeout();
+          this.#setBuildImageTimeout(isFile);
         }
         break;
       case "footerSize":
@@ -390,7 +393,7 @@ class CameraManager {
         if (this.#footerProgress == 1) {
           _console.log("finished getting footer data");
           if (this.#imageProgress == 1) {
-            this.#buildImage();
+            this.#buildImage(isFile);
           }
         }
         break;
@@ -410,8 +413,8 @@ class CameraManager {
   #footerProgress: number = 0;
 
   #didBuildImage: boolean = false;
-  #buildImage() {
-    _console.log("building image...");
+  #buildImage(isFile?: boolean) {
+    _console.log("building image...", { isFile });
     const now = Date.now();
     const timestamp = this.#latestTakingPictureTimestamp;
     //_console.log({ now, timestamp });
@@ -435,6 +438,7 @@ class CameraManager {
       timestamp,
       latency: now - timestamp,
       arrayBuffer: imageData,
+      isFile,
     };
 
     this.#dispatchEvent("cameraImage", cameraImage);
@@ -940,7 +944,7 @@ class CameraManager {
     const dataView = new DataView(
       fileConfiguration.buffer.slice(emptyHeaderDataView.byteLength),
     );
-    this.parseMessage("cameraData", dataView);
+    this.#parseCameraData(dataView, true);
     const { message: cameraImage } = await this.waitForEvent("cameraImage", {
       immediate: true,
     });

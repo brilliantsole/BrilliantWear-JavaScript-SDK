@@ -366,7 +366,7 @@ const createIframeContainer = (src) => {
 
   iframeContainers.appendChild(iframeContainer);
 };
-// createIframeContainer("../display-text");
+createIframeContainer("../display-text");
 // createIframeContainer("../display-wireframe");
 // createIframeContainer("../display-midi");
 // createIframeContainer("../display-prompt");
@@ -414,9 +414,9 @@ const generateSpriteSheet = (name, length) => {
   }
   displayCanvasHelper.uploadSpriteSheet(spriteSheet);
 };
-// generateSpriteSheet("test", 50);
-// generateSpriteSheet("test2", 100);
-// generateSpriteSheet("test3", 200);
+generateSpriteSheet("test", 50);
+generateSpriteSheet("test2", 100);
+generateSpriteSheet("test3", 200);
 
 BS.DeviceManager.addEventListener("deviceCameraImage", (e) => {
   const i = new Image();

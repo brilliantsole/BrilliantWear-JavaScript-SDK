@@ -1729,6 +1729,12 @@ class Device {
     if (sensorRate == undefined && this.sensorConfiguration.camera == 0) {
       sensorRate = 20;
     }
+    if (sensorRate == 0 && this.fileTransferStatus != "idle") {
+      _console.error(
+        "device is currently busy transferring file - cannot request cameraImage",
+      );
+      return;
+    }
     if (
       sensorRate != undefined &&
       this.sensorConfiguration.camera != sensorRate

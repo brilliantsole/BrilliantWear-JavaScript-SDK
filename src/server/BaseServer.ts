@@ -911,14 +911,15 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       return;
     }
     const { target: device, message } = deviceEvent;
-    const { fileTransferStatus } = message;
+    const { fileTransferStatus, fileType } = message;
 
-    _console.log("#onDeviceFileTransferStatus", device, { fileTransferStatus });
+    _console.log("#onDeviceFileTransferStatus", device, {
+      fileTransferStatus,
+      fileType,
+    });
 
-    switch (fileTransferStatus) {
-      case "idle":
-        this.#onDoneTransferringFile(device);
-        break;
+    if (fileTransferStatus == "idle" && fileType == "cameraImage") {
+      this.#onDoneTransferringFile(device);
     }
   }
   #onDeviceFileTransferComplete(

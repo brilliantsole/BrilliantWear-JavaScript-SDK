@@ -1184,6 +1184,7 @@ interface CameraImage {
     arrayBuffer: ArrayBuffer;
     timestamp: number;
     latency: number;
+    isFile?: boolean;
 }
 interface CameraImageFrame extends CameraImage {
     duration: number;
