@@ -10,9 +10,24 @@ import EventDispatcher from "./utils/EventDispatcher.ts";
 import autoBind from "auto-bind";
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
-import { TfliteFileConfiguration } from "./TfliteManager.ts";
-import { DisplaySpriteSheetFileConfiguration } from "./DisplayManager.ts";
-import { CameraImageFileConfiguration } from "./CameraManager.ts";
+import {
+  ExtendedTfliteFileConfiguration,
+  TfliteFileConfiguration,
+} from "./TfliteManager.ts";
+import {
+  DisplaySpriteSheetFileConfiguration,
+  ExtendedDisplaySpriteSheetFileConfiguration,
+} from "./DisplayManager.ts";
+import {
+  CameraImageFileConfiguration,
+  ExtendedCameraImageFileConfiguration,
+} from "./CameraManager.ts";
+import {
+  ExtendedWifiServerCertFileConfiguration,
+  ExtendedWifiServerKeyFileConfiguration,
+  WifiServerCertFileConfiguration,
+  WifiServerKeyFileConfiguration,
+} from "./WifiManager.ts";
 
 const _console = createConsole("FileTransferManager", { log: true });
 
@@ -45,6 +60,7 @@ export const FileTypes = [
   "cameraImage",
 ] as const;
 export type FileType = (typeof FileTypes)[number];
+
 export type FileOrBlob = File | Blob;
 
 export const FileTransferStatuses = ["idle", "sending", "receiving"] as const;
@@ -87,16 +103,11 @@ export const RequiredFileTransferMessageTypes: FileTransferMessageType[] = [
 ];
 
 export interface BaseFileConfiguration {
+  readonly fileType: FileType;
   file: FileLike;
-  fileType: FileType;
 }
 
-export type FileConfiguration =
-  | TfliteFileConfiguration
-  | DisplaySpriteSheetFileConfiguration
-  | CameraImageFileConfiguration;
-
-export interface ExtendedFileConfiguration extends BaseFileConfiguration {
+export interface BaseExtendedFileConfiguration extends BaseFileConfiguration {
   checksum: number;
   length: number;
   indirectly?: boolean;
@@ -104,6 +115,20 @@ export interface ExtendedFileConfiguration extends BaseFileConfiguration {
   file: FileOrBlob;
   direction: FileTransferDirection;
 }
+
+export type FileConfiguration =
+  | TfliteFileConfiguration
+  | DisplaySpriteSheetFileConfiguration
+  | CameraImageFileConfiguration
+  | WifiServerCertFileConfiguration
+  | WifiServerKeyFileConfiguration;
+
+export type ExtendedFileConfiguration =
+  | ExtendedTfliteFileConfiguration
+  | ExtendedDisplaySpriteSheetFileConfiguration
+  | ExtendedCameraImageFileConfiguration
+  | ExtendedWifiServerCertFileConfiguration
+  | ExtendedWifiServerKeyFileConfiguration;
 
 export interface FileTransferEventMessages {
   getFileTypes: { fileTypes: FileType[] };
@@ -575,7 +600,7 @@ class FileTransferManager {
     _console.log({ isComplete });
 
     let buffer: ArrayBuffer | undefined;
-    let fileConfiguration: ExtendedFileConfiguration | undefined;
+    let fileConfiguration: BaseExtendedFileConfiguration | undefined;
     if (isComplete) {
       buffer = concatenateArrayBuffers(this.#receivedBlocks);
       file = this.#createFile(buffer);
@@ -594,7 +619,9 @@ class FileTransferManager {
         length: this.#length,
         direction,
       };
-      this.fileConfigurations.push(fileConfiguration);
+      this.fileConfigurations.push(
+        fileConfiguration as ExtendedFileConfiguration,
+      );
     }
 
     this.#dispatchEvent("fileTransferProgress", {
@@ -604,13 +631,13 @@ class FileTransferManager {
       bytesTransferred: this.#bytesTransferred,
       isComplete,
       file,
-      fileConfiguration,
+      fileConfiguration: fileConfiguration as ExtendedFileConfiguration,
       indirectly,
     });
     this.#dispatchEvent("getFileBlock", { fileTransferBlock: dataView });
 
     if (isComplete) {
-      this.onFileConfiguration(fileConfiguration!);
+      this.onFileConfiguration(fileConfiguration as ExtendedFileConfiguration);
     } else {
       if (
         this.#isRequestingReceive ||
@@ -921,7 +948,7 @@ class FileTransferManager {
 
     const file = this.#file!;
     const direction: FileTransferDirection = "sending";
-    let fileConfiguration: ExtendedFileConfiguration | undefined;
+    let fileConfiguration: BaseExtendedFileConfiguration | undefined;
     if (isComplete) {
       _console.log("finished sending buffer");
 
@@ -934,7 +961,9 @@ class FileTransferManager {
         direction,
       };
       _console.log("sent file directly", fileConfiguration);
-      this.fileConfigurations.push(fileConfiguration);
+      this.fileConfigurations.push(
+        fileConfiguration as ExtendedFileConfiguration,
+      );
     }
 
     this.#dispatchEvent("fileTransferProgress", {
@@ -943,7 +972,7 @@ class FileTransferManager {
       direction,
       bytesTransferred: this.#bytesTransferred,
       isComplete,
-      fileConfiguration,
+      fileConfiguration: fileConfiguration as ExtendedFileConfiguration,
       file: isComplete ? file : undefined,
     });
 
@@ -1069,7 +1098,7 @@ class FileTransferManager {
 
     const direction: FileTransferDirection = "sending";
 
-    let fileConfiguration: ExtendedFileConfiguration | undefined;
+    let fileConfiguration: BaseExtendedFileConfiguration | undefined;
     if (isComplete) {
       this.#indirectSentBlocks.length = 0;
       file = file!;
@@ -1094,7 +1123,9 @@ class FileTransferManager {
           1,
         );
       }
-      this.fileConfigurations.push(fileConfiguration);
+      this.fileConfigurations.push(
+        fileConfiguration as ExtendedFileConfiguration,
+      );
       _console.log("sent file indirectly", fileConfiguration);
     }
 
@@ -1106,7 +1137,7 @@ class FileTransferManager {
       bytesTransferred: this.#bytesTransferred,
       indirectly,
       file,
-      fileConfiguration,
+      fileConfiguration: fileConfiguration as ExtendedFileConfiguration,
     });
     this.#dispatchEvent("setFileBlock", { fileTransferBlock: dataView });
   }

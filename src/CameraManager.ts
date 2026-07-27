@@ -6,6 +6,7 @@ import autoBind from "auto-bind";
 import { enumToArrayBuffer, parseMessage } from "./utils/ParseUtils.ts";
 import { concatenateArrayBuffers } from "./utils/ArrayBufferUtils.ts";
 import {
+  BaseExtendedFileConfiguration,
   BaseFileConfiguration,
   emptyHeaderDataView,
   ExtendedFileConfiguration,
@@ -150,10 +151,16 @@ export type CameraEventDispatcher = EventDispatcher<
 export type SendCameraMessagesCallback =
   SendMessagesCallback<CameraMessageType>;
 
-export interface CameraImageFileConfiguration extends BaseFileConfiguration {
+export interface BaseCameraImageFileConfiguration extends BaseFileConfiguration {
   fileType: "cameraImage";
   cameraImage: CameraImage;
 }
+
+export type CameraImageFileConfiguration = BaseFileConfiguration &
+  BaseCameraImageFileConfiguration;
+
+export type ExtendedCameraImageFileConfiguration =
+  BaseExtendedFileConfiguration & BaseCameraImageFileConfiguration;
 
 class CameraManager {
   constructor() {
@@ -939,7 +946,9 @@ class CameraManager {
     }
   }
 
-  async onFileConfiguration(fileConfiguration: ExtendedFileConfiguration) {
+  async onFileConfiguration(
+    fileConfiguration: ExtendedCameraImageFileConfiguration,
+  ) {
     _console.log("onFileConfiguration", fileConfiguration);
     const dataView = new DataView(
       fileConfiguration.buffer.slice(emptyHeaderDataView.byteLength),

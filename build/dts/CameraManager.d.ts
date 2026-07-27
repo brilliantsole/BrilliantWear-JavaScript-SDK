@@ -1,6 +1,6 @@
 import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
-import { BaseFileConfiguration, ExtendedFileConfiguration, OnParseFileCallback } from "./FileTransferManager.ts";
+import { BaseExtendedFileConfiguration, BaseFileConfiguration, OnParseFileCallback } from "./FileTransferManager.ts";
 export declare const CameraSensorTypes: readonly ["camera"];
 export type CameraSensorType = (typeof CameraSensorTypes)[number];
 export declare const CameraCommands: readonly ["focus", "takePicture", "stop", "sleep", "wake"];
@@ -67,19 +67,21 @@ export interface CameraEventMessages {
 }
 export type CameraEventDispatcher = EventDispatcher<Device, CameraEventType, CameraEventMessages>;
 export type SendCameraMessagesCallback = SendMessagesCallback<CameraMessageType>;
-export interface CameraImageFileConfiguration extends BaseFileConfiguration {
+export interface BaseCameraImageFileConfiguration extends BaseFileConfiguration {
     fileType: "cameraImage";
     cameraImage: CameraImage;
 }
+export type CameraImageFileConfiguration = BaseFileConfiguration & BaseCameraImageFileConfiguration;
+export type ExtendedCameraImageFileConfiguration = BaseExtendedFileConfiguration & BaseCameraImageFileConfiguration;
 declare class CameraManager {
     #private;
     constructor();
     sendMessages: SendCameraMessagesCallback;
     onParseFile: OnParseFileCallback;
     eventDispatcher: CameraEventDispatcher;
-    get waitForEvent(): <T extends "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "cameraImage" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture">(type: T, options?: {
+    get waitForEvent(): <T extends "cameraImage" | "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture">(type: T, options?: {
         immediate?: boolean;
-    }) => Promise<import("./utils/EventDispatcher.ts").ListenerEvent<Device, "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "cameraImage" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture", CameraEventMessages, T>>;
+    }) => Promise<import("./utils/EventDispatcher.ts").ListenerEvent<Device, "cameraImage" | "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture", CameraEventMessages, T>>;
     requestRequiredInformation(sendImmediately?: boolean): void;
     get cameraStatus(): "idle" | "focusing" | "takingPicture" | "asleep";
     focus(): Promise<void>;
@@ -105,6 +107,6 @@ declare class CameraManager {
     set autoPicture(newAutoPicture: boolean);
     parseMessage(messageType: CameraMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     clear(): void;
-    onFileConfiguration(fileConfiguration: ExtendedFileConfiguration): Promise<void>;
+    onFileConfiguration(fileConfiguration: ExtendedCameraImageFileConfiguration): Promise<void>;
 }
 export default CameraManager;

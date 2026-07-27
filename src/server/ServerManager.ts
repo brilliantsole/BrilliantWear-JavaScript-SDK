@@ -250,6 +250,8 @@ class ServerManager {
   deviceDisplayContextCommandToClientGuardManager = new GuardManager<
     [BaseServerClientDeviceDisplayContextCommandGuardManagerArg]
   >();
+  // FILL - guard for fileTransfer
+  // TODO: - guard for vibration
 }
 
 export default ServerManager.shared;

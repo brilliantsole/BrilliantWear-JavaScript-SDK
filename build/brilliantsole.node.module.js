@@ -1029,7 +1029,7 @@ class FileTransferManager {
             bytesTransferred: this.#bytesTransferred,
             isComplete,
             file,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
             indirectly,
         });
         this.#dispatchEvent("getFileBlock", { fileTransferBlock: dataView });
@@ -1300,7 +1300,7 @@ class FileTransferManager {
             direction,
             bytesTransferred: this.#bytesTransferred,
             isComplete,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
             file: isComplete ? file : undefined,
         });
         if (!isComplete) {
@@ -1419,7 +1419,7 @@ class FileTransferManager {
             bytesTransferred: this.#bytesTransferred,
             indirectly,
             file,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
         });
         this.#dispatchEvent("setFileBlock", { fileTransferBlock: dataView });
     }
@@ -2637,7 +2637,7 @@ class TouchSensorDataManager {
 }
 
 var _a$6;
-const _console$N = createConsole("CameraManager", { log: true });
+const _console$N = createConsole("CameraManager", { log: false });
 const CameraSensorTypes = ["camera"];
 const CameraCommands = [
     "focus",
@@ -21769,7 +21769,7 @@ const RequiredDeviceInformationMessageTypes = [
     ...RequiredMicrophoneMessageTypes,
     ...RequiredDisplayMessageTypes,
 ];
-const _console$b = createConsole("BaseServer", { log: false });
+const _console$b = createConsole("BaseServer", { log: true });
 const serverMtus = {
     udp: 1024,
     webSocket: 1024,
@@ -23076,7 +23076,7 @@ class BaseServer {
                             }
                             const deviceMessages = [];
                             if (isComplete) {
-                                switch (fileType) {
+                                switch (fileConfiguration.fileType) {
                                     case "tflite":
                                         {
                                             device._tfliteManager.onFileConfiguration(fileConfiguration);

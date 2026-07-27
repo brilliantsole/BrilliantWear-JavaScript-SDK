@@ -5,7 +5,7 @@ import { DisplayScaleDirection, DisplayColorRGB, DisplayCropDirection, DisplayCo
 import { DisplayAlignment, DisplayAlignmentDirection, DisplayContextState, DisplayContextStateKey, DisplayDirection, DisplaySegmentCap, PartialDisplayContextState } from "./utils/DisplayContextState.ts";
 import { DisplayContextCommand } from "./utils/DisplayContextCommand.ts";
 import { DisplayManagerInterface } from "./utils/DisplayManagerInterface.ts";
-import { ExtendedFileConfiguration, OnParseFileCallback, SendFileCallback } from "./FileTransferManager.ts";
+import { BaseExtendedFileConfiguration, BaseFileConfiguration, OnParseFileCallback, SendFileCallback } from "./FileTransferManager.ts";
 import { DisplaySprite, DisplaySpritePaletteSwap, DisplaySpriteSheetPalette, DisplaySpriteSheetPaletteSwap, DisplaySpriteSheet, DisplaySpriteLines } from "./utils/DisplaySpriteSheetUtils.ts";
 import { default as DisplayCanvasHelper } from "./utils/DisplayCanvasHelper.ts";
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
@@ -137,11 +137,13 @@ export type DisplayBitmap = {
     numberOfColors: number;
     pixels: number[];
 };
-export interface DisplaySpriteSheetFileConfiguration extends ExtendedFileConfiguration {
+export interface BaseDisplaySpriteSheetFileConfiguration {
     fileType: "spriteSheet";
     spriteSheetIndex?: number;
     spriteSheet: DisplaySpriteSheet;
 }
+export type DisplaySpriteSheetFileConfiguration = BaseFileConfiguration & BaseDisplaySpriteSheetFileConfiguration;
+export type ExtendedDisplaySpriteSheetFileConfiguration = BaseExtendedFileConfiguration & BaseDisplaySpriteSheetFileConfiguration;
 declare class DisplayManager implements DisplayManagerInterface {
     #private;
     constructor();

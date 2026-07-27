@@ -978,6 +978,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       .set(fileConfiguration, fileTransferMetaData);
 
     this.clients.forEach((client) => {
+      // FILL - use guard to check whether to send file
       this.#sendDeviceFileConfigurationToClient(
         device,
         fileConfiguration,
@@ -2284,7 +2285,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                   const deviceMessages: DeviceMessage[] = [];
 
                   if (isComplete) {
-                    switch (fileType) {
+                    switch (fileConfiguration!.fileType) {
                       case "tflite":
                         {
                           // @ts-expect-error

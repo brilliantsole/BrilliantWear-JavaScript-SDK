@@ -94,8 +94,8 @@ import {
   serializeOpacities,
 } from "./utils/DisplayManagerInterface.ts";
 import {
+  BaseExtendedFileConfiguration,
   BaseFileConfiguration,
-  ExtendedFileConfiguration,
   OnParseFileCallback,
   SendFileCallback,
 } from "./FileTransferManager.ts";
@@ -330,11 +330,17 @@ export type DisplayBitmap = {
   pixels: number[];
 };
 
-export interface DisplaySpriteSheetFileConfiguration extends ExtendedFileConfiguration {
+export interface BaseDisplaySpriteSheetFileConfiguration {
   fileType: "spriteSheet";
   spriteSheetIndex?: number;
   spriteSheet: DisplaySpriteSheet;
 }
+
+export type DisplaySpriteSheetFileConfiguration = BaseFileConfiguration &
+  BaseDisplaySpriteSheetFileConfiguration;
+
+export type ExtendedDisplaySpriteSheetFileConfiguration =
+  BaseExtendedFileConfiguration & BaseDisplaySpriteSheetFileConfiguration;
 
 function ForwardToHelper(
   originalMethod: Function,

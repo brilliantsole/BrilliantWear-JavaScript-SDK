@@ -1,4 +1,8 @@
 import Device, { SendMessagesCallback } from "./Device.ts";
+import {
+  BaseExtendedFileConfiguration,
+  BaseFileConfiguration,
+} from "./FileTransferManager.ts";
 import { valueToUInt8ArrayBuffer } from "./utils/ArrayBufferUtils.ts";
 import { createConsole } from "./utils/Console.ts";
 import { isInNode } from "./utils/environment.ts";
@@ -7,6 +11,24 @@ import { textDecoder, textEncoder } from "./utils/Text.ts";
 import autoBind from "auto-bind";
 
 const _console = createConsole("WifiManager", { log: false });
+
+export interface BaseWifiServerKeyFileConfiguration {
+  fileType: "wifiServerKey";
+}
+export type WifiServerKeyFileConfiguration = BaseFileConfiguration &
+  BaseWifiServerKeyFileConfiguration;
+
+export type ExtendedWifiServerKeyFileConfiguration =
+  BaseExtendedFileConfiguration & BaseWifiServerKeyFileConfiguration;
+
+export interface BaseWifiServerCertFileConfiguration {
+  fileType: "wifiServerCert";
+}
+export type WifiServerCertFileConfiguration = BaseFileConfiguration &
+  BaseWifiServerCertFileConfiguration;
+
+export type ExtendedWifiServerCertFileConfiguration =
+  BaseExtendedFileConfiguration & BaseWifiServerCertFileConfiguration;
 
 export const MinWifiSSIDLength = 1;
 export const MaxWifiSSIDLength = 32;

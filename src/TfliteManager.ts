@@ -9,9 +9,8 @@ import { SensorType } from "./sensor/SensorDataManager.ts";
 import Device, { SendMessagesCallback } from "./Device.ts";
 import autoBind from "auto-bind";
 import {
+  BaseExtendedFileConfiguration,
   BaseFileConfiguration,
-  ExtendedFileConfiguration,
-  FileOrBlob,
   OnParseFileCallback,
   SendFileCallback,
 } from "./FileTransferManager.ts";
@@ -100,7 +99,7 @@ export const TfliteSensorTypes = [
 ] as const satisfies readonly SensorType[];
 export type TfliteSensorType = (typeof TfliteSensorTypes)[number];
 
-export interface TfliteFileConfiguration extends BaseFileConfiguration {
+export interface BaseTfliteFileConfiguration {
   fileType: "tflite";
   name: string;
   sensorTypes: TfliteSensorType[];
@@ -110,6 +109,12 @@ export interface TfliteFileConfiguration extends BaseFileConfiguration {
   threshold?: number;
   classes?: string[];
 }
+
+export type TfliteFileConfiguration = BaseFileConfiguration &
+  BaseTfliteFileConfiguration;
+
+export type ExtendedTfliteFileConfiguration = BaseExtendedFileConfiguration &
+  BaseTfliteFileConfiguration;
 
 export function serializeTfliteFileHeader(
   fileConfiguration: TfliteFileConfiguration,
@@ -161,8 +166,9 @@ export function serializeTfliteFileHeader(
   return headerDataView;
 }
 export function parseTfliteFileHeader(
-  fileConfiguration: ExtendedFileConfiguration,
+  fileConfiguration: ExtendedTfliteFileConfiguration,
 ) {
+  fileConfiguration;
   _console.log("parseTfliteFileHeader", fileConfiguration);
   const dataView = new DataView(fileConfiguration.buffer);
   let offset = 0;
@@ -453,12 +459,10 @@ class TfliteManager {
     this.#isReady = isReady;
     this.onIsReady();
   }
-  onFileConfiguration(fileConfiguration: ExtendedFileConfiguration) {
+  onFileConfiguration(fileConfiguration: ExtendedTfliteFileConfiguration) {
     _console.log("onFileConfiguration", fileConfiguration);
     parseTfliteFileHeader(fileConfiguration);
-    // @ts-expect-error
     if (fileConfiguration.classes) {
-      // @ts-expect-error
       this.setClasses(fileConfiguration.classes);
     }
     this.onIsReady();

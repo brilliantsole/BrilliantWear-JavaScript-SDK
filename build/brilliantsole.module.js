@@ -1040,7 +1040,7 @@ class FileTransferManager {
             bytesTransferred: this.#bytesTransferred,
             isComplete,
             file,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
             indirectly,
         });
         this.#dispatchEvent("getFileBlock", { fileTransferBlock: dataView });
@@ -1311,7 +1311,7 @@ class FileTransferManager {
             direction,
             bytesTransferred: this.#bytesTransferred,
             isComplete,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
             file: isComplete ? file : undefined,
         });
         if (!isComplete) {
@@ -1430,7 +1430,7 @@ class FileTransferManager {
             bytesTransferred: this.#bytesTransferred,
             indirectly,
             file,
-            fileConfiguration,
+            fileConfiguration: fileConfiguration,
         });
         this.#dispatchEvent("setFileBlock", { fileTransferBlock: dataView });
     }
@@ -4406,7 +4406,7 @@ function serializeTfliteFileHeader(fileConfiguration) {
     _console$I.log("serialized headerDataView", headerDataView);
     return headerDataView;
 }
-function parseTfliteFileHeader$1(fileConfiguration) {
+function parseTfliteFileHeader(fileConfiguration) {
     _console$I.log("parseTfliteFileHeader", fileConfiguration);
     const dataView = new DataView(fileConfiguration.buffer);
     let offset = 0;
@@ -4633,7 +4633,7 @@ class TfliteManager {
     }
     onFileConfiguration(fileConfiguration) {
         _console$I.log("onFileConfiguration", fileConfiguration);
-        parseTfliteFileHeader$1(fileConfiguration);
+        parseTfliteFileHeader(fileConfiguration);
         if (fileConfiguration.classes) {
             this.setClasses(fileConfiguration.classes);
         }
@@ -37305,7 +37305,7 @@ class BaseServer {
                             }
                             const deviceMessages = [];
                             if (isComplete) {
-                                switch (fileType) {
+                                switch (fileConfiguration.fileType) {
                                     case "tflite":
                                         {
                                             device._tfliteManager.onFileConfiguration(fileConfiguration);

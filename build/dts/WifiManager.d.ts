@@ -1,5 +1,16 @@
 import Device, { SendMessagesCallback } from "./Device.ts";
+import { BaseExtendedFileConfiguration, BaseFileConfiguration } from "./FileTransferManager.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
+export interface BaseWifiServerKeyFileConfiguration {
+    fileType: "wifiServerKey";
+}
+export type WifiServerKeyFileConfiguration = BaseFileConfiguration & BaseWifiServerKeyFileConfiguration;
+export type ExtendedWifiServerKeyFileConfiguration = BaseExtendedFileConfiguration & BaseWifiServerKeyFileConfiguration;
+export interface BaseWifiServerCertFileConfiguration {
+    fileType: "wifiServerCert";
+}
+export type WifiServerCertFileConfiguration = BaseFileConfiguration & BaseWifiServerCertFileConfiguration;
+export type ExtendedWifiServerCertFileConfiguration = BaseExtendedFileConfiguration & BaseWifiServerCertFileConfiguration;
 export declare const MinWifiSSIDLength = 1;
 export declare const MaxWifiSSIDLength = 32;
 export declare const MinWifiPasswordLength = 8;
