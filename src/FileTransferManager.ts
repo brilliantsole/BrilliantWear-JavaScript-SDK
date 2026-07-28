@@ -29,7 +29,7 @@ import {
   WifiServerKeyFileConfiguration,
 } from "./WifiManager.ts";
 
-const _console = createConsole("FileTransferManager", { log: false });
+const _console = createConsole("FileTransferManager", { log: true });
 
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
@@ -114,6 +114,7 @@ export interface BaseExtendedFileConfiguration extends BaseFileConfiguration {
   buffer: ArrayBuffer;
   file: FileOrBlob;
   direction: FileTransferDirection;
+  removed?: boolean;
 }
 
 export type FileConfiguration =
@@ -871,6 +872,45 @@ class FileTransferManager {
       this.fileConfigurations.push(fileConfiguration!);
     }
     fileConfiguration = fileConfiguration!;
+
+    switch (fileConfiguration.fileType) {
+      case "cameraImage":
+      case "tflite":
+      case "spriteSheet":
+        for (let i = this.fileConfigurations.length - 1; i >= 0; i--) {
+          const _fileConfiguration = this.fileConfigurations[i];
+
+          if (_fileConfiguration.fileType != fileConfiguration.fileType) {
+            continue;
+          }
+          if (_fileConfiguration == fileConfiguration) {
+            continue;
+          }
+
+          let remove = false;
+          switch (fileConfiguration.fileType) {
+            case "cameraImage":
+              remove = true;
+              break;
+            case "tflite":
+              remove = true;
+              break;
+            case "spriteSheet":
+              remove =
+                fileConfiguration.spriteSheet.name ==
+                (_fileConfiguration as DisplaySpriteSheetFileConfiguration)
+                  .spriteSheet.name;
+              break;
+          }
+
+          if (remove) {
+            _console.log("removing fileConfiguration", _fileConfiguration);
+            _fileConfiguration.removed = true;
+            this.fileConfigurations.splice(i, 1);
+          }
+        }
+        break;
+    }
 
     const { indirectly, fileType, file } = fileConfiguration!;
     _console.log("onParseFile", {

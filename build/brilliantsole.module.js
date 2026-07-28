@@ -647,7 +647,7 @@ function valueToUInt32DataView(value, littleEndian) {
 }
 
 var _a$7;
-const _console$V = createConsole("FileTransferManager", { log: false });
+const _console$V = createConsole("FileTransferManager", { log: true });
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
 const FileTransferMessageTypes = [
@@ -1224,6 +1224,41 @@ class FileTransferManager {
             this.fileConfigurations.push(fileConfiguration);
         }
         fileConfiguration = fileConfiguration;
+        switch (fileConfiguration.fileType) {
+            case "cameraImage":
+            case "tflite":
+            case "spriteSheet":
+                for (let i = this.fileConfigurations.length - 1; i >= 0; i--) {
+                    const _fileConfiguration = this.fileConfigurations[i];
+                    if (_fileConfiguration.fileType != fileConfiguration.fileType) {
+                        continue;
+                    }
+                    if (_fileConfiguration == fileConfiguration) {
+                        continue;
+                    }
+                    let remove = false;
+                    switch (fileConfiguration.fileType) {
+                        case "cameraImage":
+                            remove = true;
+                            break;
+                        case "tflite":
+                            remove = true;
+                            break;
+                        case "spriteSheet":
+                            remove =
+                                fileConfiguration.spriteSheet.name ==
+                                    _fileConfiguration
+                                        .spriteSheet.name;
+                            break;
+                    }
+                    if (remove) {
+                        _console$V.log("removing fileConfiguration", _fileConfiguration);
+                        _fileConfiguration.removed = true;
+                        this.fileConfigurations.splice(i, 1);
+                    }
+                }
+                break;
+        }
         const { indirectly, fileType, file } = fileConfiguration;
         _console$V.log("onParseFile", {
             fileConfiguration,
@@ -4342,7 +4377,7 @@ class SensorConfigurationManager {
 }
 _a$4 = SensorConfigurationManager;
 
-const _console$I = createConsole("TfliteManager", { log: false });
+const _console$I = createConsole("TfliteManager", { log: true });
 const TfliteMessageTypes = [
     "getTfliteName",
     "setTfliteName",
@@ -4421,7 +4456,8 @@ function parseTfliteFileHeader(fileConfiguration) {
     let offset = 0;
     const headerLength = dataView.getUint16(offset, true);
     offset += 2;
-    if (headerLength == 0) {
+    if (headerLength == 2) {
+        console.log("tfliteFile doesn't contain any metadata");
         return;
     }
     const numberOfClasses = dataView.getUint8(offset++);
@@ -4904,6 +4940,9 @@ class TfliteManager {
     async uploadModel(configuration) {
         configuration.fileType = "tflite";
         _console$I.log("uploadModel", configuration);
+        if (!configuration.classes && this.classes) {
+            configuration.classes = this.classes.slice();
+        }
         this.#sendConfiguration(configuration, false);
         const header = serializeTfliteFileHeader(configuration);
         const includesHeader = Boolean(header);
@@ -36640,6 +36679,19 @@ class BaseServer {
             _console$d.warn("device isn't connected");
             return;
         }
+        for (const [_fileConfiguration, _] of [
+            ...this.#clientSentFileConfigurations.get(device),
+        ]) {
+            if (_fileConfiguration.removed) {
+                _console$d.log("removing fileConfiguration from #clientSentFileConfigurations", _fileConfiguration);
+                this.#clientSentFileConfigurations
+                    .get(device)
+                    .delete(_fileConfiguration);
+                this.#clientFileConfigurationMetaData
+                    .get(device)
+                    .delete(_fileConfiguration);
+            }
+        }
         const { fileConfiguration } = message;
         if (!this.#clientSentFileConfigurations.get(device).has(fileConfiguration)) {
             this.#clientSentFileConfigurations
@@ -36804,12 +36856,13 @@ class BaseServer {
         });
     }
     #allowDeviceFileToClientGuardManager(device, client, fileConfiguration) {
-        return ServerManager_default.deviceFileToClientGuardManager.evaluate({
-            device,
-            client,
-            fileConfiguration,
-            server: this,
-        });
+        return (!fileConfiguration.removed &&
+            ServerManager_default.deviceFileToClientGuardManager.evaluate({
+                device,
+                client,
+                fileConfiguration,
+                server: this,
+            }));
     }
     parseClientMessage(client, dataView) {
         if (!this.#allowClientToServer(client)) {
@@ -36957,7 +37010,8 @@ class BaseServer {
                     }
                     for (const [device, map] of [...this.#clientSentFileConfigurations]) {
                         for (const [fileConfiguration, _] of [...map]) {
-                            if (this.#allowDeviceFileToClientGuardManager(device, client, fileConfiguration)) {
+                            if (fileConfiguration.fileType != "cameraImage" &&
+                                this.#allowDeviceFileToClientGuardManager(device, client, fileConfiguration)) {
                                 const _messages = this.#sendDeviceFileConfigurationToClient(device, fileConfiguration, client, false);
                                 if (_messages) {
                                     messages.push(..._messages);

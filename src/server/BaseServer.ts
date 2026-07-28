@@ -941,6 +941,24 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       return;
     }
 
+    for (const [_fileConfiguration, _] of [
+      ...this.#clientSentFileConfigurations.get(device)!,
+    ]) {
+      if (_fileConfiguration.removed) {
+        _console.log(
+          "removing fileConfiguration from #clientSentFileConfigurations",
+          _fileConfiguration,
+        );
+        this.#clientSentFileConfigurations
+          .get(device)!
+          .delete(_fileConfiguration);
+
+        this.#clientFileConfigurationMetaData
+          .get(device)!
+          .delete(_fileConfiguration);
+      }
+    }
+
     const { fileConfiguration } = message;
 
     if (
@@ -978,6 +996,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       case "cameraImage":
         break;
     }
+
     this.#clientFileConfigurationMetaData
       .get(device)!
       .set(fileConfiguration, fileTransferMetaData);
@@ -1224,14 +1243,17 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     client: ServerClient,
     fileConfiguration: ExtendedFileConfiguration,
   ) {
-    return ServerManager.deviceFileToClientGuardManager.evaluate({
-      device,
-      // @ts-expect-error
-      client,
-      fileConfiguration,
-      // @ts-expect-error
-      server: this,
-    });
+    return (
+      !fileConfiguration.removed &&
+      ServerManager.deviceFileToClientGuardManager.evaluate({
+        device,
+        // @ts-expect-error
+        client,
+        fileConfiguration,
+        // @ts-expect-error
+        server: this,
+      })
+    );
   }
 
   protected parseClientMessage(
@@ -1456,6 +1478,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           for (const [device, map] of [...this.#clientSentFileConfigurations]) {
             for (const [fileConfiguration, _] of [...map]) {
               if (
+                fileConfiguration.fileType != "cameraImage" &&
                 this.#allowDeviceFileToClientGuardManager(
                   device,
                   client,

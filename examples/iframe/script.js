@@ -403,6 +403,13 @@ BS.ServerManager.clientVibrationConfigurationToDeviceGuardManager.add(
   },
 );
 
+BS.ServerManager.deviceFileToClientGuardManager.add(
+  ({ client, message, fileConfiguration }) => {
+    console.log("allow fileConfiguration?", fileConfiguration);
+    return true;
+  },
+);
+
 const generateSpriteSheet = (name, length) => {
   /** @type {BS.DisplaySpriteSheet} */
   const spriteSheet = {
@@ -425,8 +432,8 @@ generateSpriteSheet("test", 50);
 generateSpriteSheet("test2", 100);
 generateSpriteSheet("test3", 200);
 
-BS.DeviceManager.addEventListener("deviceCameraImage", (e) => {
-  const i = new Image();
-  i.src = e.message.url;
-  document.body.appendChild(i);
+let image = new Image();
+document.body.appendChild(image);
+BS.DeviceManager.addEventListener("deviceCameraImage", (event) => {
+  image.src = event.message.url;
 });

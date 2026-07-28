@@ -21,7 +21,7 @@ import {
 } from "./utils/ArrayBufferUtils.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
 
-const _console = createConsole("TfliteManager", { log: false });
+const _console = createConsole("TfliteManager", { log: true });
 
 export const TfliteMessageTypes = [
   "getTfliteName",
@@ -176,7 +176,8 @@ export function parseTfliteFileHeader(
   const headerLength = dataView.getUint16(offset, true);
   offset += 2;
 
-  if (headerLength == 0) {
+  if (headerLength == 2) {
+    console.log("tfliteFile doesn't contain any metadata");
     return;
   }
 
@@ -795,6 +796,9 @@ class TfliteManager {
   async uploadModel(configuration: TfliteFileConfiguration) {
     configuration.fileType = "tflite";
     _console.log("uploadModel", configuration);
+    if (!configuration.classes && this.classes) {
+      configuration.classes = this.classes.slice();
+    }
     this.#sendConfiguration(configuration, false);
     const header = serializeTfliteFileHeader(configuration);
     const includesHeader = Boolean(header);
