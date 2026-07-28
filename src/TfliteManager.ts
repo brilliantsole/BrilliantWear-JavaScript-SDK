@@ -796,9 +796,9 @@ class TfliteManager {
   async uploadModel(configuration: TfliteFileConfiguration) {
     configuration.fileType = "tflite";
     _console.log("uploadModel", configuration);
-    if (!configuration.classes && this.classes) {
-      configuration.classes = this.classes.slice();
-    }
+    // if (!configuration.classes && this.classes) {
+    //   configuration.classes = this.classes.slice();
+    // }
     this.#sendConfiguration(configuration, false);
     const header = serializeTfliteFileHeader(configuration);
     const includesHeader = Boolean(header);
