@@ -1025,16 +1025,22 @@ class FileTransferManager {
 
   #createFile(buffer: ArrayBuffer) {
     let fileName = new Date().toLocaleString();
-    switch (this.type) {
-      case "tflite":
-        fileName += ".tflite";
-        break;
-      case "wifiServerCert":
-        fileName += "_server.crt";
-        break;
-      case "wifiServerKey":
-        fileName += "_server.key";
-        break;
+    // file has a header now, so we won't use this
+    if (false) {
+      switch (this.type) {
+        case "tflite":
+          fileName += ".tflite";
+          break;
+        case "cameraImage":
+          fileName += ".tflite";
+          break;
+        case "wifiServerCert":
+          fileName += "_server.crt";
+          break;
+        case "wifiServerKey":
+          fileName += "_server.key";
+          break;
+      }
     }
 
     let file: FileOrBlob;

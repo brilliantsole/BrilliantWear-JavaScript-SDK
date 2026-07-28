@@ -77,8 +77,8 @@ class WindowClient extends BaseClient {
   }
 
   // MESSAGING
-  sendServerMessage(...messages: ServerMessageOrMessageType[]) {
-    _console.log("sendServerMessage", messages);
+  sendToServer(...messages: ServerMessageOrMessageType[]) {
+    _console.log("sendToServer", messages);
     WindowManagerClient.sendMessage({
       type: "serverMessage",
       data: createServerMessage(...messages),

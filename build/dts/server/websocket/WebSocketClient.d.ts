@@ -12,6 +12,6 @@ declare class WebSocketClient extends BaseClient {
     disconnect(): void;
     reconnect(): void;
     toggleConnection(url?: ServerURL): void;
-    sendServerMessage(...messages: ServerMessageOrMessageType[]): void;
+    sendToServer(...messages: ServerMessageOrMessageType[]): void;
 }
 export default WebSocketClient;

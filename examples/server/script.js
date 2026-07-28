@@ -1124,23 +1124,6 @@ BS.DeviceManager.addEventListener("connectedDevices", (event) => {
       });
       fileTransferDirectionSelect.dispatchEvent(new Event("input"));
 
-      /** @param {File} file */
-      function downloadFile(file) {
-        const a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        const url = window.URL.createObjectURL(file);
-        a.href = url;
-        a.download = file.name;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      }
-
-      device.addEventListener("fileReceived", (event) => {
-        const file = event.message.file;
-        downloadFile(file);
-      });
-
       const updateDeviceFileTransferContainer = () => {
         if (device.isConnected && device.fileTransferStatus.length > 0) {
           deviceFileTransferContainer.removeAttribute("hidden");

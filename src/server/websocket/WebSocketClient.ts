@@ -111,7 +111,8 @@ class WebSocketClient extends BaseClient {
     this.#pingTimer.restart();
   }
 
-  sendServerMessage(...messages: ServerMessageOrMessageType[]) {
+  sendToServer(...messages: ServerMessageOrMessageType[]) {
+    _console.log("sendToServer", messages);
     this.#sendMessage(
       createWebSocketMessage({
         type: "serverMessage",

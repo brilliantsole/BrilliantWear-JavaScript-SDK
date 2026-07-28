@@ -173,7 +173,7 @@ abstract class BaseClient {
     this._reconnectOnDisconnection = newReconnectOnDisconnection;
   }
 
-  abstract sendServerMessage(...messages: ServerMessageOrMessageType[]): void;
+  abstract sendToServer(...messages: ServerMessageOrMessageType[]): void;
 
   // CONNECTION STATUS
   #_connectionStatus: ClientConnectionStatus = "notConnected";
@@ -219,7 +219,7 @@ abstract class BaseClient {
   }
   protected _sendRequiredMessages() {
     _console.log("sending required messages", this.#requiredMessageTypes);
-    this.sendServerMessage(...this.#requiredMessageTypes);
+    this.sendToServer(...this.#requiredMessageTypes);
   }
 
   #receivedMessageTypes: ServerMessageOrMessageType[] = [];
@@ -375,7 +375,7 @@ abstract class BaseClient {
     );
   }
   protected requestIsScanningAvailable() {
-    this.sendServerMessage("isScanningAvailable");
+    this.sendToServer("isScanningAvailable");
   }
 
   #_isScanning = false;
@@ -391,7 +391,7 @@ abstract class BaseClient {
     return this.#isScanning;
   }
   #requestIsScanning() {
-    this.sendServerMessage("isScanning");
+    this.sendToServer("isScanning");
   }
 
   #assertIsScanning() {
@@ -403,11 +403,11 @@ abstract class BaseClient {
 
   startScan() {
     this.#assertIsNotScanning();
-    this.sendServerMessage("startScan");
+    this.sendToServer("startScan");
   }
   stopScan() {
     this.#assertIsScanning();
-    this.sendServerMessage("stopScan");
+    this.sendToServer("stopScan");
   }
   toggleScan() {
     this.#assertIsScanningAvailable();
@@ -431,7 +431,7 @@ abstract class BaseClient {
     this.#dispatchEvent("discoveredDevice", { discoveredDevice });
   }
   requestDiscoveredDevices() {
-    this.sendServerMessage({ type: "discoveredDevices" });
+    this.sendToServer({ type: "discoveredDevices" });
   }
   #onExpiredDiscoveredDevice(bluetoothId: string) {
     _console.log({ expiredBluetoothDeviceId: bluetoothId });
@@ -470,7 +470,7 @@ abstract class BaseClient {
     connectionType?: ClientConnectionType,
   ) {
     if (connectionType) {
-      this.sendServerMessage({
+      this.sendToServer({
         type: "connectToDevice",
         data: concatenateArrayBuffers(
           stringToArrayBuffer(bluetoothId),
@@ -478,7 +478,7 @@ abstract class BaseClient {
         ),
       });
     } else {
-      this.sendServerMessage({ type: "connectToDevice", data: bluetoothId });
+      this.sendToServer({ type: "connectToDevice", data: bluetoothId });
     }
   }
 
@@ -540,21 +540,21 @@ abstract class BaseClient {
     return device;
   }
   protected sendDisconnectFromDeviceMessage(bluetoothId: string) {
-    this.sendServerMessage({ type: "disconnectFromDevice", data: bluetoothId });
+    this.sendToServer({ type: "disconnectFromDevice", data: bluetoothId });
   }
 
   protected sendDeviceMessage(
     bluetoothId: string,
     ...messages: ClientDeviceMessage[]
   ) {
-    this.sendServerMessage({
+    this.sendToServer({
       type: "deviceMessage",
       data: [bluetoothId, createClientDeviceMessage(...messages)],
     });
   }
 
   protected sendRequiredDeviceInformationMessage(bluetoothId: string) {
-    this.sendServerMessage({
+    this.sendToServer({
       type: "requiredDeviceInformation",
       data: [bluetoothId],
     });

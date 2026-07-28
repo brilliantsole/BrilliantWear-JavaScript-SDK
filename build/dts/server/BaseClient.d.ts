@@ -60,7 +60,7 @@ declare abstract class BaseClient {
     protected _reconnectOnDisconnection: boolean;
     get reconnectOnDisconnection(): boolean;
     set reconnectOnDisconnection(newReconnectOnDisconnection: boolean);
-    abstract sendServerMessage(...messages: ServerMessageOrMessageType[]): void;
+    abstract sendToServer(...messages: ServerMessageOrMessageType[]): void;
     protected get _connectionStatus(): "notConnected" | "connecting" | "connected" | "disconnecting";
     protected set _connectionStatus(newConnectionStatus: "notConnected" | "connecting" | "connected" | "disconnecting");
     get connectionStatus(): "notConnected" | "connecting" | "connected" | "disconnecting";

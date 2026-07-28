@@ -21,7 +21,7 @@ import {
 } from "./utils/ArrayBufferUtils.ts";
 import { enumToArrayBuffer } from "./utils/ParseUtils.ts";
 
-const _console = createConsole("TfliteManager", { log: true });
+const _console = createConsole("TfliteManager", { log: false });
 
 export const TfliteMessageTypes = [
   "getTfliteName",

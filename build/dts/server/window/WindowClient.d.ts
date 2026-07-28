@@ -12,7 +12,7 @@ declare class WindowClient extends BaseClient {
     disconnect(): void;
     reconnect(): void;
     toggleConnection(): void;
-    sendServerMessage(...messages: ServerMessageOrMessageType[]): void;
+    sendToServer(...messages: ServerMessageOrMessageType[]): void;
 }
 export { WindowClient };
 declare const _default: WindowClient;
