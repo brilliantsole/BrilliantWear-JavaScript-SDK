@@ -116,7 +116,7 @@ export type ServerType = (typeof ServerTypes)[number];
 export const serverMtus: Record<ServerType, number> = {
   udp: 1024,
   webSocket: 1024,
-  window: 1024,
+  window: 1024 * 5,
 };
 
 export interface BaseServerClient {
