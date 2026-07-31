@@ -3084,7 +3084,7 @@ interface BaseServerClientGuardManagerArg {
     message?: ServerMessage;
     server: Server;
 }
-interface BaseServerClientDeviceGuardManagerArg {
+interface BaseServerClientDeviceGuardManagerArg$1 {
     device: Device;
     client: ServerClient;
     message?: DeviceMessage;
@@ -3134,8 +3134,8 @@ declare class ServerManager {
     private broadcast;
     clientToServerGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
     serverToClientGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
-    clientToDeviceGuardManager: GuardManager<[BaseServerClientDeviceGuardManagerArg]>;
-    deviceToClientGuardManager: GuardManager<[BaseServerClientDeviceGuardManagerArg]>;
+    clientToDeviceGuardManager: GuardManager<[BaseServerClientDeviceGuardManagerArg$1]>;
+    deviceToClientGuardManager: GuardManager<[BaseServerClientDeviceGuardManagerArg$1]>;
     deviceSensorDataToClientGuardManager: GuardManager<[BaseServerClientDeviceSensorDataGuardManagerArg]>;
     clientSensorConfigurationToDeviceGuardManager: GuardManager<[BaseServerClientDeviceSensorConfigurationGuardManagerArg]>;
     clientDisplayContextCommandToDeviceGuardManager: GuardManager<[BaseServerClientDeviceDisplayContextCommandGuardManagerArg]>;
@@ -3250,6 +3250,12 @@ type BasePubSubManagerOptions = {
 };
 type PubSubManagerPublishOptions = BasePubSubManagerOptions;
 type PubSubManagerListenerOptions = BasePubSubManagerOptions & EventDispatcherOptions;
+interface PubSubManagerPeerSubscriptionGuardManagerArg {
+    receivingPeer: PubSubPeer;
+    type: string;
+    data: DataView;
+    sendingPeer: PubSubPeer;
+}
 declare class PubSubManager {
     #private;
     get addEventListener(): <T extends "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished" | "*">(type: T, listener: (event: ListenerEvent<PubSubManager, "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished", PubSubManagerEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
@@ -3266,6 +3272,7 @@ declare class PubSubManager {
     unsubscribe(type: string, listener: PubSubListener): void;
     publish(type: string, data: DataView | ArrayBuffer, options?: PubSubManagerPublishOptions): PubSubPeer[];
     private _parsePeerMessage;
+    peerSubscriptionGuardManager: GuardManager<[PubSubManagerPeerSubscriptionGuardManagerArg]>;
 }
 declare const _default: PubSubManager;
 

@@ -34,6 +34,7 @@ import {
 } from "../utils/ArrayBufferUtils.ts";
 import { serverMtus, ServerType } from "../server/BaseServer.ts";
 import { textDecoder } from "../utils/Text.ts";
+import GuardManager from "../utils/GuardManager.ts";
 
 const _console = createConsole("PubSubManager", { log: true });
 
@@ -151,6 +152,13 @@ export function doesBasePubSubManagerOptionsIncludePeer(
     return false;
   }
   return true;
+}
+
+export interface PubSubManagerPeerSubscriptionGuardManagerArg {
+  receivingPeer: PubSubPeer;
+  type: string;
+  data: DataView;
+  sendingPeer: PubSubPeer;
 }
 
 @Singleton
@@ -429,25 +437,18 @@ class PubSubManager {
     this.#peerSubscriptions.delete(peer);
     this.#peers = this.#peers.filter((_peer) => _peer != peer);
 
+    const typesToUpdate: Set<string> = new Set();
     Object.entries(this.#listeners).forEach(([type, listenerObjects]) => {
       listenerObjects.forEach((listenerObject) => {
         const { peers, ignorePeers } = listenerObject;
-        let shouldRemove = false;
         if (peers && peers.length == 1 && peers.includes(peer)) {
-          shouldRemove = true;
-        }
-        if (shouldRemove) {
-          _console.log("removing listenerObject", listenerObject);
-          listenerObjects.splice(listenerObjects.indexOf(listenerObject), 1);
+          listenerObject.shouldRemove = true;
+          typesToUpdate.add(type);
         }
       });
-      if (listenerObjects.length == 0) {
-        _console.log(`listenerObjects for "${type}" is empty - deleting`);
-        delete this.#listeners[type];
-        // FILL - unsubscribe
-      }
     });
 
+    this.#updateListeners(...typesToUpdate);
     this.#dispatchEvent("peerNotConnected", { peer });
   }
   #sendToPeer(peer: PubSubPeer, ...messages: PubSubManagerMessage[]) {
@@ -598,6 +599,8 @@ class PubSubManager {
       this.#unsubscribeFromPeer(_peer, ...removedTypes);
     });
 
+    this.#updateListeners(...removedTypes);
+
     removedTypes.forEach((type) => {
       this.#dispatchEvent("peerUnsubscribed", { peer, type });
     });
@@ -629,6 +632,8 @@ class PubSubManager {
     }
     this.#latestEvents[type] = event;
 
+    this.#dispatchEvent("peerPublished", { peer, type, data });
+
     this.#peersSubscriptions.forEach((subscriptions, _peer) => {
       if (_peer == peer) {
         return;
@@ -636,9 +641,10 @@ class PubSubManager {
       if (!subscriptions.has(type)) {
         return;
       }
-      _console.log(`relaying "${type}" message to peer`, _peer);
-      // FILL - guard
-      this.#sendToPeer(_peer, { type: "publish", data: dataView });
+      if (this.#allowPeerSubscription(_peer, type, dataView, peer)) {
+        _console.log(`relaying "${type}" message to peer`, _peer);
+        this.#sendToPeer(_peer, { type: "publish", data: dataView });
+      }
     });
   }
 
@@ -742,6 +748,24 @@ class PubSubManager {
         _console.error(`uncaught messageType "${messageType}"`);
         break;
     }
+  }
+
+  // GUARDS
+  peerSubscriptionGuardManager = new GuardManager<
+    [PubSubManagerPeerSubscriptionGuardManagerArg]
+  >();
+  #allowPeerSubscription(
+    receivingPeer: PubSubPeer,
+    type: string,
+    data: DataView,
+    sendingPeer: PubSubPeer,
+  ) {
+    return this.peerSubscriptionGuardManager.evaluate({
+      receivingPeer,
+      type,
+      data,
+      sendingPeer,
+    });
   }
 }
 

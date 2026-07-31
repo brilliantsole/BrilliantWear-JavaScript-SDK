@@ -3156,6 +3156,12 @@ type BasePubSubManagerOptions = {
 };
 type PubSubManagerPublishOptions = BasePubSubManagerOptions;
 type PubSubManagerListenerOptions = BasePubSubManagerOptions & EventDispatcherOptions;
+interface PubSubManagerPeerSubscriptionGuardManagerArg {
+    receivingPeer: PubSubPeer;
+    type: string;
+    data: DataView;
+    sendingPeer: PubSubPeer;
+}
 declare class PubSubManager {
     #private;
     get addEventListener(): <T extends "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished" | "*">(type: T, listener: (event: ListenerEvent<PubSubManager, "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished", PubSubManagerEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
@@ -3172,6 +3178,7 @@ declare class PubSubManager {
     unsubscribe(type: string, listener: PubSubListener): void;
     publish(type: string, data: DataView | ArrayBuffer, options?: PubSubManagerPublishOptions): PubSubPeer[];
     private _parsePeerMessage;
+    peerSubscriptionGuardManager: GuardManager<[PubSubManagerPeerSubscriptionGuardManagerArg]>;
 }
 declare const _default$2: PubSubManager;
 

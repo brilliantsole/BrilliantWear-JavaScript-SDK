@@ -3,6 +3,7 @@ import { PubSubMessageOrMessageType } from "./PubSubManagerUtils.ts";
 import { ServerClient } from "../server/Server.ts";
 import { Client } from "../server/Client.ts";
 import { ServerType } from "../server/BaseServer.ts";
+import GuardManager from "../utils/GuardManager.ts";
 export type PubSubPeer = ServerClient | Client;
 export interface PubSubPeerContext {
     peer: PubSubPeer;
@@ -75,6 +76,12 @@ export declare const DefaultPubSubListenerOptions: PubSubManagerListenerOptions;
 export declare function verifyBasePubSubManagerOptions(options: BasePubSubManagerOptions): void;
 export declare function verifyPubSubManagerEventTypeLength(type: string): void;
 export declare function doesBasePubSubManagerOptionsIncludePeer(options: BasePubSubManagerOptions, peer: PubSubPeer): boolean;
+export interface PubSubManagerPeerSubscriptionGuardManagerArg {
+    receivingPeer: PubSubPeer;
+    type: string;
+    data: DataView;
+    sendingPeer: PubSubPeer;
+}
 declare class PubSubManager {
     #private;
     get addEventListener(): <T extends "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished" | "*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<PubSubManager, "peerConnected" | "peerNotConnected" | "subscribed" | "unsubscribed" | "peerSubscribed" | "peerUnsubscribed" | "published" | "peerPublished", PubSubManagerEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
@@ -91,6 +98,7 @@ declare class PubSubManager {
     unsubscribe(type: string, listener: PubSubListener): void;
     publish(type: string, data: DataView | ArrayBuffer, options?: PubSubManagerPublishOptions): PubSubPeer[];
     private _parsePeerMessage;
+    peerSubscriptionGuardManager: GuardManager<[PubSubManagerPeerSubscriptionGuardManagerArg]>;
 }
 declare const _default: PubSubManager;
 export default _default;
