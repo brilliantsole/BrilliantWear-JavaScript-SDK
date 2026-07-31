@@ -37237,7 +37237,7 @@ let PubSubManager = (() => {
             });
         }
         #invokeListener(listenerObject, event) {
-            _console$b.log(`dispatching "${event.target}" listener`, listenerObject);
+            _console$b.log(`dispatching "${event.type}" listener`, listenerObject);
             try {
                 listenerObject.listener(event);
             }
@@ -37245,7 +37245,7 @@ let PubSubManager = (() => {
                 _console$b.error(error);
             }
             if (listenerObject.once) {
-                _console$b.log(`flagging "${event.target}" listener`, listenerObject);
+                _console$b.log(`flagging "${event.type}" listener`, listenerObject);
                 listenerObject.shouldRemove = true;
             }
         }

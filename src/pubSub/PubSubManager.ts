@@ -661,7 +661,7 @@ class PubSubManager {
     listenerObject: PubSubManagerListenerObject,
     event: PubSubEvent,
   ) {
-    _console.log(`dispatching "${event.target}" listener`, listenerObject);
+    _console.log(`dispatching "${event.type}" listener`, listenerObject);
 
     try {
       listenerObject.listener(event);
@@ -670,7 +670,7 @@ class PubSubManager {
     }
 
     if (listenerObject.once) {
-      _console.log(`flagging "${event.target}" listener`, listenerObject);
+      _console.log(`flagging "${event.type}" listener`, listenerObject);
       listenerObject.shouldRemove = true;
     }
   }

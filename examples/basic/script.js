@@ -4659,3 +4659,14 @@ BS.PubSubManager.peerSubscriptionGuardManager.add(
     return window.allowPeerSubscription;
   },
 );
+
+const abortController = new AbortController();
+BS.PubSubManager.subscribe(
+  "hello",
+  (event) => {
+    console.log("PUBSUB", event);
+    // abortController.abort();
+  },
+  { signal: abortController.signal },
+);
+window.abortController = abortController;

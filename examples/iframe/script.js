@@ -364,6 +364,13 @@ const createIframeContainer = (src) => {
 
   toggleSensorDataButton.addEventListener("click", () => toggleSensorData());
 
+  const closeButton = iframeContainer.querySelector(".close");
+  const close = () => {
+    console.log("closing");
+    iframeContainer.remove();
+  };
+  closeButton.addEventListener("click", () => close());
+
   iframeContainers.appendChild(iframeContainer);
 };
 // createIframeContainer("../display-text");
@@ -372,6 +379,11 @@ const createIframeContainer = (src) => {
 // createIframeContainer("../display-prompt");
 createIframeContainer();
 window.createIframeContainer = createIframeContainer;
+
+const addIframeButton = document.getElementById("addIframe");
+addIframeButton.addEventListener("click", () => {
+  createIframeContainer();
+});
 
 BS.ServerManager.clientSensorConfigurationToDeviceGuardManager.add(
   ({ client, message, sensorType, sensorRate }) => {
@@ -451,8 +463,10 @@ BS.PubSubManager.subscribe(
 );
 window.abortController = abortController;
 
+window.allowPeerSubscription = true;
 BS.PubSubManager.peerSubscriptionGuardManager.add(
   ({ peer, type, data, sendingPeer }) => {
     console.log("allow peerSubscription?", peer, type, data, sendingPeer);
+    return window.allowPeerSubscription;
   },
 );
