@@ -115,7 +115,7 @@ class ClientManager {
     _console.log("onClient", client);
     addEventListeners(client, this.#boundClientEventListeners);
     if (!this.#clients.includes(client)) {
-      _console.log("client", client);
+      _console.log("adding client", client);
       this.#clients.push(client);
       this.#dispatchEvent("client", { client });
       this.#dispatchEvent("clients", {

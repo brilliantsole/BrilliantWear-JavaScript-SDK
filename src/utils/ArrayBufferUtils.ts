@@ -1,5 +1,5 @@
 import { createConsole } from "./Console.ts";
-import { textEncoder } from "./Text.ts";
+import { textDecoder, textEncoder } from "./Text.ts";
 
 const _console = createConsole("ArrayBufferUtils", { log: false });
 
@@ -61,6 +61,20 @@ export function dataToArrayBuffer(data: Buffer) {
 export function stringToArrayBuffer(string: string) {
   const encoding = textEncoder.encode(string);
   return concatenateArrayBuffers(encoding.byteLength, encoding);
+}
+export function arrayBufferToStrings(arrayBuffer: ArrayBuffer) {
+  const dataView = new DataView(arrayBuffer);
+  let offset = 0;
+  const strings: string[] = [];
+  while (offset < dataView.byteLength) {
+    const stringLength = dataView.getUint8(offset++);
+    const string = textDecoder.decode(
+      dataView.buffer.slice(offset, offset + stringLength),
+    );
+    offset += stringLength;
+    strings.push(string);
+  }
+  return strings;
 }
 
 export function objectToArrayBuffer(object: object) {

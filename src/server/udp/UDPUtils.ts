@@ -1,5 +1,9 @@
 import { createConsole } from "../../utils/Console.ts";
-import { createMessage, MessageOrMessageType } from "../ServerUtils.ts";
+import {
+  createMessage,
+  Message,
+  MessageOrMessageType,
+} from "../ServerUtils.ts";
 
 const _console = createConsole("UDPUtils", { log: false });
 
@@ -14,9 +18,13 @@ export const UDPServerMessageTypes = [
 ] as const;
 export type UDPServerMessageType = (typeof UDPServerMessageTypes)[number];
 
-export type UDPServerMessage = MessageOrMessageType<UDPServerMessageType>;
+export type UDPServerMessageOrMessageType =
+  MessageOrMessageType<UDPServerMessageType>;
+export type UDPServerMessage = Message<UDPServerMessageType>;
 
-export function createUDPServerMessage(...messages: UDPServerMessage[]) {
+export function createUDPServerMessage(
+  ...messages: UDPServerMessageOrMessageType[]
+) {
   _console.log("createUDPServerMessage", ...messages);
   return createMessage(UDPServerMessageTypes, true, ...messages);
 }

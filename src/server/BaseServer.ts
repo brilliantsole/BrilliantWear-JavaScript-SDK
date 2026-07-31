@@ -94,6 +94,7 @@ import {
   serializeVibrationConfigurations,
   VibrationConfiguration,
 } from "../vibration/VibrationManager.ts";
+import { default as PubSubManager } from "../pubSub/PubSubManager.ts";
 
 const RequiredDeviceInformationMessageTypes: ConnectionMessageType[] = [
   ...DeviceInformationTypes,
@@ -108,7 +109,7 @@ const RequiredDeviceInformationMessageTypes: ConnectionMessageType[] = [
   ...RequiredDisplayMessageTypes,
 ];
 
-const _console = createConsole("BaseServer", { log: true });
+const _console = createConsole("BaseServer", { log: false });
 
 export const ServerTypes = ["window", "webSocket", "udp"] as const;
 export type ServerType = (typeof ServerTypes)[number];
@@ -125,7 +126,7 @@ export interface BaseServerClient {
 
 export const ServerEventTypes = [
   "clientConnected",
-  "clientDisconnected",
+  "clientNotConnected",
 ] as const;
 export type ServerEventType = (typeof ServerEventTypes)[number];
 
@@ -133,7 +134,7 @@ export interface BaseServerEventMessages<
   ServerClient extends BaseServerClient,
 > {
   clientConnected: { client: ServerClient };
-  clientDisconnected: { client: ServerClient };
+  clientNotConnected: { client: ServerClient };
 }
 
 export type BaseServerEventDispatcherTypes<
@@ -223,12 +224,14 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       DisplayCanvasHelperManager,
       this.#boundDisplayCanvasHelperManagerEventListeners,
     );
-    addEventListeners(this, this.#boundServerListeners);
 
-    // @ts-expect-error
     BaseServer.OnServer(this);
   }
 
+  #requiredMessageTypesSentToClients: Map<
+    ServerClient,
+    Set<ServerMessageOrMessageType>
+  > = new Map();
   clients: ServerClient[] = [];
 
   static #ClearSensorConfigurationsWhenNoClients = true;
@@ -251,24 +254,21 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   }
 
   // SERVER LISTENERS
-  #boundServerListeners: BoundBaseServerEventListeners<ServerClient> = {
-    clientConnected: this.#onClientConnected.bind(this),
-    clientDisconnected: this.#onClientDisconnected.bind(this),
-  };
-  #onClientConnected(
-    event: BaseServerEventMap<ServerClient>["clientConnected"],
-  ) {
-    const client = event.message.client;
+
+  #onClientConnected(client: ServerClient) {
     if (!this.clients.includes(client)) {
       this.clients.push(client);
     }
-    _console.log("onClientConnected");
+    _console.log("#onClientConnected", client);
     _console.log(`currently have ${this.clients.length} clients`);
+
+    this.#eventDispatcher.dispatchEvent("clientConnected", { client });
   }
-  #onClientDisconnected(
-    event: BaseServerEventMap<ServerClient>["clientDisconnected"],
-  ) {
-    const client = event.message.client;
+  protected _onClientConnected(client: ServerClient) {
+    _console.log("_onClientConnected", client);
+    this.#requiredMessageTypesSentToClients.set(client, new Set());
+  }
+  protected _onClientNotConnected(client: ServerClient) {
     if (this.clients.includes(client)) {
       this.clients.splice(this.clients.indexOf(client), 1);
     }
@@ -314,7 +314,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       }
     }
 
-    _console.log("onClientDisconnected");
+    _console.log("_onClientNotConnected");
     _console.log(`currently have ${this.clients.length} clients`);
     if (
       this.clients.length == 0 &&
@@ -325,15 +325,32 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         device.setTfliteInferencingEnabled(false);
       });
     }
+    this.#eventDispatcher.dispatchEvent("clientNotConnected", { client });
   }
 
   // CLIENT MESSAGING
-  protected sendToClient(
+  _sendToClient(
     client: ServerClient,
     arrayBuffer: ArrayBuffer,
     isWrapped?: boolean,
   ) {
     return this.#allowServerToClient(client);
+  }
+  protected _onSendToClient(client: ServerClient) {
+    _console.log("_onSendToClient", client);
+    if (!this.clients.includes(client)) {
+      const didSendRequiredMessageTypes = BaseClient.RequiredMessageTypes.every(
+        (messageType) =>
+          this.#requiredMessageTypesSentToClients.get(client)!.has(messageType),
+      );
+      _console.log(
+        { didSendRequiredMessageTypes },
+        this.#requiredMessageTypesSentToClients.get(client),
+      );
+      if (didSendRequiredMessageTypes) {
+        this.#onClientConnected(client);
+      }
+    }
   }
 
   broadcast(
@@ -349,7 +366,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     clients
       .filter((client) => this.clients.includes(client))
       .forEach((client) => {
-        this.sendToClient(client, arrayBuffer, isWrapped);
+        this._sendToClient(client, arrayBuffer, isWrapped);
       });
   }
 
@@ -633,7 +650,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
               dataView,
             );
 
-            this.sendToClient(
+            this._sendToClient(
               client,
               this.#createDeviceServerMessage(device, deviceMessage),
             );
@@ -683,7 +700,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                     messageType,
                     dataView,
                   );
-                  this.sendToClient(
+                  this._sendToClient(
                     clientRequestingSend,
                     this.#createDeviceServerMessage(device, deviceMessage),
                   );
@@ -739,7 +756,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                       "sending",
                     );
 
-                    this.sendToClient(
+                    this._sendToClient(
                       clientRequestingSend,
                       this.#createDeviceServerMessage(
                         device,
@@ -838,7 +855,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
               messageType,
               dataView,
             );
-            this.sendToClient(
+            this._sendToClient(
               clientRequestingSend,
               this.#createDeviceServerMessage(device, deviceMessage),
             );
@@ -1315,11 +1332,26 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       case "isScanningAvailable":
         if (this.#allowServerToClient(client, "isScanningAvailable")) {
           responseMessages.push(this.#isScanningAvailableMessage);
+          this.#requiredMessageTypesSentToClients
+            .get(client)!
+            .add("isScanningAvailable");
+
+          if (scanner.isScanningAvailable) {
+            if (this.#allowServerToClient(client, "isScanning")) {
+              responseMessages.push(this.#isScanningMessage);
+              this.#requiredMessageTypesSentToClients
+                .get(client)!
+                .add("isScanning");
+            }
+          }
         }
         break;
       case "isScanning":
         if (this.#allowServerToClient(client, "isScanning")) {
           responseMessages.push(this.#isScanningMessage);
+          this.#requiredMessageTypesSentToClients
+            .get(client)!
+            .add("isScanning");
         }
         break;
       case "startScan":
@@ -1331,6 +1363,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       case "discoveredDevices":
         if (this.#allowServerToClient(client, "discoveredDevices")) {
           responseMessages.push(this.#discoveredDevicesMessage);
+          this.#requiredMessageTypesSentToClients
+            .get(client)!
+            .add("discoveredDevices");
         }
         break;
       case "connectToDevice":
@@ -1386,6 +1421,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       case "connectedDevices":
         if (this.#allowServerToClient(client, "connectedDevices")) {
           responseMessages.push(this.#connectedDevicesMessage);
+          this.#requiredMessageTypesSentToClients
+            .get(client)!
+            .add("connectedDevices");
         }
         break;
       case "deviceMessage":
@@ -1507,6 +1545,21 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           }
         }
         break;
+      case "pubSub":
+        {
+          // @ts-expect-error
+          const responseMessage = PubSubManager._parsePeerMessage(
+            // @ts-expect-error
+            client,
+            dataView,
+          );
+          if (responseMessage) {
+            responseMessages.push(
+              createServerMessage({ type: "pubSub", data: responseMessage }),
+            );
+          }
+        }
+        break;
       default:
         _console.error(`uncaught messageType "${messageType}"`);
         break;
@@ -1613,7 +1666,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         if (client == _client) {
           return deviceMessages;
         } else {
-          this.sendToClient(
+          this._sendToClient(
             _client,
             this.#createDeviceServerMessage(device, ...deviceMessages),
           );
@@ -1945,7 +1998,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       }
 
       if (sendImmediately) {
-        this.sendToClient(
+        this._sendToClient(
           client,
           this.#createDeviceServerMessage(device, ...deviceMessages),
         );
@@ -2488,7 +2541,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                       "sending fileTransfer deviceMessages to client",
                       deviceMessages,
                     );
-                    this.sendToClient(
+                    this._sendToClient(
                       client,
                       this.#createDeviceServerMessage(
                         device,
@@ -2559,7 +2612,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
                           valueToUInt32DataView(bytesTransferred, true),
                         );
 
-                      this.sendToClient(
+                      this._sendToClient(
                         client,
                         this.#createDeviceServerMessage(
                           device,
@@ -2652,7 +2705,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
       clientContext.responseMessages,
     );
     _console.log(`sending ${responseMessage.byteLength} bytes to client...`);
-    this.sendToClient(clientContext.client, responseMessage, true);
+    this._sendToClient(clientContext.client, responseMessage, true);
 
     const localBroadcastMessage = concatenateArrayBuffers(
       clientContext.localBroadcastMessages,
@@ -2685,3 +2738,4 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
 export default BaseServer;
 
 import { default as ServerManager } from "./ServerManager.ts";
+import BaseClient from "./BaseClient.ts";

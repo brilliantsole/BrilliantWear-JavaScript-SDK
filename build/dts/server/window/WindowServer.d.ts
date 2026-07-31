@@ -8,9 +8,9 @@ declare class WindowServer extends BaseServer<WindowServerClient> {
     static type: "window";
     readonly type: "window";
     static readonly shared: WindowServer;
-    protected init(): void;
+    protected _init(): void;
     constructor();
-    protected sendToClient(client: WindowServerClient, arrayBuffer: ArrayBuffer, isWrapped?: boolean): boolean;
+    _sendToClient(client: WindowServerClient, arrayBuffer: ArrayBuffer, isWrapped?: boolean): boolean;
 }
 export { WindowServer };
 declare const _default: WindowServer;

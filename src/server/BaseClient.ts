@@ -29,6 +29,7 @@ import {
   ConnectionTypes,
 } from "../connection/BaseConnectionManager.ts";
 import { serverMtus, ServerTypes } from "./BaseServer.ts";
+import { default as PubSubManager } from "../pubSub/PubSubManager.ts";
 
 const _console = createConsole("BaseClient", { log: false });
 
@@ -78,6 +79,10 @@ export type BoundClientEventListeners =
   ClientEventDispatcherTypes["BoundEventListeners"];
 
 export type ServerURL = string | URL;
+
+export interface ClientContext {
+  responseMessages: ServerMessageOrMessageType[];
+}
 
 abstract class BaseClient {
   static type: ClientType;
@@ -209,13 +214,13 @@ abstract class BaseClient {
     return this._connectionStatus;
   }
 
-  static #RequiredMessageTypes: ServerMessageOrMessageType[] = [
+  static RequiredMessageTypes: ServerMessageOrMessageType[] = [
     "isScanningAvailable",
     "discoveredDevices",
     "connectedDevices",
   ];
   get #requiredMessageTypes(): ServerMessageOrMessageType[] {
-    return BaseClient.#RequiredMessageTypes;
+    return BaseClient.RequiredMessageTypes;
   }
   protected _sendRequiredMessages() {
     _console.log("sending required messages", this.#requiredMessageTypes);
@@ -247,23 +252,38 @@ abstract class BaseClient {
 
   protected parseMessage(dataView: DataView<ArrayBuffer>) {
     _console.log("parseMessage", { dataView });
+
+    const context: ClientContext = {
+      responseMessages: [],
+    };
+
     parseMessage(
       dataView,
       ServerMessageTypes,
       this.#parseMessageCallback.bind(this),
-      null,
+      context,
       true,
     );
     this.#checkIfFullyConnected();
+
+    const { responseMessages } = context;
+    if (responseMessages.length == 0) {
+      _console.log("no responseMessages");
+      return;
+    }
+    this.sendToServer(...responseMessages);
   }
 
   #parseMessageCallback(
     messageType: ServerMessageType,
     dataView: DataView<ArrayBuffer>,
+    context: ClientContext,
   ) {
     let byteOffset = 0;
 
-    _console.log({ messageType }, dataView);
+    _console.log({ messageType }, dataView, context);
+
+    const { responseMessages } = context;
 
     switch (messageType) {
       case "isScanningAvailable":
@@ -339,6 +359,19 @@ abstract class BaseClient {
           connectionManager.onClientMessage(_dataView);
         }
         break;
+      case "pubSub":
+        {
+          // @ts-expect-error
+          const responseMessage = PubSubManager._parsePeerMessage(
+            // @ts-expect-error
+            this,
+            dataView,
+          );
+          if (responseMessage) {
+            responseMessages.push({ type: "pubSub", data: responseMessage });
+          }
+        }
+        break;
       default:
         _console.error(`uncaught messageType "${messageType}"`);
         break;
@@ -347,6 +380,7 @@ abstract class BaseClient {
     if (this.connectionStatus == "connecting") {
       this.#receivedMessageTypes.push(messageType);
     }
+    _console.log("responseMessages", responseMessages);
   }
 
   // SCANNING
@@ -360,9 +394,6 @@ abstract class BaseClient {
     this.#dispatchEvent("isScanningAvailable", {
       isScanningAvailable: this.isScanningAvailable,
     });
-    if (this.isScanningAvailable) {
-      this.#requestIsScanning();
-    }
   }
   get isScanningAvailable() {
     return this.#isScanningAvailable;

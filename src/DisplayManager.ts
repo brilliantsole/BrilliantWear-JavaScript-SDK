@@ -119,7 +119,7 @@ import { wait } from "./utils/Timer.ts";
 import { default as DisplayCanvasHelper } from "./utils/DisplayCanvasHelper.ts";
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
 
-const _console = createConsole("DisplayManager", { log: true });
+const _console = createConsole("DisplayManager", { log: false });
 
 export const DefaultNumberOfDisplayColors = 16;
 

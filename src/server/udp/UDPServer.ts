@@ -62,7 +62,7 @@ class UDPServer extends BaseServer<UDPServerClient> {
       };
       _console.log("created new client", client);
 
-      this.dispatchEvent("clientConnected", { client });
+      this._onClientConnected(client);
     }
     return client;
   }
@@ -288,27 +288,31 @@ class UDPServer extends BaseServer<UDPServerClient> {
     }
     return true;
   }
-  protected sendToClient(
+  _sendToClient(
     client: UDPServerClient,
     arrayBuffer: ArrayBuffer,
     isWrapped?: boolean,
   ) {
-    if (!super.sendToClient(client, arrayBuffer, isWrapped)) {
+    if (!super._sendToClient(client, arrayBuffer, isWrapped)) {
       return false;
     }
-    return this.#sendToClient(
+    const didSend = this.#sendToClient(
       client,
       isWrapped
         ? arrayBuffer
         : createUDPServerMessage({ type: "serverMessage", data: arrayBuffer }),
     );
+    if (didSend) {
+      this._onSendToClient(client);
+    }
+    return didSend;
   }
 
   // REMOVE CLIENT
   #removeClient(client: UDPServerClient) {
     _console.log(`removing client ${this.#clientToString(client)}...`);
     client.removeSelfTimer.stop();
-    this.dispatchEvent("clientDisconnected", { client });
+    this._onClientNotConnected(client);
   }
 }
 

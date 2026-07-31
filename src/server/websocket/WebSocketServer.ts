@@ -86,7 +86,7 @@ class WebSocketServer extends BaseServer<WebSocketServerClient> {
     );
     client.pingClientTimer.start();
     addEventListeners(client, this.#boundWebSocketClientListeners);
-    this.dispatchEvent("clientConnected", { client });
+    this._onClientConnected(client);
   }
   #onWebSocketServerError(error: Error) {
     _console.error(error);
@@ -125,7 +125,7 @@ class WebSocketServer extends BaseServer<WebSocketServerClient> {
     const client = event.target as WebSocketServerClient;
     client.pingClientTimer!.stop();
     removeEventListeners(client, this.#boundWebSocketClientListeners);
-    this.dispatchEvent("clientDisconnected", { client });
+    this._onClientNotConnected(client);
   }
   #onWebSocketClientError(event: ws.ErrorEvent) {
     _console.error("client.error", event.message);
@@ -230,20 +230,24 @@ class WebSocketServer extends BaseServer<WebSocketServerClient> {
     }
     return true;
   }
-  protected sendToClient(
+  _sendToClient(
     client: WebSocketServerClient,
     arrayBuffer: ArrayBuffer,
     isWrapped?: boolean,
   ) {
-    if (!super.sendToClient(client, arrayBuffer, isWrapped)) {
+    if (!super._sendToClient(client, arrayBuffer, isWrapped)) {
       return false;
     }
-    return this.#sendToClient(
+    const didSend = this.#sendToClient(
       client,
       isWrapped
         ? arrayBuffer
         : createWebSocketMessage({ type: "serverMessage", data: arrayBuffer }),
     );
+    if (didSend) {
+      this._onSendToClient(client);
+    }
+    return didSend;
   }
 
   // PING

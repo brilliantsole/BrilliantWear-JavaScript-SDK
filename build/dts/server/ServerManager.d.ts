@@ -30,7 +30,7 @@ interface BaseServerManagerEventMessages {
     };
     [wildcardServerEventType]: WildcardServerEventMessage<BaseServerManagerServerEventMessage>;
 }
-export declare const ServerManagerEventTypes: readonly [...("serverClientConnected" | "serverClientDisconnected")[], "server", "servers", "server*"];
+export declare const ServerManagerEventTypes: readonly [...("serverClientConnected" | "serverClientNotConnected")[], "server", "servers", "server*"];
 export type ServerManagerEventType = (typeof ServerManagerEventTypes)[number];
 export type ServerManagerEventMessages = ServerManagerServerEventMessages & BaseServerManagerEventMessages;
 export type ServerManagerEventDisptcherTypes = EventDispatcherTypes<ServerManager, ServerManagerEventType, ServerManagerEventMessages>;
@@ -87,9 +87,10 @@ declare class ServerManager {
     static readonly shared: ServerManager;
     constructor();
     get servers(): Server[];
-    get addEventListener(): <T extends "*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "server*" | "servers">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "serverClientConnected" | "serverClientDisconnected" | "server*" | "servers", ServerManagerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "server*" | "servers">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "serverClientConnected" | "serverClientDisconnected" | "server*" | "servers", ServerManagerEventMessages, T>) => void) => void;
-    get removeEventListeners(): <T extends "*" | "server" | "serverClientConnected" | "serverClientDisconnected" | "server*" | "servers">(type: T) => void;
+    getServerByClient(client: ServerClient): Server | undefined;
+    get addEventListener(): <T extends "*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers" | "server*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "serverClientConnected" | "serverClientNotConnected" | "servers" | "server*", ServerManagerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers" | "server*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<ServerManager, "server" | "serverClientConnected" | "serverClientNotConnected" | "servers" | "server*", ServerManagerEventMessages, T>) => void) => void;
+    get removeEventListeners(): <T extends "*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers" | "server*">(type: T) => void;
     private broadcast;
     clientToServerGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
     serverToClientGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;

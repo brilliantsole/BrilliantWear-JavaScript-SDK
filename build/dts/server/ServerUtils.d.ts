@@ -1,6 +1,6 @@
 import { ConnectionMessageType } from "../connection/BaseConnectionManager.ts";
 import { DeviceEventType } from "../Device.ts";
-export declare const ServerMessageTypes: readonly ["isScanningAvailable", "isScanning", "startScan", "stopScan", "discoveredDevice", "discoveredDevices", "expiredDiscoveredDevice", "connectToDevice", "disconnectFromDevice", "connectedDevices", "deviceMessage", "requiredDeviceInformation"];
+export declare const ServerMessageTypes: readonly ["isScanningAvailable", "isScanning", "startScan", "stopScan", "discoveredDevice", "discoveredDevices", "expiredDiscoveredDevice", "connectToDevice", "disconnectFromDevice", "connectedDevices", "deviceMessage", "requiredDeviceInformation", "pubSub"];
 export type ServerMessageType = (typeof ServerMessageTypes)[number];
 export declare const DeviceMessageTypes: readonly ["connectionStatus", "batteryLevel", "deviceInformation", "rx", "smp"];
 export type DeviceMessageType = (typeof DeviceMessageTypes)[number];

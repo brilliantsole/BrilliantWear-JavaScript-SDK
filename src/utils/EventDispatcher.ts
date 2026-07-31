@@ -116,8 +116,12 @@ export type EventDispatcherOptions = {
   immediate?: boolean;
   signal?: AbortSignal;
 };
+export const DefaultEventDispatcherOptions: EventDispatcherOptions = {
+  once: false,
+  immediate: false,
+};
 
-export type EventDispatcherListener = {
+export type EventDispatcherListenerObject = {
   listener: Function;
   shouldRemove?: boolean;
 } & EventDispatcherOptions;
@@ -128,7 +132,7 @@ class EventDispatcher<
   EventMessages extends Partial<Record<EventType, any>>,
 > {
   #listeners: Partial<
-    Record<EventType | WildcardEventType, EventDispatcherListener[]>
+    Record<EventType | WildcardEventType, EventDispatcherListenerObject[]>
   > = {};
   #latestEvents: Partial<{
     [K in EventType]: {
@@ -166,7 +170,7 @@ class EventDispatcher<
     );
   }
 
-  #updateEventListeners<T extends EventType | WildcardEventType>(type: T) {
+  #updateListeners<T extends EventType | WildcardEventType>(type: T) {
     if (!this.#listeners[type]) return;
     this.#listeners[type] = this.#listeners[type]!.filter(
       (listenerObj) => !listenerObj.shouldRemove,
@@ -178,7 +182,9 @@ class EventDispatcher<
     listener: (
       event: ListenerEvent<Target, EventType, EventMessages, T>,
     ) => void,
-    options: EventDispatcherOptions = { once: false, immediate: false },
+    options: EventDispatcherOptions = structuredClone(
+      DefaultEventDispatcherOptions,
+    ),
   ): void {
     if (!this.#isValidListenerType(type)) {
       throw new Error(`Invalid event type: ${type}`);
@@ -208,20 +214,22 @@ class EventDispatcher<
       options.signal.addEventListener(
         "abort",
         () => {
-          _console.log(`removing listener after receiving "abort" signal`);
+          _console.log(
+            `removing "${type}" listener after receiving "abort" signal`,
+          );
           this.removeEventListener(type, listener);
         },
         { once: true },
       );
     }
-    const listenerObj: EventDispatcherListener = {
+    const listenerObject: EventDispatcherListenerObject = {
       listener,
       once: options.once,
       immediate: options.immediate,
       signal: options.signal,
     };
-    _console.log(`adding "${type}" listener`, listenerObj);
-    this.#listeners[type]!.push(listenerObj);
+    _console.log(`adding "${type}" listener`, listenerObject);
+    this.#listeners[type]!.push(listenerObject);
 
     _console.log(
       `currently have ${this.#listeners[type]!.length} "${type}" listeners`,
@@ -232,12 +240,12 @@ class EventDispatcher<
 
       if (latestEvent) {
         this.#invokeListener(
-          listenerObj,
+          listenerObject,
           latestEvent.type,
           latestEvent.message,
         );
 
-        this.#updateEventListeners(type);
+        this.#updateListeners(type);
       }
     }
   }
@@ -259,14 +267,14 @@ class EventDispatcher<
     this.#listeners[type]!.forEach((listenerObj) => {
       const isListenerToRemove = listenerObj.listener === listener;
       if (isListenerToRemove) {
-        _console.log(`flagging "${type}" listener`, listener);
+        _console.log(`flagging "${type}" listener for removal`, listener);
         listenerObj.shouldRemove = true;
         foundListener = true;
       }
     });
 
     if (foundListener) {
-      this.#updateEventListeners(type);
+      this.#updateListeners(type);
     }
   }
 
@@ -301,20 +309,20 @@ class EventDispatcher<
     this.#dispatchEvent(type, message, true);
   }
   #invokeListener<T extends EventType>(
-    listenerObj: EventDispatcherListener,
+    listenerObject: EventDispatcherListenerObject,
     type: T,
     message: EventMessages[T],
   ) {
-    _console.log(`dispatching "${type}" listener`, listenerObj);
+    _console.log(`dispatching "${type}" listener`, listenerObject);
     try {
-      listenerObj.listener({ type, target: this.#target, message });
+      listenerObject.listener({ type, target: this.#target, message });
     } catch (error) {
       _console.error(error);
     }
 
-    if (listenerObj.once) {
-      _console.log(`flagging "${type}" listener`, listenerObj);
-      listenerObj.shouldRemove = true;
+    if (listenerObject.once) {
+      _console.log(`flagging "${type}" listener`, listenerObject);
+      listenerObject.shouldRemove = true;
     }
   }
   #dispatchEvent<T extends EventType>(
@@ -340,7 +348,7 @@ class EventDispatcher<
       this.#invokeListener(listenerObj, type, message);
     });
 
-    this.#updateEventListeners(type);
+    this.#updateListeners(type);
   }
 
   waitForEvent<T extends EventType>(

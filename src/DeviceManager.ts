@@ -28,7 +28,7 @@ import {
 } from "./utils/TypeScriptUtils.ts";
 import { serviceUUIDs } from "./connection/bluetooth/bluetoothUUIDs.ts";
 
-const _console = createConsole("DeviceManager", { log: true });
+const _console = createConsole("DeviceManager", { log: false });
 
 export interface LocalStorageDeviceInformation {
   type: DeviceType;

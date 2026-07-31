@@ -53,7 +53,8 @@ export type EventDispatcherOptions = {
     immediate?: boolean;
     signal?: AbortSignal;
 };
-export type EventDispatcherListener = {
+export declare const DefaultEventDispatcherOptions: EventDispatcherOptions;
+export type EventDispatcherListenerObject = {
     listener: Function;
     shouldRemove?: boolean;
 } & EventDispatcherOptions;

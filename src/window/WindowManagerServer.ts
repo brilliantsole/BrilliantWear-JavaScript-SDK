@@ -36,14 +36,14 @@ export interface WindowManagerServerClientContext extends BaseServerClientContex
 
 export const WindowManagerServerEventTypes = [
   "clientConnected",
-  "clientDisconnected",
+  "clientNotConnected",
 ] as const;
 export type WindowManagerServerEventType =
   (typeof WindowManagerServerEventTypes)[number];
 
 interface WindowManagerServerEventMessages {
   clientConnected: { client: WindowManagerServerClient };
-  clientDisconnected: { client: WindowManagerServerClient };
+  clientNotConnected: { client: WindowManagerServerClient };
 }
 
 export type WindowManagerServerEventDispatcherTypes = EventDispatcherTypes<
@@ -87,7 +87,7 @@ class WindowManagerServer {
   removeAllEventListeners() {
     this.#eventDispatcher.removeAllEventListeners();
     // @ts-expect-error
-    WindowServer.init();
+    WindowServer._init();
   }
 
   // CONSTRUCTOR
@@ -222,7 +222,7 @@ class WindowManagerServer {
       `received ${dataView.byteLength} bytes via window`,
       dataView.buffer,
     );
-    this.#parseWindowManagerClientMessage(client, dataView);
+    this.#parseClientMessage(client, dataView);
   }
   async #waitForClientToLoad(client: WindowManagerServerClient) {
     _console.log("waitForClientToLoad", client);
@@ -253,7 +253,7 @@ class WindowManagerServer {
     return client;
   }
   #destroyClient(client: WindowManagerServerClient) {
-    _console.log("onClientDisconnected", client);
+    _console.log("onClientNotConnected", client);
     const { messageChannel } = client;
     if (messageChannel) {
       messageChannel.port1.close();
@@ -264,7 +264,7 @@ class WindowManagerServer {
     }
 
     this.#clients.splice(this.#clients.indexOf(client), 1);
-    this.#dispatchEvent("clientDisconnected", { client });
+    this.#dispatchEvent("clientNotConnected", { client });
     return client;
   }
 
@@ -358,15 +358,15 @@ class WindowManagerServer {
       dataView.buffer,
       client,
     );
-    this.#parseWindowManagerClientMessage(client, dataView);
+    this.#parseClientMessage(client, dataView);
   }
 
   // PARSING
-  #parseWindowManagerClientMessage(
+  #parseClientMessage(
     client: WindowManagerServerClient,
     dataView: DataView<ArrayBuffer>,
   ) {
-    _console.log("parseWindowManagerClientMessage", client, dataView);
+    _console.log("#parseClientMessage", client, dataView);
 
     const clientContext: WindowManagerServerClientContext = {
       responseMessages: [],
@@ -456,4 +456,4 @@ class WindowManagerServer {
 
 export default WindowManagerServer.shared;
 // @ts-expect-error
-WindowServer.init();
+WindowServer._init();

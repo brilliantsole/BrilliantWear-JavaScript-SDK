@@ -23,7 +23,8 @@ class WindowServer extends BaseServer<WindowServerClient> {
 
   static readonly shared: WindowServer;
 
-  protected init() {
+  protected _init() {
+    _console.log("_init");
     addEventListeners(
       WindowManagerServer,
       this.#boundWindowManagerServerEventListeners,
@@ -38,15 +39,15 @@ class WindowServer extends BaseServer<WindowServerClient> {
 
   // CLIENTS
 
-  protected sendToClient(
+  _sendToClient(
     client: WindowServerClient,
     arrayBuffer: ArrayBuffer,
     isWrapped?: boolean,
   ) {
-    if (!super.sendToClient(client, arrayBuffer, isWrapped)) {
+    if (!super._sendToClient(client, arrayBuffer, isWrapped)) {
       return false;
     }
-    return WindowManagerServer.sendToClient(
+    const didSend = WindowManagerServer.sendToClient(
       client,
       isWrapped
         ? arrayBuffer
@@ -55,6 +56,10 @@ class WindowServer extends BaseServer<WindowServerClient> {
             data: arrayBuffer,
           }),
     );
+    if (didSend) {
+      this._onSendToClient(client);
+    }
+    return didSend;
   }
 
   // WINDOW
@@ -64,22 +69,22 @@ class WindowServer extends BaseServer<WindowServerClient> {
     ) => void;
   } = {
     clientConnected: this.#onWindowManagerServerClientConnected.bind(this),
-    clientDisconnected:
-      this.#onWindowManagerServerClientDisconnected.bind(this),
+    clientNotConnected:
+      this.#onWindowManagerServerClientNotConnected.bind(this),
   };
   #onWindowManagerServerClientConnected(
     event: WindowManagerServerEventMap["clientConnected"],
   ) {
     const { client } = event.message;
     _console.log("onWindowManagerServerClientConnected", client);
-    this.dispatchEvent("clientConnected", { client });
+    this._onClientConnected(client);
   }
-  #onWindowManagerServerClientDisconnected(
-    event: WindowManagerServerEventMap["clientDisconnected"],
+  #onWindowManagerServerClientNotConnected(
+    event: WindowManagerServerEventMap["clientNotConnected"],
   ) {
     const { client } = event.message;
-    _console.log("onWindowManagerServerClientDisconnected", client);
-    this.dispatchEvent("clientDisconnected", { client });
+    _console.log("onWindowManagerServerClientNotConnected", client);
+    this._onClientNotConnected(client);
   }
 }
 export { WindowServer };

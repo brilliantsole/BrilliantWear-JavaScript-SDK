@@ -9,12 +9,12 @@ window.BS = BS;
 //BS.setAllConsoleLevelFlags({ log: false });
 //BS.setConsoleLevelFlagsForType("PressureDataManager", { log: true });
 
-BS.setConsoleLevelFlagsForType("Device", { log: false });
-BS.setConsoleLevelFlagsForType("DisplayManager", { log: false });
-BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
-BS.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
-BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: false });
-BS.setConsoleLevelFlagsForType("BaseServer", { log: false });
+// BS.setConsoleLevelFlagsForType("Device", { log: false });
+// BS.setConsoleLevelFlagsForType("DisplayManager", { log: false });
+// BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
+// BS.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
+// BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: false });
+// BS.setConsoleLevelFlagsForType("BaseServer", { log: false });
 // BS.setConsoleLevelFlagsForType("FileTransferManager", { log: true });
 // BS.setConsoleLevelFlagsForType("BaseClient", { log: true });
 // BS.setConsoleLevelFlagsForType("Device", { log: true });
@@ -4649,3 +4649,5 @@ onCurrentDevice(() => {
 //     console.log("outputDetails", outputDetails[0]);
 //   }
 // });
+
+// PUBSUB

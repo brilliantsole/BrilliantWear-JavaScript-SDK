@@ -7,13 +7,13 @@ export declare const serverMtus: Record<ServerType, number>;
 export interface BaseServerClient {
     readonly type: ServerType;
 }
-export declare const ServerEventTypes: readonly ["clientConnected", "clientDisconnected"];
+export declare const ServerEventTypes: readonly ["clientConnected", "clientNotConnected"];
 export type ServerEventType = (typeof ServerEventTypes)[number];
 export interface BaseServerEventMessages<ServerClient extends BaseServerClient> {
     clientConnected: {
         client: ServerClient;
     };
-    clientDisconnected: {
+    clientNotConnected: {
         client: ServerClient;
     };
 }
@@ -47,12 +47,12 @@ declare abstract class BaseServer<ServerClient extends BaseServerClient> {
     protected get baseConstructor(): typeof BaseServer;
     static get clientMtu(): number;
     get clientMtu(): number;
-    get addEventListener(): <T extends "*" | "clientConnected" | "clientDisconnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientDisconnected", BaseServerEventMessages<ServerClient>, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    protected get dispatchEvent(): <T extends "clientConnected" | "clientDisconnected">(type: T, message: BaseServerEventMessages<ServerClient>[T]) => void;
-    get removeEventListener(): <T extends "*" | "clientConnected" | "clientDisconnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientDisconnected", BaseServerEventMessages<ServerClient>, T>) => void) => void;
-    get waitForEvent(): <T extends "clientConnected" | "clientDisconnected">(type: T, options?: {
+    get addEventListener(): <T extends "*" | "clientConnected" | "clientNotConnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    protected get dispatchEvent(): <T extends "clientConnected" | "clientNotConnected">(type: T, message: BaseServerEventMessages<ServerClient>[T]) => void;
+    get removeEventListener(): <T extends "*" | "clientConnected" | "clientNotConnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void) => void;
+    get waitForEvent(): <T extends "clientConnected" | "clientNotConnected">(type: T, options?: {
         immediate?: boolean;
-    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientDisconnected", BaseServerEventMessages<ServerClient>, T>>;
+    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>>;
     private static OnServer;
     constructor();
     clients: ServerClient[];
@@ -60,7 +60,10 @@ declare abstract class BaseServer<ServerClient extends BaseServerClient> {
     static set ClearSensorConfigurationsWhenNoClients(newValue: boolean);
     get clearSensorConfigurationsWhenNoClients(): boolean;
     set clearSensorConfigurationsWhenNoClients(newValue: boolean);
-    protected sendToClient(client: ServerClient, arrayBuffer: ArrayBuffer, isWrapped?: boolean): boolean;
+    protected _onClientConnected(client: ServerClient): void;
+    protected _onClientNotConnected(client: ServerClient): void;
+    _sendToClient(client: ServerClient, arrayBuffer: ArrayBuffer, isWrapped?: boolean): boolean;
+    protected _onSendToClient(client: ServerClient): void;
     broadcast(arrayBuffer: ArrayBuffer, clients?: ServerClient[], excludeClients?: ServerClient[], isWrapped?: boolean): void;
     protected parseClientMessage(client: ServerClient, dataView: DataView<ArrayBuffer>): BaseServerClientContext<BaseServerClient> | undefined;
     protected sendClientContext(clientContext: BaseServerClientContext<ServerClient>): void;

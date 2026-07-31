@@ -14,6 +14,8 @@ import { default as ServerManager } from "./server/ServerManager.ts";
 export { ServerManager };
 import { default as ClientManager } from "./server/ClientManager.ts";
 export { ClientManager };
+import { default as PubSubManager } from "./pubSub/PubSubManager.ts";
+export { PubSubManager };
 /** BROWSER_START */
 import { default as WindowManagerServer } from "./window/WindowManagerServer.ts";
 export { WindowManagerServer };

@@ -1,6 +1,7 @@
 export declare function concatenateArrayBuffers(...arrayBuffers: any[]): ArrayBuffer;
 export declare function dataToArrayBuffer(data: Buffer): ArrayBuffer | SharedArrayBuffer;
 export declare function stringToArrayBuffer(string: string): ArrayBuffer;
+export declare function arrayBufferToStrings(arrayBuffer: ArrayBuffer): string[];
 export declare function objectToArrayBuffer(object: object): ArrayBuffer;
 export declare function sliceDataView(dataView: DataView<ArrayBuffer>, begin: number, length?: number): DataView<ArrayBuffer>;
 export type FileLike = number[] | ArrayBuffer | DataView | URL | string | File | Buffer | Blob;

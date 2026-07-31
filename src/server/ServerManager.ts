@@ -27,12 +27,8 @@ import { DeviceMessage, ServerMessage } from "./ServerUtils.ts";
 import Device from "../Device.ts";
 import { DisplayContextCommand } from "../utils/DisplayContextCommand.ts";
 import { VibrationConfiguration } from "../vibration/VibrationManager.ts";
-import {
-  ExtendedFileConfiguration,
-  FileConfiguration,
-  FileTransferDirection,
-  FileType,
-} from "../FileTransferManager.ts";
+import { ExtendedFileConfiguration } from "../FileTransferManager.ts";
+import { PubSubManager } from "../index.ts";
 
 const _console = createConsole("ServerManager", { log: false });
 
@@ -166,6 +162,13 @@ class ServerManager {
   get servers() {
     return this.#servers;
   }
+  getServerByClient(client: ServerClient) {
+    const server = this.servers.find((server) =>
+      // @ts-expect-error
+      server.clients.includes(client),
+    );
+    return server;
+  }
 
   #boundServerEventListeners: BoundServerEventListeners = {
     [wildcardEventType]: this.#onServerEvent.bind(this),
@@ -282,3 +285,6 @@ class ServerManager {
 }
 
 export default ServerManager.shared;
+
+// @ts-expect-error
+PubSubManager._init();

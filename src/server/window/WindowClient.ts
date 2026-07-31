@@ -23,7 +23,7 @@ class WindowClient extends BaseClient {
 
   constructor() {
     super();
-
+    this._connectionStatus = "connecting";
     addEventListeners(WindowManagerClient, this.#boundWindowEventListeners);
   }
 
