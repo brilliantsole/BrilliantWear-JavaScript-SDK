@@ -445,7 +445,14 @@ BS.PubSubManager.subscribe(
   "hello",
   (event) => {
     console.log("PUBSUB", event);
-    abortController.abort();
+    // abortController.abort();
   },
   { signal: abortController.signal },
+);
+window.abortController = abortController;
+
+BS.PubSubManager.peerSubscriptionGuardManager.add(
+  ({ peer, type, data, sendingPeer }) => {
+    console.log("allow peerSubscription?", peer, type, data, sendingPeer);
+  },
 );

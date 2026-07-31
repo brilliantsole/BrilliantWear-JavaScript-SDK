@@ -4651,3 +4651,11 @@ onCurrentDevice(() => {
 // });
 
 // PUBSUB
+
+window.allowPeerSubscription = true;
+BS.PubSubManager.peerSubscriptionGuardManager.add(
+  ({ peer, type, data, sendingPeer }) => {
+    console.log("allow peerSubscription?", peer, type, data, sendingPeer);
+    return window.allowPeerSubscription;
+  },
+);

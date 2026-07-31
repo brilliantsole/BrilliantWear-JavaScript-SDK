@@ -155,10 +155,10 @@ export function doesBasePubSubManagerOptionsIncludePeer(
 }
 
 export interface PubSubManagerPeerSubscriptionGuardManagerArg {
-  receivingPeer: PubSubPeer;
+  peer: PubSubPeer;
   type: string;
   data: DataView;
-  sendingPeer: PubSubPeer;
+  sendingPeer?: PubSubPeer;
 }
 
 @Singleton
@@ -362,6 +362,13 @@ class PubSubManager {
     verifyPubSubManagerEventTypeLength(type);
     verifyBasePubSubManagerOptions(options);
 
+    _console.assertWithError(
+      data instanceof DataView || data instanceof ArrayBuffer,
+      "data is not DataView or ArrayBuffer",
+    );
+
+    data = data instanceof DataView ? data : new DataView(data);
+
     _console.log("publish", { type, data, options });
 
     const messageData = concatenateArrayBuffers(type, data);
@@ -378,11 +385,13 @@ class PubSubManager {
             peer,
           );
         }
-        peersPublishedTo.push(peer);
-        this.#sendToPeer(peer, {
-          type: "publish",
-          data: messageData,
-        });
+        if (this.#allowPeerSubscription(peer, type, data)) {
+          peersPublishedTo.push(peer);
+          this.#sendToPeer(peer, {
+            type: "publish",
+            data: messageData,
+          });
+        }
       }
     });
     _console.log("peersPublishedTo", peersPublishedTo);
@@ -755,13 +764,13 @@ class PubSubManager {
     [PubSubManagerPeerSubscriptionGuardManagerArg]
   >();
   #allowPeerSubscription(
-    receivingPeer: PubSubPeer,
+    peer: PubSubPeer,
     type: string,
     data: DataView,
-    sendingPeer: PubSubPeer,
+    sendingPeer?: PubSubPeer,
   ) {
     return this.peerSubscriptionGuardManager.evaluate({
-      receivingPeer,
+      peer,
       type,
       data,
       sendingPeer,
