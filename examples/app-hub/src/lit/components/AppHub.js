@@ -34,12 +34,8 @@ class AppHub extends LitElement {
   };
 
   static styles = css`
-    .wa-gap-2xs {
-      gap: var(--wa-space-2xs);
-    }
-
     :host {
-      gap: var(--wa-space-2xs);
+      /* gap: var(--wa-space-3xs); */
       width: 100%;
       height: 100%;
       display: flex;
@@ -67,14 +63,14 @@ class AppHub extends LitElement {
     /* touch screens */
     @media (pointer: coarse) {
       @media (orientation: landscape) {
-        :host([data-left-handed]) {
-          flex-direction: row;
+        :host {
+          flex-direction: row-reverse;
           bw-nav {
             flex-direction: column;
           }
         }
-        :host(:not([data-left-handed])) {
-          flex-direction: row-reverse;
+        :host([data-left-handed]) {
+          flex-direction: row;
           bw-nav {
             flex-direction: column;
           }
@@ -82,14 +78,13 @@ class AppHub extends LitElement {
       }
 
       @media (orientation: portrait) {
-        :host([data-left-handed]) {
-          flex-direction: column;
+        :host {
+          flex-direction: column-reverse;
           bw-nav {
-            flex-direction: row;
+            flex-direction: row-reverse;
           }
         }
-        :host(:not([data-left-handed])) {
-          flex-direction: column-reverse;
+        :host([data-left-handed]) {
           bw-nav {
             flex-direction: row;
           }
@@ -100,14 +95,8 @@ class AppHub extends LitElement {
     /* non-touch screens */
     @media (pointer: fine) {
       @media (orientation: landscape) {
-        :host([data-left-handed]) {
+        :host {
           flex-direction: row;
-          bw-nav {
-            flex-direction: column;
-          }
-        }
-        :host(:not([data-left-handed])) {
-          flex-direction: row-reverse;
           bw-nav {
             flex-direction: column;
           }
@@ -115,14 +104,8 @@ class AppHub extends LitElement {
       }
 
       @media (orientation: portrait) {
-        :host([data-left-handed]) {
+        :host {
           flex-direction: column;
-          bw-nav {
-            flex-direction: row;
-          }
-        }
-        :host(:not([data-left-handed])) {
-          flex-direction: column-reverse;
           bw-nav {
             flex-direction: row;
           }
