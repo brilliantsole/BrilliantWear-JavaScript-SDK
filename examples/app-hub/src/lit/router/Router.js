@@ -1,0 +1,153 @@
+// based on https://github.com/lit/lit/blob/c42ee1e96b8fd61f7256f61d715daef572e76e52/packages/labs/router/src/router.ts
+
+import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
+const { litRouter } = await waitForGlobals();
+
+const origin = location.origin || location.protocol + "//" + location.host;
+const baseUrl = new URL(location);
+
+const latestRouterStateSessionStorageKey = "router-state";
+
+export class Router extends litRouter.Routes {
+  constructor(host, routes, defaultRoute) {
+    super(host, routes);
+    this._defaultRoute = defaultRoute ?? "/";
+  }
+  hostConnected() {
+    super.hostConnected();
+    navigation.addEventListener("navigate", this._onNavigate);
+    navigation.addEventListener(
+      "currententrychange",
+      this._onCurrentEntryChange,
+    );
+    // Kick off routed rendering by going to the current URL
+
+    const entries = navigation.entries();
+    if (entries.length == 1) {
+      const state = entries[0].getState();
+      if (!state) {
+        console.log("setting initial state");
+        const state = { route: this._defaultRoute };
+        navigation.updateCurrentEntry({ state });
+        this.goto(state.route);
+      } else {
+        console.log("loading state", state);
+        this.goto(state.route);
+      }
+    } else {
+      const entryIndex = navigation.currentEntry.index;
+      const state = navigation.currentEntry.getState();
+      console.log({ entryIndex, state });
+      if (state) {
+        console.log("loading state", state);
+        this.goto(state.route);
+      } else {
+        try {
+          const stateString = sessionStorage.getItem(
+            latestRouterStateSessionStorageKey,
+          );
+          const state = JSON.parse(stateString);
+          console.log("session state", state);
+          navigation.updateCurrentEntry({ state });
+          this.goto(state.route);
+        } catch (error) {
+          console.log("no sessionStorage - traversing to latest");
+          for (let i = entries.length; i >= 0; i--) {
+            entries;
+          }
+          entries.reverse().some((entry) => {
+            const state = entry.getState();
+            if (state) {
+              console.log("using prior state");
+              navigation.updateCurrentEntry({ state });
+              this.goto(state.route);
+              return true;
+            }
+          });
+          console.log("failed to find valid entry - going to root");
+          const state = { route: this._defaultRoute };
+          navigation.updateCurrentEntry({ state });
+          this.goto(state.route);
+        }
+      }
+    }
+  }
+
+  hostDisconnected() {
+    super.hostDisconnected();
+    navigation.removeEventListener("navigate", this._onNavigate);
+    navigation.removeEventListener(
+      "currententrychange",
+      this._onCurrentEntryChange,
+    );
+  }
+
+  /** @param {NavigationEventMap["currententrychange"]} e */
+  _onCurrentEntryChange = (e) => {
+    const { from, navigationType } = e;
+    const { currentEntry } = navigation;
+    const currentState = currentEntry.getState();
+    console.log("_onCurrentEntryChange", from, { navigationType });
+    console.log("updating sessionStorage");
+    sessionStorage.setItem(
+      latestRouterStateSessionStorageKey,
+      JSON.stringify(currentState),
+    );
+  };
+  /** @param {NavigationEventMap["navigate"]} e */
+  _onNavigate = (e) => {
+    const { destination, navigationType } = e;
+    const { currentEntry } = navigation;
+    console.log("_onNavigate", destination, { navigationType });
+
+    const url = new URL(destination.url);
+
+    // Ignore cross-origin navigations
+    if (url.origin !== origin) {
+      return;
+    }
+
+    // Let browser handle downloads, external targets, etc.
+    if (e.downloadRequest || e.info?.external || e.hashChange) {
+      return;
+    }
+
+    const destinationState = destination.getState();
+    const currentState = currentEntry.getState();
+
+    const isBase = url.pathname == baseUrl.pathname;
+    const pathname = url.pathname.slice(baseUrl.pathname.length - 1);
+    const route = destinationState?.route ?? url.pathname;
+
+    console.log({ isBase, route, pathname });
+
+    if (currentState.route == route) {
+      console.log("redundant route - skipping");
+      try {
+        e.preventDefault();
+      } catch (error) {}
+      const state = {
+        ...currentState,
+        repeat: (currentState?.repeat ?? 0) + 1,
+      };
+      navigation.updateCurrentEntry({
+        state,
+      });
+      return;
+    }
+
+    if (isBase) {
+      e.intercept({
+        handler: async () => {
+          this.goto(route);
+        },
+      });
+    } else {
+      try {
+        e.preventDefault();
+      } catch (error) {}
+      const state = { route };
+      navigation.navigate("./", { state, history: "push" });
+    }
+  };
+}

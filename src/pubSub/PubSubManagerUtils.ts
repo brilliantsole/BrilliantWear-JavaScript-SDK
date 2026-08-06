@@ -5,7 +5,7 @@ import {
   MessageOrMessageType,
 } from "../server/ServerUtils.ts";
 
-const _console = createConsole("PubSubManagerUtils", { log: true });
+const _console = createConsole("PubSubManagerUtils", { log: false });
 
 export const PubSubManagerMessageTypes = [
   "subscribe",

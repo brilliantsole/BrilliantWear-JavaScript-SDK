@@ -19,6 +19,7 @@ import {
 import { parseMessage } from "../utils/ParseUtils.ts";
 import { MessageLike } from "../server/ServerUtils.ts";
 import { Singleton } from "../utils/TypeScriptUtils.ts";
+import { Timer } from "../utils/Timer.ts";
 
 const _console = createConsole("WindowManagerClient", { log: false });
 
@@ -222,6 +223,7 @@ class WindowManagerClient {
     switch (newConnectionStatus) {
       case "connected":
       case "notConnected":
+        this.#connectPingTimer.stop();
         this.#dispatchEvent("isConnected", { isConnected: this.isConnected });
         break;
     }
@@ -246,15 +248,43 @@ class WindowManagerClient {
   // connection is automatic for now
   connect() {
     _console.log("connect");
-    this.#ping();
+    if (this.#connectionStatus == "connecting") {
+      _console.log("already connecting");
+      return;
+    }
+    this.connectionStatus = "connecting";
+    this.#numberOfConnectPingAttempts = 0;
+    this.#connectPingTimer.start();
   }
-  disconnect(): void {
+  disconnect() {
+    _console.log("disconnect");
+    if (this.#connectionStatus == "connecting") {
+      this.#connectPingTimer.stop();
+      this.connectionStatus = "notConnected";
+    }
+  }
+  #connectPingTimerInterval = 1000;
+  #connectPingTimer = new Timer(() => {
+    this.#connectPing();
+  }, this.#connectPingTimerInterval);
+  #maxNumberOfConnectPingAttempts = 3;
+  #numberOfConnectPingAttempts = 0;
+  #connectPing() {
+    _console.log("#connectPing");
+    this.#numberOfConnectPingAttempts++;
+    if (
+      this.#numberOfConnectPingAttempts <= this.#maxNumberOfConnectPingAttempts
+    ) {
+      this.#ping();
+    } else {
+      _console.log("pinged too many times - stopping");
+      this.disconnect();
+    }
+  }
+  reconnect() {
     throw new Error("Method not implemented.");
   }
-  reconnect(): void {
-    throw new Error("Method not implemented.");
-  }
-  toggleConnection(): void {
+  toggleConnection() {
     throw new Error("Method not implemented.");
   }
 
@@ -287,6 +317,7 @@ class WindowManagerClient {
     _console.log("#ping");
     this.#sendMessage(windowManagerPingMessage);
   }
+
   #pong() {
     _console.log("#pong");
     this.#sendMessage(windowManagerPongMessage);

@@ -97,7 +97,9 @@ class WindowManagerServer {
     addEventListeners(window, this.#boundWindowEventListeners);
 
     this.#iframeObserver = new MutationObserver((mutations) => {
+      // _console.log("mutations", mutations);
       for (const mutation of mutations) {
+        // _console.log("mutation", mutation);
         // Handle added iframes
         for (const node of mutation.addedNodes) {
           this.#collectIframes(node).forEach((iframe) => {
@@ -290,6 +292,10 @@ class WindowManagerServer {
     }
     _console.log("iframe added", iframe);
     this.#iframes.push(iframe);
+  }
+  addIframe(iframe: HTMLIFrameElement) {
+    _console.log("addIframe", iframe);
+    this.#onIframeAdded(iframe);
   }
   #onIframeRemoved(iframe: HTMLIFrameElement) {
     if (!this.#iframes.includes(iframe)) {

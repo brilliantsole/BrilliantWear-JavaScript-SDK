@@ -1,0 +1,82 @@
+<html class="wa-cloak">
+  <head>
+    <title>App Hub | BrilliantWear JavaScript SDK</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/themes/default.css"
+    />
+    <script
+      type="module"
+      src="https://ka-f.webawesome.com/webawesome@3.11.0/webawesome.loader.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/utilities.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/native.css"
+    />
+
+    <script type="module-cos">
+      import * as lit from  "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js" with {
+        integrity: "sha256-9gf0cEddireQdUy3D3LNviOQxKV6tZ32zbNg7rcr2Hw=",
+        crossOriginStorage: "*",
+      };
+      console.log('lit loaded', lit)
+      window.lit = lit
+      window.dispatchEvent(new CustomEvent("lit-loaded", {detail: lit}))
+    </script>
+
+    <script type="module-cos">
+      import * as litRouter from  "https://cdn.jsdelivr.net/npm/@lit-labs/router/+esm" with {
+        integrity: "sha256-29vokUfSDA9f7ch0l1G7D5fogI+fnFXb9zeag/CU+S0=",
+        crossOriginStorage: "*",
+      };
+      console.log('litRouter loaded', litRouter)
+      window.litRouter = litRouter
+      window.dispatchEvent(new CustomEvent("litRouter-loaded", {detail: litRouter}))
+    </script>
+
+    <script type="module-cos">
+      import * as litContext from "https://cdn.jsdelivr.net/npm/@lit/context@1.1.6/+esm" with {
+        integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",
+        crossOriginStorage: "*",
+      };
+      console.log("litContext loaded", litContext);
+      window.litContext = litContext;
+      window.dispatchEvent(
+        new CustomEvent("litContext-loaded", { detail: litContext }),
+      );
+    </script>
+
+    <script type="module-cos">
+      import * as BW from  "./src/brilliantwear/brilliantwear.module.min.js" with {
+        integrity: "sha256-MhagQu/CuXLB/Mo0G08XBTgcGCsSjKwSPWV9Pxv7NSk=",
+        crossOriginStorage: "*",
+      };
+      console.log('BW loaded', BW)
+      window.BW = BW
+      window.dispatchEvent(new CustomEvent("BW-loaded", {detail: BW}))
+    </script>
+
+    <script src="./src/utils/wa-zoomable-frame-utils.js" type="module"></script>
+
+    <script type="module" src="./src/lit/components/AppHub.js"></script>
+  </head>
+  <body>
+    <bw-app-hub></bw-app-hub>
+  </body>
+
+  <script>
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle("wa-dark");
+    }
+  </script>
+</html>

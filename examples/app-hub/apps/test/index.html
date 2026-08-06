@@ -1,0 +1,63 @@
+<html class="wa-cloak">
+  <head>
+    <title>Layers | BrilliantWear JavaScript SDK</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/themes/default.css"
+    />
+    <script
+      type="module"
+      src="https://ka-f.webawesome.com/webawesome@3.11.0/webawesome.loader.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/utilities.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/native.css"
+    />
+
+    <script type="module-cos">
+      import * as lit from  "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js" with {
+        integrity: "sha256-9gf0cEddireQdUy3D3LNviOQxKV6tZ32zbNg7rcr2Hw=",
+        crossOriginStorage: "*",
+      };
+      console.log('lit loaded', lit)
+      window.lit = lit
+      window.dispatchEvent(new CustomEvent("lit-loaded", {detail: lit}))
+    </script>
+
+    <script type="module-cos">
+      import * as BW from "./src/brilliantwear/brilliantwear.min.js" with {
+        integrity: "sha256-MhagQu/CuXLB/Mo0G08XBTgcGCsSjKwSPWV9Pxv7NSk=",
+        crossOriginStorage: "*",
+      };
+      console.log('BW loaded', BW)
+      window.BW = BW
+      window.dispatchEvent(new CustomEvent("BW-loaded", {detail: BW}))
+    </script>
+
+    <script type="module" src="./script.js"></script>
+  </head>
+  <body>
+    <wa-page>
+      <header slot="header">
+        <h1>My App</h1>
+      </header>
+
+      <main>
+        <h2>Hello Web Awesome</h2>
+        <wa-button variant="brand">Click me</wa-button>
+      </main>
+
+      <footer slot="footer">Footer content</footer>
+    </wa-page>
+  </body>
+</html>

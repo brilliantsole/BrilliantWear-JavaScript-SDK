@@ -1,11 +1,11 @@
-type ENVIRONMENT_FLAG = "__BRILLIANTSOLE__DEV__" | "__BRILLIANTSOLE__PROD__";
-const __BRILLIANTSOLE__ENVIRONMENT__: ENVIRONMENT_FLAG =
-  "__BRILLIANTSOLE__DEV__";
+type ENVIRONMENT_FLAG = "__BRILLIANTWEAR__DEV__" | "__BRILLIANTWEAR__PROD__";
+const __BRILLIANTWEAR__ENVIRONMENT__: ENVIRONMENT_FLAG =
+  "__BRILLIANTWEAR__DEV__";
 
 const isInProduction =
   // @ts-expect-error
-  __BRILLIANTSOLE__ENVIRONMENT__ == "__BRILLIANTSOLE__PROD__";
-const isInDev = __BRILLIANTSOLE__ENVIRONMENT__ == "__BRILLIANTSOLE__DEV__";
+  __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__PROD__";
+const isInDev = __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__DEV__";
 
 // https://github.com/flexdinesh/browser-or-node/blob/master/src/index.ts
 const isInBrowser =
@@ -17,7 +17,7 @@ try {
   isInIframe = true;
 }
 
-const isWKWebView =
+const isInWKWebView =
   typeof window !== "undefined" &&
   typeof window?.webkit?.messageHandlers !== "undefined";
 
@@ -43,12 +43,25 @@ const isSafari =
 const isIOS = isInBrowser && /iPad|iPhone|iPod/i.test(userAgent);
 const isMac = isInBrowser && /Macintosh/i.test(userAgent);
 
+const INSTANCE_KEY = Symbol.for("brilliantwear");
+const existing = globalThis[INSTANCE_KEY];
+console.log({ existing });
+if (existing) {
+  throw new Error(
+    `Multiple instances of brilliantwear detected.\n` +
+      `First loaded from: ${existing.stack}`,
+  );
+}
+globalThis[INSTANCE_KEY] = {
+  stack: new Error().stack,
+};
+
 export {
   isInDev,
   isInProduction,
   isInBrowser,
   isInIframe,
-  isWKWebView,
+  isInWKWebView,
   isInNode,
   isAndroid,
   isInBluefy,

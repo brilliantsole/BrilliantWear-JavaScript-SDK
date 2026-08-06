@@ -5,7 +5,7 @@ const app = express();
 import fs from "fs";
 import ip from "ip";
 import path from "path";
-import * as BS from "./build/brilliantsole.node.module.js";
+import * as BW from "./build/brilliantwear.node.module.js";
 import { WebSocketServer } from "ws";
 import * as dgram from "dgram";
 import dotenv from "dotenv";
@@ -14,11 +14,11 @@ dotenv.config({ path: "./config.env" });
 
 process.on("warning", (e) => console.warn(e.stack));
 
-// BS.setAllConsoleLevelFlags({ log: true });
-// BS.setConsoleLevelFlagsForType("EventDispatcher", { log: false });
-// BS.setConsoleLevelFlagsForType("BaseScanner", { log: true });
-// BS.setConsoleLevelFlagsForType("NobleScanner", { log: true });
-// BS.setConsoleLevelFlagsForType("NobleConnectionManager", { log: true });
+// BW.setAllConsoleLevelFlags({ log: true });
+// BW.setConsoleLevelFlagsForType("EventDispatcher", { log: false });
+// BW.setConsoleLevelFlagsForType("BaseScanner", { log: true });
+// BW.setConsoleLevelFlagsForType("NobleScanner", { log: true });
+// BW.setConsoleLevelFlagsForType("NobleConnectionManager", { log: true });
 
 // HTTPS SERVER
 app.use(function (req, res, next) {
@@ -57,7 +57,7 @@ app.use(express.json());
 const httpServer = http.createServer(app);
 httpServer.listen(80, () => {
   console.log(
-    `server listening on http://localhost and http://${ip.address()}`
+    `server listening on http://localhost and http://${ip.address()}`,
   );
 });
 
@@ -71,19 +71,19 @@ if (useHttps) {
   httpsServer = https.createServer(serverOptions, app);
   httpsServer.listen(443, () => {
     console.log(
-      `server listening on  https://localhost and https://${ip.address()}`
+      `server listening on  https://localhost and https://${ip.address()}`,
     );
   });
 }
 
 // WEBSOCKET
 const ws = new WebSocketServer({ server: httpsServer ?? httpServer });
-const webSocketServer = new BS.WebSocketServer();
+const webSocketServer = new BW.WebSocketServer();
 webSocketServer.server = ws;
 
 // UDP
 const udpSocket = dgram.createSocket("udp4");
-const udpServer = new BS.UDPServer();
+const udpServer = new BW.UDPServer();
 udpServer.socket = udpSocket;
 udpSocket.bind(3000);
 
@@ -106,7 +106,7 @@ async function saveBlobUrlContent(folderPath, blob, filename) {
 
 const saveMicrophoneRecordingsToFolder =
   process.env.SAVE_MICROPHONE_RECORDINGS_TO_FOLDER == "true";
-/** @param {BS.DeviceEventMap["microphoneRecording"]} event */
+/** @param {BW.DeviceEventMap["microphoneRecording"]} event */
 function onMicrophoneRecording(event) {
   if (!saveMicrophoneRecordingsToFolder) {
     return;
@@ -114,7 +114,7 @@ function onMicrophoneRecording(event) {
   saveBlobUrlContent(
     microphoneFolderPath,
     event.message.blob,
-    `${new Date().toLocaleString().replaceAll("/", "-")}.wav`
+    `${new Date().toLocaleString().replaceAll("/", "-")}.wav`,
   );
 }
 
@@ -130,7 +130,7 @@ if (saveMicrophoneRecordingsToFolder) {
 }
 
 const autoRecordMicrophone = process.env.AUTO_RECORD_MICROPHONE == "true";
-/** @param {BS.DeviceEventMap["microphoneStatus"]} event */
+/** @param {BW.DeviceEventMap["microphoneStatus"]} event */
 function onMicrophoneStatus(event) {
   if (!autoRecordMicrophone) {
     return;
@@ -162,7 +162,7 @@ if (saveCameraImagesToFolder) {
   }
 }
 
-/** @param {BS.DeviceEventMap["cameraImage"]} event */
+/** @param {BW.DeviceEventMap["cameraImage"]} event */
 function onCameraImage(event) {
   if (!saveCameraImagesToFolder) {
     return;
@@ -170,7 +170,7 @@ function onCameraImage(event) {
   saveBlobUrlContent(
     cameraFolderPath,
     event.message.blob,
-    `${new Date().toLocaleString().replaceAll("/", "-")}.jpg`
+    `${new Date().toLocaleString().replaceAll("/", "-")}.jpg`,
   );
 }
 
@@ -191,12 +191,12 @@ if (saveCameraRecordingsToFolder) {
   }
 }
 
-/** @param {BS.DeviceEventMap["isRecordingCamera"]} event */
+/** @param {BW.DeviceEventMap["isRecordingCamera"]} event */
 function onIsRecordingCamera(event) {
   console.log(`isRecordingCamera? ${event.message.isRecordingCamera}`);
 }
 
-/** @param {BS.DeviceEventMap["cameraRecording"]} event */
+/** @param {BW.DeviceEventMap["cameraRecording"]} event */
 function onCameraRecording(event) {
   console.log({
     saveCameraRecordingsToFolder,
@@ -207,28 +207,28 @@ function onCameraRecording(event) {
   saveBlobUrlContent(
     cameraRecordingsFolderPath,
     event.message.blob,
-    `${new Date().toLocaleString().replaceAll("/", "-")}.mp4`
+    `${new Date().toLocaleString().replaceAll("/", "-")}.mp4`,
   );
 }
 
 // DEVICE LISTENERS
 
-/** @param {BS.DeviceEventMap["acceleration"]} event */
+/** @param {BW.DeviceEventMap["acceleration"]} event */
 function onAcceleration(event) {
   const device = event.target;
   const { acceleration, timestamp } = event.message;
   console.log(
     `[${timestamp}] received acceleration data from "${device.name}"`,
-    acceleration
+    acceleration,
   );
 }
 
-/** @param {BS.DeviceEventMap["microphoneData"]} event */
+/** @param {BW.DeviceEventMap["microphoneData"]} event */
 function onMicrophoneData(event) {
   //console.log(event.message.samples);
 }
 
-/** @type {BS.BoundDeviceEventListeners} */
+/** @type {BW.BoundDeviceEventListeners} */
 const boundDeviceEventListeners = {
   acceleration: onAcceleration,
 
@@ -250,17 +250,17 @@ const boundDeviceEventListeners = {
   tfliteInference: onTfliteInference,
 };
 
-BS.DeviceManager.AddEventListener("deviceIsConnected", (event) => {
+BW.DeviceManager.AddEventListener("deviceIsConnected", (event) => {
   const { device } = event.message;
   console.log(
     `device "${device.name}" ${
       device.isConnected ? "connected" : "disconnected"
-    }`
+    }`,
   );
   if (device.isConnected) {
-    BS.EventUtils.addEventListeners(device, boundDeviceEventListeners);
+    BW.EventUtils.addEventListeners(device, boundDeviceEventListeners);
   } else {
-    BS.EventUtils.removeEventListeners(device, boundDeviceEventListeners);
+    BW.EventUtils.removeEventListeners(device, boundDeviceEventListeners);
   }
 });
 
@@ -272,7 +272,7 @@ if (sendTfliteModel) {
     const fileName =
       process.env.TFLITE_MODEL_PATH.split("/").pop().split(".")[0] ?? "model";
 
-    /** @type {BS.TfliteFileConfiguration} */
+    /** @type {BW.TfliteFileConfiguration} */
     const tfliteConfiguration = {
       type: "tflite",
       name: fileName,
@@ -285,22 +285,22 @@ if (sendTfliteModel) {
       file,
     };
 
-    BS.DeviceManager.AddEventListener("deviceConnected", async (event) => {
+    BW.DeviceManager.AddEventListener("deviceConnected", async (event) => {
       const { device } = event.message;
       if (
         tfliteConfiguration.sensorTypes.every(
-          (sensorType) => sensorType in device.sensorConfiguration
+          (sensorType) => sensorType in device.sensorConfiguration,
         )
       ) {
         console.log(
-          `sending tfliteConfiguration "${tfliteConfiguration.name}" to "${device.name}"...`
+          `sending tfliteConfiguration "${tfliteConfiguration.name}" to "${device.name}"...`,
         );
         try {
           await device.sendTfliteConfiguration(tfliteConfiguration);
         } catch (error) {
           console.error(
             `error sending tfliteConfiguration "${tfliteConfiguration.name}" to "${device.name}"`,
-            error
+            error,
           );
         }
       } else {
@@ -308,35 +308,35 @@ if (sendTfliteModel) {
           `device "${
             device.name
           }" doesn't contain all required sensorTypes ${tfliteConfiguration.sensorTypes.join(
-            ","
-          )} for tflite model "${tfliteConfiguration.name}"`
+            ",",
+          )} for tflite model "${tfliteConfiguration.name}"`,
         );
       }
     });
   } catch (error) {
     console.error(
-      `failed to get tflite model file at "${process.env.TFLITE_MODEL_PATH}"`
+      `failed to get tflite model file at "${process.env.TFLITE_MODEL_PATH}"`,
     );
   }
 }
 
 // FILE TRANSFER LISTENERS
 
-/** @param {BS.DeviceEventMap["fileTransferStatus"]} event */
+/** @param {BW.DeviceEventMap["fileTransferStatus"]} event */
 function onFileTransferStatus(event) {
   const device = event.target;
   const { fileTransferStatus } = event.message;
   console.log(`fileTransferStatus for "${device.name}": ${fileTransferStatus}`);
 }
 
-/** @param {BS.DeviceEventMap["fileTransferProgress"]} event */
+/** @param {BW.DeviceEventMap["fileTransferProgress"]} event */
 function onFileTransferProgress(event) {
   const device = event.target;
   const { progress } = event.message;
   console.log(`fileTransferProgress for "${device.name}": ${progress}%`);
 }
 
-/** @param {BS.DeviceEventMap["fileTransferComplete"]} event */
+/** @param {BW.DeviceEventMap["fileTransferComplete"]} event */
 function onFileTransferComplete(event) {
   const device = event.target;
   console.log(`fileTransferComplete for "${device.name}"`);
@@ -344,7 +344,7 @@ function onFileTransferComplete(event) {
 
 // TFLITE LISTENERS
 
-/** @param {BS.DeviceEventMap["tfliteIsReady"]} event */
+/** @param {BW.DeviceEventMap["tfliteIsReady"]} event */
 async function onTfliteIsReady(event) {
   const device = event.target;
   const { tfliteIsReady } = event.message;
@@ -355,16 +355,16 @@ async function onTfliteIsReady(event) {
   }
 }
 
-/** @param {BS.DeviceEventMap["getTfliteInferencingEnabled"]} event */
+/** @param {BW.DeviceEventMap["getTfliteInferencingEnabled"]} event */
 function onTfliteInferencingEnabled(event) {
   const device = event.target;
   const { tfliteInferencingEnabled } = event.message;
   console.log(
-    `tfliteInferencingEnabled for "${device.name}"? ${tfliteInferencingEnabled}`
+    `tfliteInferencingEnabled for "${device.name}"? ${tfliteInferencingEnabled}`,
   );
 }
 
-/** @param {BS.DeviceEventMap["tfliteInference"]} event */
+/** @param {BW.DeviceEventMap["tfliteInference"]} event */
 function onTfliteInference(event) {
   const device = event.target;
   const { tfliteInference } = event.message;
@@ -376,32 +376,32 @@ function onTfliteInference(event) {
 const autoScan = process.env.AUTO_SCAN == "true";
 const autoEnableSensorData = process.env.AUTO_ENABLE_SENSOR_DATA == "true";
 if (autoScan) {
-  BS.Scanner.addEventListener("scanningAvailable", (event) => {
+  BW.Scanner.addEventListener("scanningAvailable", (event) => {
     console.log("scanningAvailable");
     // automatically scan when available
-    BS.Scanner.startScan();
+    BW.Scanner.startScan();
   });
-  BS.Scanner.addEventListener("isScanning", (event) => {
+  BW.Scanner.addEventListener("isScanning", (event) => {
     const { isScanning } = event.message;
     console.log(`isScanning? ${isScanning}`);
   });
-  BS.Scanner.addEventListener("discoveredDevice", (event) => {
+  BW.Scanner.addEventListener("discoveredDevice", (event) => {
     const { discoveredDevice } = event.message;
     // connect to first available device
-    BS.Scanner.connectToDevice(discoveredDevice.bluetoothId);
+    BW.Scanner.connectToDevice(discoveredDevice.bluetoothId);
     console.log("connecting to discoveredDevice...", discoveredDevice);
   });
-  BS.DeviceManager.AddEventListener("deviceConnected", (event) => {
+  BW.DeviceManager.AddEventListener("deviceConnected", (event) => {
     console.log("device connected - stopping scan...");
-    BS.Scanner.stopScan();
+    BW.Scanner.stopScan();
   });
-  BS.DeviceManager.AddEventListener("deviceDisconnected", (event) => {
+  BW.DeviceManager.AddEventListener("deviceDisconnected", (event) => {
     console.log("device disconnected - restarting scan...");
-    BS.Scanner.startScan();
+    BW.Scanner.startScan();
   });
 }
 
-BS.DeviceManager.AddEventListener("deviceConnected", (event) => {
+BW.DeviceManager.AddEventListener("deviceConnected", (event) => {
   const { device } = event.message;
   console.log(`connected to "${device.name}"`);
   if (autoEnableSensorData) {

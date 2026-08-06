@@ -24,7 +24,7 @@ class WindowServer extends BaseServer<WindowServerClient> {
   static readonly shared: WindowServer;
 
   protected _init() {
-    _console.log("_init");
+    // _console.log("_init");
     addEventListeners(
       WindowManagerServer,
       this.#boundWindowManagerServerEventListeners,

@@ -4,7 +4,7 @@ import http from "http";
 const app = express();
 import fs from "fs";
 import ip from "ip";
-import * as BS from "./build/brilliantsole.node.module.js";
+import * as BW from "./build/brilliantwear.node.module.js";
 import { WebSocketServer } from "ws";
 import * as dgram from "dgram";
 import nocache from "nocache";
@@ -13,12 +13,12 @@ import osc from "osc";
 
 process.on("warning", (e) => console.warn(e.stack));
 
-// BS.setAllConsoleLevelFlags({ log: true });
-// BS.setConsoleLevelFlagsForType("EventDispatcher", { log: false });
-// BS.setConsoleLevelFlagsForType("NobleScanner", { log: true });
-// BS.setConsoleLevelFlagsForType("SensorConfigurationManager", { log: true });
-// BS.setConsoleLevelFlagsForType("FileTransferManager", { log: true });
-// BS.setConsoleLevelFlagsForType("BaseServer", { log: true });
+// BW.setAllConsoleLevelFlags({ log: true });
+// BW.setConsoleLevelFlagsForType("EventDispatcher", { log: false });
+// BW.setConsoleLevelFlagsForType("NobleScanner", { log: true });
+// BW.setConsoleLevelFlagsForType("SensorConfigurationManager", { log: true });
+// BW.setConsoleLevelFlagsForType("FileTransferManager", { log: true });
+// BW.setConsoleLevelFlagsForType("BaseServer", { log: true });
 
 // HTTPS SERVER
 app.use(nocache());
@@ -30,8 +30,8 @@ app.use(function (req, res, next) {
 
   // Add CORS headers
   res.header("Access-Control-Allow-Origin", "https://localhost"); // Adjust this to your allowed origin
-  res.header("Access-Control-Allow-Origin", "http://bs.local"); // Adjust this to your allowed origin
-  res.header("Access-Control-Allow-Origin", "https://bs.local"); // Adjust this to your allowed origin
+  res.header("Access-Control-Allow-Origin", "http://bw.local"); // Adjust this to your allowed origin
+  res.header("Access-Control-Allow-Origin", "https://bw.local"); // Adjust this to your allowed origin
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS"); // Allowed HTTP methods
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
   res.setHeader("Access-Control-Allow-Credentials", "true"); // Allow cookies or other credentials if needed
@@ -64,8 +64,8 @@ if (true) {
   };
 } else {
   serverOptions = {
-    key: fs.readFileSync("./sec/bs.local-key.pem"),
-    cert: fs.readFileSync("./sec/bs.local.pem"),
+    key: fs.readFileSync("./sec/bw.local-key.pem"),
+    cert: fs.readFileSync("./sec/bw.local.pem"),
   };
 }
 
@@ -77,23 +77,23 @@ httpsServer.listen(443, () => {
 
   const bonjourService = bonjour();
   bonjourService.publish({
-    name: "Brilliant Sole Server",
+    name: "Brilliant Wear Server",
     type: "https",
     port: 443,
-    host: "bs.local",
+    host: "bw.local",
   });
 
-  console.log("Advertised as bs.local");
+  console.log("Advertised as bw.local");
 });
 
 // WEBSOCKET
 const wss = new WebSocketServer({ server: httpsServer });
-const webSocketServer = new BS.WebSocketServer();
+const webSocketServer = new BW.WebSocketServer();
 webSocketServer.server = wss;
 
 // UDP
 const udpSocket = dgram.createSocket("udp4");
-const udpServer = new BS.UDPServer();
+const udpServer = new BW.UDPServer();
 udpServer.socket = udpSocket;
 udpSocket.bind(3000);
 
@@ -171,7 +171,7 @@ const setVRChat2DInput = (horizontal, vertical) => {
     debouncedReset2DInput();
   }
 };
-const debouncedReset2DInput = BS.ThrottleUtils.debounce(() => {
+const debouncedReset2DInput = BW.ThrottleUtils.debounce(() => {
   // console.log("debouncedReset2DInput");
   setVRChat2DInput(0, 0);
 }, 200);
@@ -200,7 +200,7 @@ const setVRChatLookHorizontal = (lookHorizontal) => {
     debouncedResetLookHorizontalInput();
   }
 };
-const debouncedResetLookHorizontalInput = BS.ThrottleUtils.debounce(() => {
+const debouncedResetLookHorizontalInput = BW.ThrottleUtils.debounce(() => {
   // console.log("debouncedResetLookHorizontalInput");
   setVRChatLookHorizontal(0);
 }, 200);

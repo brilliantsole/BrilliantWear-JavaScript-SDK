@@ -39,11 +39,13 @@ class WindowClient extends BaseClient {
   #onWindowManagerClientConnectionStatus(
     event: WindowManagerClientEventMap["connectionStatus"],
   ) {
-    _console.log(
-      "onWindowManagerClientConnectionStatus",
-      event.message.connectionStatus,
-    );
-    this._sendRequiredMessages();
+    const { connectionStatus } = event.message;
+    _console.log("onWindowManagerClientConnectionStatus", { connectionStatus });
+    switch (connectionStatus) {
+      case "connected":
+        this._sendRequiredMessages();
+        break;
+    }
   }
   #onWindowManagerClientServerMessage(
     event: WindowManagerClientEventMap["serverMessage"],

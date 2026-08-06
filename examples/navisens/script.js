@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 window.BS = BS;
 
 const device = new BS.Device();
@@ -7,7 +7,7 @@ window.device = device;
 // CONNECTION START
 const toggleConnectionButton = document.getElementById("toggleConnection");
 toggleConnectionButton.addEventListener("click", () =>
-  device.toggleConnection()
+  device.toggleConnection(),
 );
 device.addEventListener("connectionStatus", () => {
   let disabled = false;
@@ -92,7 +92,7 @@ const setIncludeMagnetometer = (newIncludeMagnetometer) => {
   includeMagnetometerCheckbox.checked = includeMagnetometer;
 };
 const includeMagnetometerCheckbox = document.getElementById(
-  "includeMagnetometer"
+  "includeMagnetometer",
 );
 includeMagnetometerCheckbox.addEventListener("input", (event) => {
   setIncludeMagnetometer(event.target.checked);
@@ -141,7 +141,7 @@ device.addEventListener("sensorData", (event) => {
   };
   if (latestSensorData.timestamp != timestamp) {
     console.error(
-      `invalid timestamp ${timestamp}, expected ${latestSensorData.timestamp}`
+      `invalid timestamp ${timestamp}, expected ${latestSensorData.timestamp}`,
     );
     return;
   }
@@ -167,7 +167,7 @@ device.addEventListener("sensorData", (event) => {
         magnetometer,
       },
       null,
-      2
+      2,
     );
     if (acceleration && gyroscope && (!includeMagnetometer || magnetometer)) {
       inputMotion(
@@ -188,7 +188,7 @@ device.addEventListener("sensorData", (event) => {
               y: magnetometer.z,
               z: -magnetometer.y,
             }
-          : undefined
+          : undefined,
       );
     } else {
       console.log("incomplete latestSensorData - skipping");
@@ -334,7 +334,7 @@ const receive = (update) => {
       position,
     },
     null,
-    2
+    2,
   );
 
   navisensUpdates.push(update);
@@ -413,7 +413,7 @@ const inputMotion = (timestampMs, gyroscope, acceleration, magnetometer) => {
       magnetometer,
     },
     null,
-    2
+    2,
   );
   if (didStartNavisens) {
     Navisens.inputMotion(
@@ -426,7 +426,7 @@ const inputMotion = (timestampMs, gyroscope, acceleration, magnetometer) => {
       acceleration.z,
       magnetometer.x,
       magnetometer.y,
-      magnetometer.z
+      magnetometer.z,
     );
   }
 };
@@ -487,13 +487,13 @@ const onDeviceMotion = (event) => {
       accelerationIncludingGravity,
     },
     null,
-    2
+    2,
   );
   const { alpha, beta, gamma } = rotationRate;
   inputMotion(
     timestamp,
     { x: alpha, y: beta, z: gamma },
-    accelerationIncludingGravity
+    accelerationIncludingGravity,
   );
 };
 // LOCAL MOTION DATA END
@@ -549,14 +549,14 @@ const drawNavisensPath = () => {
   ctx.fillStyle = navisensPathOptions.marker.color;
   ctx.beginPath();
   const markerPosition = navisensPathOptions.getCanvasPosition(
-    navisensUpdates.at(-1)
+    navisensUpdates.at(-1),
   );
   ctx.arc(
     markerPosition.x,
     markerPosition.y,
     navisensPathOptions.marker.radius,
     0,
-    2 * Math.PI
+    2 * Math.PI,
   );
   ctx.fill();
 };

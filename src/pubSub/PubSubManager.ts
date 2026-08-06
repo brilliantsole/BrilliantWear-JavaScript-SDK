@@ -36,7 +36,7 @@ import { serverMtus, ServerType } from "../server/BaseServer.ts";
 import { textDecoder } from "../utils/Text.ts";
 import GuardManager from "../utils/GuardManager.ts";
 
-const _console = createConsole("PubSubManager", { log: true });
+const _console = createConsole("PubSubManager", { log: false });
 
 export type PubSubPeer = ServerClient | Client;
 
@@ -191,7 +191,7 @@ class PubSubManager {
   static readonly shared: PubSubManager;
 
   protected _init() {
-    _console.log("_init");
+    // _console.log("_init");
     addEventListeners(ServerManager, this.#boundServerManagerListeners);
     addEventListeners(ClientManager, this.#boundClientManagerListeners);
   }

@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 /** @typedef {import("../utils/three/three.module.min").Vector2} TVector2 */
 /** @typedef {import("../utils/three/three.module.min").Vector3} TVector3 */
 /** @typedef {import("../utils/three/three.module.min").Quaternion} TQuaternion */

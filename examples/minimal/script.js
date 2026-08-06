@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 
 const device = new BS.Device();
 const connectButton = document.getElementById("connect");
@@ -16,6 +16,6 @@ device.addEventListener("gameRotation", (event) => {
   quaternionSpan.innerText = JSON.stringify(
     event.message.gameRotationEuler,
     null,
-    2
+    2,
   );
 });

@@ -2,10 +2,10 @@
  * @copyright Zack Qattan 2024
  * @license MIT
  */
-const __BRILLIANTSOLE__ENVIRONMENT__ = "__BRILLIANTSOLE__DEV__";
+const __BRILLIANTWEAR__ENVIRONMENT__ = "__BRILLIANTWEAR__DEV__";
 const isInProduction =
-__BRILLIANTSOLE__ENVIRONMENT__ == "__BRILLIANTSOLE__PROD__";
-const isInDev = __BRILLIANTSOLE__ENVIRONMENT__ == "__BRILLIANTSOLE__DEV__";
+__BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__PROD__";
+const isInDev = __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__DEV__";
 const isInBrowser = typeof window !== "undefined" && typeof window?.document !== "undefined";
 let isInIframe = false;
 try {
@@ -14,7 +14,7 @@ try {
 catch {
     isInIframe = true;
 }
-const isWKWebView = typeof window !== "undefined" &&
+const isInWKWebView = typeof window !== "undefined" &&
     typeof window?.webkit?.messageHandlers !== "undefined";
 const isInNode = typeof process !== "undefined" && process?.versions?.node != null;
 const userAgent = (isInBrowser && navigator.userAgent) || "";
@@ -31,6 +31,16 @@ const isAndroid = isInBrowser && /Android/i.test(userAgent);
 const isSafari = isInBrowser && /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent);
 const isIOS = isInBrowser && /iPad|iPhone|iPod/i.test(userAgent);
 const isMac = isInBrowser && /Macintosh/i.test(userAgent);
+const INSTANCE_KEY = Symbol.for("brilliantwear");
+const existing = globalThis[INSTANCE_KEY];
+console.log({ existing });
+if (existing) {
+    throw new Error(`Multiple instances of brilliantwear detected.\n` +
+        `First loaded from: ${existing.stack}`);
+}
+globalThis[INSTANCE_KEY] = {
+    stack: new Error().stack,
+};
 
 var environment = /*#__PURE__*/Object.freeze({
     __proto__: null,
@@ -43,10 +53,10 @@ var environment = /*#__PURE__*/Object.freeze({
     get isInIframe () { return isInIframe; },
     isInNode: isInNode,
     isInProduction: isInProduction,
+    isInWKWebView: isInWKWebView,
     isInWebBLE: isInWebBLE,
     isMac: isMac,
-    isSafari: isSafari,
-    isWKWebView: isWKWebView
+    isSafari: isSafari
 });
 
 var __console;
@@ -34136,7 +34146,11 @@ class Device {
         _console$k.log("reconnecting...");
         return this.connectionManager?.reconnect();
     }
+    static get CanConnect() {
+        return WebBluetoothConnectionManager.isSupported;
+    }
     static async Connect() {
+        _console$k.assertWithError(this.CanConnect, `can't connect to any device - must connect to discovered device`);
         const device = new _a$3();
         await device.connect();
         return device;
@@ -36164,7 +36178,7 @@ let DisplayCanvasHelperManager = (() => {
 })();
 var DisplayCanvasHelperManager$1 = DisplayCanvasHelperManager.shared;
 
-const _console$f = createConsole("PubSubManagerUtils", { log: true });
+const _console$f = createConsole("PubSubManagerUtils", { log: false });
 const PubSubManagerMessageTypes = [
     "subscribe",
     "unsubscribe",
@@ -36825,7 +36839,7 @@ class GuardManager {
     }
 }
 
-const _console$b = createConsole("PubSubManager", { log: true });
+const _console$b = createConsole("PubSubManager", { log: false });
 const PubSubManagerEventTypes = [
     "peerConnected",
     "peerNotConnected",
@@ -36899,7 +36913,6 @@ let PubSubManager = (() => {
         }
         static shared;
         _init() {
-            _console$b.log("_init");
             addEventListeners(ServerManager_default, this.#boundServerManagerListeners);
             addEventListeners(ClientManager$1, this.#boundClientManagerListeners);
         }
@@ -39040,7 +39053,6 @@ let WindowServer = (() => {
         type = WindowServer.type;
         static shared;
         _init() {
-            _console$7.log("_init");
             addEventListeners(WindowManagerServer_default, this.#boundWindowManagerServerEventListeners);
         }
         constructor() {
@@ -39284,6 +39296,10 @@ let WindowManagerServer = (() => {
             }
             _console$6.log("iframe added", iframe);
             this.#iframes.push(iframe);
+        }
+        addIframe(iframe) {
+            _console$6.log("addIframe", iframe);
+            this.#onIframeAdded(iframe);
         }
         #onIframeRemoved(iframe) {
             if (!this.#iframes.includes(iframe)) {
@@ -39538,6 +39554,7 @@ let WindowManagerClient = (() => {
             switch (newConnectionStatus) {
                 case "connected":
                 case "notConnected":
+                    this.#connectPingTimer.stop();
                     this.#dispatchEvent("isConnected", { isConnected: this.isConnected });
                     break;
             }
@@ -39556,10 +39573,37 @@ let WindowManagerClient = (() => {
         }
         connect() {
             _console$5.log("connect");
-            this.#ping();
+            if (this.#connectionStatus == "connecting") {
+                _console$5.log("already connecting");
+                return;
+            }
+            this.connectionStatus = "connecting";
+            this.#numberOfConnectPingAttempts = 0;
+            this.#connectPingTimer.start();
         }
         disconnect() {
-            throw new Error("Method not implemented.");
+            _console$5.log("disconnect");
+            if (this.#connectionStatus == "connecting") {
+                this.#connectPingTimer.stop();
+                this.connectionStatus = "notConnected";
+            }
+        }
+        #connectPingTimerInterval = 1000;
+        #connectPingTimer = new Timer(() => {
+            this.#connectPing();
+        }, this.#connectPingTimerInterval);
+        #maxNumberOfConnectPingAttempts = 3;
+        #numberOfConnectPingAttempts = 0;
+        #connectPing() {
+            _console$5.log("#connectPing");
+            this.#numberOfConnectPingAttempts++;
+            if (this.#numberOfConnectPingAttempts <= this.#maxNumberOfConnectPingAttempts) {
+                this.#ping();
+            }
+            else {
+                _console$5.log("pinged too many times - stopping");
+                this.disconnect();
+            }
         }
         reconnect() {
             throw new Error("Method not implemented.");
@@ -39626,8 +39670,13 @@ let WindowClient = (() => {
             serverMessage: this.#onWindowManagerClientServerMessage.bind(this),
         };
         #onWindowManagerClientConnectionStatus(event) {
-            _console$4.log("onWindowManagerClientConnectionStatus", event.message.connectionStatus);
-            this._sendRequiredMessages();
+            const { connectionStatus } = event.message;
+            _console$4.log("onWindowManagerClientConnectionStatus", { connectionStatus });
+            switch (connectionStatus) {
+                case "connected":
+                    this._sendRequiredMessages();
+                    break;
+            }
         }
         #onWindowManagerClientServerMessage(event) {
             _console$4.log("onWindowManagerClientServerMessage", event.message.dataView);
@@ -40248,4 +40297,4 @@ const ThrottleUtils = {
 };
 
 export { CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ContinuousSensorTypes, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager$1 as DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
-//# sourceMappingURL=brilliantsole.module.js.map
+//# sourceMappingURL=brilliantwear.module.js.map

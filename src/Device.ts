@@ -762,7 +762,14 @@ class Device {
     return this.connectionManager?.reconnect();
   }
 
+  static get CanConnect() {
+    return WebBluetoothConnectionManager.isSupported;
+  }
   static async Connect() {
+    _console.assertWithError(
+      this.CanConnect,
+      `can't connect to any device - must connect to discovered device`,
+    );
     const device = new Device();
     await device.connect();
     return device;

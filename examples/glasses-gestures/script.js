@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 window.BS = BS;
 console.log(BS);
 
@@ -28,7 +28,7 @@ function classify(features) {
     document.querySelector("#results").textContent = JSON.stringify(
       res,
       null,
-      4
+      4,
     );
     res.results.forEach(({ label, value }, index) => {
       if (index == 0) {
@@ -41,7 +41,7 @@ function classify(features) {
           gestureTitle.innerText = gesture;
         } else {
           gestureTitle.innerText = `detected "${gesture}" gesture (score: ${value.toFixed(
-            2
+            2,
           )})`;
         }
 
@@ -66,7 +66,7 @@ window.device = device;
 
 const toggleConnectionButton = document.getElementById("toggleConnection");
 toggleConnectionButton.addEventListener("click", () =>
-  device.toggleConnection()
+  device.toggleConnection(),
 );
 device.addEventListener("connectionStatus", () => {
   let disabled = false;
@@ -189,7 +189,7 @@ function appendData(timestamp, sensorType, data) {
   }
   pendingSample[sensorType] = data;
   const gotAllSensorSamples = sensorTypes.every(
-    (sensorType) => sensorType in pendingSample
+    (sensorType) => sensorType in pendingSample,
   );
   if (gotAllSensorSamples) {
     //console.log("got all samples");

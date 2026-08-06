@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 //import BS.Device from "../../src/BS.Device.js";
 window.BS = BS;
 console.log(BS);

@@ -1,27 +1,27 @@
 {
   "name": "brilliantsole",
   "version": "0.0.78",
-  "description": "JavaScript SDK for BrilliantSole Smart Insoles",
-  "main": "./build/brilliantsole.module.js",
-  "module": "./build/brilliantsole.module.js",
-  "browser": "./build/brilliantsole.module.js",
+  "description": "JavaScript SDK for BrilliantWear Devices",
+  "main": "./build/brilliantwear.module.js",
+  "module": "./build/brilliantwear.module.js",
+  "browser": "./build/brilliantwear.module.js",
   "types": "./build/index.d.ts",
   "type": "module",
   "exports": {
     "./browser": {
-      "import": "./build/brilliantsole.module.js",
-      "default": "./build/brilliantsole.module.js",
+      "import": "./build/brilliantwear.module.js",
+      "default": "./build/brilliantwear.module.js",
       "types": "./build/index.d.ts"
     },
     "./node": {
-      "import": "./build/brilliantsole.node.module.js",
-      "node": "./build/brilliantsole.node.module.js",
-      "require": "./build/brilliantsole.cjs",
-      "default": "./build/brilliantsole.node.module.js",
+      "import": "./build/brilliantwear.node.module.js",
+      "node": "./build/brilliantwear.node.module.js",
+      "require": "./build/brilliantwear.cjs",
+      "default": "./build/brilliantwear.node.module.js",
       "types": "./build/index.node.d.ts"
     },
     "./ls": {
-      "default": "./build/brilliantsole.ls.module.js",
+      "default": "./build/brilliantwear.ls.module.js",
       "types": "./build/index.d.ts"
     }
   },
@@ -34,13 +34,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/brilliantsole/BrilliantSole-JavaScript-SDK.git"
+    "url": "https://github.com/brilliantwear/BrilliantWear-JavaScript-SDK.git"
   },
-  "homepage": "https://github.com/brilliantsole/BrilliantSole-JavaScript-SDK/",
-  "author": "Zack Qattan <zack@brilliantsole.com>",
+  "homepage": "https://github.com/brilliantwear/BrilliantWear-JavaScript-SDK/",
+  "author": "Zack Qattan <zack@brilliantwear.com>",
   "license": "MIT",
   "devDependencies": {
     "@huggingface/transformers": "^4.2.0",
+    "@lit/context": "^1.1.6",
     "@rollup/plugin-commonjs": "^25.0.8",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
@@ -59,6 +60,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.18.3",
     "ip": "^2.0.1",
+    "lit": "^3.3.3",
     "magic-string": "^0.30.5",
     "nocache": "^4.0.0",
     "osc": "^2.4.5",
@@ -84,6 +86,7 @@
     "ws": "^8.16.0"
   },
   "dependencies": {
+    "@lit-labs/router": "^0.1.4",
     "@stoprocent/noble": "^2.4.0",
     "@tensorflow/tfjs": "^4.22.0",
     "alawmulaw": "^6.0.0",

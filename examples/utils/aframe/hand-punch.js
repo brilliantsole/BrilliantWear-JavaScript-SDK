@@ -1,4 +1,4 @@
-import * as BS from "../../../build/brilliantsole.module.js";
+import * as BS from "../../../build/brilliantwear.module.js";
 
 AFRAME.registerComponent("hand-punch", {
   schema: {
@@ -49,7 +49,7 @@ AFRAME.registerComponent("hand-punch", {
     this.onCollisionEnded = this.onCollisionEnded.bind(this);
     this.collider.addEventListener(
       "obbcollisionstarted",
-      this.onCollisionStarted
+      this.onCollisionStarted,
     );
     this.collider.addEventListener("obbcollisionended", this.onCollisionEnded);
   },

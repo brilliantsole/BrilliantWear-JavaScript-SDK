@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 window.BS = BS;
 
 // UTILS START
@@ -32,7 +32,7 @@ const togglePressure = async () => {
 };
 
 const toggleDevicePairPressureDataButton = document.getElementById(
-  "toggleDevicePairPressureData"
+  "toggleDevicePairPressureData",
 );
 toggleDevicePairPressureDataButton.addEventListener("click", () => {
   togglePressure();
@@ -64,7 +64,7 @@ devicePair.addEventListener("pressure", (event) => {
       }
       return value;
     },
-    2
+    2,
   );
 });
 // DEVICE PAIR END
@@ -101,7 +101,7 @@ const addPairPressureDataMap = (pressureData, position) => {
     "addPairPressureData",
     pressureData,
     position,
-    pairPressureDataMaps.length
+    pairPressureDataMaps.length,
   );
   didPairPressureDataMapsUpdate = true;
   updateClearPressureDataButton();
@@ -122,7 +122,7 @@ const toggleRecordPressureData = () => {
   updateToggleRecordPressureDataButton();
 };
 const toggleRecordPressureDataButton = document.getElementById(
-  "toggleRecordPressureData"
+  "toggleRecordPressureData",
 );
 toggleRecordPressureDataButton.addEventListener("click", () => {
   toggleRecordPressureData();
@@ -147,7 +147,7 @@ clearPressureDataButton.addEventListener("click", () => {
   clearPressureData();
 });
 const downloadPressureDataButton = document.getElementById(
-  "downloadPressureData"
+  "downloadPressureData",
 );
 const updateDownloadPressureDataButton = () => {
   const enabled = pairPressureDataMaps.length > 0;
@@ -188,7 +188,7 @@ const {
     updateClearPressureDataButton();
     updateDownloadPressureDataButton();
   },
-  () => didPairPressureDataMapsUpdate
+  () => didPairPressureDataMapsUpdate,
 );
 // DATA COLLECTION END
 
@@ -225,7 +225,7 @@ const wiiBalanceBoard = new WiiBalanceBoard();
 window.wiiBalanceBoard = wiiBalanceBoard;
 
 const toggleWiiBalanceBoardConnectionButton = document.getElementById(
-  "toggleWiiBalanceBoardConnection"
+  "toggleWiiBalanceBoardConnection",
 );
 toggleWiiBalanceBoardConnectionButton.addEventListener("click", () => {
   wiiBalanceBoard.toggleConnection();
@@ -251,7 +251,7 @@ wiiBalanceBoard.onConnectionStatus((event) => {
 });
 
 const tareWiiBalanceBoardButton = document.getElementById(
-  "tareWiiBalanceBoard"
+  "tareWiiBalanceBoard",
 );
 tareWiiBalanceBoardButton.addEventListener("click", () => {
   wiiBalanceBoard.tareWeight();
@@ -259,7 +259,7 @@ tareWiiBalanceBoardButton.addEventListener("click", () => {
 
 /** @type {HTMLPreElement} */
 const wiiBalanceBoardWeightsPre = document.getElementById(
-  "wiiBalanceBoardWeights"
+  "wiiBalanceBoardWeights",
 );
 wiiBalanceBoard.onWeights((event) => {
   const weightData = event.detail;
@@ -268,7 +268,7 @@ wiiBalanceBoard.onWeights((event) => {
 
 /** @type {HTMLCanvasElement} */
 const wiiBalanceBoardVisualizationCanvas = document.querySelector(
-  "canvas.wiiBalanceBoard"
+  "canvas.wiiBalanceBoard",
 );
 const wiiBalanceBoardVisualizationContext =
   wiiBalanceBoardVisualizationCanvas.getContext("2d");

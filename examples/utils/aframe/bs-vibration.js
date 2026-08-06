@@ -1,4 +1,4 @@
-import * as BS from "../../../build/brilliantsole.module.js";
+import * as BS from "../../../build/brilliantwear.module.js";
 
 AFRAME.registerComponent("bs-vibration", {
   schema: {
@@ -29,22 +29,22 @@ AFRAME.registerComponent("bs-vibration", {
         this.devicePair = BS.DevicePair.gloves;
 
         this.el.addEventListener("grabstarted", () =>
-          this.setGrabEnabled(true)
+          this.setGrabEnabled(true),
         );
         this.el.addEventListener("grabended", () => this.setGrabEnabled(false));
 
         this.setGrabEnabled = AFRAME.utils.throttleLeadingAndTrailing(
           this.setGrabEnabled.bind(this),
-          70
+          70,
         );
 
         this.el.sceneEl.addEventListener(
           "startPetting",
-          this.onStartPetting.bind(this)
+          this.onStartPetting.bind(this),
         );
         this.el.sceneEl.addEventListener(
           "stopPetting",
-          this.onStopPetting.bind(this)
+          this.onStopPetting.bind(this),
         );
         break;
       case "insole":
@@ -54,7 +54,7 @@ AFRAME.registerComponent("bs-vibration", {
 
     this.el.sceneEl.addEventListener(
       "bs-trigger-vibration",
-      this.onVibrate.bind(this)
+      this.onVibrate.bind(this),
     );
   },
 
@@ -130,7 +130,7 @@ AFRAME.registerComponent("bs-vibration", {
             type: "waveformEffect",
             locations: ["rear"],
             segments: new Array(
-              BS.MaxNumberOfVibrationWaveformEffectSegments
+              BS.MaxNumberOfVibrationWaveformEffectSegments,
             ).fill({ effect: waveformEffect }),
           },
         ]);

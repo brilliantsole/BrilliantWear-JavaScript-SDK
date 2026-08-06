@@ -11,7 +11,8 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 const production = !process.env.ROLLUP_WATCH;
 
-const name = "BS";
+const name = "BW";
+const fullName = "brilliantwear";
 const input = "src/index.ts";
 
 function header() {
@@ -68,7 +69,7 @@ function replaceEnvironment() {
   return replace({
     preventAssignment: true,
     values: {
-      __BRILLIANTSOLE__ENVIRONMENT__: JSON.stringify("__BRILLIANTSOLE__PROD__"),
+      __BRILLIANTWEAR__ENVIRONMENT__: JSON.stringify("__BRILLIANTWEAR__PROD__"),
     },
   });
 }
@@ -117,7 +118,7 @@ const nodeExternal = [
 const defaultOutput = {
   sourcemap: true,
   sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
-    return relativeSourcePath.replace("../src/", "../brilliantsole/");
+    return relativeSourcePath.replace("../src/", `../${fullName}/`);
   },
 };
 
@@ -173,7 +174,7 @@ const builds = [
       {
         ...defaultOutput,
         format: "esm",
-        file: "build/brilliantsole.module.js",
+        file: `build/${fullName}.module.js`,
       },
     ],
     ...defaultBuild,
@@ -189,12 +190,12 @@ const builds = [
           {
             src: "build/index.d.ts",
             dest: "build",
-            rename: "brilliantsole.module.d.ts",
+            rename: `${fullName}.module.d.ts`,
           },
           {
             src: "build/index.d.ts",
             dest: "build",
-            rename: "brilliantsole.module.min.d.ts",
+            rename: `${fullName}.module.min.d.ts`,
           },
         ],
       }),
@@ -210,7 +211,7 @@ const builds = [
       {
         ...defaultOutput,
         format: "esm",
-        file: "build/brilliantsole.node.module.js",
+        file: `build/${fullName}.node.module.js`,
       },
     ],
     ...defaultBuild,
@@ -227,7 +228,7 @@ const builds = [
           {
             src: "build/index.node.d.ts",
             dest: "build",
-            rename: "brilliantsole.node.module.d.ts",
+            rename: `${fullName}.node.module.d.ts`,
           },
         ],
       }),
@@ -245,7 +246,7 @@ const productionOnlyBuilds = [
       {
         ...defaultOutput,
         format: "esm",
-        file: "build/brilliantsole.module.min.js",
+        file: `build/${fullName}.module.min.js`,
       },
     ],
     ...defaultBuild,
@@ -258,7 +259,7 @@ const productionOnlyBuilds = [
         name,
         ...defaultOutput,
         format: "umd",
-        file: "build/brilliantsole.js",
+        file: `build/${fullName}.js`,
         indent: "\t",
       },
     ],
@@ -272,7 +273,7 @@ const productionOnlyBuilds = [
         ...defaultOutput,
         format: "umd",
         name,
-        file: "build/brilliantsole.min.js",
+        file: `build/${fullName}.min.js`,
       },
     ],
     ...defaultBuild,
@@ -287,7 +288,7 @@ const productionOnlyBuilds = [
         ...defaultOutput,
         format: "cjs",
         name,
-        file: "build/brilliantsole.cjs",
+        file: `build/${fullName}.cjs`,
       },
     ],
     ...defaultBuild,

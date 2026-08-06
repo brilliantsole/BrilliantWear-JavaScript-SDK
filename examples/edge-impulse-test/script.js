@@ -1,4 +1,4 @@
-import * as BS from "../../build/brilliantsole.module.js";
+import * as BS from "../../build/brilliantwear.module.js";
 window.BS = BS;
 console.log(BS);
 
@@ -29,7 +29,7 @@ function classify(features) {
     document.querySelector("#results").textContent = JSON.stringify(
       res,
       null,
-      4
+      4,
     );
     console.log(res);
     let maxValue = 0.8;
@@ -52,7 +52,7 @@ function classify(features) {
           now: Date.now(),
         },
         null,
-        4
+        4,
       );
     }
     return res;
@@ -71,7 +71,7 @@ window.device = device;
 
 const toggleConnectionButton = document.getElementById("toggleConnection");
 toggleConnectionButton.addEventListener("click", () =>
-  device.toggleConnection()
+  device.toggleConnection(),
 );
 device.addEventListener("connectionStatus", () => {
   let disabled = false;
@@ -158,7 +158,7 @@ device.addEventListener("cameraImage", async (event) => {
 
   const scale = Math.max(
     input_width / imageBitmap.width,
-    input_height / imageBitmap.height
+    input_height / imageBitmap.height,
   );
 
   const drawWidth = imageBitmap.width * scale;
@@ -172,7 +172,7 @@ device.addEventListener("cameraImage", async (event) => {
     offsetX,
     offsetY,
     drawWidth,
-    drawHeight
+    drawHeight,
   );
 
   if (sensorTypes.includes("camera")) {
@@ -183,7 +183,7 @@ device.addEventListener("cameraImage", async (event) => {
       0,
       0,
       cameraImageCanvas.width,
-      cameraImageCanvas.height
+      cameraImageCanvas.height,
     );
     const rgba = imageData.data;
 
@@ -209,7 +209,7 @@ device.addEventListener("cameraImage", async (event) => {
         0,
         0,
         cameraImageResultsCanvas.width,
-        cameraImageResultsCanvas.height
+        cameraImageResultsCanvas.height,
       );
       cameraImageResultsContext.lineWidth = 3;
       cameraImageResultsContext.strokeStyle = "red";
@@ -257,8 +257,8 @@ device.addEventListener("microphoneData", (event) => {
   const { samples, sampleRate, bitDepth } = event.message;
   microphoneSamples.push(
     ...Array.from(samples).map((value) =>
-      Math.round(value * (value > 0 ? 32767 : 32768))
-    )
+      Math.round(value * (value > 0 ? 32767 : 32768)),
+    ),
   );
   if (microphoneSamples.length > frame_sample_count) {
     microphoneSamples = microphoneSamples.slice(-frame_sample_count);
@@ -340,7 +340,7 @@ function appendData(timestamp, sensorType, data) {
   }
   pendingSample[sensorType] = data;
   const gotAllSensorSamples = sensorTypes.every(
-    (sensorType) => sensorType in pendingSample
+    (sensorType) => sensorType in pendingSample,
   );
   if (gotAllSensorSamples) {
     //console.log("got all samples");
