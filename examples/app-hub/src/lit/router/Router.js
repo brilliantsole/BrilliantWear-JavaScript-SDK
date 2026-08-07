@@ -1,12 +1,88 @@
 // based on https://github.com/lit/lit/blob/c42ee1e96b8fd61f7256f61d715daef572e76e52/packages/labs/router/src/router.ts
 
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
+import { defaultTab } from "../components/AppHub.js";
 const { litRouter } = await waitForGlobals();
 
 const origin = location.origin || location.protocol + "//" + location.host;
 const baseUrl = new URL(location);
 
-const latestRouterStateSessionStorageKey = "router-state";
+const latestRouterStateSessionStorageKey = "latest-router-state";
+
+const saveLatestEntryToLocalStorage = true;
+const saveEntriesToLocalStorage = true; // need to save to sessionStorage for safari iOS
+const routerStateSessionsStorageKeyPrefix = "router-states";
+const entryKey = "index"; // safari iOS's key isn't consistent
+navigation.addEventListener("currententrychange", (event) => {
+  const { from, navigationType } = event;
+  const { currentEntry } = navigation;
+  const currentState = currentEntry.getState();
+  console.log("currententrychange", currentEntry, currentState);
+  if (!currentState) {
+    return;
+  }
+
+  const currentStateString = JSON.stringify(currentState);
+
+  if (saveLatestEntryToLocalStorage) {
+    console.log(
+      "saving currentState with latestRouterStateSessionStorageKey",
+      currentState,
+    );
+
+    sessionStorage.setItem(
+      latestRouterStateSessionStorageKey,
+      currentStateString,
+    );
+  }
+
+  if (saveEntriesToLocalStorage) {
+    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
+    console.log(`saving currentState with key ${key}`, currentState);
+    sessionStorage.setItem(key, currentStateString);
+  }
+});
+
+if (saveEntriesToLocalStorage) {
+  const _getNavigationHistoryEntryState =
+    NavigationHistoryEntry.prototype.getState;
+  const _getNavigationDestinationState =
+    NavigationDestination.prototype.getState;
+
+  /** @param {NavigationHistoryEntry | NavigationDestination} entry */
+  const getState = (entry) => {
+    // console.log("getState interception", this);
+    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
+    const stateString = sessionStorage.getItem(key);
+    // console.log("sessionStorage", { key, stateString });
+    if (stateString) {
+      try {
+        const state = JSON.parse(stateString);
+        // console.log("sessionStorage state", state);
+        return state;
+      } catch (error) {
+        console.error("failed to parse stateString", error);
+      }
+    }
+  };
+
+  NavigationHistoryEntry.prototype.getState = function () {
+    const state = _getNavigationHistoryEntryState.call(this);
+    if (state) {
+      // console.log("existing state", state);
+      return state;
+    }
+    return getState(this);
+  };
+  NavigationDestination.prototype.getState = function () {
+    const state = _getNavigationDestinationState.call(this);
+    if (state) {
+      // console.log("existing state", state);
+      return state;
+    }
+    return getState(this);
+  };
+}
 
 export class Router extends litRouter.Routes {
   constructor(host, routes, defaultRoute) {
@@ -21,17 +97,16 @@ export class Router extends litRouter.Routes {
       this._onCurrentEntryChange,
     );
     // Kick off routed rendering by going to the current URL
-
     const entries = navigation.entries();
     if (entries.length == 1) {
       const state = entries[0].getState();
-      if (!state) {
+      if (state) {
+        console.log("loading state", state);
+        this.goto(state.route);
+      } else {
         console.log("setting initial state");
         const state = { route: this._defaultRoute };
         navigation.updateCurrentEntry({ state });
-        this.goto(state.route);
-      } else {
-        console.log("loading state", state);
         this.goto(state.route);
       }
     } else {
@@ -87,12 +162,17 @@ export class Router extends litRouter.Routes {
     const { from, navigationType } = e;
     const { currentEntry } = navigation;
     const currentState = currentEntry.getState();
-    console.log("_onCurrentEntryChange", from, { navigationType });
-    console.log("updating sessionStorage");
-    sessionStorage.setItem(
-      latestRouterStateSessionStorageKey,
-      JSON.stringify(currentState),
-    );
+    console.log("_onCurrentEntryChange", {
+      navigationType,
+      from,
+      currentEntry,
+      currentState,
+    });
+    if (!currentState) {
+      console.log("currentState not defined - updating");
+      const state = { route: this._defaultRoute };
+      navigation.updateCurrentEntry({ state });
+    }
   };
   /** @param {NavigationEventMap["navigate"]} e */
   _onNavigate = (e) => {
@@ -114,12 +194,38 @@ export class Router extends litRouter.Routes {
 
     const destinationState = destination.getState();
     const currentState = currentEntry.getState();
+    console.log({ destinationState, currentState });
+
+    // if (!destinationState) {
+    //   console.warn("undefined destinationState - not traversing");
+    //   try {
+    //     e.preventDefault();
+    //   } catch (error) {}
+    //   navigation.updateCurrentEntry({
+    //     state: { ...currentState },
+    //   });
+    //   return;
+    // }
+
+    if (navigationType == "traverse" && !destinationState) {
+      console.warn("no destinationState for traversal");
+      e.intercept({
+        handler: async () => {
+          this.goto(defaultTab);
+        },
+      });
+      return;
+    }
 
     const isBase = url.pathname == baseUrl.pathname;
-    const pathname = url.pathname.slice(baseUrl.pathname.length - 1);
     const route = destinationState?.route ?? url.pathname;
 
-    console.log({ isBase, route, pathname });
+    console.log({
+      urlPathname: url.pathname,
+      baseUrlPathname: baseUrl.pathname,
+      isBase,
+      route,
+    });
 
     if (currentState.route == route) {
       console.log("redundant route - skipping");

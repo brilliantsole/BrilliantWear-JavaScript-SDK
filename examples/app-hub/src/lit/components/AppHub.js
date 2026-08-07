@@ -8,10 +8,15 @@ const { ContextProvider } = litContext;
 
 import { Router } from "../router/Router.js";
 
-import "./Nav.js";
+import "./nav/Nav.js";
+
+import "./layers/Layers.js";
+import "./apps/Apps.js";
+import "./devices/Devices.js";
+import "./settings/Settings.js";
 
 export const defaultTab = "/layers";
-import { selectedTabContext } from "../contexts/selectedTabContext.js";
+import { activeTabContext } from "../contexts/activeTabContext.js";
 
 class AppHub extends LitElement {
   router = new Router(
@@ -25,39 +30,33 @@ class AppHub extends LitElement {
     defaultTab,
   );
 
-  static properties = {
-    selectedTab: {
-      type: String,
-      attribute: "data-selected-tab",
-      reflect: true,
-    },
-  };
-
   static styles = css`
     :host {
       /* gap: var(--wa-space-3xs); */
       width: 100%;
       height: 100%;
       display: flex;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
     main {
-      background-color: var(--wa-color-neutral-fill-quiet);
+      overflow-y: scroll;
+      padding-left: var(--wa-space-s);
+      touch-action: pan-x pan-y;
     }
-    :host([data-selected-tab="layers"]) main {
-      background-color: hsl(
-        from var(--wa-color-success-fill-quiet) h calc(s * 0.2) l
-      );
+
+    bw-nav {
+      background-color: var(--wa-color-surface-default);
+      touch-action: none;
     }
-    :host([data-selected-tab="apps"]) main {
-      background-color: hsl(
-        from var(--wa-color-warning-fill-quiet) h calc(s * 0.2) l
-      );
+
+    @media (orientation: landscape) {
+      bw-nav {
+        padding-top: var(--wa-space-2xs);
+      }
     }
-    :host([data-selected-tab="devices"]) main {
-      background-color: hsl(
-        from var(--wa-color-brand-fill-quiet) h calc(s * 0.4) l
-      );
+    @media (orientation: portrait) {
     }
 
     /* touch screens */
@@ -116,9 +115,8 @@ class AppHub extends LitElement {
 
   constructor() {
     super();
-    this.selectedTab = defaultTab;
-    this.selectedTabProvider = new ContextProvider(this, {
-      context: selectedTabContext,
+    this._activeTabProvider = new ContextProvider(this, {
+      context: activeTabContext,
     });
   }
 
@@ -128,7 +126,7 @@ class AppHub extends LitElement {
       "currententrychange",
       this._onCurrentEntryChange,
     );
-    this.#updateSelectedTab();
+    this.#updateActiveTab();
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -141,16 +139,31 @@ class AppHub extends LitElement {
   /** @param {NavigationEventMap["currententrychange"]} e */
   _onCurrentEntryChange = (e) => {
     console.log("_onCurrentEntryChange");
-    this.#updateSelectedTab();
+    this.#updateActiveTab();
   };
 
-  #updateSelectedTab() {
-    console.log("#updateSelectedTab");
+  #updateActiveTab() {
+    console.log("#updateActiveTab");
     const state = navigation.currentEntry.getState();
-    const selectedTab = state.route.split("/").filter(Boolean)[0];
-    console.log({ selectedTab });
-    this.selectedTab = selectedTab;
-    this.selectedTabProvider.setValue(selectedTab);
+    const activeTab =
+      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultTab;
+    // console.log({ activeTab });
+    this.activeTab = activeTab;
+  }
+
+  get activeTab() {
+    return this._activeTabProvider.value;
+  }
+  set activeTab(newActiveTab) {
+    console.log({ newActiveTab });
+    document.documentElement.dataset.activeTab = newActiveTab;
+    const color = getComputedStyle(document.documentElement)
+      .getPropertyValue("background-color")
+      .trim();
+    document
+      .querySelector('meta[name="theme-color"]')
+      .setAttribute("content", color);
+    this._activeTabProvider.setValue(newActiveTab);
   }
 
   render() {

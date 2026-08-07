@@ -1,6 +1,6 @@
-import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { BW, lit } = await waitForGlobals();
+const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
@@ -9,9 +9,13 @@ import "./NavButtonApps.js";
 import "./NavButtonDevices.js";
 import "./NavButtonSettings.js";
 
-import { defaultTab } from "./AppHub.js";
+import { defaultTab } from "../AppHub.js";
 
 class Nav extends LitElement {
+  static properties = {
+    isActive: { type: Boolean },
+  };
+
   static styles = css`
     :host {
       display: flex;
@@ -20,6 +24,8 @@ class Nav extends LitElement {
       align-items: center;
       gap: var(--wa-space-2xs);
     }
+
+    /* TODO: - different justify-content for different screen sizes */
   `;
 
   constructor() {
