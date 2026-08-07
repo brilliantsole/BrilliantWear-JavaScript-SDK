@@ -12,10 +12,6 @@ import "./NavButtonSettings.js";
 import { defaultTab } from "../AppHub.js";
 
 class Nav extends LitElement {
-  static properties = {
-    isActive: { type: Boolean },
-  };
-
   static styles = css`
     :host {
       display: flex;

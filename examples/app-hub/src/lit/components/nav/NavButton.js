@@ -1,6 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litContext, BW } = await waitForGlobals();
+const { lit, litContext, BW, keyed } = await waitForGlobals();
 const { ContextConsumer } = litContext;
 
 const { LitElement, html, css } = lit;
@@ -45,7 +45,7 @@ class NavButton extends LitElement {
     this._activeTabConsumer = new ContextConsumer(this, {
       context: activeTabContext,
       subscribe: true,
-      callback: (activeTab) => {
+      callback: async (activeTab) => {
         const isActive = `/${this._activeTabConsumer.value}` == this.href;
         // console.log({ isActive }, this.href);
         this.isActive = isActive;
@@ -55,7 +55,7 @@ class NavButton extends LitElement {
 
   render() {
     console.log("render", { isActive: this.isActive }, this);
-    return html`<wa-button
+    const _html = html`<wa-button
       pill
       size="l"
       .variant=${this.variant}
@@ -67,6 +67,12 @@ class NavButton extends LitElement {
         <span class="wa-font-size-xs"><slot></slot></span>
       </div>
     </wa-button>`;
+
+    if (BW.Environment.isIOS) {
+      return html` ${keyed(this.isActive, _html)} `;
+    } else {
+      return _html;
+    }
   }
 }
 customElements.define("bw-nav-button", NavButton);

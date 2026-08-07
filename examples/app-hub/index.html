@@ -63,6 +63,17 @@
     </script>
 
     <script type="module">
+      import { keyed } from "https://unpkg.com/lit@3/directives/keyed.js?module"; // FIX
+      // with {
+      //   integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",
+      //   crossOriginStorage: "*",
+      // };
+      console.log("keyed loaded", keyed);
+      window.keyed = keyed;
+      window.dispatchEvent(new CustomEvent("keyed-loaded", { detail: keyed }));
+    </script>
+
+    <script type="module">
       import * as BW from "./src/brilliantwear/brilliantwear.module.min.js";
       // with {
       //   integrity: "sha256-MhagQu/CuXLB/Mo0G08XBTgcGCsSjKwSPWV9Pxv7NSk=",
