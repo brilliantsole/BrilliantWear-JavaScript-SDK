@@ -54,7 +54,7 @@ class NavButton extends LitElement {
   }
 
   render() {
-    console.log("render", { isActive: this.isActive }, this);
+    // console.log("render", { isActive: this.isActive }, this);
     const _html = html`<wa-button
       pill
       size="l"

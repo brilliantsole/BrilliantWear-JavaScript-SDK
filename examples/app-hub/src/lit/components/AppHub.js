@@ -32,12 +32,9 @@ class AppHub extends LitElement {
 
   static styles = css`
     :host {
-      /* gap: var(--wa-space-3xs); */
       width: 100%;
       height: 100%;
       display: flex;
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
     }
 
     main {
@@ -68,11 +65,17 @@ class AppHub extends LitElement {
             flex-direction: column;
           }
         }
-        :host([data-left-handed]) {
+
+        :host([data-left-handed]:not([data-anchor-nav])),
+        :host([data-orientation="landscape-secondary"][data-anchor-nav]) {
           flex-direction: row;
-          bw-nav {
-            flex-direction: column;
-          }
+        }
+
+        :host([data-orientation="landscape-primary"]) {
+          padding-left: env(safe-area-inset-left);
+        }
+        :host([data-orientation="landscape-secondary"]) {
+          padding-right: env(safe-area-inset-right);
         }
       }
 
@@ -126,7 +129,13 @@ class AppHub extends LitElement {
       "currententrychange",
       this._onCurrentEntryChange,
     );
+    window.screen.orientation.addEventListener(
+      "change",
+      this._onOrientationChange,
+    );
+
     this.#updateActiveTab();
+    this.#updateOrientation();
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -134,6 +143,22 @@ class AppHub extends LitElement {
       "currententrychange",
       this._onCurrentEntryChange,
     );
+    window.screen.orientation.removeEventListener(
+      "change",
+      this._onOrientationChange,
+    );
+  }
+
+  /** @param {ScreenOrientationEventMap["change"]} e */
+  _onOrientationChange = (e) => {
+    console.log("_onOrientationChange");
+    this.#updateOrientation();
+  };
+  #updateOrientation() {
+    console.log("#updateOrientation");
+    const { type, angle } = window.screen.orientation;
+    console.log({ type, angle });
+    this.dataset.orientation = type;
   }
 
   /** @param {NavigationEventMap["currententrychange"]} e */
