@@ -244,8 +244,8 @@ class AppHub extends LitElement {
       "change",
       this._onOrientationChange,
     );
-    this.#updateActiveTab();
-    this.#updateOrientation();
+    this._updateActiveTab();
+    this._updateOrientation();
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -280,9 +280,9 @@ class AppHub extends LitElement {
   /** @param {ScreenOrientationEventMap["change"]} e */
   _onOrientationChange = (e) => {
     // console.log("_onOrientationChange");
-    this.#updateOrientation();
+    this._updateOrientation();
   };
-  #updateOrientation() {
+  _updateOrientation() {
     // console.log("#updateOrientation");
     const { type, angle } = window.screen.orientation;
     console.log({ type, angle });
@@ -317,10 +317,10 @@ class AppHub extends LitElement {
   /** @param {NavigationEventMap["currententrychange"]} e */
   _onCurrentEntryChange = (e) => {
     console.log("_onCurrentEntryChange");
-    this.#updateActiveTab();
+    this._updateActiveTab();
   };
 
-  #updateActiveTab() {
+  _updateActiveTab() {
     // console.log("#updateActiveTab");
     const state = navigation.currentEntry.getState();
     const activeTab =
@@ -336,11 +336,11 @@ class AppHub extends LitElement {
     console.log({ newActiveTab });
     document.documentElement.dataset.activeTab = newActiveTab;
 
-    this.#updateMetaThemeColor();
+    this._updateMetaThemeColor();
     this._activeTabProvider.setValue(newActiveTab);
   }
 
-  #updateMetaThemeColor() {
+  _updateMetaThemeColor() {
     const color = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
