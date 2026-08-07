@@ -246,6 +246,7 @@ export class Router extends litRouter.Routes {
     if (isBase) {
       e.intercept({
         handler: async () => {
+          // FILL - determine direction
           await this.goto(route);
         },
       });

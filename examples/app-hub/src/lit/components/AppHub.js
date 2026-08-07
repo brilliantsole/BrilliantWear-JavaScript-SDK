@@ -20,6 +20,14 @@ import { activeTabContext } from "../contexts/activeTabContext.js";
 import { screenOrientationContext } from "../contexts/screenOrientationContext.js";
 import { isTouch } from "../../utils/environment.js";
 
+export const tabs = ["layers", "apps", "devices", "settings"];
+const tabRenders = {
+  layers: () => html`<bw-layers></bw-layers>`,
+  apps: () => html`<bw-apps></bw-apps>`,
+  devices: () => html`<bw-devices></bw-devices>`,
+  settings: () => html`<bw-settings></bw-settings>`,
+};
+
 class AppHub extends LitElement {
   static properties = {
     screenOrientationType: {
@@ -41,12 +49,10 @@ class AppHub extends LitElement {
 
   router = new Router(
     this,
-    [
-      { path: "/layers", render: () => html`<bw-layers></bw-layers>` },
-      { path: "/apps", render: () => html`<bw-apps></bw-apps>` },
-      { path: "/devices", render: () => html`<bw-devices></bw-devices>` },
-      { path: "/settings", render: () => html`<bw-settings></bw-settings>` },
-    ],
+    tabs.map((tab) => ({
+      path: `/${tab}`,
+      render: tabRenders[tab],
+    })),
     defaultTab,
   );
 
@@ -95,7 +101,7 @@ class AppHub extends LitElement {
           flex-direction: row;
         }
 
-        @supports (padding-inline-end: env(safe-area-inset-right)) {
+        @supports (padding-left: env(safe-area-inset-left)) {
           :host(
               [data-screen-orientation-type="landscape-secondary"]:not(
                 [data-left-handed],
@@ -103,9 +109,7 @@ class AppHub extends LitElement {
               )
             )
             bw-nav {
-            padding-inline-end: calc(
-              env(safe-area-inset-right) - var(--wa-space-s)
-            );
+            padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
           }
 
           :host(
@@ -114,8 +118,9 @@ class AppHub extends LitElement {
                 )[data-left-handed]
             )
             bw-nav {
-            padding-inline-start: calc(
-              env(safe-area-inset-left) - var(--wa-space-s)
+            padding-left: max(
+              var(--wa-space-s),
+              calc(env(safe-area-inset-left) - var(--wa-space-s))
             );
           }
 
@@ -126,9 +131,7 @@ class AppHub extends LitElement {
               )
             )
             main {
-            padding-inline-end: calc(
-              env(safe-area-inset-right) - var(--wa-space-s)
-            );
+            padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
           }
 
           :host(
@@ -138,8 +141,9 @@ class AppHub extends LitElement {
               )
             )
             main {
-            padding-inline-start: calc(
-              env(safe-area-inset-left) - var(--wa-space-xs)
+            padding-left: max(
+              var(--wa-space-s),
+              calc(env(safe-area-inset-left) - var(--wa-space-xs))
             );
           }
         }
