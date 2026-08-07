@@ -1,6 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litContext, BW, keyed } = await waitForGlobals();
+const { lit, litContext, keyed } = await waitForGlobals();
 const { ContextConsumer } = litContext;
 
 const { LitElement, html, css } = lit;
@@ -9,6 +9,8 @@ import "https://ka-f.webawesome.com/webawesome@3.11.0/components/badge/badge.js"
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
 import { activeTabContext } from "../../contexts/activeTabContext.js";
+import { screenOrientationContext } from "../../contexts/screenOrientationContext.js";
+import { isIOS, isTouch } from "../../../utils/environment.js";
 
 class NavButton extends LitElement {
   static properties = {
@@ -17,6 +19,7 @@ class NavButton extends LitElement {
     iconFamily: { attribute: "icon-family" },
     iconName: { attribute: "icon-name" },
     isActive: { type: Boolean },
+    pill: { type: Boolean },
   };
 
   static styles = css`
@@ -41,6 +44,7 @@ class NavButton extends LitElement {
 
   constructor() {
     super();
+    this.pill = true;
     this.isActive = false;
     this._activeTabConsumer = new ContextConsumer(this, {
       context: activeTabContext,
@@ -51,12 +55,21 @@ class NavButton extends LitElement {
         this.isActive = isActive;
       },
     });
+    this._screenOrientationConsumer = new ContextConsumer(this, {
+      context: screenOrientationContext,
+      subscribe: true,
+      /** @param {ScreenOrientation} screenOrientation */
+      callback: async (screenOrientation) => {
+        this.pill = screenOrientation.type.includes("landscape") && isTouch;
+        // console.log("this.pill", this.pill);
+      },
+    });
   }
 
   render() {
     // console.log("render", { isActive: this.isActive }, this);
     const _html = html`<wa-button
-      pill
+      ?pill=${this.pill}
       size="l"
       .variant=${this.variant}
       .appearance=${this.isActive ? "accent" : "plain"}
@@ -68,7 +81,7 @@ class NavButton extends LitElement {
       </div>
     </wa-button>`;
 
-    if (BW.Environment.isIOS) {
+    if (isIOS) {
       return html` ${keyed(this.isActive, _html)} `;
     } else {
       return _html;
