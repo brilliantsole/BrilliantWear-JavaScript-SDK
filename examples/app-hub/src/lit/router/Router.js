@@ -88,6 +88,7 @@ export class Router extends litRouter.Routes {
   constructor(host, routes, defaultRoute) {
     super(host, routes);
     this._defaultRoute = defaultRoute ?? "/";
+    console.log("Router", this);
   }
   hostConnected() {
     super.hostConnected();
@@ -211,7 +212,7 @@ export class Router extends litRouter.Routes {
       console.warn("no destinationState for traversal");
       e.intercept({
         handler: async () => {
-          this.goto(defaultTab);
+          await this.goto(route);
         },
       });
       return;
@@ -245,7 +246,7 @@ export class Router extends litRouter.Routes {
     if (isBase) {
       e.intercept({
         handler: async () => {
-          this.goto(route);
+          await this.goto(route);
         },
       });
     } else {
