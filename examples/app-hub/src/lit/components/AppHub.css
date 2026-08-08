@@ -33,16 +33,17 @@ bw-nav {
 /* touch screens */
 @media (pointer: coarse) {
   @media (orientation: landscape) {
+    /* vertical nav on right */
+    bw-nav {
+      flex-direction: column;
+    }
     bw-app-hub {
       flex-direction: row-reverse;
     }
 
-    bw-nav {
-      flex-direction: column;
-    }
-
     bw-app-hub[data-anchor-nav][data-screen-orientation-type="landscape-secondary"],
     bw-app-hub[data-left-handed]:not([data-anchor-nav]) {
+      /* vertical nav on left */
       flex-direction: row;
     }
 
@@ -94,15 +95,16 @@ bw-nav {
   }
 
   @media (orientation: portrait) {
+    /* horizontal nav on bottom */
+    bw-nav {
+      flex-direction: row-reverse;
+    }
     bw-app-hub {
       flex-direction: column-reverse;
     }
 
-    bw-nav {
-      flex-direction: row-reverse;
-    }
-
     bw-app-hub[data-left-handed] bw-nav {
+      /* reversed horizontal nav on bottom */
       flex-direction: row;
     }
 
@@ -117,21 +119,22 @@ bw-nav {
 /* non-touch screens */
 @media (pointer: fine) {
   @media (orientation: landscape) {
-    bw-app-hub {
-      flex-direction: row;
-    }
-
+    /* vertical nav on left */
     bw-nav {
       flex-direction: column;
+    }
+    bw-app-hub {
+      flex-direction: row;
     }
   }
 
   @media (orientation: portrait) {
-    bw-app-hub {
-      flex-direction: column;
-    }
+    /* horizontal nav on top */
     bw-nav {
       flex-direction: row;
+    }
+    bw-app-hub {
+      flex-direction: column;
     }
   }
 }
@@ -212,84 +215,164 @@ html:active-view-transition {
 }
 
 html:active-view-transition-type(previous-tab) {
+  --previous-tab-main-old-animation-name: slide-out-to-right;
+  --previous-tab-main-new-animation-name: slide-in-from-left;
+
   &::view-transition-old(main) {
-    animation-name: slide-out-to-right;
+    animation-name: var(--previous-tab-main-old-animation-name);
   }
   &::view-transition-new(main) {
-    animation-name: slide-in-from-left;
+    animation-name: var(--previous-tab-main-new-animation-name);
   }
 }
 html:active-view-transition-type(next-tab) {
+  --next-tab-main-old-animation-name: slide-out-to-left;
+  --next-tab-main-new-animation-name: slide-in-from-right;
+
   &::view-transition-old(main) {
-    animation-name: slide-out-to-left;
+    animation-name: var(--next-tab-main-old-animation-name);
   }
   &::view-transition-new(main) {
-    animation-name: slide-in-from-right;
+    animation-name: var(--next-tab-main-new-animation-name);
+  }
+}
+
+/* touch screens */
+@media (pointer: coarse) {
+  @media (orientation: landscape) {
+    /* vertical nav */
+    html:active-view-transition-type(previous-tab) {
+      --previous-tab-main-old-animation-name: slide-out-to-bottom;
+      --previous-tab-main-new-animation-name: slide-in-from-top;
+    }
+    html:active-view-transition-type(next-tab) {
+      --next-tab-main-old-animation-name: slide-out-to-top;
+      --next-tab-main-new-animation-name: slide-in-from-bottom;
+    }
+  }
+
+  @media (orientation: portrait) {
+    /* horizontal nav on bottom */
+    html:active-view-transition-type(previous-tab) {
+      --previous-tab-main-old-animation-name: slide-out-to-left;
+      --previous-tab-main-new-animation-name: slide-in-from-right;
+    }
+    html:active-view-transition-type(next-tab) {
+      --next-tab-main-old-animation-name: slide-out-to-right;
+      --next-tab-main-new-animation-name: slide-in-from-left;
+    }
+
+    /* reversed horizontal nav on bottom */
+    html:active-view-transition-type(previous-tab):has(
+        bw-app-hub[data-left-handed]
+      ) {
+      --previous-tab-main-old-animation-name: slide-out-to-right;
+      --previous-tab-main-new-animation-name: slide-in-from-left;
+    }
+    html:active-view-transition-type(next-tab):has(
+        bw-app-hub[data-left-handed]
+      ) {
+      --next-tab-main-old-animation-name: slide-out-to-left;
+      --next-tab-main-new-animation-name: slide-in-from-right;
+    }
+  }
+}
+
+/* non-touch screens */
+@media (pointer: fine) {
+  @media (orientation: landscape) {
+    /* vertical nav on left */
+    html:active-view-transition-type(previous-tab) {
+      --previous-tab-main-old-animation-name: slide-out-to-bottom;
+      --previous-tab-main-new-animation-name: slide-in-from-top;
+    }
+    html:active-view-transition-type(next-tab) {
+      --next-tab-main-old-animation-name: slide-out-to-top;
+      --next-tab-main-new-animation-name: slide-in-from-bottom;
+    }
+  }
+
+  @media (orientation: portrait) {
+    /* horizontal nav on top */
+    html:active-view-transition-type(previous-tab) {
+      --previous-tab-main-old-animation-name: slide-out-to-right;
+      --previous-tab-main-new-animation-name: slide-in-from-left;
+    }
+    html:active-view-transition-type(next-tab) {
+      --next-tab-main-old-animation-name: slide-out-to-left;
+      --next-tab-main-new-animation-name: slide-in-from-right;
+    }
   }
 }
 
 @keyframes slide-out-to-left {
   from {
-    right: 0%;
+    transform: translateX(0);
   }
   to {
-    right: 100%;
+    transform: translateX(-100%);
   }
 }
+
 @keyframes slide-out-to-right {
   from {
-    left: 0%;
+    transform: translateX(0);
   }
   to {
-    left: 100%;
+    transform: translateX(100%);
   }
 }
+
 @keyframes slide-out-to-top {
   from {
-    top: 0%;
+    transform: translateY(0);
   }
   to {
-    top: 100%;
+    transform: translateY(-100%);
   }
 }
+
 @keyframes slide-out-to-bottom {
   from {
-    bottom: 0%;
+    transform: translateY(0);
   }
   to {
-    bottom: 100%;
+    transform: translateY(100%);
   }
 }
 
 @keyframes slide-in-from-right {
   from {
-    left: 100%;
+    transform: translateX(100%);
   }
   to {
-    left: 0%;
+    transform: translateX(0);
   }
 }
+
 @keyframes slide-in-from-left {
   from {
-    right: 100%;
+    transform: translateX(-100%);
   }
   to {
-    right: 0%;
+    transform: translateX(0);
   }
 }
+
 @keyframes slide-in-from-top {
   from {
-    top: 100%;
+    transform: translateY(-100%);
   }
   to {
-    top: 0%;
+    transform: translateY(0);
   }
 }
+
 @keyframes slide-in-from-bottom {
   from {
-    bottom: 100%;
+    transform: translateY(100%);
   }
   to {
-    bottom: 0%;
+    transform: translateY(0);
   }
 }
