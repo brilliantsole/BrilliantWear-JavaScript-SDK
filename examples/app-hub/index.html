@@ -5,6 +5,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
+
     <meta name="theme-color" />
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 
@@ -89,24 +90,6 @@
     <script type="module" src="./src/lit/components/AppHub.js"></script>
     <link rel="stylesheet" href="./src/lit/components/AppHub.css" />
   </head>
-  <style>
-    html,
-    body {
-      overflow: hidden;
-    }
-
-    ::view-transition-group(*),
-    ::view-transition-image-pair(*),
-    ::view-transition-old(*),
-    ::view-transition-new(*) {
-      pointer-events: none;
-    }
-
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-      animation: none;
-    }
-  </style>
 
   <body>
     <bw-app-hub></bw-app-hub>

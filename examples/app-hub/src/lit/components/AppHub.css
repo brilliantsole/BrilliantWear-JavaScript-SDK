@@ -1,6 +1,23 @@
+html,
+body {
+  overflow: hidden;
+}
+
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 bw-app-hub {
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   display: flex;
 }
 
@@ -20,8 +37,6 @@ bw-nav {
   flex-direction: var(--nav-flex-direction);
   align-items: center;
   gap: var(--wa-space-2xs);
-
-  /* TODO: - different justify-content for different screen sizes */
 }
 
 @media (orientation: landscape) {
@@ -95,6 +110,17 @@ bw-nav {
   }
 
   @media (orientation: portrait) {
+    @supports (padding-top: env(safe-area-inset-top)) {
+      #main {
+        padding-top: calc(env(safe-area-inset-top) - var(--wa-space-xl));
+      }
+    }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      bw-nav {
+        padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
+      }
+    }
+
     /* horizontal nav on bottom */
     bw-nav {
       flex-direction: row-reverse;
