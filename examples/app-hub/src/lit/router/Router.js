@@ -89,7 +89,14 @@ export class Router extends litRouter.Routes {
   constructor(host, routes, defaultRoute) {
     super(host, routes);
     this._defaultRoute = defaultRoute ?? "/";
+    this._host = host;
     console.log("Router", this);
+    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.reducedMotionEnabled = this.reducedMotion.matches;
+    this.reducedMotion.addEventListener("change", (event) => {
+      this.reducedMotionEnabled = event.matches;
+      console.log("reducedMotionEnabled", this.reducedMotionEnabled);
+    });
   }
   hostConnected() {
     super.hostConnected();
@@ -265,7 +272,11 @@ export class Router extends litRouter.Routes {
             await this.goto(route);
           };
 
-          if (!document.startViewTransition) {
+          if (
+            !document.startViewTransition ||
+            this.reducedMotionEnabled ||
+            this._host.skipViewTransitions
+          ) {
             await render();
             return;
           }
@@ -281,7 +292,7 @@ export class Router extends litRouter.Routes {
           } else {
             // FILL - moving between paths of the same route
           }
-          console.log("transition types", types);
+          console.log("view transition types", types);
 
           await document.startViewTransition({
             update: async () => {

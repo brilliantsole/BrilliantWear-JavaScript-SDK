@@ -11,7 +11,7 @@ import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
 
 import { activeTabContext } from "../../contexts/activeTabContext.js";
 import { screenOrientationContext } from "../../contexts/screenOrientationContext.js";
-import { isIOS, isTouch } from "../../../utils/environment.js";
+import { isTouch } from "../../../utils/environment.js";
 
 class NavButton extends LitElement {
   static properties = {
@@ -62,7 +62,7 @@ class NavButton extends LitElement {
       /** @param {ScreenOrientation} screenOrientation */
       callback: async (screenOrientation) => {
         this.pill = screenOrientation.type.includes("landscape") && isTouch;
-        // console.log("this.pill", this.pill);
+        // console.log("this.pill", this.pill, { isTouch });
       },
     });
   }

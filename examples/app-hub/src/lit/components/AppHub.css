@@ -170,11 +170,21 @@ html[data-active-tab="devices"] {
 
 /* VIEW TRANSITIONS */
 
-bw-app-hub[data-no-view-transitions] {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
+html:active-view-transition:has(bw-app-hub[data-disable-view-transitions]) {
+  &::view-transition-group(*),
+  &::view-transition-old(*),
+  &::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:active-view-transition {
+    &::view-transition-group(*),
+    &::view-transition-old(*),
+    &::view-transition-new(*) {
+      animation: none !important;
+    }
   }
 }
 

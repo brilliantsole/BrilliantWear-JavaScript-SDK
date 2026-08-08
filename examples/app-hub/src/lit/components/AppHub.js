@@ -45,6 +45,16 @@ class AppHub extends LitElement {
       reflect: true,
       attribute: "data-anchor-nav",
     },
+    disableViewTransitions: {
+      type: Boolean,
+      reflect: true,
+      attribute: "data-disable-view-transitions",
+    },
+    isCharging: {
+      type: Boolean,
+      reflect: true,
+      attribute: "data-is-charging",
+    },
   };
 
   router = new Router(
@@ -61,6 +71,11 @@ class AppHub extends LitElement {
 
   createRenderRoot() {
     return this;
+  }
+
+  get skipViewTransitions() {
+    // TODO: - false if low power mode
+    return this.disableViewTransitions;
   }
 
   constructor() {
@@ -85,11 +100,17 @@ class AppHub extends LitElement {
 
     // this.leftHanded = true;
     // this.anchorNav = true;
+    // this.disableViewTransitions = true;
 
     if ("getBattery" in navigator) {
       navigator.getBattery().then((batteryManager) => {
         console.log("battery", batteryManager);
         this.batteryManager = batteryManager;
+
+        this._onBatteryChargingChange();
+        this._onBatteryLevelChange();
+        this._onBatteryChargingTimeChange();
+        this._onBatteryDischargingTimeChange();
 
         batteryManager.addEventListener(
           "chargingchange",
@@ -164,25 +185,23 @@ class AppHub extends LitElement {
     this.screenOrientationType = type;
   }
 
-  _onBatteryChargingChange = (e) => {
+  _onBatteryChargingChange = () => {
     console.log("_onBatteryChargingChange");
     const { charging } = this.batteryManager;
     console.log({ charging });
-    if (isTouch) {
-      // TODO: - put nav on notch side to avoid holding charging cable
-    }
+    this.isCharging = charging;
   };
-  _onBatteryLevelChange = (e) => {
+  _onBatteryLevelChange = () => {
     console.log("_onBatteryLevelChange");
     const { level } = this.batteryManager;
     console.log({ level });
   };
-  _onBatteryChargingTimeChange = (e) => {
+  _onBatteryChargingTimeChange = () => {
     console.log("_onBatteryChargingTimeChange");
     const { chargingTime } = this.batteryManager;
     console.log({ chargingTime });
   };
-  _onBatteryDischargingTimeChange = (e) => {
+  _onBatteryDischargingTimeChange = () => {
     console.log("_onBatteryDischargingTimeChange");
     const { dischargingTime } = this.batteryManager;
     console.log({ dischargingTime });
