@@ -95,33 +95,6 @@
       overflow: hidden;
     }
 
-    html {
-      --background-color: var(--wa-color-neutral-fill-quiet);
-      background-color: var(--background-color);
-    }
-
-    html[data-active-tab="settings"] {
-      --background-color: var(--wa-color-neutral-fill-quiet);
-    }
-
-    html[data-active-tab="layers"] {
-      --background-color: hsl(
-        from var(--wa-color-success-fill-quiet) h calc(s * 0.2) l
-      );
-    }
-
-    html[data-active-tab="apps"] {
-      --background-color: hsl(
-        from var(--wa-color-warning-fill-quiet) h calc(s * 0.1) l
-      );
-    }
-
-    html[data-active-tab="devices"] {
-      --background-color: hsl(
-        from var(--wa-color-brand-fill-quiet) h calc(s * 0.4) l
-      );
-    }
-
     ::view-transition-group(*),
     ::view-transition-image-pair(*),
     ::view-transition-old(*),

@@ -10,17 +10,9 @@ import "./NavButtonDevices.js";
 import "./NavButtonSettings.js";
 
 class Nav extends LitElement {
-  static styles = css`
-    :host {
-      display: flex;
-      flex: 0 0 auto;
-      flex-direction: var(--nav-flex-direction);
-      align-items: center;
-      gap: var(--wa-space-2xs);
-    }
-
-    /* TODO: - different justify-content for different screen sizes */
-  `;
+  createRenderRoot() {
+    return this;
+  }
 
   constructor() {
     super();

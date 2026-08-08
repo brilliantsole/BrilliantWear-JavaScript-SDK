@@ -12,7 +12,7 @@ const latestRouterStateSessionStorageKey = "latest-router-state";
 const saveLatestEntryToLocalStorage = true;
 const saveEntriesToLocalStorage = true; // need to save to sessionStorage for safari iOS
 const routerStateSessionsStorageKeyPrefix = "router-states";
-const getEntryKey = () => "index"; // safari iOS's key isn't consistent
+const entryKey = "index"; // safari iOS's key isn't consistent
 // TODO - store a buffer ring of indices (safari has a max of 99 entries)
 navigation.addEventListener("currententrychange", (event) => {
   const { from, navigationType } = event;
@@ -38,7 +38,7 @@ navigation.addEventListener("currententrychange", (event) => {
   }
 
   if (saveEntriesToLocalStorage) {
-    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[getEntryKey()]}`;
+    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
     // console.log(`saving currentState with key ${key}`, currentState);
     sessionStorage.setItem(key, currentStateString);
   }
@@ -53,7 +53,7 @@ if (saveEntriesToLocalStorage) {
   /** @param {NavigationHistoryEntry | NavigationDestination} entry */
   const getState = (entry) => {
     // console.log("getState interception", this);
-    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[getEntryKey()]}`;
+    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
     const stateString = sessionStorage.getItem(key);
     // console.log("sessionStorage", { key, stateString });
     if (stateString) {
@@ -255,12 +255,17 @@ export class Router extends litRouter.Routes {
             await this.goto(route);
           };
 
+          const activeTab =
+            route.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
+          console.log({ activeTab });
+
           if (!document.startViewTransition) {
             await render();
             return;
           }
 
           await document.startViewTransition(async () => {
+            document.documentElement.dataset.activeTab = activeTab;
             await render();
           }).finished;
         },

@@ -1,6 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litContext, keyed } = await waitForGlobals();
+const { lit, litContext } = await waitForGlobals();
 const { ContextConsumer } = litContext;
 
 const { LitElement, html, css } = lit;
@@ -8,6 +8,7 @@ const { LitElement, html, css } = lit;
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/badge/badge.js";
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
+
 import { activeTabContext } from "../../contexts/activeTabContext.js";
 import { screenOrientationContext } from "../../contexts/screenOrientationContext.js";
 import { isIOS, isTouch } from "../../../utils/environment.js";
@@ -68,7 +69,7 @@ class NavButton extends LitElement {
 
   render() {
     // console.log("render", { isActive: this.isActive }, this);
-    const _html = html`<wa-button
+    return html`<wa-button
       ?pill=${this.pill}
       size="l"
       .variant=${this.variant}
@@ -80,12 +81,6 @@ class NavButton extends LitElement {
         <span class="wa-font-size-xs"><slot></slot></span>
       </div>
     </wa-button>`;
-
-    if (isIOS) {
-      return html` ${keyed(this.isActive, _html)} `;
-    } else {
-      return _html;
-    }
   }
 }
 customElements.define("bw-nav-button", NavButton);

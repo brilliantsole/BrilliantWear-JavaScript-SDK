@@ -52,6 +52,9 @@ class AppHub extends LitElement {
     tabs.map((tab) => ({
       path: `/${tab}`,
       render: tabRenders[tab],
+      enter: () => {
+        this._updateActiveTab();
+      },
     })),
     defaultPath,
   );
@@ -192,7 +195,7 @@ class AppHub extends LitElement {
   };
 
   _updateActiveTab() {
-    // console.log("#updateActiveTab");
+    // console.log("_updateActiveTab");
     const state = navigation.currentEntry.getState();
     const activeTab =
       state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
@@ -205,13 +208,14 @@ class AppHub extends LitElement {
   }
   set activeTab(newActiveTab) {
     console.log({ newActiveTab });
-    document.documentElement.dataset.activeTab = newActiveTab;
-
     this._updateMetaThemeColor();
     this._activeTabProvider.setValue(newActiveTab);
   }
 
   _updateMetaThemeColor() {
+    if (!this._themeColorMeta) {
+      return;
+    }
     const color = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
@@ -221,7 +225,7 @@ class AppHub extends LitElement {
   render() {
     return html`
       <bw-nav></bw-nav>
-      <main style="flex: 1;">${this.router.outlet()}</main>
+      <main id="main">${this.router.outlet()}</main>
     `;
   }
 }
