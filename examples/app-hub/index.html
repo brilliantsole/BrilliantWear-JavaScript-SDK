@@ -87,6 +87,7 @@
     <script src="./src/utils/wa-zoomable-frame-utils.js" type="module"></script>
 
     <script type="module" src="./src/lit/components/AppHub.js"></script>
+    <link rel="stylesheet" href="./src/lit/components/AppHub.css" />
   </head>
   <style>
     html,
@@ -120,7 +121,20 @@
         from var(--wa-color-brand-fill-quiet) h calc(s * 0.4) l
       );
     }
+
+    ::view-transition-group(*),
+    ::view-transition-image-pair(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      pointer-events: none;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
   </style>
+
   <body>
     <bw-app-hub></bw-app-hub>
   </body>

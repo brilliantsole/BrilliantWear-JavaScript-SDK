@@ -9,8 +9,6 @@ import "./NavButtonApps.js";
 import "./NavButtonDevices.js";
 import "./NavButtonSettings.js";
 
-import { defaultTab } from "../AppHub.js";
-
 class Nav extends LitElement {
   static styles = css`
     :host {

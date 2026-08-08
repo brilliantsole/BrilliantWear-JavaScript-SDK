@@ -15,7 +15,7 @@ import "./apps/Apps.js";
 import "./devices/Devices.js";
 import "./settings/Settings.js";
 
-export const defaultTab = "/layers";
+export const defaultPath = "/layers";
 import { activeTabContext } from "../contexts/activeTabContext.js";
 import { screenOrientationContext } from "../contexts/screenOrientationContext.js";
 import { isTouch } from "../../utils/environment.js";
@@ -53,145 +53,12 @@ class AppHub extends LitElement {
       path: `/${tab}`,
       render: tabRenders[tab],
     })),
-    defaultTab,
+    defaultPath,
   );
 
-  static styles = css`
-    :host {
-      width: 100%;
-      height: 100%;
-      display: flex;
-    }
-
-    main {
-      overflow-y: scroll;
-      padding-left: var(--wa-space-s);
-      touch-action: pan-x pan-y;
-    }
-
-    bw-nav {
-      background-color: var(--wa-color-surface-default);
-      touch-action: none;
-    }
-
-    @media (orientation: landscape) {
-      bw-nav {
-        padding-top: var(--wa-space-2xs);
-      }
-    }
-    @media (orientation: portrait) {
-      bw-nav {
-      }
-    }
-
-    /* touch screens */
-    @media (pointer: coarse) {
-      @media (orientation: landscape) {
-        :host {
-          flex-direction: row-reverse;
-          bw-nav {
-            flex-direction: column;
-          }
-        }
-
-        :host(
-          [data-anchor-nav][data-screen-orientation-type="landscape-secondary"]
-        ),
-        :host([data-left-handed]:not([data-anchor-nav])) {
-          flex-direction: row;
-        }
-
-        @supports (padding-left: env(safe-area-inset-left)) {
-          :host(
-              [data-screen-orientation-type="landscape-secondary"]:not(
-                [data-left-handed],
-                [data-anchor-nav]
-              )
-            )
-            bw-nav {
-            padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
-          }
-
-          :host(
-              [data-screen-orientation-type="landscape-primary"]:not(
-                  [data-anchor-nav]
-                )[data-left-handed]
-            )
-            bw-nav {
-            padding-left: max(
-              var(--wa-space-s),
-              calc(env(safe-area-inset-left) - var(--wa-space-s))
-            );
-          }
-
-          :host(
-              [data-screen-orientation-type="landscape-secondary"]:is(
-                [data-left-handed],
-                [data-anchor-nav]
-              )
-            )
-            main {
-            padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
-          }
-
-          :host(
-              [data-screen-orientation-type="landscape-primary"]:is(
-                [data-anchor-nav],
-                :not([data-left-handed])
-              )
-            )
-            main {
-            padding-left: max(
-              var(--wa-space-s),
-              calc(env(safe-area-inset-left) - var(--wa-space-xs))
-            );
-          }
-        }
-
-        @media (min-height: 5in) {
-          bw-nav {
-            /* "center" or "end" for large phones/tablets held sideways? */
-            justify-content: center;
-          }
-        }
-      }
-
-      @media (orientation: portrait) {
-        :host {
-          flex-direction: column-reverse;
-          bw-nav {
-            flex-direction: row-reverse;
-          }
-        }
-        :host([data-left-handed]) {
-          bw-nav {
-            flex-direction: row;
-          }
-        }
-      }
-    }
-
-    /* non-touch screens */
-    @media (pointer: fine) {
-      @media (orientation: landscape) {
-        :host {
-          flex-direction: row;
-          bw-nav {
-            flex-direction: column;
-          }
-        }
-      }
-
-      @media (orientation: portrait) {
-        :host {
-          flex-direction: column;
-          bw-nav {
-            flex-direction: row;
-          }
-        }
-      }
-    }
-  `;
+  createRenderRoot() {
+    return this;
+  }
 
   constructor() {
     super();
@@ -328,7 +195,7 @@ class AppHub extends LitElement {
     // console.log("#updateActiveTab");
     const state = navigation.currentEntry.getState();
     const activeTab =
-      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultTab;
+      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
     // console.log({ activeTab });
     this.activeTab = activeTab;
   }

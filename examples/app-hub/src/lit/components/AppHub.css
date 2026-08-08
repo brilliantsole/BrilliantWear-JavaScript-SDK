@@ -1,0 +1,157 @@
+bw-app-hub {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+bw-app-hub main {
+  overflow-y: scroll;
+  padding-left: var(--wa-space-s);
+  touch-action: pan-x pan-y;
+}
+
+bw-app-hub bw-nav {
+  background-color: var(--wa-color-surface-default);
+  touch-action: none;
+  z-index: 2;
+}
+
+@media (orientation: landscape) {
+  bw-app-hub bw-nav {
+    padding-top: var(--wa-space-2xs);
+  }
+}
+
+/* touch screens */
+@media (pointer: coarse) {
+  @media (orientation: landscape) {
+    bw-app-hub {
+      flex-direction: row-reverse;
+    }
+
+    bw-app-hub bw-nav {
+      flex-direction: column;
+    }
+
+    bw-app-hub[data-anchor-nav][data-screen-orientation-type="landscape-secondary"],
+    bw-app-hub[data-left-handed]:not([data-anchor-nav]) {
+      flex-direction: row;
+    }
+
+    @supports (padding-left: env(safe-area-inset-left)) {
+      bw-app-hub[data-screen-orientation-type="landscape-secondary"]:not(
+          [data-left-handed],
+          [data-anchor-nav]
+        )
+        bw-nav {
+        padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
+      }
+
+      bw-app-hub[data-screen-orientation-type="landscape-primary"]:not(
+          [data-anchor-nav]
+        )[data-left-handed]
+        bw-nav {
+        padding-left: max(
+          var(--wa-space-s),
+          calc(env(safe-area-inset-left) - var(--wa-space-s))
+        );
+      }
+
+      bw-app-hub[data-screen-orientation-type="landscape-secondary"]:is(
+          [data-left-handed],
+          [data-anchor-nav]
+        )
+        main {
+        padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
+      }
+
+      bw-app-hub[data-screen-orientation-type="landscape-primary"]:is(
+          [data-anchor-nav],
+          :not([data-left-handed])
+        )
+        main {
+        padding-left: max(
+          var(--wa-space-s),
+          calc(env(safe-area-inset-left) - var(--wa-space-xs))
+        );
+      }
+    }
+
+    @media (min-height: 5in) {
+      bw-app-hub bw-nav {
+        /* "center" or "end" for large phones/tablets held sideways */
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (orientation: portrait) {
+    bw-app-hub {
+      flex-direction: column-reverse;
+    }
+
+    bw-app-hub bw-nav {
+      flex-direction: row-reverse;
+    }
+
+    bw-app-hub[data-left-handed] bw-nav {
+      flex-direction: row;
+    }
+  }
+}
+
+/* non-touch screens */
+@media (pointer: fine) {
+  @media (orientation: landscape) {
+    bw-app-hub {
+      flex-direction: row;
+    }
+
+    bw-app-hub bw-nav {
+      flex-direction: column;
+    }
+  }
+
+  @media (orientation: portrait) {
+    bw-app-hub {
+      flex-direction: column;
+    }
+
+    bw-app-hub bw-nav {
+      flex-direction: row;
+    }
+  }
+}
+
+bw-app-hub main {
+  view-transition-name: main;
+}
+
+::view-transition-old(main) {
+  animation: slide-out-to-left 300ms ease both;
+}
+
+::view-transition-new(main) {
+  animation: slide-in-from-right 300ms ease both;
+}
+
+::view-transition-group(main) {
+  z-index: 0;
+}
+
+@keyframes slide-out-to-left {
+  from {
+    right: 0%;
+  }
+  to {
+    right: 100%;
+  }
+}
+@keyframes slide-in-from-right {
+  from {
+    left: 100%;
+  }
+  to {
+    left: 0%;
+  }
+}

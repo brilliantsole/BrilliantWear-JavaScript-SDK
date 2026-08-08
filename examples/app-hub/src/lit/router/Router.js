@@ -1,7 +1,7 @@
 // based on https://github.com/lit/lit/blob/c42ee1e96b8fd61f7256f61d715daef572e76e52/packages/labs/router/src/router.ts
 
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
-import { defaultTab } from "../components/AppHub.js";
+import { defaultPath, tabs } from "../components/AppHub.js";
 const { litRouter } = await waitForGlobals();
 
 const origin = location.origin || location.protocol + "//" + location.host;
@@ -12,7 +12,8 @@ const latestRouterStateSessionStorageKey = "latest-router-state";
 const saveLatestEntryToLocalStorage = true;
 const saveEntriesToLocalStorage = true; // need to save to sessionStorage for safari iOS
 const routerStateSessionsStorageKeyPrefix = "router-states";
-const entryKey = "index"; // safari iOS's key isn't consistent
+const getEntryKey = () => "index"; // safari iOS's key isn't consistent
+// TODO - store a buffer ring of indices (safari has a max of 99 entries)
 navigation.addEventListener("currententrychange", (event) => {
   const { from, navigationType } = event;
   const { currentEntry } = navigation;
@@ -25,10 +26,10 @@ navigation.addEventListener("currententrychange", (event) => {
   const currentStateString = JSON.stringify(currentState);
 
   if (saveLatestEntryToLocalStorage) {
-    console.log(
-      "saving currentState with latestRouterStateSessionStorageKey",
-      currentState,
-    );
+    // console.log(
+    //   "saving currentState with latestRouterStateSessionStorageKey",
+    //   currentState,
+    // );
 
     sessionStorage.setItem(
       latestRouterStateSessionStorageKey,
@@ -37,8 +38,8 @@ navigation.addEventListener("currententrychange", (event) => {
   }
 
   if (saveEntriesToLocalStorage) {
-    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
-    console.log(`saving currentState with key ${key}`, currentState);
+    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[getEntryKey()]}`;
+    // console.log(`saving currentState with key ${key}`, currentState);
     sessionStorage.setItem(key, currentStateString);
   }
 });
@@ -52,7 +53,7 @@ if (saveEntriesToLocalStorage) {
   /** @param {NavigationHistoryEntry | NavigationDestination} entry */
   const getState = (entry) => {
     // console.log("getState interception", this);
-    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
+    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[getEntryKey()]}`;
     const stateString = sessionStorage.getItem(key);
     // console.log("sessionStorage", { key, stateString });
     if (stateString) {
@@ -244,10 +245,24 @@ export class Router extends litRouter.Routes {
     }
 
     if (isBase) {
+      console.log("about to intercept navigation");
       e.intercept({
         handler: async () => {
+          console.log("routeHandler", { route }, tabs);
+
           // FILL - determine direction
-          await this.goto(route);
+          const render = async () => {
+            await this.goto(route);
+          };
+
+          if (!document.startViewTransition) {
+            await render();
+            return;
+          }
+
+          await document.startViewTransition(async () => {
+            await render();
+          }).finished;
         },
       });
     } else {
