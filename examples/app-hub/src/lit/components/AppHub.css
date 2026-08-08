@@ -178,28 +178,44 @@ bw-app-hub[data-no-view-transitions] {
   }
 }
 
-bw-nav {
-  view-transition-name: nav;
-}
-::view-transition-group(nav) {
-  animation: none;
-  z-index: 1;
+html:active-view-transition {
+  :root {
+    view-transition-name: none;
+  }
+
+  bw-nav {
+    view-transition-name: nav;
+  }
+  &::view-transition-group(nav) {
+    animation: none;
+    z-index: 1;
+  }
+
+  #main {
+    view-transition-name: main;
+  }
+  &::view-transition-group(main) {
+    z-index: 0;
+    animation-duration: 300ms;
+    animation-timing-function: ease;
+  }
 }
 
-#main {
-  view-transition-name: main;
+html:active-view-transition-type(previous-tab) {
+  &::view-transition-old(main) {
+    animation-name: slide-out-to-right;
+  }
+  &::view-transition-new(main) {
+    animation-name: slide-in-from-left;
+  }
 }
-
-::view-transition-old(main) {
-  animation: slide-out-to-left 300ms ease both;
-}
-
-::view-transition-new(main) {
-  animation: slide-in-from-right 300ms ease both;
-}
-
-::view-transition-group(main) {
-  z-index: 0;
+html:active-view-transition-type(next-tab) {
+  &::view-transition-old(main) {
+    animation-name: slide-out-to-left;
+  }
+  &::view-transition-new(main) {
+    animation-name: slide-in-from-right;
+  }
 }
 
 @keyframes slide-out-to-left {
@@ -210,11 +226,60 @@ bw-nav {
     right: 100%;
   }
 }
+@keyframes slide-out-to-right {
+  from {
+    left: 0%;
+  }
+  to {
+    left: 100%;
+  }
+}
+@keyframes slide-out-to-top {
+  from {
+    top: 0%;
+  }
+  to {
+    top: 100%;
+  }
+}
+@keyframes slide-out-to-bottom {
+  from {
+    bottom: 0%;
+  }
+  to {
+    bottom: 100%;
+  }
+}
+
 @keyframes slide-in-from-right {
   from {
     left: 100%;
   }
   to {
     left: 0%;
+  }
+}
+@keyframes slide-in-from-left {
+  from {
+    right: 100%;
+  }
+  to {
+    right: 0%;
+  }
+}
+@keyframes slide-in-from-top {
+  from {
+    top: 100%;
+  }
+  to {
+    top: 0%;
+  }
+}
+@keyframes slide-in-from-bottom {
+  from {
+    bottom: 100%;
+  }
+  to {
+    bottom: 0%;
   }
 }

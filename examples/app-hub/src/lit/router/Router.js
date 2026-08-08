@@ -250,23 +250,44 @@ export class Router extends litRouter.Routes {
         handler: async () => {
           console.log("routeHandler", { route }, tabs);
 
-          // FILL - determine direction
-          const render = async () => {
-            await this.goto(route);
-          };
-
           const activeTab =
             route.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
-          console.log({ activeTab });
+          const tabIndex = tabs.indexOf(activeTab);
+          console.log({ route, activeTab, tabIndex });
+
+          const previousRoute = currentState.route;
+          const previousTab = previousRoute.split("/")?.filter(Boolean)?.[0];
+          const previousTabIndex = tabs.indexOf(previousTab);
+          console.log({ previousRoute, previousTab, previousTabIndex });
+
+          const render = async () => {
+            document.documentElement.dataset.activeTab = activeTab;
+            await this.goto(route);
+          };
 
           if (!document.startViewTransition) {
             await render();
             return;
           }
 
-          await document.startViewTransition(async () => {
-            document.documentElement.dataset.activeTab = activeTab;
-            await render();
+          const types = [];
+          if (tabIndex != previousTabIndex) {
+            console.log(
+              `moving from "${previousTab}" tab to "${activeTab}" tab`,
+            );
+            types.push(
+              tabIndex > previousTabIndex ? "next-tab" : "previous-tab",
+            );
+          } else {
+            // FILL - moving between paths of the same route
+          }
+          console.log("transition types", types);
+
+          await document.startViewTransition({
+            update: async () => {
+              await render();
+            },
+            types,
           }).finished;
         },
       });
