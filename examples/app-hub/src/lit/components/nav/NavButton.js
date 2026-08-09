@@ -21,6 +21,7 @@ class NavButton extends LitElement {
     iconName: { attribute: "icon-name" },
     isActive: { type: Boolean },
     pill: { type: Boolean },
+    click: { attribute: false },
   };
 
   static styles = css`
@@ -40,6 +41,10 @@ class NavButton extends LitElement {
 
     wa-button {
       -webkit-touch-callout: none;
+    }
+    wa-button::part(button) {
+      padding: 0
+        calc(var(--wa-form-control-padding-inline) - var(--wa-space-3xs));
     }
   `;
 
@@ -67,6 +72,10 @@ class NavButton extends LitElement {
     });
   }
 
+  onDoubleClick(event) {
+    event.preventDefault();
+  }
+
   render() {
     // console.log("render", { isActive: this.isActive }, this);
     return html`<wa-button
@@ -74,7 +83,9 @@ class NavButton extends LitElement {
       size="l"
       .variant=${this.variant}
       .appearance=${this.isActive ? "accent" : "plain"}
-      href=${this.href}
+      .href=${this.href}
+      @click=${this.click}
+      @dblclick=${this.onDoubleClick}
     >
       <div class="wa-align-items-center wa-stack wa-gap-2xs">
         <wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon>

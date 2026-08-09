@@ -52,7 +52,6 @@ const isIOS = isInBrowser && /iPad|iPhone|iPod/i.test(userAgent);
 const isMac = isInBrowser && /Macintosh/i.test(userAgent);
 const INSTANCE_KEY = Symbol.for("brilliantwear");
 const existing = globalThis[INSTANCE_KEY];
-console.log({ existing });
 if (existing) {
     throw new Error(`Multiple instances of brilliantwear detected.\n` +
         `First loaded from: ${existing.stack}`);

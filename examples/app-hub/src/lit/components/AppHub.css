@@ -1,6 +1,7 @@
 html,
 body {
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 ::view-transition-group(*),
@@ -15,10 +16,18 @@ body {
   animation: none;
 }
 
+.mainAxis,
+.crossAxis {
+  display: flex;
+}
+
+.crossAxis {
+  align-items: center;
+}
+
 bw-app-hub {
   width: 100%;
   height: 100dvh;
-  display: flex;
 }
 
 #main {
@@ -28,20 +37,35 @@ bw-app-hub {
   flex: 1;
 }
 
-#nav {
-  background-color: var(--wa-color-surface-default);
-  touch-action: none;
-
-  display: flex;
+#header {
   flex: 0 0 auto;
-  flex-direction: var(--nav-flex-direction);
-  align-items: center;
-  gap: var(--wa-space-2xs);
+
+  background-color: var(--wa-color-surface-default);
+
+  justify-content: space-between;
 }
 
 @media (orientation: landscape) {
-  #nav {
+  #header {
     padding-top: var(--wa-space-2xs);
+  }
+  #nav {
+    /* gap: var(--wa-space-2xs); */
+  }
+}
+
+@media (orientation: portrait) {
+  @media (max-width: 400px) {
+    #menu {
+      display: none;
+    }
+  }
+}
+@media (orientation: landscape) {
+  @media (max-height: 300px) {
+    #menu {
+      display: none;
+    }
   }
 }
 
@@ -49,10 +73,10 @@ bw-app-hub {
 @media (pointer: coarse) {
   @media (orientation: landscape) {
     /* vertical nav on right */
-    #nav {
+    .crossAxis {
       flex-direction: column;
     }
-    bw-app-hub {
+    .mainAxis {
       flex-direction: row-reverse;
     }
 
@@ -67,14 +91,14 @@ bw-app-hub {
           [data-left-handed],
           [data-anchor-nav]
         )
-        #nav {
+        #header {
         padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
       }
 
       bw-app-hub[data-screen-orientation-type="landscape-primary"]:not(
           [data-anchor-nav]
         )[data-left-handed]
-        #nav {
+        #header {
         padding-left: max(
           var(--wa-space-s),
           calc(env(safe-area-inset-left) - var(--wa-space-s))
@@ -102,9 +126,10 @@ bw-app-hub {
     }
 
     @media (min-height: 5in) {
-      #nav {
-        /* "center" or "end" for large phones/tablets held sideways */
-        justify-content: center;
+      #header {
+        /* reverse nav for large phones/tablets held sideways - assume on a stand */
+        flex-direction: column-reverse;
+        /* justify-content: center; */
       }
     }
   }
@@ -116,16 +141,16 @@ bw-app-hub {
       }
     }
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      #nav {
+      #header {
         padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
       }
     }
 
     /* horizontal nav on bottom */
-    #nav {
+    .crossAxis {
       flex-direction: row-reverse;
     }
-    bw-app-hub {
+    .mainAxis {
       flex-direction: column-reverse;
     }
 
@@ -146,20 +171,20 @@ bw-app-hub {
 @media (pointer: fine) {
   @media (orientation: landscape) {
     /* vertical nav on left */
-    #nav {
+    .crossAxis {
       flex-direction: column;
     }
-    bw-app-hub {
+    .mainAxis {
       flex-direction: row;
     }
   }
 
   @media (orientation: portrait) {
     /* horizontal nav on top */
-    #nav {
+    .crossAxis {
       flex-direction: row;
     }
-    bw-app-hub {
+    .mainAxis {
       flex-direction: column;
     }
   }
@@ -222,10 +247,10 @@ html:active-view-transition {
     view-transition-name: none;
   }
 
-  #nav {
-    view-transition-name: nav;
+  #header {
+    view-transition-name: header;
   }
-  &::view-transition-group(nav) {
+  &::view-transition-group(header) {
     animation: none;
     z-index: 1;
   }

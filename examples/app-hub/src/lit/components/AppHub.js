@@ -2,7 +2,7 @@ import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 
 const { lit, litRouter, litContext } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 const { Routes } = litRouter;
 const { ContextProvider } = litContext;
 
@@ -30,6 +30,7 @@ import "./nav/NavButtonLayers.js";
 import "./nav/NavButtonApps.js";
 import "./nav/NavButtonDevices.js";
 import "./nav/NavButtonSettings.js";
+import "./nav/NavButtonFlip.js";
 
 class AppHub extends LitElement {
   static properties = {
@@ -83,6 +84,7 @@ class AppHub extends LitElement {
 
   constructor() {
     super();
+    this.classList.add("mainAxis");
     console.log("AppHub", this);
     this._activeTabProvider = new ContextProvider(this, {
       context: activeTabContext,
@@ -246,12 +248,17 @@ class AppHub extends LitElement {
 
   render() {
     return html`
-      <nav id="nav">
-        <bw-nav-button-layers></bw-nav-button-layers>
-        <bw-nav-button-apps></bw-nav-button-apps>
-        <bw-nav-button-devices></bw-nav-button-devices>
-        <bw-nav-button-settings></bw-nav-button-settings>
-      </nav>
+      <header id="header" class="crossAxis">
+        <nav id="nav" class="crossAxis">
+          <bw-nav-button-layers></bw-nav-button-layers>
+          <bw-nav-button-apps></bw-nav-button-apps>
+          <bw-nav-button-devices></bw-nav-button-devices>
+          <bw-nav-button-settings></bw-nav-button-settings>
+        </nav>
+        <menu id="menu">
+          <bw-nav-button-flip></bw-nav-button-flip>
+        </menu>
+      </header>
       <main id="main">${this.router.outlet()}</main>
     `;
   }
