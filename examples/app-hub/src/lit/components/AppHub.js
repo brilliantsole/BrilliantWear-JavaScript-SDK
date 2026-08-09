@@ -8,8 +8,6 @@ const { ContextProvider } = litContext;
 
 import { Router } from "../router/Router.js";
 
-import "./nav/Nav.js";
-
 import "./layers/Layers.js";
 import "./apps/Apps.js";
 import "./devices/Devices.js";
@@ -27,6 +25,11 @@ const tabRenders = {
   devices: () => html`<bw-devices></bw-devices>`,
   settings: () => html`<bw-settings></bw-settings>`,
 };
+
+import "./nav/NavButtonLayers.js";
+import "./nav/NavButtonApps.js";
+import "./nav/NavButtonDevices.js";
+import "./nav/NavButtonSettings.js";
 
 class AppHub extends LitElement {
   static properties = {
@@ -243,7 +246,12 @@ class AppHub extends LitElement {
 
   render() {
     return html`
-      <bw-nav></bw-nav>
+      <nav id="nav">
+        <bw-nav-button-layers></bw-nav-button-layers>
+        <bw-nav-button-apps></bw-nav-button-apps>
+        <bw-nav-button-devices></bw-nav-button-devices>
+        <bw-nav-button-settings></bw-nav-button-settings>
+      </nav>
       <main id="main">${this.router.outlet()}</main>
     `;
   }

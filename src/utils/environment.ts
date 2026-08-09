@@ -45,7 +45,7 @@ const isMac = isInBrowser && /Macintosh/i.test(userAgent);
 
 const INSTANCE_KEY = Symbol.for("brilliantwear");
 const existing = globalThis[INSTANCE_KEY];
-console.log({ existing });
+// console.log({ existing });
 if (existing) {
   throw new Error(
     `Multiple instances of brilliantwear detected.\n` +

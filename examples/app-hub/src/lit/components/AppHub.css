@@ -28,7 +28,7 @@ bw-app-hub {
   flex: 1;
 }
 
-bw-nav {
+#nav {
   background-color: var(--wa-color-surface-default);
   touch-action: none;
 
@@ -40,7 +40,7 @@ bw-nav {
 }
 
 @media (orientation: landscape) {
-  bw-nav {
+  #nav {
     padding-top: var(--wa-space-2xs);
   }
 }
@@ -49,7 +49,7 @@ bw-nav {
 @media (pointer: coarse) {
   @media (orientation: landscape) {
     /* vertical nav on right */
-    bw-nav {
+    #nav {
       flex-direction: column;
     }
     bw-app-hub {
@@ -67,14 +67,14 @@ bw-nav {
           [data-left-handed],
           [data-anchor-nav]
         )
-        bw-nav {
+        #nav {
         padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
       }
 
       bw-app-hub[data-screen-orientation-type="landscape-primary"]:not(
           [data-anchor-nav]
         )[data-left-handed]
-        bw-nav {
+        #nav {
         padding-left: max(
           var(--wa-space-s),
           calc(env(safe-area-inset-left) - var(--wa-space-s))
@@ -102,7 +102,7 @@ bw-nav {
     }
 
     @media (min-height: 5in) {
-      bw-nav {
+      #nav {
         /* "center" or "end" for large phones/tablets held sideways */
         justify-content: center;
       }
@@ -116,26 +116,26 @@ bw-nav {
       }
     }
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      bw-nav {
+      #nav {
         padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
       }
     }
 
     /* horizontal nav on bottom */
-    bw-nav {
+    #nav {
       flex-direction: row-reverse;
     }
     bw-app-hub {
       flex-direction: column-reverse;
     }
 
-    bw-app-hub[data-left-handed] bw-nav {
+    bw-app-hub[data-left-handed] #nav {
       /* reversed horizontal nav on bottom */
       flex-direction: row;
     }
 
     @media (max-width: 4in) {
-      bw-nav {
+      #nav {
         justify-content: space-evenly;
       }
     }
@@ -146,7 +146,7 @@ bw-nav {
 @media (pointer: fine) {
   @media (orientation: landscape) {
     /* vertical nav on left */
-    bw-nav {
+    #nav {
       flex-direction: column;
     }
     bw-app-hub {
@@ -156,7 +156,7 @@ bw-nav {
 
   @media (orientation: portrait) {
     /* horizontal nav on top */
-    bw-nav {
+    #nav {
       flex-direction: row;
     }
     bw-app-hub {
@@ -222,7 +222,7 @@ html:active-view-transition {
     view-transition-name: none;
   }
 
-  bw-nav {
+  #nav {
     view-transition-name: nav;
   }
   &::view-transition-group(nav) {
