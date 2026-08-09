@@ -13,9 +13,10 @@ import "./apps/Apps.js";
 import "./devices/Devices.js";
 import "./settings/Settings.js";
 
-export const defaultPath = "/layers";
-import { activeTabContext } from "../contexts/activeTabContext.js";
-import { screenOrientationContext } from "../contexts/screenOrientationContext.js";
+export const defaultTab = "/layers";
+export const defaultPath = `/${defaultTab}`;
+import { createActiveTabContextProvider } from "../contexts/activeTabContext.js";
+import { createScreenOrientationContextProvider } from "../contexts/screenOrientationContext.js";
 import { isTouch } from "../../utils/environment.js";
 
 export const tabs = ["layers", "apps", "devices", "settings"];
@@ -31,6 +32,7 @@ import "./nav/NavButtonApps.js";
 import "./nav/NavButtonDevices.js";
 import "./nav/NavButtonSettings.js";
 import "./nav/NavButtonFlip.js";
+import { createLeftHandedContextProvider } from "../contexts/leftHandedContext.js";
 
 class AppHub extends LitElement {
   static properties = {
@@ -78,7 +80,7 @@ class AppHub extends LitElement {
   }
 
   get skipViewTransitions() {
-    // TODO: - false if low power mode
+    // TODO: - return false if low power mode
     return this.disableViewTransitions;
   }
 
@@ -86,12 +88,18 @@ class AppHub extends LitElement {
     super();
     this.classList.add("mainAxis");
     console.log("AppHub", this);
-    this._activeTabProvider = new ContextProvider(this, {
-      context: activeTabContext,
-    });
-    this._screenOrientationProvider = new ContextProvider(this, {
-      context: screenOrientationContext,
-    });
+    this._activeTabProvider = createActiveTabContextProvider(this);
+    this._screenOrientationProvider =
+      createScreenOrientationContextProvider(this);
+    this._leftHandedProvider = createLeftHandedContextProvider(
+      this,
+      {
+        isLeftHanded: false,
+      },
+      () => {
+        this._updateLeftHanded();
+      },
+    );
   }
 
   connectedCallback() {
@@ -146,6 +154,7 @@ class AppHub extends LitElement {
     );
     this._updateActiveTab();
     this._updateOrientation();
+    this._updateLeftHanded();
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -186,8 +195,17 @@ class AppHub extends LitElement {
     // console.log("#updateOrientation");
     const { type, angle } = window.screen.orientation;
     console.log({ type, angle });
-    this._screenOrientationProvider.setValue({ type, angle });
+    this._screenOrientationProvider.value.update({ type, angle });
     this.screenOrientationType = type;
+  }
+
+  _updateLeftHanded() {
+    const leftHanded = this._leftHandedProvider.value.state.isLeftHanded;
+    console.log({ leftHanded });
+    // FIX
+    document.startViewTransition(() => {
+      this.leftHanded = leftHanded;
+    });
   }
 
   _onBatteryChargingChange = () => {
@@ -222,18 +240,18 @@ class AppHub extends LitElement {
     // console.log("_updateActiveTab");
     const state = navigation.currentEntry.getState();
     const activeTab =
-      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
+      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultTab;
     // console.log({ activeTab });
     this.activeTab = activeTab;
   }
 
   get activeTab() {
-    return this._activeTabProvider.value;
+    return this._activeTabProvider.value.state.activeTab;
   }
   set activeTab(newActiveTab) {
     console.log({ newActiveTab });
     this._updateMetaThemeColor();
-    this._activeTabProvider.setValue(newActiveTab);
+    this._activeTabProvider.value.update({ activeTab: newActiveTab });
   }
 
   _updateMetaThemeColor() {

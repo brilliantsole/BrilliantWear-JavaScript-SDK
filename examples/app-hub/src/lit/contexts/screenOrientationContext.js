@@ -1,8 +1,15 @@
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
+import { createContext } from "./createContext.js";
 
-const { litContext } = await waitForGlobals();
+const {
+  createContextConsumer: createScreenOrientationContextConsumer,
+  createContextProvider: createScreenOrientationContextProvider,
+} = createContext("screenOrientationContext", {
+  type: "landscape-primary",
+  angle: 0,
+});
 
-export const screenOrientationContextKey = Symbol("screenOrientationContext");
-export const screenOrientationContext = litContext.createContext(
-  screenOrientationContextKey,
-);
+export {
+  createScreenOrientationContextConsumer,
+  createScreenOrientationContextProvider,
+};

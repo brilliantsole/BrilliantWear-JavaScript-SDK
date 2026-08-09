@@ -55,14 +55,14 @@ bw-app-hub {
 }
 
 @media (orientation: portrait) {
-  @media (max-width: 400px) {
+  @media (max-width: 4in) {
     #menu {
       display: none;
     }
   }
 }
 @media (orientation: landscape) {
-  @media (max-height: 300px) {
+  @media (max-height: 3in) {
     #menu {
       display: none;
     }
@@ -154,7 +154,7 @@ bw-app-hub {
       flex-direction: column-reverse;
     }
 
-    bw-app-hub[data-left-handed] #nav {
+    bw-app-hub[data-left-handed] .crossAxis {
       /* reversed horizontal nav on bottom */
       flex-direction: row;
     }

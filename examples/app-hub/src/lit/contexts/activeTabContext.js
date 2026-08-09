@@ -1,6 +1,10 @@
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 
-const { litContext } = await waitForGlobals();
+import { createContext } from "./createContext.js";
 
-export const activeTabContextKey = Symbol("activeTabContext");
-export const activeTabContext = litContext.createContext(activeTabContextKey);
+const {
+  createContextConsumer: createActiveTabContextConsumer,
+  createContextProvider: createActiveTabContextProvider,
+} = createContext("activeTab");
+
+export { createActiveTabContextConsumer, createActiveTabContextProvider };

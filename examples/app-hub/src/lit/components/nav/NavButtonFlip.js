@@ -1,11 +1,20 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-const { lit } = await waitForGlobals();
+import { createLeftHandedContextConsumer } from "../../contexts/leftHandedContext.js";
+
+const { lit, litContext } = await waitForGlobals();
+const { ContextConsumer } = litContext;
 
 const { LitElement, html, css } = lit;
 
 import "./NavButton.js";
 
 class NavButtonFlip extends LitElement {
+  constructor() {
+    super();
+
+    this._leftHandedConsumer = createLeftHandedContextConsumer(this);
+  }
+
   static styles = css`
     @media (pointer: fine) {
       :host {
@@ -13,8 +22,10 @@ class NavButtonFlip extends LitElement {
       }
     }
   `;
+
   onClick(event) {
-    // FILL
+    const { isLeftHanded } = this._leftHandedConsumer.value.state;
+    this._leftHandedConsumer.value.update({ isLeftHanded: !isLeftHanded });
   }
 
   render() {

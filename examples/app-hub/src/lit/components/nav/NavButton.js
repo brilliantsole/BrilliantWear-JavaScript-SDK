@@ -9,8 +9,8 @@ import "https://ka-f.webawesome.com/webawesome@3.11.0/components/badge/badge.js"
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
 
-import { activeTabContext } from "../../contexts/activeTabContext.js";
-import { screenOrientationContext } from "../../contexts/screenOrientationContext.js";
+import { createActiveTabContextConsumer } from "../../contexts/activeTabContext.js";
+import { createScreenOrientationContextConsumer } from "../../contexts/screenOrientationContext.js";
 import { isTouch } from "../../../utils/environment.js";
 
 class NavButton extends LitElement {
@@ -52,24 +52,24 @@ class NavButton extends LitElement {
     super();
     this.pill = true;
     this.isActive = false;
-    this._activeTabConsumer = new ContextConsumer(this, {
-      context: activeTabContext,
-      subscribe: true,
-      callback: async (activeTab) => {
-        const isActive = `/${this._activeTabConsumer.value}` == this.href;
-        // console.log({ isActive }, this.href);
+    this._activeTabConsumer = createActiveTabContextConsumer(
+      this,
+      true,
+      ({ activeTab }) => {
+        const isActive = `/${activeTab}` == this.href;
+        console.log({ isActive }, this.href);
         this.isActive = isActive;
       },
-    });
-    this._screenOrientationConsumer = new ContextConsumer(this, {
-      context: screenOrientationContext,
-      subscribe: true,
+    );
+    this._screenOrientationConsumer = createScreenOrientationContextConsumer(
+      this,
+      true,
       /** @param {ScreenOrientation} screenOrientation */
-      callback: async (screenOrientation) => {
+      (screenOrientation) => {
         this.pill = screenOrientation.type.includes("landscape") && isTouch;
-        // console.log("this.pill", this.pill, { isTouch });
+        console.log("this.pill", this.pill, { isTouch });
       },
-    });
+    );
   }
 
   onDoubleClick(event) {
