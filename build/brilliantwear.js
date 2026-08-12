@@ -38,7 +38,6 @@
 	const isMac = isInBrowser && /Macintosh/i.test(userAgent);
 	const INSTANCE_KEY = Symbol.for("brilliantwear");
 	const existing = globalThis[INSTANCE_KEY];
-	console.log({ existing });
 	if (existing) {
 	    throw new Error(`Multiple instances of brilliantwear detected.\n` +
 	        `First loaded from: ${existing.stack}`);
@@ -3001,7 +3000,7 @@
 	        const imageData = concatenateArrayBuffers(this.#headerData, this.#imageData, this.#footerData);
 	        _console$P.log({ imageData });
 	        this.#didBuildImage = true;
-	        let blob = new Blob([imageData], { type: "image/jpg" });
+	        const blob = new Blob([imageData], { type: "image/jpg" });
 	        _console$P.log("created blob", blob);
 	        const url = URL.createObjectURL(blob);
 	        _console$P.log("created url", url);
@@ -34148,7 +34147,11 @@
 	        _console$k.log("reconnecting...");
 	        return this.connectionManager?.reconnect();
 	    }
+	    static get CanConnect() {
+	        return WebBluetoothConnectionManager.isSupported;
+	    }
 	    static async Connect() {
+	        _console$k.assertWithError(this.CanConnect, `can't connect to any device - must connect to discovered device`);
 	        const device = new _a$3();
 	        await device.connect();
 	        return device;

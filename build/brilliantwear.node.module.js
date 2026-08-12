@@ -2983,7 +2983,7 @@ class CameraManager {
         const imageData = concatenateArrayBuffers(this.#headerData, this.#imageData, this.#footerData);
         _console$O.log({ imageData });
         this.#didBuildImage = true;
-        let blob = new Blob([imageData], { type: "image/jpg" });
+        const blob = new Blob([imageData], { type: "image/jpg" });
         _console$O.log("created blob", blob);
         const url = URL.createObjectURL(blob);
         _console$O.log("created url", url);

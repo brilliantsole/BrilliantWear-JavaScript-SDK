@@ -91,6 +91,14 @@ export class Router extends litRouter.Routes {
     this._defaultRoute = defaultRoute ?? "/";
     this._host = host;
     console.log("Router", this);
+
+    this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!this._themeColorMeta) {
+      this._themeColorMeta = document.createElement("meta");
+      this._themeColorMeta.name = "theme-color";
+      document.head.appendChild(this._themeColorMeta);
+    }
+
     this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.reducedMotionEnabled = this.reducedMotion.matches;
     this.reducedMotion.addEventListener("change", (event) => {
@@ -268,8 +276,13 @@ export class Router extends litRouter.Routes {
           console.log({ previousRoute, previousTab, previousTabIndex });
 
           const render = async () => {
-            document.documentElement.dataset.activeTab = activeTab;
             await this.goto(route);
+
+            document.documentElement.dataset.activeTab = activeTab;
+            const color = getComputedStyle(document.documentElement)
+              .getPropertyValue("background-color")
+              .trim();
+            this._themeColorMeta.setAttribute("content", color);
           };
 
           if (

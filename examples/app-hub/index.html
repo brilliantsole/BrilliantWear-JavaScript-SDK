@@ -27,7 +27,7 @@
     />
 
     <script type="module">
-      import * as lit from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
+      import * as lit from "https://cdn.jsdelivr.net/gh/lit/dist@3.3.3/core/lit-core.min.js";
       // with {
       //   integrity: "sha256-9gf0cEddireQdUy3D3LNviOQxKV6tZ32zbNg7rcr2Hw=",
       //   crossOriginStorage: "*",
@@ -99,5 +99,21 @@
     function toggleDarkMode() {
       document.documentElement.classList.toggle("wa-dark");
     }
+
+    function resetViewport() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      console.log("lol");
+    }
+
+    document.addEventListener("visibilitychange", (e) => {
+      console.log(e.type, document.hidden);
+      if (!document.hidden) {
+        requestAnimationFrame(resetViewport);
+      }
+    });
+
+    window.addEventListener("pageshow", resetViewport);
   </script>
 </html>

@@ -67,7 +67,7 @@ class NavButton extends LitElement {
       /** @param {ScreenOrientation} screenOrientation */
       (screenOrientation) => {
         this.pill = screenOrientation.type.includes("landscape") && isTouch;
-        console.log("this.pill", this.pill, { isTouch });
+        // console.log({ pill: this.pill, isTouch });
       },
     );
   }

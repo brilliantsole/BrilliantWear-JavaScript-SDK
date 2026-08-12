@@ -13,7 +13,7 @@ import "./apps/Apps.js";
 import "./devices/Devices.js";
 import "./settings/Settings.js";
 
-export const defaultTab = "/layers";
+export const defaultTab = "layers";
 export const defaultPath = `/${defaultTab}`;
 import { createActiveTabContextProvider } from "../contexts/activeTabContext.js";
 import { createScreenOrientationContextProvider } from "../contexts/screenOrientationContext.js";
@@ -86,6 +86,7 @@ class AppHub extends LitElement {
 
   constructor() {
     super();
+    this.addEventListener("touchend", this.onTouchEnd);
     this.classList.add("mainAxis");
     console.log("AppHub", this);
     this._activeTabProvider = createActiveTabContextProvider(this);
@@ -104,12 +105,6 @@ class AppHub extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (!this._themeColorMeta) {
-      this._themeColorMeta = document.createElement("meta");
-      this._themeColorMeta.name = "theme-color";
-      document.head.appendChild(this._themeColorMeta);
-    }
 
     // this.leftHanded = true;
     // this.anchorNav = true;
@@ -250,19 +245,54 @@ class AppHub extends LitElement {
   }
   set activeTab(newActiveTab) {
     console.log({ newActiveTab });
-    this._updateMetaThemeColor();
     this._activeTabProvider.value.update({ activeTab: newActiveTab });
   }
 
-  _updateMetaThemeColor() {
-    if (!this._themeColorMeta) {
+  _lastTouchTime = 0;
+  /** @param {TouchEvent} event */
+  onTouchEnd = (event) => {
+    console.log("onTouchEnd", event);
+
+    if (event.changedTouches.length != 1) {
       return;
     }
-    const color = getComputedStyle(document.documentElement)
-      .getPropertyValue("background-color")
-      .trim();
-    this._themeColorMeta.setAttribute("content", color);
-  }
+    if (event.touches.length != 0) {
+      return;
+    }
+
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - this._lastTouchTime;
+
+    // console.log({ tapLength });
+
+    if (tapLength < 300 && tapLength > 0) {
+      console.log("double tap detected");
+      event.preventDefault();
+
+      if (
+        this._screenOrientationProvider.value.state.type.includes("landscape")
+      ) {
+        const touch = event.changedTouches[0];
+        const { clientX, clientY, target } = touch;
+        console.log({ clientX, clientY });
+
+        const { isLeftHanded } = this._leftHandedProvider.value.state;
+
+        // FILL - check which side header is on
+        // FILL - check if touch is on bottom
+        // FILL - check if close to edge opposite header
+
+        const isInCorner = true;
+        if (isInCorner) {
+          return;
+          this._leftHandedProvider.value.update({
+            isLeftHanded: !isLeftHanded,
+          });
+        }
+      }
+    }
+    this._lastTouchTime = currentTime;
+  };
 
   render() {
     return html`

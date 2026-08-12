@@ -4,6 +4,10 @@ body {
   touch-action: manipulation;
 }
 
+* {
+  touch-action: manipulation;
+}
+
 ::view-transition-group(*),
 ::view-transition-image-pair(*),
 ::view-transition-old(*),
@@ -39,10 +43,9 @@ bw-app-hub {
 
 #header {
   flex: 0 0 auto;
-
   background-color: var(--wa-color-surface-default);
-
   justify-content: space-between;
+  touch-action: pan-x pan-y;
 }
 
 @media (orientation: landscape) {
@@ -66,6 +69,17 @@ bw-app-hub {
     #menu {
       display: none;
     }
+  }
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  #header {
+    padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
+  }
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  #main {
+    padding-top: calc(env(safe-area-inset-top) - var(--wa-space-xl));
   }
 }
 
@@ -135,17 +149,6 @@ bw-app-hub {
   }
 
   @media (orientation: portrait) {
-    @supports (padding-top: env(safe-area-inset-top)) {
-      #main {
-        padding-top: calc(env(safe-area-inset-top) - var(--wa-space-xl));
-      }
-    }
-    @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      #header {
-        padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
-      }
-    }
-
     /* horizontal nav on bottom */
     .crossAxis {
       flex-direction: row-reverse;
