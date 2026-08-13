@@ -42,34 +42,6 @@ import { createTouchEnabledContextProvider } from "../contexts/touchEnabledConte
 import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
 
 class AppHub extends LitElement {
-  static properties = {
-    screenOrientationType: {
-      type: String,
-      reflect: true,
-      attribute: "data-screen-orientation-type",
-    },
-    _isLeftHanded: {
-      type: Boolean,
-      reflect: true,
-      attribute: "data-left-handed",
-    },
-    _anchorNav: {
-      type: Boolean,
-      reflect: true,
-      attribute: "data-anchor-nav",
-    },
-    _disableViewTransitions: {
-      type: Boolean,
-      reflect: true,
-      attribute: "data-disable-view-transitions",
-    },
-    isCharging: {
-      type: Boolean,
-      reflect: true,
-      attribute: "data-is-charging",
-    },
-  };
-
   createRenderRoot() {
     return this;
   }
@@ -86,6 +58,10 @@ class AppHub extends LitElement {
     const { anchorNav } = this._anchorNavContextProvider.value.state;
     console.log({ anchorNav });
     this._anchorNav = anchorNav;
+    document.documentElement.toggleAttribute(
+      "data-anchor-nav",
+      this._anchorNav,
+    );
   }
 
   get disableViewTransitions() {
@@ -101,6 +77,10 @@ class AppHub extends LitElement {
       this._disableViewTransitionsProvider.value.state;
     console.log({ disableViewTransitions });
     this._disableViewTransitions = disableViewTransitions;
+    document.documentElement.toggleAttribute(
+      "data-disable-view-transitions",
+      this._disableViewTransitions,
+    );
   }
   get skipViewTransitions() {
     if (!document.startViewTransition) {
@@ -227,10 +207,6 @@ class AppHub extends LitElement {
 
     this.addEventListener("touchend", this._onTouchEnd, options);
 
-    // this.isLeftHanded = true;
-    // this.anchorNav = true;
-    // this.disableViewTransitions = true;
-
     this._onScreenOrientationUpdate();
     this._updateActiveTab();
     this._onIsLeftHandedUpdate();
@@ -267,7 +243,11 @@ class AppHub extends LitElement {
   _onScreenOrientationUpdate() {
     // console.log("_onScreenOrientationUpdate");
     const { type } = this._screenOrientationProvider.value.state;
-    this.screenOrientationType = type;
+    this._screenOrientationType = type;
+    document.documentElement.setAttribute(
+      "data-screen-orientation-type",
+      this._screenOrientationType,
+    );
   }
 
   _onReducedMotionUpdate() {
@@ -300,16 +280,24 @@ class AppHub extends LitElement {
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
     console.log({ isLeftHanded });
+    const update = () => {
+      this._isLeftHanded = isLeftHanded;
+      document.documentElement.toggleAttribute(
+        "data-left-handed",
+        this._isLeftHanded,
+      );
+    };
+
     if (
       !this._didFirstUpdate ||
       this.skipViewTransitions ||
       this.anchorNav ||
       !this._touchEnabled
     ) {
-      this._isLeftHanded = isLeftHanded;
+      update();
     } else {
       document.startViewTransition(() => {
-        this._isLeftHanded = isLeftHanded;
+        update();
       });
     }
   }
@@ -333,7 +321,11 @@ class AppHub extends LitElement {
     console.log("_onBatteryChargingChange");
     const { charging } = this._batteryManagerState;
     console.log({ charging });
-    this.isCharging = charging;
+    this._isCharging = charging;
+    document.documentElement.toggleAttribute(
+      "data-is-charging",
+      this._isCharging,
+    );
   };
   _onBatteryLevelChange = () => {
     console.log("_onBatteryLevelChange");

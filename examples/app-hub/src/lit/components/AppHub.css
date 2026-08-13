@@ -1,7 +1,6 @@
 html,
 body {
   overflow: hidden;
-  touch-action: manipulation;
 }
 
 * {
@@ -25,6 +24,15 @@ body {
   display: flex;
 }
 
+:dir(ltr) {
+  --flex-direction-lrt: row;
+  --flex-direction-rtl: row-reverse;
+}
+:dir(rtl) {
+  --flex-direction-lrt: row-reverse;
+  --flex-direction-rtl: row;
+}
+
 .crossAxis {
   align-items: center;
 }
@@ -36,7 +44,8 @@ bw-app-hub {
 
 #main {
   overflow-y: scroll;
-  padding-left: var(--wa-space-s);
+  padding-left: var(--wa-space-xs);
+  padding-right: var(--wa-space-xs);
   touch-action: pan-x pan-y;
   flex: 1;
 }
@@ -87,21 +96,22 @@ bw-app-hub {
 @media (pointer: coarse) {
   @media (orientation: landscape) {
     /* vertical nav on right */
+    .mainAxis {
+      flex-direction: var(--flex-direction-rtl);
+    }
     .crossAxis {
       flex-direction: column;
     }
-    .mainAxis {
-      flex-direction: row-reverse;
-    }
 
-    bw-app-hub[data-anchor-nav][data-screen-orientation-type="landscape-secondary"],
-    bw-app-hub[data-left-handed]:not([data-anchor-nav]) {
+    html[data-anchor-nav][data-screen-orientation-type="landscape-secondary"]
+      .mainAxis,
+    html[data-left-handed]:not([data-anchor-nav]) .mainAxis {
       /* vertical nav on left */
-      flex-direction: row;
+      flex-direction: var(--flex-direction-lrt);
     }
 
     @supports (padding-left: env(safe-area-inset-left)) {
-      bw-app-hub[data-screen-orientation-type="landscape-secondary"]:not(
+      html[data-screen-orientation-type="landscape-secondary"]:not(
           [data-left-handed],
           [data-anchor-nav]
         )
@@ -109,14 +119,14 @@ bw-app-hub {
         padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
       }
 
-      bw-app-hub[data-screen-orientation-type="landscape-primary"]:not(
+      html[data-screen-orientation-type="landscape-primary"]:not(
           [data-anchor-nav]
         )[data-left-handed]
         #header {
         padding-left: calc(env(safe-area-inset-left) - var(--wa-space-s));
       }
 
-      bw-app-hub[data-screen-orientation-type="landscape-secondary"]:is(
+      html[data-screen-orientation-type="landscape-secondary"]:is(
           [data-left-handed],
           [data-anchor-nav]
         )
@@ -124,7 +134,7 @@ bw-app-hub {
         padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
       }
 
-      bw-app-hub[data-screen-orientation-type="landscape-primary"]:is(
+      html[data-screen-orientation-type="landscape-primary"]:is(
           [data-anchor-nav],
           :not([data-left-handed])
         )
@@ -147,16 +157,16 @@ bw-app-hub {
 
   @media (orientation: portrait) {
     /* horizontal nav on bottom */
-    .crossAxis {
-      flex-direction: row-reverse;
-    }
     .mainAxis {
       flex-direction: column-reverse;
     }
+    .crossAxis {
+      flex-direction: var(--flex-direction-rtl);
+    }
 
-    bw-app-hub[data-left-handed] .crossAxis {
+    html[data-left-handed] .crossAxis {
       /* reversed horizontal nav on bottom */
-      flex-direction: row;
+      flex-direction: var(--flex-direction-lrt);
     }
 
     @media (max-width: 4in) {
@@ -224,7 +234,7 @@ html[data-active-tab="devices"] {
 
 /* VIEW TRANSITIONS */
 
-html:active-view-transition:has(bw-app-hub[data-disable-view-transitions]) {
+html[data-disable-view-transitions]:active-view-transition {
   &::view-transition-group(*),
   &::view-transition-old(*),
   &::view-transition-new(*) {
@@ -314,15 +324,11 @@ html:active-view-transition-type(next-tab) {
     }
 
     /* reversed horizontal nav on bottom */
-    html:active-view-transition-type(previous-tab):has(
-        bw-app-hub[data-left-handed]
-      ) {
+    html[data-left-handed]:active-view-transition-type(previous-tab) {
       --previous-tab-main-old-animation-name: slide-out-to-right;
       --previous-tab-main-new-animation-name: slide-in-from-left;
     }
-    html:active-view-transition-type(next-tab):has(
-        bw-app-hub[data-left-handed]
-      ) {
+    html[data-left-handed]:active-view-transition-type(next-tab) {
       --next-tab-main-old-animation-name: slide-out-to-left;
       --next-tab-main-new-animation-name: slide-in-from-right;
     }
