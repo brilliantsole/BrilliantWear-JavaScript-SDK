@@ -5,6 +5,17 @@ body {
 
 * {
   touch-action: manipulation;
+
+  -webkit-tap-highlight-color: transparent; /* Modern syntax */
+  -webkit-tap-highlight-color: rgba(
+    0,
+    0,
+    0,
+    0
+  ); /* Fallback for older engines */
+
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 ::view-transition-group(*),

@@ -107,8 +107,9 @@
     }
 
     document.addEventListener("visibilitychange", (e) => {
-      console.log(e.type, document.hidden);
-      if (!document.hidden) {
+      const { hidden } = document;
+      console.log(e.type, { hidden });
+      if (!hidden) {
         requestAnimationFrame(resetViewport);
       }
     });

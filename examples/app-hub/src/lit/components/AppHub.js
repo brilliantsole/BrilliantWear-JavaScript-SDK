@@ -93,6 +93,7 @@ class AppHub extends LitElement {
       return true;
     }
     // TODO: - return true if low power mode
+    return false;
   }
 
   constructor() {
@@ -206,6 +207,27 @@ class AppHub extends LitElement {
     /** @type {AddEventListenerOptions} */
     const options = { signal: this._abortController.signal };
 
+    // FILL - swipe recognition
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        // FILL - move between tabs
+        // console.log(event.key);
+        // navigation.navigate("/settings");
+        switch (event.key) {
+          case "ArrowRight":
+            break;
+          case "ArrowLeft":
+            break;
+          case "ArrowUp":
+            break;
+          case "ArrowDown":
+            break;
+        }
+      },
+      options,
+    );
+
     this.addEventListener("touchend", this._onTouchEnd, options);
 
     this._onScreenOrientationUpdate();
@@ -236,7 +258,7 @@ class AppHub extends LitElement {
       return;
     }
     this.#activeTab = newActiveTab;
-    console.log({ activeTab: this.#activeTab });
+    // console.log({ activeTab: this.#activeTab });
     document.documentElement.dataset.activeTab = this.activeTab;
     this._updateMetaColor();
   }
@@ -253,12 +275,12 @@ class AppHub extends LitElement {
 
   _onReducedMotionUpdate() {
     const { reducedMotion } = this._reducedMotionProvider.value.state;
-    console.log({ reducedMotion });
+    // console.log({ reducedMotion });
     this._reducedMotion = reducedMotion;
   }
   _onTouchEnabledUpdate() {
     const { touchEnabled } = this._touchEnabledProvider.value.state;
-    console.log({ touchEnabled });
+    // console.log({ touchEnabled });
     this._touchEnabled = touchEnabled;
   }
   /** @type {import("../contexts/viewportOrientationContext.js").ViewportOrientation} */
@@ -266,7 +288,7 @@ class AppHub extends LitElement {
   _onViewportOrientationUpdate() {
     const { viewportOrientation } =
       this._viewportOrientationProvider.value.state;
-    console.log({ viewportOrientation });
+    // console.log({ viewportOrientation });
     this._viewportOrientation = viewportOrientation;
   }
 
@@ -280,7 +302,7 @@ class AppHub extends LitElement {
   }
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
-    console.log({ isLeftHanded });
+    // console.log({ isLeftHanded });
     const update = () => {
       this._isLeftHanded = isLeftHanded;
       document.documentElement.toggleAttribute(
@@ -341,10 +363,10 @@ class AppHub extends LitElement {
   };
 
   _lastTouchTime = 0;
-  _doubleTapTime = 300;
+  _doubleTapTime = 500;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
-    console.log("onTouchEnd", event);
+    // console.log("onTouchEnd", event);
 
     if (event.changedTouches.length != 1) {
       return;

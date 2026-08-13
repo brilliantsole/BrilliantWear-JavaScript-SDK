@@ -7,59 +7,168 @@ const { litRouter } = await waitForGlobals();
 const origin = location.origin || location.protocol + "//" + location.host;
 const baseUrl = new URL(location);
 
-const latestRouterStateSessionStorageKey = "latest-router-state";
+const latestNavigationEntryStateSessionStorageKey =
+  "latest-navigation-entry-state";
 
-const saveLatestEntryToSessionStorage = true;
-const saveEntriesToSessionStorage = true; // need to save to sessionStorage for safari iOS
-const routerStateSessionsStorageKeyPrefix = "router-states";
+const latestNavigationEntryIndexSessionStorageKey =
+  "latest-navigation-entry-index";
+const latestNavigationEntryIndex = Number(
+  sessionStorage.getItem(latestNavigationEntryIndexSessionStorageKey) ?? 0,
+);
+const initialNavigationEntryIndex = navigation.currentEntry.index;
+const initialNavigationEntryIndexOffset =
+  latestNavigationEntryIndex - initialNavigationEntryIndex;
+
+const useCircularNavigationEntryStateBuffer = true;
+const circularNavigationEntryStateBufferLength = 100; // iOS max
+const latestCircularNavigationEntryStateBufferIndexSessionStorageKey =
+  "latest-circular-navigation-entry-state-buffer-index";
+const latestCircularNavigationEntryStateBufferIndex = Number(
+  sessionStorage.getItem(
+    latestCircularNavigationEntryStateBufferIndexSessionStorageKey,
+  ) ?? 0,
+);
+let currentCircularNavigationEntryStateBufferIndex =
+  latestCircularNavigationEntryStateBufferIndex;
+
+console.log({
+  initialNavigationEntryIndex,
+  latestNavigationEntryIndex,
+  currentCircularNavigationEntryStateBufferIndex,
+  initialNavigationEntryIndexOffset,
+});
+const circularNavigationEntryStateBufferSessionsStorageKeyPrefix =
+  "circular-navigation-entry-state-buffer";
+
+const saveLatestNavigationEntryToSessionStorage = true;
+const saveNavigationEntryStatesToSessionStorage = true; // need to save to sessionStorage for safari iOS
+const navigationEntryStateSessionsStorageKeyPrefix = "navigation-entry-state";
 const entryKey = "index"; // safari iOS's key isn't consistent
-// TODO - store a buffer ring of indices (safari has a max of 99 entries)
+
+/** @param {NavigationHistoryEntry | NavigationDestination} entry */
+const getCircularNavigationEntryStateBufferIndex = (entry) => {
+  const entryIndex = entry.index;
+  if (entryIndex == -1) {
+    return null;
+  }
+  const currentEntryIndex = navigation.currentEntry.index;
+  if (entryIndex == currentEntryIndex) {
+    console.log({
+      circularNavigationEntryStateBufferIndex:
+        currentCircularNavigationEntryStateBufferIndex,
+    });
+    return currentCircularNavigationEntryStateBufferIndex;
+  }
+  let circularNavigationEntryStateBufferIndex =
+    currentCircularNavigationEntryStateBufferIndex +
+    entryIndex -
+    currentEntryIndex;
+  while (circularNavigationEntryStateBufferIndex < 0) {
+    circularNavigationEntryStateBufferIndex +=
+      circularNavigationEntryStateBufferLength;
+  }
+  circularNavigationEntryStateBufferIndex %=
+    circularNavigationEntryStateBufferLength;
+
+  console.log("getRouterCircularBufferIndex", {
+    entry,
+    circularNavigationEntryStateBufferLength,
+    currentEntryIndex,
+    entryIndex,
+    currentCircularNavigationEntryStateBufferIndex,
+    circularNavigationEntryStateBufferIndex,
+    initialNavigationEntryIndexOffset,
+  });
+  return circularNavigationEntryStateBufferIndex;
+};
+
 navigation.addEventListener("currententrychange", (event) => {
   const { from, navigationType } = event;
   const { currentEntry } = navigation;
-  const currentState = currentEntry.getState();
-  console.log("currententrychange", currentEntry, currentState);
-  if (!currentState) {
+
+  if (from.index == currentEntry.index) {
     return;
   }
 
+  const indexOffset = currentEntry.index - from.index;
+  currentCircularNavigationEntryStateBufferIndex += indexOffset;
+  while (currentCircularNavigationEntryStateBufferIndex < 0) {
+    currentCircularNavigationEntryStateBufferIndex +=
+      circularNavigationEntryStateBufferLength;
+  }
+  currentCircularNavigationEntryStateBufferIndex %=
+    circularNavigationEntryStateBufferLength;
+  console.log({
+    indexOffset,
+    currentCircularNavigationEntryStateBufferIndex,
+  });
+});
+
+const saveCurrentNavigationEntryStateToSessionStorage = () => {
+  console.log("saveCurrentNavigationEntryStateToSessionStorage");
+  const { currentEntry } = navigation;
+  const currentState = currentEntry.getState();
   const currentStateString = JSON.stringify(currentState);
 
-  if (saveLatestEntryToSessionStorage) {
+  if (saveLatestNavigationEntryToSessionStorage) {
     // console.log(
     //   "saving currentState with latestRouterStateSessionStorageKey",
     //   currentState,
     // );
 
     sessionStorage.setItem(
-      latestRouterStateSessionStorageKey,
+      latestNavigationEntryStateSessionStorageKey,
       currentStateString,
     );
   }
 
-  if (saveEntriesToSessionStorage) {
-    const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
-    // console.log(`saving currentState with key ${key}`, currentState);
-    sessionStorage.setItem(key, currentStateString);
-  }
-});
+  if (saveNavigationEntryStatesToSessionStorage) {
+    if (useCircularNavigationEntryStateBuffer) {
+      sessionStorage.setItem(
+        latestNavigationEntryIndexSessionStorageKey,
+        currentEntry.index,
+      );
+      sessionStorage.setItem(
+        latestCircularNavigationEntryStateBufferIndexSessionStorageKey,
+        currentCircularNavigationEntryStateBufferIndex,
+      );
 
-if (saveEntriesToSessionStorage) {
+      const key = `${circularNavigationEntryStateBufferSessionsStorageKeyPrefix}-${getCircularNavigationEntryStateBufferIndex(currentEntry)}`;
+      console.log(`saving currentState with key ${key}`, currentState);
+      sessionStorage.setItem(key, currentStateString);
+    } else {
+      const key = `${navigationEntryStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
+      // console.log(`saving currentState with key ${key}`, currentState);
+      sessionStorage.setItem(key, currentStateString);
+    }
+  }
+};
+
+if (saveNavigationEntryStatesToSessionStorage) {
   const _getNavigationHistoryEntryState =
     NavigationHistoryEntry.prototype.getState;
   const _getNavigationDestinationState =
     NavigationDestination.prototype.getState;
 
   /** @param {NavigationHistoryEntry | NavigationDestination} entry */
-  const getState = (entry) => {
-    // console.log("getState interception", this);
-    const key = `${routerStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
+  const getStateFromSessionStorage = (entry) => {
+    console.log("retrieving entry state from sessionStorage", entry);
+    if (entry.index == -1) {
+      console.log(
+        `not saving entry to sessionStorage - invalid index ${entry.index}`,
+        entry,
+      );
+      return;
+    }
+    const key = useCircularNavigationEntryStateBuffer
+      ? `${circularNavigationEntryStateBufferSessionsStorageKeyPrefix}-${getCircularNavigationEntryStateBufferIndex(entry)}`
+      : `${navigationEntryStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
     const stateString = sessionStorage.getItem(key);
-    // console.log("sessionStorage", { key, stateString });
+    console.log("sessionStorage", { key, stateString });
     if (stateString) {
       try {
         const state = JSON.parse(stateString);
-        // console.log("sessionStorage state", state);
+        console.log("sessionStorage state", state);
         return state;
       } catch (error) {
         console.error("failed to parse stateString", error);
@@ -68,20 +177,22 @@ if (saveEntriesToSessionStorage) {
   };
 
   NavigationHistoryEntry.prototype.getState = function () {
+    console.log("entry getState", this);
     const state = _getNavigationHistoryEntryState.call(this);
     if (state) {
-      // console.log("existing state", state);
+      console.log("existing state", state);
       return state;
     }
-    return getState(this);
+    return getStateFromSessionStorage(this);
   };
   NavigationDestination.prototype.getState = function () {
+    console.log("destination getState", this);
     const state = _getNavigationDestinationState.call(this);
     if (state) {
-      // console.log("existing state", state);
+      console.log("existing state", state);
       return state;
     }
-    return getState(this);
+    return getStateFromSessionStorage(this);
   };
 }
 
@@ -105,11 +216,6 @@ export class Router extends litRouter.Routes {
     const options = { signal: this._abortController.signal };
 
     navigation.addEventListener("navigate", this._onNavigate, options);
-    navigation.addEventListener(
-      "currententrychange",
-      this._onCurrentEntryChange,
-      options,
-    );
 
     // Kick off routed rendering by going to the current URL
     const entries = navigation.entries();
@@ -125,16 +231,17 @@ export class Router extends litRouter.Routes {
         this.goto(state.route);
       }
     } else {
-      const entryIndex = navigation.currentEntry.index;
-      const state = navigation.currentEntry.getState();
-      console.log({ entryIndex, state });
-      if (state) {
-        console.log("loading state", state);
-        this.goto(state.route);
+      const currentEntryIndex = navigation.currentEntry.index;
+      const currentEntryState = navigation.currentEntry.getState();
+      console.log({ currentEntryIndex, currentEntryState });
+      // if you pass the navigation.entries() max, it just stores the first n entries instead of the last n entries
+      if (false && currentEntryState) {
+        console.log("loading currentEntryState", currentEntryState);
+        this.goto(currentEntryState.route);
       } else {
         try {
           const stateString = sessionStorage.getItem(
-            latestRouterStateSessionStorageKey,
+            latestNavigationEntryStateSessionStorageKey,
           );
           const state = JSON.parse(stateString);
           console.log("session state", state);
@@ -176,25 +283,18 @@ export class Router extends litRouter.Routes {
     await this._beforeGoto?.(pathname, activeTab);
     await super.goto(pathname);
     await this._afterGoto?.(pathname, activeTab);
-  }
 
-  /** @param {NavigationEventMap["currententrychange"]} e */
-  _onCurrentEntryChange = (e) => {
-    const { from, navigationType } = e;
     const { currentEntry } = navigation;
     const currentState = currentEntry.getState();
-    console.log("_onCurrentEntryChange", {
-      navigationType,
-      from,
-      currentEntry,
-      currentState,
-    });
     if (!currentState) {
       console.log("currentState not defined - updating");
       const state = { route: this._defaultRoute };
       navigation.updateCurrentEntry({ state });
     }
-  };
+
+    saveCurrentNavigationEntryStateToSessionStorage();
+  }
+
   /** @param {NavigationEventMap["navigate"]} e */
   _onNavigate = (e) => {
     const { destination, navigationType } = e;
@@ -215,7 +315,7 @@ export class Router extends litRouter.Routes {
 
     const destinationState = destination.getState();
     const currentState = currentEntry.getState();
-    console.log({ destinationState, currentState });
+    // console.log({ destinationState, currentState });
 
     // if (!destinationState) {
     //   console.warn("undefined destinationState - not traversing");
@@ -230,11 +330,9 @@ export class Router extends litRouter.Routes {
 
     if (navigationType == "traverse" && !destinationState) {
       console.warn("no destinationState for traversal");
-      e.intercept({
-        handler: async () => {
-          await this.goto(route);
-        },
-      });
+      try {
+        e.preventDefault();
+      } catch (error) {}
       return;
     }
 
@@ -264,20 +362,20 @@ export class Router extends litRouter.Routes {
     }
 
     if (isBase) {
-      console.log("about to intercept navigation");
+      // console.log("about to intercept navigation");
       e.intercept({
         handler: async () => {
-          console.log("routeHandler", { route }, tabs);
+          // console.log("routeHandler", { route }, tabs);
 
           const activeTab =
             route.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
           const tabIndex = tabs.indexOf(activeTab);
-          console.log({ route, activeTab, tabIndex });
+          // console.log({ route, activeTab, tabIndex });
 
           const previousRoute = currentState.route;
           const previousTab = previousRoute.split("/")?.filter(Boolean)?.[0];
           const previousTabIndex = tabs.indexOf(previousTab);
-          console.log({ previousRoute, previousTab, previousTabIndex });
+          // console.log({ previousRoute, previousTab, previousTabIndex });
 
           if (!document.startViewTransition || this._host.skipViewTransitions) {
             await this.goto(route);
@@ -286,16 +384,16 @@ export class Router extends litRouter.Routes {
 
           const types = [];
           if (tabIndex != previousTabIndex) {
-            console.log(
-              `moving from "${previousTab}" tab to "${activeTab}" tab`,
-            );
+            // console.log(
+            //   `moving from "${previousTab}" tab to "${activeTab}" tab`,
+            // );
             types.push(
               tabIndex > previousTabIndex ? "next-tab" : "previous-tab",
             );
           } else {
             // FILL - moving between paths of the same route
           }
-          console.log("view transition types", types);
+          // console.log("view transition types", types);
 
           await document.startViewTransition({
             update: async () => {
