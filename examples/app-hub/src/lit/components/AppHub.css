@@ -24,6 +24,13 @@ body {
 ::view-transition-new(*) {
   pointer-events: none;
 }
+::view-transition {
+  pointer-events: none;
+}
+
+:root {
+  view-transition-name: none;
+}
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
