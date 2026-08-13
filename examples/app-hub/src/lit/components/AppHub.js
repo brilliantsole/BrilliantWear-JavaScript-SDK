@@ -39,6 +39,7 @@ import { createDisableViewTransitionsContextProvider } from "../contexts/disable
 import { createAnchorNavContextProvider } from "../contexts/anchorNavContext.js";
 import { createReducedMotionContextProvider } from "../contexts/reducedMotionContext.js";
 import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
+import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
 
 class AppHub extends LitElement {
   static properties = {
@@ -161,6 +162,10 @@ class AppHub extends LitElement {
         this._onTouchEnabledUpdate();
       },
     );
+    this._viewportOrientationProvider =
+      createViewportOrientationContextProvider(this, null, () => {
+        this._onViewportOrientationUpdate();
+      });
     this._batteryManagerProvider = createBatteryManagerContextProvider(
       this,
       null,
@@ -231,6 +236,7 @@ class AppHub extends LitElement {
     this._onIsLeftHandedUpdate();
     this._onReducedMotionUpdate();
     this._onTouchEnabledUpdate();
+    this._onViewportOrientationUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -274,6 +280,14 @@ class AppHub extends LitElement {
     console.log({ touchEnabled });
     this._touchEnabled = touchEnabled;
   }
+  /** @type {import("../contexts/viewportOrientationContext.js").ViewportOrientation} */
+  _viewportOrientation = "landscape";
+  _onViewportOrientationUpdate() {
+    const { viewportOrientation } =
+      this._viewportOrientationProvider.value.state;
+    console.log({ viewportOrientation });
+    this._viewportOrientation = viewportOrientation;
+  }
 
   get isLeftHanded() {
     return this._isLeftHanded;
@@ -286,8 +300,12 @@ class AppHub extends LitElement {
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
     console.log({ isLeftHanded });
-    // FIX - only if touch, landscape, and !anchorNav
-    if (!this._didFirstUpdate || this.skipViewTransitions || this.anchorNav) {
+    if (
+      !this._didFirstUpdate ||
+      this.skipViewTransitions ||
+      this.anchorNav ||
+      !this._touchEnabled
+    ) {
       this._isLeftHanded = isLeftHanded;
     } else {
       document.startViewTransition(() => {
@@ -369,6 +387,7 @@ class AppHub extends LitElement {
 
         const isInCorner = true;
         if (isInCorner) {
+          return;
           this._isLeftHandedProvider.value.update({
             isLeftHanded: !isLeftHanded,
           });
