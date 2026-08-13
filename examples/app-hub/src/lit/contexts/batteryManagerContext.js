@@ -55,7 +55,7 @@ const {
       return;
     }
     const batteryManager = await navigator.getBattery();
-    console.log("batteryManager", batteryManager);
+    // console.log("batteryManager", batteryManager);
 
     /** @type {AddEventListenerOptions} */
     const options = { signal: abortController.signal };

@@ -150,7 +150,7 @@ class AppHub extends LitElement {
       this,
       null,
       () => {
-        console.log("batteryManagerState", this._batteryManagerState);
+        // console.log("batteryManagerState", this._batteryManagerState);
         this._batteryManagerState.changes.forEach((change) => {
           switch (change) {
             case "charging":
@@ -191,11 +191,12 @@ class AppHub extends LitElement {
   }
 
   _updateMetaColor() {
-    console.log("_updateMetaColor");
-    const color = getComputedStyle(document.documentElement)
+    // console.log("_updateMetaColor");
+    const metaContentColor = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
-    this._themeColorMeta.setAttribute("content", color);
+    // console.log({ metaContentColor });
+    this._themeColorMeta.setAttribute("content", metaContentColor);
   }
 
   connectedCallback() {
@@ -318,32 +319,29 @@ class AppHub extends LitElement {
     return this._batteryManagerProvider.value.state;
   }
   _onBatteryChargingChange = () => {
-    console.log("_onBatteryChargingChange");
+    // console.log("_onBatteryChargingChange");
     const { charging } = this._batteryManagerState;
-    console.log({ charging });
-    this._isCharging = charging;
-    document.documentElement.toggleAttribute(
-      "data-is-charging",
-      this._isCharging,
-    );
+    // console.log({ charging });
+    // TODO: - flip if horizontal, header is on the "bottom", and !anchorNav
   };
   _onBatteryLevelChange = () => {
-    console.log("_onBatteryLevelChange");
+    // console.log("_onBatteryLevelChange");
     const { level } = this._batteryManagerState;
-    console.log({ level });
+    // console.log({ level });
   };
   _onBatteryChargingTimeChange = () => {
-    console.log("_onBatteryChargingTimeChange");
+    // console.log("_onBatteryChargingTimeChange");
     const { chargingTime } = this._batteryManagerState;
-    console.log({ chargingTime });
+    // console.log({ chargingTime });
   };
   _onBatteryDischargingTimeChange = () => {
-    console.log("_onBatteryDischargingTimeChange");
+    // console.log("_onBatteryDischargingTimeChange");
     const { dischargingTime } = this._batteryManagerState;
-    console.log({ dischargingTime });
+    // console.log({ dischargingTime });
   };
 
   _lastTouchTime = 0;
+  _doubleTapTime = 300;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     console.log("onTouchEnd", event);
@@ -360,31 +358,9 @@ class AppHub extends LitElement {
 
     // console.log({ tapLength });
 
-    if (tapLength < 300 && tapLength > 0) {
+    if (tapLength < this._doubleTapTime && tapLength > 0) {
       console.log("double tap detected");
       event.preventDefault();
-
-      if (
-        this._screenOrientationProvider.value.state.type.includes("landscape")
-      ) {
-        const touch = event.changedTouches[0];
-        const { clientX, clientY, target } = touch;
-        console.log({ clientX, clientY });
-
-        const { isLeftHanded } = this._isLeftHandedProvider.value.state;
-
-        // FILL - check which side header is on
-        // FILL - check if touch is on bottom
-        // FILL - check if close to edge opposite header
-
-        const isInCorner = true;
-        if (isInCorner) {
-          return;
-          this._isLeftHandedProvider.value.update({
-            isLeftHanded: !isLeftHanded,
-          });
-        }
-      }
     }
     this._lastTouchTime = currentTime;
   };

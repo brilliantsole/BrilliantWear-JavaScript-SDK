@@ -60,7 +60,7 @@ class NavButton extends LitElement {
       true,
       ({ activeTab }) => {
         const isActive = `/${activeTab}` == this.href;
-        console.log({ isActive }, this.href);
+        // console.log({ isActive }, this.href);
         this.isActive = isActive;
       },
     );
