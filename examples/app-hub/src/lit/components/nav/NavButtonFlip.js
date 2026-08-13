@@ -1,5 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-import { createLeftHandedContextConsumer } from "../../contexts/leftHandedContext.js";
+import { createAnchorNavContextConsumer } from "../../contexts/anchorNavContext.js";
+import { createIsLeftHandedContextConsumer } from "../../contexts/isLeftHandedContext.js";
 
 const { lit, litContext } = await waitForGlobals();
 const { ContextConsumer } = litContext;
@@ -12,7 +13,8 @@ class NavButtonFlip extends LitElement {
   constructor() {
     super();
 
-    this._leftHandedConsumer = createLeftHandedContextConsumer(this);
+    this._anchorNavConsumer = createAnchorNavContextConsumer(this);
+    this._isLeftHandedConsumer = createIsLeftHandedContextConsumer(this);
   }
 
   static styles = css`
@@ -24,8 +26,9 @@ class NavButtonFlip extends LitElement {
   `;
 
   onClick(event) {
-    const { isLeftHanded } = this._leftHandedConsumer.value.state;
-    this._leftHandedConsumer.value.update({ isLeftHanded: !isLeftHanded });
+    const { isLeftHanded } = this._isLeftHandedConsumer.value.state;
+    this._anchorNavConsumer.value.update({ anchorNav: false });
+    this._isLeftHandedConsumer.value.update({ isLeftHanded: !isLeftHanded });
   }
 
   render() {

@@ -113,10 +113,7 @@ bw-app-hub {
           [data-anchor-nav]
         )[data-left-handed]
         #header {
-        padding-left: max(
-          var(--wa-space-s),
-          calc(env(safe-area-inset-left) - var(--wa-space-s))
-        );
+        padding-left: calc(env(safe-area-inset-left) - var(--wa-space-s));
       }
 
       bw-app-hub[data-screen-orientation-type="landscape-secondary"]:is(

@@ -15,9 +15,9 @@ import "./settings/Settings.js";
 
 export const defaultTab = "layers";
 export const defaultPath = `/${defaultTab}`;
+
 import { createActiveTabContextProvider } from "../contexts/activeTabContext.js";
 import { createScreenOrientationContextProvider } from "../contexts/screenOrientationContext.js";
-import { isTouch } from "../../utils/environment.js";
 
 export const tabs = ["layers", "apps", "devices", "settings"];
 const tabRenders = {
@@ -32,7 +32,13 @@ import "./nav/NavButtonApps.js";
 import "./nav/NavButtonDevices.js";
 import "./nav/NavButtonSettings.js";
 import "./nav/NavButtonFlip.js";
-import { createLeftHandedContextProvider } from "../contexts/leftHandedContext.js";
+
+import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
+import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
+import { createDisableViewTransitionsContextProvider } from "../contexts/disableViewTransitionsContext.js";
+import { createAnchorNavContextProvider } from "../contexts/anchorNavContext.js";
+import { createReducedMotionContextProvider } from "../contexts/reducedMotionContext.js";
+import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
 
 class AppHub extends LitElement {
   static properties = {
@@ -41,17 +47,17 @@ class AppHub extends LitElement {
       reflect: true,
       attribute: "data-screen-orientation-type",
     },
-    leftHanded: {
+    _isLeftHanded: {
       type: Boolean,
       reflect: true,
       attribute: "data-left-handed",
     },
-    anchorNav: {
+    _anchorNav: {
       type: Boolean,
       reflect: true,
       attribute: "data-anchor-nav",
     },
-    disableViewTransitions: {
+    _disableViewTransitions: {
       type: Boolean,
       reflect: true,
       attribute: "data-disable-view-transitions",
@@ -63,194 +69,273 @@ class AppHub extends LitElement {
     },
   };
 
-  router = new Router(
-    this,
-    tabs.map((tab) => ({
-      path: `/${tab}`,
-      render: tabRenders[tab],
-      enter: () => {
-        this._updateActiveTab();
-      },
-    })),
-    defaultPath,
-  );
-
   createRenderRoot() {
     return this;
   }
 
+  get anchorNav() {
+    return this._anchorNav;
+  }
+  set anchorNav(newAnchorNav) {
+    this._anchorNavContextProvider.value.update({
+      anchorNav: newAnchorNav,
+    });
+  }
+  _onAnchorNavUpdate() {
+    const { anchorNav } = this._anchorNavContextProvider.value.state;
+    console.log({ anchorNav });
+    this._anchorNav = anchorNav;
+  }
+
+  get disableViewTransitions() {
+    return this._disableViewTransitions;
+  }
+  set disableViewTransitions(newDisableViewTransitions) {
+    this._disableViewTransitionsProvider.value.update({
+      disableViewTransitions: newDisableViewTransitions,
+    });
+  }
+  _onDisableViewTransitionsUpdate() {
+    const { disableViewTransitions } =
+      this._disableViewTransitionsProvider.value.state;
+    console.log({ disableViewTransitions });
+    this._disableViewTransitions = disableViewTransitions;
+  }
   get skipViewTransitions() {
-    // TODO: - return false if low power mode
-    return this.disableViewTransitions;
+    if (!document.startViewTransition) {
+      return true;
+    }
+    if (this._reducedMotionEnabled) {
+      return true;
+    }
+    if (this.disableViewTransitions) {
+      return true;
+    }
+    // TODO: - return true if low power mode
   }
 
   constructor() {
     super();
-    this.addEventListener("touchend", this.onTouchEnd);
     this.classList.add("mainAxis");
-    console.log("AppHub", this);
-    this._activeTabProvider = createActiveTabContextProvider(this);
-    this._screenOrientationProvider =
-      createScreenOrientationContextProvider(this);
-    this._leftHandedProvider = createLeftHandedContextProvider(
+
+    this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!this._themeColorMeta) {
+      this._themeColorMeta = document.createElement("meta");
+      this._themeColorMeta.name = "theme-color";
+      document.head.appendChild(this._themeColorMeta);
+    }
+
+    this._disableViewTransitionsProvider =
+      createDisableViewTransitionsContextProvider(this, null, () =>
+        this._onDisableViewTransitionsUpdate(),
+      );
+    this._anchorNavContextProvider = createAnchorNavContextProvider(
       this,
-      {
-        isLeftHanded: false,
-      },
+      null,
+      () => this._onAnchorNavUpdate(),
+    );
+    this._activeTabProvider = createActiveTabContextProvider(this);
+    this._screenOrientationProvider = createScreenOrientationContextProvider(
+      this,
+      null,
+      () => this._onScreenOrientationUpdate(),
+    );
+    this._isLeftHandedProvider = createIsLeftHandedContextProvider(
+      this,
+      null,
       () => {
-        this._updateLeftHanded();
+        this._onIsLeftHandedUpdate();
       },
     );
+    this._reducedMotionProvider = createReducedMotionContextProvider(
+      this,
+      null,
+      () => {
+        this._onReducedMotionUpdate();
+      },
+    );
+    this._touchEnabledProvider = createTouchEnabledContextProvider(
+      this,
+      null,
+      () => {
+        this._onTouchEnabledUpdate();
+      },
+    );
+    this._batteryManagerProvider = createBatteryManagerContextProvider(
+      this,
+      null,
+      () => {
+        console.log("batteryManagerState", this._batteryManagerState);
+        this._batteryManagerState.changes.forEach((change) => {
+          switch (change) {
+            case "charging":
+              this._onBatteryChargingChange();
+              break;
+            case "level":
+              this._onBatteryLevelChange();
+              break;
+            case "chargingTime":
+              this._onBatteryChargingTimeChange();
+              break;
+            case "dischargingTime":
+              this._onBatteryDischargingTimeChange();
+              break;
+          }
+        });
+      },
+    );
+
+    this.router = new Router(
+      this,
+      tabs.map((tab) => ({
+        path: `/${tab}`,
+        render: tabRenders[tab],
+      })),
+      {
+        defaultPath,
+        beforeGoto: (pathname, activeTab) => {
+          this._activeTabProvider.value.update({ activeTab });
+        },
+        afterGoto: (pathname, activeTab) => {
+          console.log("after", pathname, { activeTab });
+          this.activeTab = activeTab;
+        },
+      },
+    );
+    console.log("AppHub", this);
+  }
+
+  _updateMetaColor() {
+    console.log("_updateMetaColor");
+    const color = getComputedStyle(document.documentElement)
+      .getPropertyValue("background-color")
+      .trim();
+    this._themeColorMeta.setAttribute("content", color);
   }
 
   connectedCallback() {
     super.connectedCallback();
 
-    // this.leftHanded = true;
+    this._abortController = new AbortController();
+    /** @type {AddEventListenerOptions} */
+    const options = { signal: this._abortController.signal };
+
+    this.addEventListener("touchend", this._onTouchEnd, options);
+
+    // this.isLeftHanded = true;
     // this.anchorNav = true;
     // this.disableViewTransitions = true;
 
-    if ("getBattery" in navigator) {
-      navigator.getBattery().then((batteryManager) => {
-        console.log("battery", batteryManager);
-        this.batteryManager = batteryManager;
-
-        this._onBatteryChargingChange();
-        this._onBatteryLevelChange();
-        this._onBatteryChargingTimeChange();
-        this._onBatteryDischargingTimeChange();
-
-        batteryManager.addEventListener(
-          "chargingchange",
-          this._onBatteryChargingChange,
-        );
-        batteryManager.addEventListener(
-          "levelchange",
-          this._onBatteryLevelChange,
-        );
-        batteryManager.addEventListener(
-          "chargingtimechange",
-          this._onBatteryChargingTimeChange,
-        );
-        batteryManager.addEventListener(
-          "dischargingtimechange",
-          this._onBatteryDischargingTimeChange,
-        );
-      });
-    }
-
-    navigation.addEventListener(
-      "currententrychange",
-      this._onCurrentEntryChange,
-    );
-    window.screen.orientation.addEventListener(
-      "change",
-      this._onOrientationChange,
-    );
+    this._onScreenOrientationUpdate();
     this._updateActiveTab();
-    this._updateOrientation();
-    this._updateLeftHanded();
+    this._onIsLeftHandedUpdate();
+    this._onReducedMotionUpdate();
+    this._onTouchEnabledUpdate();
+
+    if (this._batteryManagerState.isAvailable) {
+      this._onBatteryChargingChange();
+      this._onBatteryLevelChange();
+      this._onBatteryChargingTimeChange();
+      this._onBatteryDischargingTimeChange();
+    }
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    navigation.removeEventListener(
-      "currententrychange",
-      this._onCurrentEntryChange,
-    );
-    if (this.batteryManager) {
-      this.batteryManager.removeEventListener(
-        "chargingchange",
-        this._onBatteryChargingChange,
-      );
-      this.batteryManager.removeEventListener(
-        "levelchange",
-        this._onBatteryLevelChange,
-      );
-      this.batteryManager.removeEventListener(
-        "chargingtimechange",
-        this._onBatteryChargingTimeChange,
-      );
-      this.batteryManager.removeEventListener(
-        "dischargingtimechange",
-        this._onBatteryDischargingTimeChange,
-      );
-    }
-    window.screen.orientation.removeEventListener(
-      "change",
-      this._onOrientationChange,
-    );
+    this._abortController.abort();
   }
 
-  /** @param {ScreenOrientationEventMap["change"]} e */
-  _onOrientationChange = (e) => {
-    // console.log("_onOrientationChange");
-    this._updateOrientation();
-  };
-  _updateOrientation() {
-    // console.log("#updateOrientation");
-    const { type, angle } = window.screen.orientation;
-    console.log({ type, angle });
-    this._screenOrientationProvider.value.update({ type, angle });
+  #activeTab;
+  get activeTab() {
+    return this.#activeTab;
+  }
+  set activeTab(newActiveTab) {
+    if (this.#activeTab == newActiveTab) {
+      return;
+    }
+    this.#activeTab = newActiveTab;
+    console.log({ activeTab: this.#activeTab });
+    document.documentElement.dataset.activeTab = this.activeTab;
+    this._updateMetaColor();
+  }
+
+  _onScreenOrientationUpdate() {
+    // console.log("_onScreenOrientationUpdate");
+    const { type } = this._screenOrientationProvider.value.state;
     this.screenOrientationType = type;
   }
 
-  _updateLeftHanded() {
-    const leftHanded = this._leftHandedProvider.value.state.isLeftHanded;
-    console.log({ leftHanded });
-    // FIX
-    document.startViewTransition(() => {
-      this.leftHanded = leftHanded;
-    });
+  _onReducedMotionUpdate() {
+    const { reducedMotion } = this._reducedMotionProvider.value.state;
+    console.log({ reducedMotion });
+    this._reducedMotion = reducedMotion;
+  }
+  _onTouchEnabledUpdate() {
+    const { touchEnabled } = this._touchEnabledProvider.value.state;
+    console.log({ touchEnabled });
+    this._touchEnabled = touchEnabled;
   }
 
+  get isLeftHanded() {
+    return this._isLeftHanded;
+  }
+  set isLeftHanded(newIsLeftHanded) {
+    this._isLeftHandedProvider.value.update({
+      isLeftHanded: newIsLeftHanded,
+    });
+  }
+  _onIsLeftHandedUpdate() {
+    const { isLeftHanded } = this._isLeftHandedProvider.value.state;
+    console.log({ isLeftHanded });
+    // FIX - only if touch, landscape, and !anchorNav
+    if (!this._didFirstUpdate || this.skipViewTransitions || this.anchorNav) {
+      this._isLeftHanded = isLeftHanded;
+    } else {
+      document.startViewTransition(() => {
+        this._isLeftHanded = isLeftHanded;
+      });
+    }
+  }
+
+  firstUpdated() {
+    console.log("firstUpdated");
+    this._didFirstUpdate = true;
+  }
+
+  _updateActiveTab() {
+    console.log("_updateActiveTab");
+    const { activeTab } = this._activeTabProvider.value.state;
+    console.log({ activeTab });
+  }
+
+  /** @type {import("../contexts/batteryManagerContext.js").BatteryManagerContextState} */
+  get _batteryManagerState() {
+    return this._batteryManagerProvider.value.state;
+  }
   _onBatteryChargingChange = () => {
     console.log("_onBatteryChargingChange");
-    const { charging } = this.batteryManager;
+    const { charging } = this._batteryManagerState;
     console.log({ charging });
     this.isCharging = charging;
   };
   _onBatteryLevelChange = () => {
     console.log("_onBatteryLevelChange");
-    const { level } = this.batteryManager;
+    const { level } = this._batteryManagerState;
     console.log({ level });
   };
   _onBatteryChargingTimeChange = () => {
     console.log("_onBatteryChargingTimeChange");
-    const { chargingTime } = this.batteryManager;
+    const { chargingTime } = this._batteryManagerState;
     console.log({ chargingTime });
   };
   _onBatteryDischargingTimeChange = () => {
     console.log("_onBatteryDischargingTimeChange");
-    const { dischargingTime } = this.batteryManager;
+    const { dischargingTime } = this._batteryManagerState;
     console.log({ dischargingTime });
   };
 
-  /** @param {NavigationEventMap["currententrychange"]} e */
-  _onCurrentEntryChange = (e) => {
-    console.log("_onCurrentEntryChange");
-    this._updateActiveTab();
-  };
-
-  _updateActiveTab() {
-    // console.log("_updateActiveTab");
-    const state = navigation.currentEntry.getState();
-    const activeTab =
-      state?.route?.split("/")?.filter(Boolean)?.[0] ?? defaultTab;
-    // console.log({ activeTab });
-    this.activeTab = activeTab;
-  }
-
-  get activeTab() {
-    return this._activeTabProvider.value.state.activeTab;
-  }
-  set activeTab(newActiveTab) {
-    console.log({ newActiveTab });
-    this._activeTabProvider.value.update({ activeTab: newActiveTab });
-  }
-
   _lastTouchTime = 0;
   /** @param {TouchEvent} event */
-  onTouchEnd = (event) => {
+  _onTouchEnd = (event) => {
     console.log("onTouchEnd", event);
 
     if (event.changedTouches.length != 1) {
@@ -276,7 +361,7 @@ class AppHub extends LitElement {
         const { clientX, clientY, target } = touch;
         console.log({ clientX, clientY });
 
-        const { isLeftHanded } = this._leftHandedProvider.value.state;
+        const { isLeftHanded } = this._isLeftHandedProvider.value.state;
 
         // FILL - check which side header is on
         // FILL - check if touch is on bottom
@@ -284,8 +369,7 @@ class AppHub extends LitElement {
 
         const isInCorner = true;
         if (isInCorner) {
-          return;
-          this._leftHandedProvider.value.update({
+          this._isLeftHandedProvider.value.update({
             isLeftHanded: !isLeftHanded,
           });
         }

@@ -1,24 +1,35 @@
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 import { createContext } from "./createContext.js";
 
+/** @typedef {{angle: number, type: OrientationType }} ScreenOrientationContextState */
+
+/** @returns {ScreenOrientationContextState} */
+const getScreenOrientationState = () => {
+  const { type, angle } = window.screen.orientation;
+  return { type, angle };
+};
+
 const {
-  createContextConsumer: createScreenOrientationContextConsumer,
   createContextProvider: createScreenOrientationContextProvider,
+  createContextConsumer: createScreenOrientationContextConsumer,
 } = createContext(
-  "screenOrientationContext",
-  {
-    type: "landscape-primary",
-    angle: 0,
-  },
-  (provider) => {
-    // FILL
-    return (provider) => {
-      // FILL
-    };
+  "screenOrientation",
+  getScreenOrientationState(),
+  (provider, abortController) => {
+    window.screen.orientation.addEventListener(
+      "change",
+      () => {
+        console.log("screen.orientation.change");
+        const screenOrientationState = getScreenOrientationState();
+        console.log({ screenOrientationState });
+        provider.value.update(screenOrientationState);
+      },
+      { signal: abortController.signal },
+    );
   },
 );
 
 export {
-  createScreenOrientationContextConsumer,
   createScreenOrientationContextProvider,
+  createScreenOrientationContextConsumer,
 };

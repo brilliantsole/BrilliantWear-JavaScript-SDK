@@ -11,7 +11,7 @@ import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
 
 import { createActiveTabContextConsumer } from "../../contexts/activeTabContext.js";
 import { createScreenOrientationContextConsumer } from "../../contexts/screenOrientationContext.js";
-import { isTouch } from "../../../utils/environment.js";
+import { createTouchEnabledContextConsumer } from "../../contexts/touchEnabledContext.js";
 
 class NavButton extends LitElement {
   static properties = {
@@ -20,7 +20,6 @@ class NavButton extends LitElement {
     iconFamily: { attribute: "icon-family" },
     iconName: { attribute: "icon-name" },
     isActive: { type: Boolean },
-    pill: { type: Boolean },
     click: { attribute: false },
   };
 
@@ -48,6 +47,10 @@ class NavButton extends LitElement {
     }
   `;
 
+  get touchEnabled() {
+    return this._touchEnabledConsumer.value.state.touchEnabled;
+  }
+
   constructor() {
     super();
     this.pill = true;
@@ -61,14 +64,10 @@ class NavButton extends LitElement {
         this.isActive = isActive;
       },
     );
+    this._touchEnabledConsumer = createTouchEnabledContextConsumer(this, true);
     this._screenOrientationConsumer = createScreenOrientationContextConsumer(
       this,
       true,
-      /** @param {ScreenOrientation} screenOrientation */
-      (screenOrientation) => {
-        this.pill = screenOrientation.type.includes("landscape") && isTouch;
-        // console.log({ pill: this.pill, isTouch });
-      },
     );
   }
 
@@ -77,9 +76,12 @@ class NavButton extends LitElement {
   }
 
   render() {
+    const pill =
+      this._screenOrientationConsumer.value.state.type.includes("landscape") &&
+      this.touchEnabled;
     // console.log("render", { isActive: this.isActive }, this);
     return html`<wa-button
-      ?pill=${this.pill}
+      ?pill=${pill}
       size="l"
       .variant=${this.variant}
       .appearance=${this.isActive ? "accent" : "plain"}

@@ -9,8 +9,8 @@ const baseUrl = new URL(location);
 
 const latestRouterStateSessionStorageKey = "latest-router-state";
 
-const saveLatestEntryToLocalStorage = true;
-const saveEntriesToLocalStorage = true; // need to save to sessionStorage for safari iOS
+const saveLatestEntryToSessionStorage = true;
+const saveEntriesToSessionStorage = true; // need to save to sessionStorage for safari iOS
 const routerStateSessionsStorageKeyPrefix = "router-states";
 const entryKey = "index"; // safari iOS's key isn't consistent
 // TODO - store a buffer ring of indices (safari has a max of 99 entries)
@@ -25,7 +25,7 @@ navigation.addEventListener("currententrychange", (event) => {
 
   const currentStateString = JSON.stringify(currentState);
 
-  if (saveLatestEntryToLocalStorage) {
+  if (saveLatestEntryToSessionStorage) {
     // console.log(
     //   "saving currentState with latestRouterStateSessionStorageKey",
     //   currentState,
@@ -37,14 +37,14 @@ navigation.addEventListener("currententrychange", (event) => {
     );
   }
 
-  if (saveEntriesToLocalStorage) {
+  if (saveEntriesToSessionStorage) {
     const key = `${routerStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
     // console.log(`saving currentState with key ${key}`, currentState);
     sessionStorage.setItem(key, currentStateString);
   }
 });
 
-if (saveEntriesToLocalStorage) {
+if (saveEntriesToSessionStorage) {
   const _getNavigationHistoryEntryState =
     NavigationHistoryEntry.prototype.getState;
   const _getNavigationDestinationState =
@@ -86,33 +86,31 @@ if (saveEntriesToLocalStorage) {
 }
 
 export class Router extends litRouter.Routes {
-  constructor(host, routes, defaultRoute) {
-    super(host, routes);
-    this._defaultRoute = defaultRoute ?? "/";
+  /** @param {{defaultPath: string, beforeGoto: (pathname: string) => Promise<void>, afterGoto: (pathname: string) => Promise<void> }} options */
+  constructor(host, routes, options) {
+    super(host, routes, options);
+    this._defaultRoute = options?.defaultPath ?? "/";
     this._host = host;
-    console.log("Router", this);
+    console.log("Router", this, options);
 
-    this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (!this._themeColorMeta) {
-      this._themeColorMeta = document.createElement("meta");
-      this._themeColorMeta.name = "theme-color";
-      document.head.appendChild(this._themeColorMeta);
-    }
-
-    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    this.reducedMotionEnabled = this.reducedMotion.matches;
-    this.reducedMotion.addEventListener("change", (event) => {
-      this.reducedMotionEnabled = event.matches;
-      console.log("reducedMotionEnabled", this.reducedMotionEnabled);
-    });
+    this._beforeGoto = options?.beforeGoto;
+    this._afterGoto = options?.afterGoto;
   }
   hostConnected() {
     super.hostConnected();
-    navigation.addEventListener("navigate", this._onNavigate);
+
+    this._abortController = new AbortController();
+
+    /** @type {AddEventListenerOptions} */
+    const options = { signal: this._abortController.signal };
+
+    navigation.addEventListener("navigate", this._onNavigate, options);
     navigation.addEventListener(
       "currententrychange",
       this._onCurrentEntryChange,
+      options,
     );
+
     // Kick off routed rendering by going to the current URL
     const entries = navigation.entries();
     if (entries.length == 1) {
@@ -167,11 +165,17 @@ export class Router extends litRouter.Routes {
 
   hostDisconnected() {
     super.hostDisconnected();
-    navigation.removeEventListener("navigate", this._onNavigate);
-    navigation.removeEventListener(
-      "currententrychange",
-      this._onCurrentEntryChange,
-    );
+
+    this._abortController.abort();
+    this._abortController = undefined;
+  }
+
+  async goto(pathname) {
+    const activeTab = pathname.split("/")?.filter(Boolean)?.[0] ?? defaultPath;
+
+    await this._beforeGoto?.(pathname, activeTab);
+    await super.goto(pathname);
+    await this._afterGoto?.(pathname, activeTab);
   }
 
   /** @param {NavigationEventMap["currententrychange"]} e */
@@ -275,22 +279,8 @@ export class Router extends litRouter.Routes {
           const previousTabIndex = tabs.indexOf(previousTab);
           console.log({ previousRoute, previousTab, previousTabIndex });
 
-          const render = async () => {
+          if (!document.startViewTransition || this._host.skipViewTransitions) {
             await this.goto(route);
-
-            document.documentElement.dataset.activeTab = activeTab;
-            const color = getComputedStyle(document.documentElement)
-              .getPropertyValue("background-color")
-              .trim();
-            this._themeColorMeta.setAttribute("content", color);
-          };
-
-          if (
-            !document.startViewTransition ||
-            this.reducedMotionEnabled ||
-            this._host.skipViewTransitions
-          ) {
-            await render();
             return;
           }
 
@@ -309,7 +299,7 @@ export class Router extends litRouter.Routes {
 
           await document.startViewTransition({
             update: async () => {
-              await render();
+              await this.goto(route);
             },
             types,
           }).finished;

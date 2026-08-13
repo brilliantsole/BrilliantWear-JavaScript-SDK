@@ -33,10 +33,10 @@ function deepEqual(val1, val2) {
 }
 
 /** @typedef {(contextProvider: _ContextProvider) => void} ContextProviderHostDisconnectionCallback */
-/** @typedef {(contextProvider: _ContextProvider) => ContextProviderHostDisconnectionCallback} ContextProviderHostConnectionCallback */
+/** @typedef {(contextProvider: _ContextProvider, abortController: AbortController) => ContextProviderHostDisconnectionCallback} ContextProviderHostConnectionCallback */
 
 /** @typedef {(contextConsumer: _ContextConsumer) => void} ContextConsumerHostDisconnectionCallback */
-/** @typedef {(contextConsumer: _ContextConsumer) => ContextConsumerHostDisconnectionCallback} ContextConsumerHostConnectionCallback */
+/** @typedef {(contextConsumer: _ContextConsumer, abortController: AbortController) => ContextConsumerHostDisconnectionCallback} ContextConsumerHostConnectionCallback */
 
 class _ContextProvider extends ContextProvider {
   /** @type {ContextProviderHostConnectionCallback?} */
@@ -47,10 +47,16 @@ class _ContextProvider extends ContextProvider {
   hostConnected() {
     super.hostConnected();
     // console.log("hostConnected");
-    this._hostDisconnectionCallback = this._hostConnectionCallback?.(this);
+    this._connectionAbortController = new AbortController();
+    this._hostDisconnectionCallback = this._hostConnectionCallback?.(
+      this,
+      this._connectionAbortController,
+    );
   }
   hostDisconnected() {
     // console.log("hostDisconnected");
+    this._connectionAbortController?.abort();
+    this._connectionAbortController = undefined;
     this._hostDisconnectionCallback?.(this);
   }
 }
@@ -63,29 +69,66 @@ class _ContextConsumer extends ContextConsumer {
   hostConnected() {
     super.hostConnected();
     // console.log("hostConnected");
-    this._hostDisconnectionCallback = this._hostConnectionCallback?.(this);
+    this._connectionAbortController = new AbortController();
+    this._hostDisconnectionCallback = this._hostConnectionCallback?.(
+      this,
+      this._connectionAbortController,
+    );
   }
   hostDisconnected() {
     super.hostDisconnected();
     // console.log("hostDisconnected");
+    this._connectionAbortController.abort();
+    this._connectionAbortController = undefined;
     this._hostDisconnectionCallback?.(this);
   }
 }
 
+/** @typedef {(state: any) => string} StringifyContextState */
+/** @typedef {(serializedState: string) => any} ParseContextState */
+
 /**
  * @param {string} key
- * @param {any} defaultState
- * @param {ContextProviderHostConnectionCallback} providerHostConnectionCallback
- * @param {ContextConsumerHostConnectionCallback} consumerHostConnectionCallback
+ * @param {any?} defaultState
+ * @param {ContextProviderHostConnectionCallback?} providerHostConnectionCallback
+ * @param {ContextConsumerHostConnectionCallback?} consumerHostConnectionCallback
+ * @param {boolean?} saveToLocalStorage
+ * @param {StringifyContextState?} stringifyState
+ * @param {ParseContextState?} parseState
  */
 export function createContext(
   key,
   defaultState,
   providerHostConnectionCallback,
   consumerHostConnectionCallback,
+  saveToLocalStorage,
+  stringifyState,
+  parseState,
 ) {
-  const contextKey = Symbol(key);
-  const context = litContext.createContext(contextKey);
+  const contextKey = `${key}-context`;
+  const contextSymbol = Symbol(contextKey);
+  const context = litContext.createContext(contextSymbol);
+
+  let parsedState = {};
+  const localStorageKey = contextKey;
+  if (saveToLocalStorage) {
+    const stringifiedState = localStorage.getItem(localStorageKey);
+    if (stringifiedState) {
+      // console.log({ localStorageKey, stringifiedState });
+      try {
+        parsedState = parseState
+          ? parseState(stringifiedState)
+          : JSON.parse(stringifiedState);
+        // console.log(`parsedState for "${key}"`, parsedState);
+      } catch (error) {
+        console.error(
+          `failed to parse stringifiedState for "${key}"`,
+          { stringifiedState },
+          error,
+        );
+      }
+    }
+  }
 
   /**
    * @param {import("lit").LitElement} host
@@ -95,17 +138,36 @@ export function createContext(
   const createContextProvider = (host, state, callback) => {
     // console.log("createContextProvider", host, state, callback);
     const value = {
-      state: { ...defaultState, ...structuredClone(state) },
+      state: { ...defaultState, ...state, ...parsedState },
       update: (newState, force) => {
         // console.log("update", newState);
         const oldState = value.state;
-        if (deepEqual(newState, oldState) && !force) {
+        if (!force && deepEqual(newState, oldState)) {
           return;
         }
         value.state = newState;
         callback?.(newState, oldState);
         // console.log("updating provider", provider, value);
         provider.setValue(value, true);
+
+        if (saveToLocalStorage) {
+          const stringifiedState = stringifyState
+            ? stringifyState(newState)
+            : JSON.stringify(newState);
+          // console.log({
+          //   stringifiedState,
+          //   state: newState,
+          //   key,
+          //   localStorageKey,
+          // });
+          localStorage.setItem(localStorageKey, stringifiedState);
+        }
+      },
+      clearLocalStorage: () => {
+        if (saveToLocalStorage) {
+          console.log("clearLocalStorage", { localStorageKey });
+          localStorage.removeItem(localStorageKey);
+        }
       },
     };
     const provider = new _ContextProvider(host, {
