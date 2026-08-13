@@ -181,6 +181,7 @@ class AppHub extends LitElement {
         defaultPath,
         beforeGoto: (pathname, activeTab) => {
           this._activeTabProvider.value.update({ activeTab });
+          this._lastTouchTime = 0;
         },
         afterGoto: (pathname, activeTab) => {
           console.log("after", pathname, { activeTab });
@@ -228,7 +229,10 @@ class AppHub extends LitElement {
       options,
     );
 
-    this.addEventListener("touchend", this._onTouchEnd, options);
+    this.addEventListener("touchend", this._onTouchEnd, {
+      ...options,
+      passive: false,
+    });
 
     this._onScreenOrientationUpdate();
     this._updateActiveTab();

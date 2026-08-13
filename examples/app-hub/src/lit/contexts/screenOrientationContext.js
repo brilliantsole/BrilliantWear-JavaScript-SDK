@@ -19,9 +19,9 @@ const {
     window.screen.orientation.addEventListener(
       "change",
       () => {
-        console.log("screen.orientation.change");
+        // console.log("screen.orientation.change");
         const screenOrientationState = getScreenOrientationState();
-        console.log({ screenOrientationState });
+        // console.log({ screenOrientationState });
         provider.value.update(screenOrientationState);
       },
       { signal: abortController.signal },

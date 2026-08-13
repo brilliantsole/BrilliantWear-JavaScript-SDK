@@ -274,6 +274,7 @@ html:active-view-transition {
   &::view-transition-group(header) {
     animation: none;
     z-index: 1;
+    pointer-events: none;
   }
 
   #main {

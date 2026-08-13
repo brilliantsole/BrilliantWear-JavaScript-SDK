@@ -27,9 +27,9 @@ const {
     viewportOrientationMediaQuery.addEventListener(
       "change",
       () => {
-        console.log("viewportOrientationMediaQuery.change");
+        // console.log("viewportOrientationMediaQuery.change");
         const viewportOrientationState = getViewportOrientationState();
-        console.log({ viewportOrientationState });
+        // console.log({ viewportOrientationState });
         provider.value.update(viewportOrientationState);
       },
       { signal: abortController.signal },

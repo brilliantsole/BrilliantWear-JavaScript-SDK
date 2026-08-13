@@ -16,9 +16,6 @@ const latestNavigationEntryIndex = Number(
   sessionStorage.getItem(latestNavigationEntryIndexSessionStorageKey) ?? 0,
 );
 const initialNavigationEntryIndex = navigation.currentEntry.index;
-const initialNavigationEntryIndexOffset =
-  latestNavigationEntryIndex - initialNavigationEntryIndex;
-
 const useCircularNavigationEntryStateBuffer = true;
 const circularNavigationEntryStateBufferLength = 100; // iOS max
 const latestCircularNavigationEntryStateBufferIndexSessionStorageKey =
@@ -35,7 +32,6 @@ console.log({
   initialNavigationEntryIndex,
   latestNavigationEntryIndex,
   currentCircularNavigationEntryStateBufferIndex,
-  initialNavigationEntryIndexOffset,
 });
 const circularNavigationEntryStateBufferSessionsStorageKeyPrefix =
   "circular-navigation-entry-state-buffer";
@@ -53,10 +49,10 @@ const getCircularNavigationEntryStateBufferIndex = (entry) => {
   }
   const currentEntryIndex = navigation.currentEntry.index;
   if (entryIndex == currentEntryIndex) {
-    console.log({
-      circularNavigationEntryStateBufferIndex:
-        currentCircularNavigationEntryStateBufferIndex,
-    });
+    // console.log({
+    //   circularNavigationEntryStateBufferIndex:
+    //     currentCircularNavigationEntryStateBufferIndex,
+    // });
     return currentCircularNavigationEntryStateBufferIndex;
   }
   let circularNavigationEntryStateBufferIndex =
@@ -70,15 +66,14 @@ const getCircularNavigationEntryStateBufferIndex = (entry) => {
   circularNavigationEntryStateBufferIndex %=
     circularNavigationEntryStateBufferLength;
 
-  console.log("getRouterCircularBufferIndex", {
-    entry,
-    circularNavigationEntryStateBufferLength,
-    currentEntryIndex,
-    entryIndex,
-    currentCircularNavigationEntryStateBufferIndex,
-    circularNavigationEntryStateBufferIndex,
-    initialNavigationEntryIndexOffset,
-  });
+  // console.log("getRouterCircularBufferIndex", {
+  //   entry,
+  //   circularNavigationEntryStateBufferLength,
+  //   currentEntryIndex,
+  //   entryIndex,
+  //   currentCircularNavigationEntryStateBufferIndex,
+  //   circularNavigationEntryStateBufferIndex,
+  // });
   return circularNavigationEntryStateBufferIndex;
 };
 
@@ -134,7 +129,7 @@ const saveCurrentNavigationEntryStateToSessionStorage = () => {
       );
 
       const key = `${circularNavigationEntryStateBufferSessionsStorageKeyPrefix}-${getCircularNavigationEntryStateBufferIndex(currentEntry)}`;
-      console.log(`saving currentState with key ${key}`, currentState);
+      // console.log(`saving currentState with key ${key}`, currentState);
       sessionStorage.setItem(key, currentStateString);
     } else {
       const key = `${navigationEntryStateSessionsStorageKeyPrefix}-${currentEntry[entryKey]}`;
