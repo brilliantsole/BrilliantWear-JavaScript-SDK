@@ -306,13 +306,13 @@ class AppHub extends LitElement {
   }
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
-    // console.log({ isLeftHanded });
+    console.log({ isLeftHanded });
     const update = () => {
-      this._isLeftHanded = isLeftHanded;
       document.documentElement.toggleAttribute(
         "data-left-handed",
-        this._isLeftHanded,
+        isLeftHanded,
       );
+      this._isLeftHanded = isLeftHanded;
     };
 
     if (
@@ -323,8 +323,13 @@ class AppHub extends LitElement {
     ) {
       update();
     } else {
-      document.startViewTransition(() => {
-        update();
+      const types = [isLeftHanded ? "left-handed" : "right-handed"];
+      console.log("types", types);
+      document.startViewTransition({
+        update: async () => {
+          update();
+        },
+        types,
       });
     }
   }
