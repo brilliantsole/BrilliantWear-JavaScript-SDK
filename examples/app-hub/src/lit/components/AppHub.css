@@ -3,16 +3,6 @@ body {
   overflow: hidden;
 }
 
-html {
-  box-sizing: border-box;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
 * {
   touch-action: manipulation;
 
@@ -26,25 +16,6 @@ html {
 
   user-select: none;
   -webkit-user-select: none;
-}
-
-::view-transition-group(*),
-::view-transition-image-pair(*),
-::view-transition-old(*),
-::view-transition-new(*) {
-  pointer-events: none;
-}
-::view-transition {
-  pointer-events: none;
-}
-
-:root {
-  view-transition-name: none;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
 }
 
 .mainAxis,
@@ -67,30 +38,85 @@ html {
 
 bw-app-hub {
   width: 100%;
-  height: 100%;
+  height: 100dvh;
 }
 
 bw-app-hub > * {
 }
 
-#main {
-  overflow-y: scroll;
-  padding-left: var(--wa-space-xs);
-  padding-right: var(--wa-space-xs);
-  touch-action: pan-x pan-y;
-  flex: 1;
+:root {
+  --header-padding-left-base: var(--wa-space-2xs);
+  --header-padding-right-base: var(--wa-space-2xs);
+  --header-padding-top-base: 0px;
+  --header-padding-bottom-base: 0px;
+  --header-padding-left-extra: 0px;
+  --header-padding-right-extra: 0px;
+  --header-padding-top-extra: 0px;
+  --header-padding-bottom-extra: 0px;
+  --header-padding-left-safe: 0px;
+  --header-padding-right-safe: 0px;
+  --header-padding-top-safe: 0px;
+  --header-padding-bottom-safe: 0px;
+
+  --header-padding-side-delta: calc(
+    var(--header-padding-right-safe) - var(--header-padding-left-safe)
+  );
+
+  --main-padding-left-base: var(--wa-space-xs);
+  --main-padding-right-base: var(--wa-space-xs);
+  --main-padding-top-base: 0px;
+  --main-padding-bottom-base: 0px;
+  --main-padding-left-extra: 0px;
+  --main-padding-right-extra: 0px;
+  --main-padding-top-extra: 0px;
+  --main-padding-bottom-extra: 0px;
+  --main-padding-left-safe: 0px;
+  --main-padding-right-safe: 0px;
+  --main-padding-top-safe: 0px;
+  --main-padding-bottom-safe: 0px;
 }
 
+#main {
+  overflow-y: scroll;
+  touch-action: pan-x pan-y;
+  flex: 1;
+
+  padding-left: calc(
+    var(--main-padding-left-base) + var(--main-padding-left-extra)
+  );
+  padding-right: calc(
+    var(--main-padding-right-base) + var(--main-padding-right-extra)
+  );
+  padding-top: calc(
+    var(--main-padding-top-base) + var(--main-padding-top-extra)
+  );
+  padding-bottom: calc(
+    var(--main-padding-bottom-base) + var(--main-padding-bottom-extra)
+  );
+}
 #header {
   flex: 0 0 auto;
   background-color: var(--wa-color-surface-default);
   justify-content: space-between;
   touch-action: pan-x pan-y;
+
+  padding-left: calc(
+    var(--header-padding-left-base) + var(--header-padding-left-extra)
+  );
+  padding-right: calc(
+    var(--header-padding-right-base) + var(--header-padding-right-extra)
+  );
+  padding-top: calc(
+    var(--header-padding-top-base) + var(--header-padding-top-extra)
+  );
+  padding-bottom: calc(
+    var(--header-padding-bottom-base) + var(--header-padding-bottom-extra)
+  );
 }
 
 @media (orientation: landscape) {
-  #header {
-    padding-top: var(--wa-space-2xs);
+  :root {
+    --header-padding-top-extra: var(--wa-space-2xs);
   }
   #nav {
     /* gap: var(--wa-space-2xs); */
@@ -113,13 +139,17 @@ bw-app-hub > * {
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-  #header {
-    padding-bottom: calc(env(safe-area-inset-bottom) - var(--wa-space-2xs));
+  :root {
+    --header-padding-bottom-extra: calc(
+      env(safe-area-inset-bottom) - var(--wa-space-2xs)
+    );
   }
 }
 @supports (padding-top: env(safe-area-inset-top)) {
-  #main {
-    padding-top: calc(env(safe-area-inset-top) - var(--wa-space-xl));
+  :root {
+    --main-padding-top-extra: calc(
+      env(safe-area-inset-top) - var(--wa-space-xl)
+    );
   }
 }
 
@@ -141,40 +171,56 @@ bw-app-hub > * {
       flex-direction: var(--flex-direction-lrt);
     }
 
-    @supports (padding-left: env(safe-area-inset-left)) {
-      html[data-screen-orientation-type="landscape-secondary"]:not(
-          [data-left-handed],
-          [data-anchor-nav]
-        )
-        #header {
-        padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
-      }
-
-      html[data-screen-orientation-type="landscape-primary"]:not(
-          [data-anchor-nav]
-        )[data-left-handed]
-        #header {
-        padding-left: calc(env(safe-area-inset-left) - var(--wa-space-s));
-      }
-
-      html[data-screen-orientation-type="landscape-secondary"]:is(
-          [data-left-handed],
-          [data-anchor-nav]
-        )
-        #main {
-        padding-right: calc(env(safe-area-inset-right) - var(--wa-space-s));
-      }
-
-      html[data-screen-orientation-type="landscape-primary"]:is(
-          [data-anchor-nav],
-          :not([data-left-handed])
-        )
-        #main {
-        padding-left: max(
-          var(--wa-space-s),
-          calc(env(safe-area-inset-left) - var(--wa-space-xs))
+    @supports (padding-right: env(safe-area-inset-right)) {
+      :root {
+        --header-padding-right-safe: max(
+          env(safe-area-inset-right) - var(--wa-space-m),
+          0px
+        );
+        --main-padding-right-safe: max(
+          env(safe-area-inset-right) - var(--wa-space-m),
+          0px
         );
       }
+    }
+    @supports (padding-left: env(safe-area-inset-left)) {
+      :root {
+        --header-padding-left-safe: max(
+          env(safe-area-inset-left) - var(--wa-space-m),
+          0px
+        );
+        --main-padding-left-safe: max(
+          env(safe-area-inset-left) - var(--wa-space-m),
+          0px
+        );
+      }
+    }
+
+    html[data-screen-orientation-type="landscape-secondary"]:not(
+        [data-left-handed],
+        [data-anchor-nav]
+      ) {
+      --header-padding-right-extra: var(--header-padding-right-safe);
+    }
+
+    html[data-screen-orientation-type="landscape-primary"]:not(
+        [data-anchor-nav]
+      )[data-left-handed] {
+      --header-padding-left-extra: var(--header-padding-left-safe);
+    }
+
+    html[data-screen-orientation-type="landscape-secondary"]:is(
+        [data-left-handed],
+        [data-anchor-nav]
+      ) {
+      --main-padding-right-extra: var(--main-padding-right-safe);
+    }
+
+    html[data-screen-orientation-type="landscape-primary"]:is(
+        [data-anchor-nav],
+        :not([data-left-handed])
+      ) {
+      --main-padding-left-extra: var(--main-padding-left-safe);
     }
 
     @media (min-height: 5in) {
@@ -232,6 +278,7 @@ bw-app-hub > * {
 }
 
 /* BACKGROUND COLORS */
+
 html,
 #main {
   background-color: var(--background-color);
@@ -265,6 +312,25 @@ html[data-active-tab="devices"] {
 
 /* VIEW TRANSITIONS */
 
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  pointer-events: none;
+}
+::view-transition {
+  pointer-events: none;
+}
+
+:root {
+  view-transition-name: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 html[data-disable-view-transitions]:active-view-transition {
   &::view-transition-group(*),
   &::view-transition-old(*),
@@ -289,7 +355,7 @@ html:active-view-transition {
   }
 }
 
-/** PREVIOUS/NEXT TAB VIEW TRANSITIONS */
+/* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
 
 html:active-view-transition-type(previous-tab, next-tab) {
   #header {
@@ -464,7 +530,7 @@ html:active-view-transition-type(next-tab) {
   }
 }
 
-/** LEFT/RIGHT HANDED VIEW TRANSITIONS  */
+/* LEFT/RIGHT HANDED VIEW TRANSITIONS  */
 
 html:active-view-transition-type(right-handed, left-handed) {
   --animation-duration: 300ms;
@@ -483,6 +549,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       &::view-transition-new(header) {
         animation-duration: var(--animation-duration);
         animation-timing-function: var(--animation-timing-function);
+        width: fit-content;
       }
 
       #main {
@@ -496,6 +563,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       &::view-transition-new(main) {
         animation-duration: var(--animation-duration);
         animation-timing-function: var(--animation-timing-function);
+        width: fit-content;
       }
     }
 
@@ -565,6 +633,7 @@ html:active-view-transition-type(right-handed) {
   --right-handed-header-new-animation-name: none;
   &::view-transition-old(header) {
     animation-name: var(--right-handed-header-old-animation-name);
+    right: var(--header-padding-side-delta);
   }
   &::view-transition-new(header) {
     animation-name: var(--right-handed-header-new-animation-name);
@@ -592,29 +661,27 @@ html:active-view-transition-type(right-handed) {
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
     @media (orientation: landscape) {
-      /** FILL - specify animation name */
-
       &:active-view-transition-type(right-handed) {
-        --right-handed-header-old-animation-name: slide-out-to-left-from-right;
-        --right-handed-header-new-animation-name: slide-in-from-right;
+        --right-handed-header-old-animation-name: slide-out-to-left-from-right-header;
+        --right-handed-header-new-animation-name: slide-in-from-right-header;
 
-        --right-handed-main-new-animation-name: slide-in-to-left;
+        --right-handed-main-new-animation-name: slide-in-to-left-main;
       }
       &:active-view-transition-type(left-handed) {
-        --left-handed-header-old-animation-name: slide-out-to-right-from-left;
-        --left-handed-header-new-animation-name: slide-in-from-left;
+        --left-handed-header-old-animation-name: slide-out-to-right-from-left-header;
+        --left-handed-header-new-animation-name: slide-in-from-left-header;
 
-        --left-handed-main-new-animation-name: slide-in-to-right;
+        --left-handed-main-new-animation-name: slide-in-to-right-main;
       }
     }
 
     @media (orientation: portrait) {
-      /** FILL - specify animation name */
+      /* FILL - specify animation name */
     }
   }
 }
 
-@keyframes slide-out-to-left-from-right {
+@keyframes slide-out-to-left-from-right-header {
   from {
     transform: translateX(calc(-100dvw + 100%));
   }
@@ -622,26 +689,46 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(-100dvw);
   }
 }
-@keyframes slide-out-to-right-from-left {
+@keyframes slide-out-to-right-from-left-header {
   from {
     transform: translateX(calc(100dvw - 100%));
   }
   to {
-    transform: translateX(100dvw);
+    transform: translateX(calc(100dvw + var(--header-padding-side-delta)));
   }
 }
-
-@keyframes slide-in-to-left {
+@keyframes slide-in-from-right-header {
   from {
-    transform: translateX(calc(100vw - 100%));
+    transform: translateX(calc(100% + var(--header-padding-side-delta)));
   }
   to {
     transform: translateX(0);
   }
 }
-@keyframes slide-in-to-right {
+@keyframes slide-in-from-left-header {
   from {
-    transform: translateX(calc(-100vw + 100%));
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-to-left-main {
+  from {
+    transform: translateX(
+      calc(100dvw - 100% - var(--header-padding-right-extra))
+    );
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slide-in-to-right-main {
+  from {
+    transform: translateX(
+      calc(-100dvw + 100% + var(--header-padding-left-extra))
+    );
   }
   to {
     transform: translateX(0);
