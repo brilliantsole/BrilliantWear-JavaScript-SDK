@@ -58,8 +58,14 @@ bw-app-hub > * {
   --header-padding-top-safe: 0px;
   --header-padding-bottom-safe: 0px;
 
-  --header-padding-side-delta: calc(
+  --header-padding-side-safe-delta: calc(
     var(--header-padding-right-safe) - var(--header-padding-left-safe)
+  );
+  --header-padding-side-base-delta: calc(
+    var(--header-padding-right-base) - var(--header-padding-left-base)
+  );
+  --header-padding-side-base: calc(
+    var(--header-padding-right-base) + var(--header-padding-left-base)
   );
 
   --main-padding-left-base: var(--wa-space-xs);
@@ -358,6 +364,11 @@ html:active-view-transition {
 /* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
 
 html:active-view-transition-type(previous-tab, next-tab) {
+  --animation-duration: 300ms;
+  --animation-timing-function: ease;
+}
+
+html:active-view-transition-type(previous-tab, next-tab) {
   #header {
     view-transition-name: header;
   }
@@ -371,8 +382,8 @@ html:active-view-transition-type(previous-tab, next-tab) {
   }
   &::view-transition-group(main) {
     z-index: 0;
-    animation-duration: 300ms;
-    animation-timing-function: ease;
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-timing-function);
   }
 }
 
@@ -535,7 +546,9 @@ html:active-view-transition-type(next-tab) {
 html:active-view-transition-type(right-handed, left-handed) {
   --animation-duration: 300ms;
   --animation-timing-function: ease;
+}
 
+html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
     @media (orientation: landscape) {
       #header {
@@ -566,42 +579,11 @@ html:active-view-transition-type(right-handed, left-handed) {
         width: fit-content;
       }
     }
-
-    @media (orientation: portrait) {
-      bw-nav-button-layers {
-        view-transition-name: bw-nav-button-layers;
-      }
-      bw-nav-button-apps {
-        view-transition-name: bw-nav-button-apps;
-      }
-      bw-nav-button-devices {
-        view-transition-name: bw-nav-button-devices;
-      }
-      bw-nav-button-settings {
-        view-transition-name: bw-nav-button-settings;
-      }
-      bw-nav-button-flip {
-        view-transition-name: bw-nav-button-flip;
-      }
-      #header > :is(nav, menu) > * {
-        view-transition-class: bw-header-button;
-        z-index: 1;
-        background-color: var(--wa-color-surface-default);
-      }
-      #header > nav > * {
-        view-transition-class: bw-nav-button;
-      }
-      #header > menu > * {
-        view-transition-class: bw-menu-button;
-      }
-    }
   }
 }
-
 html:active-view-transition-type(left-handed) {
   --left-handed-header-old-animation-name: none;
   --left-handed-header-new-animation-name: none;
-
   &::view-transition-old(header) {
     animation-name: var(--left-handed-header-old-animation-name);
   }
@@ -617,23 +599,13 @@ html:active-view-transition-type(left-handed) {
   &::view-transition-new(main) {
     animation-name: var(--left-handed-main-new-animation-name);
   }
-
-  --left-handed-menu-old-animation-name: none;
-  --left-handed-menu-new-animation-name: none;
-  &::view-transition-old(menu) {
-    animation-name: var(--left-handed-menu-old-animation-name);
-  }
-  &::view-transition-new(menu) {
-    animation-name: var(--left-handed-menu-new-animation-name);
-  }
 }
-
 html:active-view-transition-type(right-handed) {
   --right-handed-header-old-animation-name: none;
   --right-handed-header-new-animation-name: none;
   &::view-transition-old(header) {
     animation-name: var(--right-handed-header-old-animation-name);
-    right: var(--header-padding-side-delta);
+    right: var(--header-padding-side-safe-delta);
   }
   &::view-transition-new(header) {
     animation-name: var(--right-handed-header-new-animation-name);
@@ -647,17 +619,7 @@ html:active-view-transition-type(right-handed) {
   &::view-transition-new(main) {
     animation-name: var(--right-handed-main-new-animation-name);
   }
-
-  --right-handed-menu-old-animation-name: none;
-  --right-handed-menu-new-animation-name: none;
-  &::view-transition-old(menu) {
-    animation-name: var(--right-handed-menu-old-animation-name);
-  }
-  &::view-transition-new(menu) {
-    animation-name: var(--right-handed-menu-new-animation-name);
-  }
 }
-
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
     @media (orientation: landscape) {
@@ -674,9 +636,117 @@ html:active-view-transition-type(right-handed, left-handed) {
         --left-handed-main-new-animation-name: slide-in-to-right-main;
       }
     }
+  }
+}
 
+html:active-view-transition-type(right-handed, left-handed) {
+  @media (pointer: coarse) {
     @media (orientation: portrait) {
-      /* FILL - specify animation name */
+      bw-nav-button-layers {
+        view-transition-name: nav-button-layers;
+      }
+      bw-nav-button-apps {
+        view-transition-name: nav-button-apps;
+      }
+      bw-nav-button-devices {
+        view-transition-name: nav-button-devices;
+      }
+      bw-nav-button-settings {
+        view-transition-name: nav-button-settings;
+      }
+      bw-nav-button-flip {
+        view-transition-name: nav-button-flip;
+      }
+
+      #header > :is(nav, menu) > * {
+        /* background-color: var(--wa-color-surface-default); */
+      }
+      #header > nav > * {
+        view-transition-class: nav-button;
+      }
+      #header > menu > * {
+        view-transition-class: menu-button;
+      }
+      &::view-transition-group(.nav-button) {
+        z-index: 1;
+      }
+      &::view-transition-group(.menu-button) {
+        z-index: 0;
+        animation: none;
+      }
+      &::view-transition-old(.menu-button),
+      &::view-transition-new(.menu-button) {
+        animation-duration: var(--animation-duration);
+        animation-timing-function: var(--animation-timing-function);
+      }
+
+      &[data-active-tab="layers"] bw-nav-button-layers,
+      &[data-active-tab="apps"] bw-nav-button-apps,
+      &[data-active-tab="devices"] bw-nav-button-devices,
+      &[data-active-tab="settings"] bw-nav-button-settings {
+        view-transition-class: nav-button active-nav-button !important;
+      }
+      &::view-transition-group(.active-nav-button) {
+        z-index: 2 !important;
+      }
+    }
+  }
+}
+html:active-view-transition-type(left-handed) {
+  --left-handed-nav-button-old-animation-name: none;
+  --left-handed-nav-button-new-animation-name: none;
+  &::view-transition-old(.nav-button) {
+    animation-name: var(--left-handed-nav-button-old-animation-name);
+  }
+  &::view-transition-new(.nav-button) {
+    animation-name: var(--left-handed-nav-button-new-animation-name);
+  }
+
+  --left-handed-menu-button-old-animation-name: none;
+  --left-handed-menu-button-new-animation-name: none;
+  &::view-transition-old(.menu-button) {
+    animation-name: var(--left-handed-menu-button-old-animation-name);
+  }
+  &::view-transition-new(.menu-button) {
+    animation-name: var(--left-handed-menu-button-new-animation-name);
+  }
+}
+html:active-view-transition-type(right-handed) {
+  --right-handed-nav-button-old-animation-name: none;
+  --right-handed-nav-button-new-animation-name: none;
+  &::view-transition-old(.nav-button) {
+    animation-name: var(--right-handed-nav-button-old-animation-name);
+  }
+  &::view-transition-new(.nav-button) {
+    animation-name: var(--right-handed-nav-button-new-animation-name);
+  }
+
+  --right-handed-menu-button-old-animation-name: none;
+  --right-handed-menu-button-new-animation-name: none;
+  &::view-transition-old(.menu-button) {
+    animation-name: var(--right-handed-menu-button-old-animation-name);
+  }
+  &::view-transition-new(.menu-button) {
+    animation-name: var(--right-handed-menu-button-new-animation-name);
+  }
+}
+html:active-view-transition-type(right-handed, left-handed) {
+  @media (pointer: coarse) {
+    @media (orientation: portrait) {
+      &:active-view-transition-type(right-handed) {
+        --right-handed-nav-button-old-animation-name: none; /*tilt-right;*/
+        --right-handed-nav-button-new-animation-name: none; /*tilt-right;*/
+
+        --right-handed-menu-button-old-animation-name: slide-out-to-right-from-left-menu;
+        --right-handed-menu-button-new-animation-name: slide-in-from-left;
+      }
+      &:active-view-transition-type(left-handed) {
+        --left-handed-nav-button-old-animation-name: none; /*tilt-left;*/
+        --left-handed-nav-button-new-animation-name: none; /*tilt-left;*/
+
+        --left-handed-menu-button-old-animation-name: slide-out-to-left-from-right-menu;
+        --left-handed-menu-button-new-animation-name: slide-in-from-right;
+      }
     }
   }
 }
@@ -694,12 +764,12 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(calc(100dvw - 100%));
   }
   to {
-    transform: translateX(calc(100dvw + var(--header-padding-side-delta)));
+    transform: translateX(calc(100dvw + var(--header-padding-side-safe-delta)));
   }
 }
 @keyframes slide-in-from-right-header {
   from {
-    transform: translateX(calc(100% + var(--header-padding-side-delta)));
+    transform: translateX(calc(100% + var(--header-padding-side-safe-delta)));
   }
   to {
     transform: translateX(0);
@@ -732,5 +802,55 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
   to {
     transform: translateX(0);
+  }
+}
+
+:root {
+  --tilt-angle: 3deg;
+  --jump-height: var(--wa-space-2xs);
+}
+@keyframes tilt-left {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--jump-height)))
+      rotate(calc(-1 * var(--tilt-angle)));
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+@keyframes tilt-right {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(-1 * var(--jump-height)))
+      rotate(calc(1 * var(--tilt-angle)));
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes slide-out-to-left-from-right-menu {
+  from {
+    transform: translateX(
+      calc(-100dvw + 100% + var(--header-padding-side-base))
+    );
+  }
+  to {
+    transform: translateX(-100dvw);
+  }
+}
+@keyframes slide-out-to-right-from-left-menu {
+  from {
+    transform: translateX(
+      calc(100dvw - 100% - var(--header-padding-side-base))
+    );
+  }
+  to {
+    transform: translateX(calc(100dvw));
   }
 }

@@ -209,25 +209,7 @@ class AppHub extends LitElement {
     const options = { signal: this._abortController.signal };
 
     // FILL - swipe recognition
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        // FILL - move between tabs
-        // console.log(event.key);
-        // navigation.navigate("/settings");
-        switch (event.key) {
-          case "ArrowRight":
-            break;
-          case "ArrowLeft":
-            break;
-          case "ArrowUp":
-            break;
-          case "ArrowDown":
-            break;
-        }
-      },
-      options,
-    );
+    document.addEventListener("keydown", this._onKeyDown, options);
 
     this.addEventListener("touchend", this._onTouchEnd, {
       ...options,
@@ -396,6 +378,23 @@ class AppHub extends LitElement {
     this._lastTouchTime = currentTime;
   };
 
+  /** @param {KeyboardEvent} event */
+  _onKeyDown = (event) => {
+    // FILL - move between tabs
+    console.log(event.key);
+    // navigation.navigate("/settings");
+    switch (event.key) {
+      case "ArrowRight":
+        break;
+      case "ArrowLeft":
+        break;
+      case "ArrowUp":
+        break;
+      case "ArrowDown":
+        break;
+    }
+  };
+
   render() {
     return html`
       <header id="header" class="crossAxis">
@@ -405,7 +404,7 @@ class AppHub extends LitElement {
           <bw-nav-button-devices></bw-nav-button-devices>
           <bw-nav-button-settings></bw-nav-button-settings>
         </nav>
-        <menu id="menu">
+        <menu id="menu" class="crossAxis">
           <bw-nav-button-flip></bw-nav-button-flip>
         </menu>
       </header>
