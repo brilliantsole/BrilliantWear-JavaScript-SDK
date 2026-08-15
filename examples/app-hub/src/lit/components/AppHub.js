@@ -371,8 +371,12 @@ class AppHub extends LitElement {
 
     // console.log({ tapLength });
 
-    if (tapLength < this._doubleTapTime && tapLength > 0) {
-      console.log("double tap detected");
+    if (
+      tapLength < this._doubleTapTime &&
+      tapLength > 0 &&
+      !event.target.nodeName.includes("BUTTON")
+    ) {
+      console.log("double tap detected", event.target);
       event.preventDefault();
     }
     this._lastTouchTime = currentTime;
@@ -380,18 +384,49 @@ class AppHub extends LitElement {
 
   /** @param {KeyboardEvent} event */
   _onKeyDown = (event) => {
-    // FILL - move between tabs
-    console.log(event.key);
-    // navigation.navigate("/settings");
-    switch (event.key) {
-      case "ArrowRight":
-        break;
-      case "ArrowLeft":
-        break;
-      case "ArrowUp":
-        break;
-      case "ArrowDown":
-        break;
+    const currentTabIndex = tabs.indexOf(this.activeTab);
+    let newTabIndex = currentTabIndex;
+    let tabIndexOffset = 0;
+    const { key } = event;
+    console.log({ key, currentTabIndex });
+    if (this._viewportOrientation == "landscape") {
+      switch (key) {
+        case "ArrowUp":
+          tabIndexOffset = -1;
+          break;
+        case "ArrowDown":
+          tabIndexOffset = 1;
+          break;
+      }
+    } else {
+      switch (key) {
+        case "ArrowRight":
+          tabIndexOffset = -1;
+          break;
+        case "ArrowLeft":
+          tabIndexOffset = 1;
+          break;
+      }
+      if (this._isLeftHanded) {
+        tabIndexOffset *= -1;
+      }
+    }
+    if (tabIndexOffset == 0) {
+      return;
+    }
+    newTabIndex += tabIndexOffset;
+
+    while (newTabIndex < 0) {
+      newTabIndex += tabs.length;
+    }
+    newTabIndex %= tabs.length;
+    console.log({ newTabIndex });
+    if (newTabIndex != currentTabIndex) {
+      try {
+        navigation.navigate(`/${tabs[newTabIndex]}`);
+      } catch (error) {
+        // console.error(error);
+      }
     }
   };
 

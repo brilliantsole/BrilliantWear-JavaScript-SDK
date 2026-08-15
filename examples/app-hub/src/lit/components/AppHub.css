@@ -41,9 +41,6 @@ bw-app-hub {
   height: 100dvh;
 }
 
-bw-app-hub > * {
-}
-
 :root {
   --header-padding-left-base: var(--wa-space-2xs);
   --header-padding-right-base: var(--wa-space-2xs);
@@ -318,16 +315,9 @@ html[data-active-tab="devices"] {
 
 /* VIEW TRANSITIONS */
 
-::view-transition-group(*),
-::view-transition-image-pair(*),
-::view-transition-old(*),
-::view-transition-new(*) {
-  pointer-events: none;
-}
 ::view-transition {
   pointer-events: none;
 }
-
 :root {
   view-transition-name: none;
 }
@@ -369,14 +359,6 @@ html:active-view-transition-type(previous-tab, next-tab) {
 }
 
 html:active-view-transition-type(previous-tab, next-tab) {
-  #header {
-    view-transition-name: header;
-  }
-  &::view-transition-group(header) {
-    animation: none;
-    z-index: 1;
-  }
-
   #main {
     view-transition-name: main;
   }

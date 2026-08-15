@@ -403,7 +403,9 @@ export class Router extends litRouter.Routes {
         e.preventDefault();
       } catch (error) {}
       const state = { route };
-      navigation.navigate("./", { state, history: "push" });
+      try {
+        navigation.navigate("./", { state, history: "push" });
+      } catch (error) {}
     }
   };
 }
