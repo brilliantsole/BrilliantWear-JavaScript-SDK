@@ -99,21 +99,5 @@
     function toggleDarkMode() {
       document.documentElement.classList.toggle("wa-dark");
     }
-
-    function resetViewport() {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }
-
-    document.addEventListener("visibilitychange", (e) => {
-      const { hidden } = document;
-      console.log(e.type, { hidden });
-      if (!hidden) {
-        requestAnimationFrame(resetViewport);
-      }
-    });
-
-    window.addEventListener("pageshow", resetViewport);
   </script>
 </html>

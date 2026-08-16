@@ -40,6 +40,7 @@ import { createAnchorNavContextProvider } from "../contexts/anchorNavContext.js"
 import { createReducedMotionContextProvider } from "../contexts/reducedMotionContext.js";
 import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
 import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
+import { createVisibilityContextProvider } from "../contexts/visibilityContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -62,6 +63,20 @@ class AppHub extends LitElement {
       "data-anchor-nav",
       this._anchorNav,
     );
+  }
+
+  _onVisibilityUpdate() {
+    const { hidden } = this._visibilityProvider.value.state;
+    // console.log({ hidden });
+    if (!hidden) {
+      this._resetViewport();
+    }
+  }
+  _resetViewport() {
+    // console.log("_resetViewport");
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 
   get disableViewTransitions() {
@@ -107,6 +122,9 @@ class AppHub extends LitElement {
       document.head.appendChild(this._themeColorMeta);
     }
 
+    this._visibilityProvider = createVisibilityContextProvider(this, null, () =>
+      this._onVisibilityUpdate(),
+    );
     this._disableViewTransitionsProvider =
       createDisableViewTransitionsContextProvider(this, null, () =>
         this._onDisableViewTransitionsUpdate(),
@@ -207,6 +225,8 @@ class AppHub extends LitElement {
     this._abortController = new AbortController();
     /** @type {AddEventListenerOptions} */
     const options = { signal: this._abortController.signal };
+
+    window.addEventListener("pageshow", this._resetViewport, options);
 
     // document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
