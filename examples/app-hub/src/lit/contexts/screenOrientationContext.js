@@ -12,10 +12,9 @@ const getScreenOrientationState = () => {
 const {
   createContextProvider: createScreenOrientationContextProvider,
   createContextConsumer: createScreenOrientationContextConsumer,
-} = createContext(
-  "screenOrientation",
-  getScreenOrientationState(),
-  (provider, abortController) => {
+} = await createContext("screenOrientation", {
+  defaultState: getScreenOrientationState(),
+  onProviderHostConnection: (provider, abortController) => {
     window.screen.orientation.addEventListener(
       "change",
       () => {
@@ -27,7 +26,7 @@ const {
       { signal: abortController.signal },
     );
   },
-);
+});
 
 export {
   createScreenOrientationContextProvider,

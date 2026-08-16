@@ -12,10 +12,9 @@ const getVisibilityState = () => {
 const {
   createContextProvider: createVisibilityContextProvider,
   createContextConsumer: createVisibilityContextConsumer,
-} = createContext(
-  "visibility",
-  getVisibilityState(),
-  (provider, abortController) => {
+} = await createContext("visibility", {
+  defaultState: getVisibilityState(),
+  onProviderHostConnection: (provider, abortController) => {
     document.addEventListener(
       "visibilitychange",
       (event) => {
@@ -27,6 +26,6 @@ const {
       { signal: abortController.signal },
     );
   },
-);
+});
 
 export { createVisibilityContextProvider, createVisibilityContextConsumer };

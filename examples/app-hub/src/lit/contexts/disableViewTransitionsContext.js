@@ -6,15 +6,10 @@ import { createContext } from "./createContext.js";
 const {
   createContextProvider: createDisableViewTransitionsContextProvider,
   createContextConsumer: createDisableViewTransitionsContextConsumer,
-} = createContext(
-  "disableViewTransitions",
-  {
-    disableViewTransitions: false,
-  },
-  null,
-  null,
-  true,
-);
+} = await createContext("disableViewTransitions", {
+  defaultState: { disableViewTransitions: false },
+  storageType: "localStorage",
+});
 
 export {
   createDisableViewTransitionsContextProvider,

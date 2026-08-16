@@ -14,10 +14,9 @@ const getTouchEnabledState = () => {
 const {
   createContextProvider: createTouchEnabledContextProvider,
   createContextConsumer: createTouchEnabledContextConsumer,
-} = createContext(
-  "touchEnabled",
-  getTouchEnabledState(),
-  (provider, abortController) => {
+} = await createContext("touchEnabled", {
+  defaultState: getTouchEnabledState(),
+  onProviderHostConnection: (provider, abortController) => {
     touchEnabledMediaQuery.addEventListener(
       "change",
       () => {
@@ -29,6 +28,6 @@ const {
       { signal: abortController.signal },
     );
   },
-);
+});
 
 export { createTouchEnabledContextProvider, createTouchEnabledContextConsumer };

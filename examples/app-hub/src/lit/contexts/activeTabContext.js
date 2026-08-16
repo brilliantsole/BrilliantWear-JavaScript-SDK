@@ -6,6 +6,6 @@ import { createContext } from "./createContext.js";
 const {
   createContextProvider: createActiveTabContextProvider,
   createContextConsumer: createActiveTabContextConsumer,
-} = createContext("activeTab");
+} = await createContext("activeTab");
 
 export { createActiveTabContextProvider, createActiveTabContextConsumer };

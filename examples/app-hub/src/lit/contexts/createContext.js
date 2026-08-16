@@ -84,97 +84,165 @@ class _ContextConsumer extends ContextConsumer {
   }
 }
 
-/** @typedef {(state: any) => string} StringifyContextState */
-/** @typedef {(serializedState: string) => any} ParseContextState */
+/** @typedef {(state: any) => any} SerializeContextState */
+/** @typedef {(serializedState: any) => any} ParseContextState */
+
+/** @typedef {(serializedState: any) => Promise<boolean>} SaveContextState */
+/** @typedef {() => Promise<any?>} LoadContextState */
+/** @typedef {() => Promise<boolean>} ClearContextState */
+
+/** @typedef {(newValue: boolean, oldValue: boolean) => boolean} HasContextStateChangedCallback */
+
+/** @typedef {"localStorage" | "sessionStorage"} ContextStorageType */
+
+/**
+ * @typedef {Object} CreateContextOptions
+ * @property {any?} defaultState
+ * @property {ContextProviderHostConnectionCallback?} onProviderHostConnection
+ * @property {ContextConsumerHostConnectionCallback?} onConsumerHostConnection
+ * @property {ContextStorageType?} storageType
+ * @property {SerializeContextState?} serialize
+ * @property {ParseContextState?} parse
+ * @property {SaveContextState?} save
+ * @property {LoadContextState?} load
+ * @property {ClearContextState?} clear
+ * @property {HasContextStateChangedCallback?} hasChanged
+ */
 
 /**
  * @param {string} key
- * @param {any?} defaultState
- * @param {ContextProviderHostConnectionCallback?} providerHostConnectionCallback
- * @param {ContextConsumerHostConnectionCallback?} consumerHostConnectionCallback
- * @param {boolean?} saveToLocalStorage
- * @param {StringifyContextState?} stringifyState
- * @param {ParseContextState?} parseState
+ * @param {CreateContextOptions} options
  */
-export function createContext(
-  key,
-  defaultState,
-  providerHostConnectionCallback,
-  consumerHostConnectionCallback,
-  saveToLocalStorage,
-  stringifyState,
-  parseState,
-) {
+export async function createContext(key, options) {
   const contextKey = `${key}-context`;
   const contextSymbol = Symbol(contextKey);
   const context = litContext.createContext(contextSymbol);
+  const storageKey = contextKey;
+
+  options = options ?? {};
+  const { storageType, onConsumerHostConnection, onProviderHostConnection } =
+    options;
+  let { load, save, parse, serialize, hasChanged, clear, defaultState } =
+    options;
+
+  defaultState = defaultState ?? {};
+
+  parse = parse ?? JSON.parse.bind(JSON);
+  serialize = serialize ?? JSON.stringify.bind(JSON);
+  hasChanged = hasChanged ?? deepEqual;
+
+  if (options?.storageType) {
+    switch (options.storageType) {
+      case "localStorage":
+        load = async () => {
+          return localStorage.getItem(storageKey);
+        };
+        save = async (serializedState) => {
+          localStorage.setItem(storageKey, serializedState);
+          return true;
+        };
+        clear = async () => {
+          localStorage.removeItem(storageKey);
+          return true;
+        };
+        break;
+      case "sessionStorage":
+        load = async () => {
+          return sessionStorage.getItem(storageKey);
+        };
+        save = async (serializedState) => {
+          sessionStorage.setItem(storageKey, serializedState);
+          return true;
+        };
+        clear = async (serializedState) => {
+          sessionStorage.removeItem(storageKey, serializedState);
+          return true;
+        };
+        break;
+      default:
+        throw Error(`uncaught storageType "${options.storageType}"`);
+        break;
+    }
+  }
 
   let parsedState = {};
-  const localStorageKey = contextKey;
-  if (saveToLocalStorage) {
-    const stringifiedState = localStorage.getItem(localStorageKey);
-    if (stringifiedState) {
-      // console.log({ localStorageKey, stringifiedState });
-      try {
-        parsedState = parseState
-          ? parseState(stringifiedState)
-          : JSON.parse(stringifiedState);
-        // console.log(`parsedState for "${key}"`, parsedState);
-      } catch (error) {
-        console.error(
-          `failed to parse stringifiedState for "${key}"`,
-          { stringifiedState },
-          error,
-        );
-      }
-    }
+  if (load) {
+    const serializedState = await load();
+    parsedState = parse(serializedState);
+    console.log({ serializedState, parsedState });
   }
 
   /**
    * @param {import("lit").LitElement} host
-   * @param {any?} state
+   * @param {any?} initialState
    * @param {((state: any, oldState: any) => void)?} callback
    */
-  const createContextProvider = (host, state, callback) => {
-    // console.log("createContextProvider", host, state, callback);
+  const createContextProvider = (host, initialState, callback) => {
+    // console.log("createContextProvider", host, initialState, callback);
     const value = {
-      state: { ...defaultState, ...state, ...parsedState },
-      update: (newState, force) => {
+      state: { ...defaultState, ...initialState, ...parsedState },
+      update: async (newState, force, dontSave) => {
         // console.log("update", newState);
         const oldState = value.state;
-        if (!force && deepEqual(newState, oldState)) {
-          return;
+        if (!force && hasChanged(newState, oldState)) {
+          return false;
         }
         value.state = newState;
         callback?.(newState, oldState);
         // console.log("updating provider", provider, value);
         provider.setValue(value, true);
 
-        if (saveToLocalStorage) {
-          const stringifiedState = stringifyState
-            ? stringifyState(newState)
-            : JSON.stringify(newState);
-          // console.log({
-          //   stringifiedState,
-          //   state: newState,
-          //   key,
-          //   localStorageKey,
-          // });
-          localStorage.setItem(localStorageKey, stringifiedState);
+        if (save && !dontSave) {
+          const serializedState = serialize(newState);
+          console.log({
+            serializedState,
+            newState,
+          });
+          const didSave = await save(serializedState);
+          if (!didSave) {
+            console.error(`failed to save "${contextKey}"`);
+          }
         }
+        return true;
       },
-      clearLocalStorage: () => {
-        if (saveToLocalStorage) {
-          console.log("clearLocalStorage", { localStorageKey });
-          localStorage.removeItem(localStorageKey);
+      clear: async () => {
+        const didClear = await clear();
+        if (!didClear) {
+          console.error(`failed to clear "${contextKey}"`);
         }
+        return didClear;
       },
     };
+
+    if (options?.storageType) {
+      /** @type {Storage?} */
+      let storageArea;
+      switch (options.storageType) {
+        case "localStorage":
+          storageArea = localStorage;
+          break;
+        case "sessionStorage":
+          storageArea = sessionStorage;
+          break;
+      }
+      if (storageArea) {
+        window.addEventListener("storage", (event) => {
+          if (event.key == storageKey && event.storageArea == storageArea) {
+            const newState = parse(event.newValue);
+            console.log(`updated "${contextKey}" from another page`, {
+              newState,
+              newValue: event.newValue,
+            });
+            value.update(newState, undefined, true);
+          }
+        });
+      }
+    }
     const provider = new _ContextProvider(host, {
       context,
       initialValue: value,
     });
-    provider._hostConnectionCallback = providerHostConnectionCallback;
+    provider._hostConnectionCallback = onProviderHostConnection;
     return provider;
   };
   /**
@@ -191,7 +259,7 @@ export function createContext(
         callback?.(value.state);
       },
     });
-    consumer._hostConnectionCallback = consumerHostConnectionCallback;
+    consumer._hostConnectionCallback = onConsumerHostConnection;
     return consumer;
   };
   return { createContextProvider, createContextConsumer };

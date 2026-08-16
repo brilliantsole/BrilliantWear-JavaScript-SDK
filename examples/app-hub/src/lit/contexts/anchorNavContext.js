@@ -6,6 +6,9 @@ import { createContext } from "./createContext.js";
 const {
   createContextProvider: createAnchorNavContextProvider,
   createContextConsumer: createAnchorNavContextConsumer,
-} = createContext("anchorNav", { anchorNav: false }, null, null, true);
+} = await createContext("anchorNav", {
+  defaultState: { anchorNav: false },
+  storageType: "localStorage",
+});
 
 export { createAnchorNavContextProvider, createAnchorNavContextConsumer };

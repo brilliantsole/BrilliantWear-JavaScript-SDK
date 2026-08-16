@@ -65,9 +65,11 @@ class AppHub extends LitElement {
     );
   }
 
+  _hidden = false;
   _onVisibilityUpdate() {
     const { hidden } = this._visibilityProvider.value.state;
     // console.log({ hidden });
+    this._hidden = hidden;
     if (!hidden) {
       this._resetViewport();
     }
@@ -106,6 +108,9 @@ class AppHub extends LitElement {
       return true;
     }
     if (this.disableViewTransitions) {
+      return true;
+    }
+    if (this._hidden) {
       return true;
     }
     // TODO: - return true if low power mode

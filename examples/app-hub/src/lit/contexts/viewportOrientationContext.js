@@ -20,10 +20,9 @@ const getViewportOrientationState = () => {
 const {
   createContextProvider: createViewportOrientationContextProvider,
   createContextConsumer: createViewportOrientationContextConsumer,
-} = createContext(
-  "viewportOrientation",
-  getViewportOrientationState(),
-  (provider, abortController) => {
+} = await createContext("viewportOrientation", {
+  defaultState: getViewportOrientationState(),
+  onProviderHostConnection: (provider, abortController) => {
     viewportOrientationMediaQuery.addEventListener(
       "change",
       () => {
@@ -35,7 +34,7 @@ const {
       { signal: abortController.signal },
     );
   },
-);
+});
 
 export {
   createViewportOrientationContextProvider,

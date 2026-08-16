@@ -16,10 +16,9 @@ const getReducedMotionState = () => {
 const {
   createContextProvider: createReducedMotionContextProvider,
   createContextConsumer: createReducedMotionContextConsumer,
-} = createContext(
-  "reducedMotion",
-  getReducedMotionState(),
-  (provider, abortController) => {
+} = await createContext("reducedMotion", {
+  defaultState: getReducedMotionState(),
+  onProviderHostConnection: (provider, abortController) => {
     reducedMotionMediaQuery.addEventListener(
       "change",
       () => {
@@ -31,7 +30,7 @@ const {
       { signal: abortController.signal },
     );
   },
-);
+});
 
 export {
   createReducedMotionContextProvider,

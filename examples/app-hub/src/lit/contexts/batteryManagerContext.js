@@ -47,10 +47,9 @@ const getBatteryManagerState = (batteryManager, ...changes) => {
 const {
   createContextProvider: createBatteryManagerContextProvider,
   createContextConsumer: createBatteryManagerContextConsumer,
-} = createContext(
-  "batteryManager",
-  getBatteryManagerState(),
-  async (provider, abortController) => {
+} = await createContext("batteryManager", {
+  defaultState: getBatteryManagerState(),
+  onProviderHostConnection: async (provider, abortController) => {
     if (!isBatteryManagerAvailable) {
       return;
     }
@@ -89,7 +88,7 @@ const {
 
     updateState(...batteryManagerContextStateTypes);
   },
-);
+});
 
 export {
   createBatteryManagerContextProvider,

@@ -7,6 +7,9 @@ import { createContext } from "./createContext.js";
 const {
   createContextProvider: createIsLeftHandedContextProvider,
   createContextConsumer: createIsLeftHandedContextConsumer,
-} = createContext("leftHanded", { isLeftHanded: false }, null, null, true);
+} = await createContext("leftHanded", {
+  defaultState: { isLeftHanded: false },
+  storageType: "localStorage",
+});
 
 export { createIsLeftHandedContextProvider, createIsLeftHandedContextConsumer };
