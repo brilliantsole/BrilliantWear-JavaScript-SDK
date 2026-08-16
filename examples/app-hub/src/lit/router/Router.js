@@ -149,10 +149,10 @@ if (saveNavigationEntryStatesToSessionStorage) {
   const getStateFromSessionStorage = (entry) => {
     console.log("retrieving entry state from sessionStorage", entry);
     if (entry.index == -1) {
-      console.log(
-        `not saving entry to sessionStorage - invalid index ${entry.index}`,
-        entry,
-      );
+      // console.log(
+      //   `not saving entry to sessionStorage - invalid index ${entry.index}`,
+      //   entry,
+      // );
       return;
     }
     const key = useCircularNavigationEntryStateBuffer
@@ -292,9 +292,9 @@ export class Router extends litRouter.Routes {
 
   /** @param {NavigationEventMap["navigate"]} e */
   _onNavigate = (e) => {
-    const { destination, navigationType } = e;
+    const { destination, navigationType, info } = e;
     const { currentEntry } = navigation;
-    console.log("_onNavigate", destination, { navigationType });
+    console.log("_onNavigate", destination, { navigationType, info });
 
     const url = new URL(destination.url);
 
@@ -304,7 +304,7 @@ export class Router extends litRouter.Routes {
     }
 
     // Let browser handle downloads, external targets, etc.
-    if (e.downloadRequest || e.info?.external || e.hashChange) {
+    if (e.downloadRequest || e.hashChange) {
       return;
     }
 
@@ -382,9 +382,13 @@ export class Router extends litRouter.Routes {
             // console.log(
             //   `moving from "${previousTab}" tab to "${activeTab}" tab`,
             // );
-            types.push(
-              tabIndex > previousTabIndex ? "next-tab" : "previous-tab",
-            );
+            if (info?.types) {
+              types.push(...info.types);
+            } else {
+              types.push(
+                tabIndex > previousTabIndex ? "next-tab" : "previous-tab",
+              );
+            }
           } else {
             // FILL - moving between paths of the same route
           }
@@ -404,7 +408,7 @@ export class Router extends litRouter.Routes {
       } catch (error) {}
       const state = { route };
       try {
-        navigation.navigate("./", { state, history: "push" });
+        navigation.navigate("./", { state, history: "push", info });
       } catch (error) {}
     }
   };

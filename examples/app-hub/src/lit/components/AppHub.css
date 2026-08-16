@@ -178,14 +178,19 @@ bw-app-hub {
       flex-direction: var(--flex-direction-lrt);
     }
 
+    :root {
+      --header-padding-right-extra: var(--wa-space-2xs);
+      --header-padding-left-extra: var(--wa-space-2xs);
+    }
+
     @supports (padding-right: env(safe-area-inset-right)) {
       :root {
         --header-padding-right-safe: max(
-          env(safe-area-inset-right) - var(--wa-space-m),
+          env(safe-area-inset-right) - var(--wa-space-s),
           0px
         );
         --main-padding-right-safe: max(
-          env(safe-area-inset-right) - var(--wa-space-m),
+          env(safe-area-inset-right) - var(--wa-space-s),
           0px
         );
       }
@@ -193,11 +198,11 @@ bw-app-hub {
     @supports (padding-left: env(safe-area-inset-left)) {
       :root {
         --header-padding-left-safe: max(
-          env(safe-area-inset-left) - var(--wa-space-m),
+          env(safe-area-inset-left) - var(--wa-space-s),
           0px
         );
         --main-padding-left-safe: max(
-          env(safe-area-inset-left) - var(--wa-space-m),
+          env(safe-area-inset-left) - var(--wa-space-s),
           0px
         );
       }

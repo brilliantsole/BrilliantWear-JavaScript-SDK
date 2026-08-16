@@ -74,6 +74,7 @@ class AppHub extends LitElement {
   }
   _resetViewport() {
     // console.log("_resetViewport");
+    window.scrollTo(0, 1);
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -497,7 +498,7 @@ class AppHub extends LitElement {
   _onKeyDown = (event) => {
     /** @type {Direction} */
     let direction;
-    let allowOverflow = false;
+    let allowOverflow = true;
     const { key } = event;
     switch (key) {
       case "ArrowUp":
@@ -553,16 +554,13 @@ class AppHub extends LitElement {
         {
           switch (direction) {
             case "right":
-              tabIndexOffset = -1;
-              break;
-            case "left":
               tabIndexOffset = 1;
               break;
+            case "left":
+              tabIndexOffset = -1;
+              break;
           }
-          if (this._isLeftHanded) {
-            tabIndexOffset *= -1;
-          }
-          if (isTouch) {
+          if (this._isLeftHanded && this._touchEnabled) {
             tabIndexOffset *= -1;
           }
         }
@@ -582,10 +580,14 @@ class AppHub extends LitElement {
       newTabIndex += tabs.length;
     }
     newTabIndex %= tabs.length;
+
     // console.log({ newTabIndex });
     if (newTabIndex != currentTabIndex) {
       try {
-        navigation.navigate(`/${tabs[newTabIndex]}`);
+        const type = tabIndexOffset > 0 ? "next-tab" : "previous-tab";
+        const types = [type];
+        console.log({ tabIndexOffset, type, types });
+        navigation.navigate(`/${tabs[newTabIndex]}`, { info: { types } });
       } catch (error) {
         // console.error(error);
       }
