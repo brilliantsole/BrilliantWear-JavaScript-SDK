@@ -248,6 +248,7 @@ class AppHub extends LitElement {
     this._onReducedMotionUpdate();
     this._onTouchEnabledUpdate();
     this._onViewportOrientationUpdate();
+    this._onVisibilityUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
