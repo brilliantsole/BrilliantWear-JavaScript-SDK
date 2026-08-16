@@ -208,7 +208,7 @@ class AppHub extends LitElement {
     /** @type {AddEventListenerOptions} */
     const options = { signal: this._abortController.signal };
 
-    // FILL - swipe recognition
+    // document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
 
     this.addEventListener("touchend", this._onTouchEnd, {
@@ -354,16 +354,28 @@ class AppHub extends LitElement {
   };
 
   _lastTouchTime = 0;
-  _doubleTapTime = 500;
+  _doubleTapTimeThreshold = 500;
+  _lastTouchPosition;
+  _doubleTapDistanceSquaredThreshold = 200;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
-    // console.log("onTouchEnd", event);
+    console.log("onTouchEnd", event);
+    const { changedTouches, touches } = event;
 
-    if (event.changedTouches.length != 1) {
+    if (changedTouches.length != 1) {
       return;
     }
-    if (event.touches.length != 0) {
+    if (touches.length != 0) {
       return;
+    }
+    this._ignoreTouchIdentifier = false;
+    const touch = changedTouches[0];
+    // console.log("touch", touch);
+    const { screenX, screenY } = touch;
+
+    if (touch.identifier == this._latestTouchMove?.identifier) {
+      this._ignoreTouchIdentifier = false;
+      this._latestTouchMove = undefined;
     }
 
     const currentTime = new Date().getTime();
@@ -372,55 +384,185 @@ class AppHub extends LitElement {
     // console.log({ tapLength });
 
     if (
-      tapLength < this._doubleTapTime &&
+      tapLength < this._doubleTapTimeThreshold &&
       tapLength > 0 &&
       !event.target.nodeName.includes("BUTTON")
     ) {
-      console.log("double tap detected", event.target);
-      event.preventDefault();
+      const screenDelta = {
+        screenX: screenX - this._lastTouchPosition.screenX,
+        screenY: screenY - this._lastTouchPosition.screenY,
+      };
+      const screenDistanceSquared =
+        screenDelta.screenX ** 2 + screenDelta.screenY ** 2;
+      // console.log({ screenDistanceSquared });
+      if (screenDistanceSquared < this._doubleTapDistanceSquaredThreshold) {
+        // console.log("double tap detected", event.target);
+        event.preventDefault();
+      }
     }
     this._lastTouchTime = currentTime;
+    this._lastTouchPosition = { screenX, screenY };
+  };
+
+  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number}?} */
+  _latestTouchMove;
+  _ignoreTouchIdentifier;
+  _touchMoveMagnitudeThreshold = 60;
+  _touchMoveAngleThreshold = 0.6;
+  /** @param {TouchEvent} event */
+  _onTouchMove = (event) => {
+    console.log("_onTouchMove", event);
+    const { targetTouches } = event;
+    if (targetTouches.length != 1) {
+      return;
+    }
+    const touch = targetTouches[0];
+    const { identifier, screenX, screenY } = touch;
+    const { timeStamp } = event;
+    if (this._ignoreTouchIdentifier) {
+      console.log("ignoring touch identifier");
+      return;
+    }
+    if (identifier != this._latestTouchMove?.identifier) {
+      this._latestTouchMove = {
+        identifier,
+        screenX,
+        screenY,
+        timeStamp,
+      };
+      return;
+    }
+    const touchMoveDelta = {
+      screenX: screenX - this._latestTouchMove.screenX,
+      screenY: screenY - this._latestTouchMove.screenY,
+      timeStamp: timeStamp - this._latestTouchMove.timeStamp,
+    };
+    let angle = Math.atan2(touchMoveDelta.screenY, touchMoveDelta.screenX);
+    const twoPI = 2 * Math.PI;
+    while (angle < 0) {
+      angle += twoPI;
+    }
+    angle %= twoPI;
+    const magnitude = Math.sqrt(
+      touchMoveDelta.screenX ** 2 + touchMoveDelta.screenY ** 2,
+    );
+    // console.log({ angle, magnitude });
+    if (magnitude < this._touchMoveMagnitudeThreshold) {
+      return;
+    }
+
+    let direction;
+    for (let i = 0; i < 4; i++) {
+      const _angle = (twoPI / 4) * i;
+      const difference = Math.min(
+        Math.abs(_angle - angle),
+        Math.abs(_angle - (angle - twoPI)),
+      );
+      if (difference < this._touchMoveAngleThreshold) {
+        direction = this._directions[i];
+      }
+    }
+    // console.log({ direction, angle });
+
+    if (!direction) {
+      return;
+    }
+
+    this._ignoreTouchIdentifier = true;
+
+    this._onDirectionGesture(direction, true, true);
   };
 
   /** @param {KeyboardEvent} event */
   _onKeyDown = (event) => {
+    /** @type {Direction} */
+    let direction;
+    let allowOverflow = false;
+    const { key } = event;
+    switch (key) {
+      case "ArrowUp":
+        direction = "up";
+        break;
+      case "ArrowRight":
+        direction = "right";
+        break;
+      case "ArrowDown":
+        direction = "down";
+        break;
+      case "ArrowLeft":
+        direction = "left";
+        break;
+    }
+    if (direction) {
+      this._onDirectionGesture(direction, false, allowOverflow);
+    }
+  };
+
+  /** @typedef {"right" | "down" | "left" | "up"} Direction */
+  /** @type {Direction[]} */
+  _directions = ["right", "down", "left", "up"];
+  /**
+   * @param {Direction} direction
+   * @param {boolean?} isTouch
+   * @param {boolean?} allowOverflow
+   */
+  _onDirectionGesture(direction, isTouch, allowOverflow) {
+    console.log("_onDirectionGesture", { direction });
+
     const currentTabIndex = tabs.indexOf(this.activeTab);
     let newTabIndex = currentTabIndex;
     let tabIndexOffset = 0;
-    const { key } = event;
-    console.log({ key, currentTabIndex });
-    if (this._viewportOrientation == "landscape") {
-      switch (key) {
-        case "ArrowUp":
-          tabIndexOffset = -1;
-          break;
-        case "ArrowDown":
-          tabIndexOffset = 1;
-          break;
-      }
-    } else {
-      switch (key) {
-        case "ArrowRight":
-          tabIndexOffset = -1;
-          break;
-        case "ArrowLeft":
-          tabIndexOffset = 1;
-          break;
-      }
-      if (this._isLeftHanded) {
-        tabIndexOffset *= -1;
-      }
+    // console.log({ key, currentTabIndex });
+    switch (this._viewportOrientation) {
+      case "landscape":
+        {
+          switch (direction) {
+            case "up":
+              tabIndexOffset = -1;
+              break;
+            case "down":
+              tabIndexOffset = 1;
+              break;
+          }
+          if (isTouch) {
+            tabIndexOffset *= -1;
+          }
+        }
+        break;
+      case "portrait":
+        {
+          switch (direction) {
+            case "right":
+              tabIndexOffset = -1;
+              break;
+            case "left":
+              tabIndexOffset = 1;
+              break;
+          }
+          if (this._isLeftHanded) {
+            tabIndexOffset *= -1;
+          }
+          if (isTouch) {
+            tabIndexOffset *= -1;
+          }
+        }
+        break;
     }
+
     if (tabIndexOffset == 0) {
       return;
     }
     newTabIndex += tabIndexOffset;
 
+    const outOfRange = newTabIndex < 0 || newTabIndex >= tabs.length;
+    if (outOfRange && !allowOverflow) {
+      return;
+    }
     while (newTabIndex < 0) {
       newTabIndex += tabs.length;
     }
     newTabIndex %= tabs.length;
-    console.log({ newTabIndex });
+    // console.log({ newTabIndex });
     if (newTabIndex != currentTabIndex) {
       try {
         navigation.navigate(`/${tabs[newTabIndex]}`);
@@ -428,11 +570,11 @@ class AppHub extends LitElement {
         // console.error(error);
       }
     }
-  };
+  }
 
   render() {
     return html`
-      <header id="header" class="crossAxis">
+      <header id="header" class="crossAxis" @touchmove=${this._onTouchMove}>
         <nav id="nav" class="crossAxis">
           <bw-nav-button-layers></bw-nav-button-layers>
           <bw-nav-button-apps></bw-nav-button-apps>

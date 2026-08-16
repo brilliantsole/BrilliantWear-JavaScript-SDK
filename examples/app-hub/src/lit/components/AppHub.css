@@ -3,6 +3,16 @@ body {
   overflow: hidden;
 }
 
+html {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+legend {
+  box-sizing: border-box;
+}
+
 * {
   touch-action: manipulation;
 
@@ -42,8 +52,8 @@ bw-app-hub {
 }
 
 :root {
-  --header-padding-left-base: var(--wa-space-2xs);
-  --header-padding-right-base: var(--wa-space-2xs);
+  --header-padding-left-base: 0px;
+  --header-padding-right-base: 0px;
   --header-padding-top-base: 0px;
   --header-padding-bottom-base: 0px;
   --header-padding-left-extra: 0px;
@@ -57,12 +67,6 @@ bw-app-hub {
 
   --header-padding-side-safe-delta: calc(
     var(--header-padding-right-safe) - var(--header-padding-left-safe)
-  );
-  --header-padding-side-base-delta: calc(
-    var(--header-padding-right-base) - var(--header-padding-left-base)
-  );
-  --header-padding-side-base: calc(
-    var(--header-padding-right-base) + var(--header-padding-left-base)
   );
 
   --main-padding-left-base: var(--wa-space-xs);
@@ -719,14 +723,14 @@ html:active-view-transition-type(right-handed, left-handed) {
         --right-handed-nav-button-old-animation-name: none; /*tilt-right;*/
         --right-handed-nav-button-new-animation-name: none; /*tilt-right;*/
 
-        --right-handed-menu-button-old-animation-name: slide-out-to-right-from-left-menu;
+        --right-handed-menu-button-old-animation-name: slide-out-to-right-from-left;
         --right-handed-menu-button-new-animation-name: slide-in-from-left;
       }
       &:active-view-transition-type(left-handed) {
         --left-handed-nav-button-old-animation-name: none; /*tilt-left;*/
         --left-handed-nav-button-new-animation-name: none; /*tilt-left;*/
 
-        --left-handed-menu-button-old-animation-name: slide-out-to-left-from-right-menu;
+        --left-handed-menu-button-old-animation-name: slide-out-to-left-from-right;
         --left-handed-menu-button-new-animation-name: slide-in-from-right;
       }
     }
@@ -816,21 +820,17 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
 }
 
-@keyframes slide-out-to-left-from-right-menu {
+@keyframes slide-out-to-left-from-right {
   from {
-    transform: translateX(
-      calc(-100dvw + 100% + var(--header-padding-side-base))
-    );
+    transform: translateX(calc(-100dvw + 100%));
   }
   to {
     transform: translateX(-100dvw);
   }
 }
-@keyframes slide-out-to-right-from-left-menu {
+@keyframes slide-out-to-right-from-left {
   from {
-    transform: translateX(
-      calc(100dvw - 100% - var(--header-padding-side-base))
-    );
+    transform: translateX(calc(100dvw - 100%));
   }
   to {
     transform: translateX(calc(100dvw));
