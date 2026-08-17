@@ -33,6 +33,8 @@ import "./nav/NavButtonDevices.js";
 import "./nav/NavButtonSettings.js";
 import "./nav/NavButtonFlip.js";
 
+import "./main/MainCornerButton.js";
+
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
 import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
 import { createDisableViewTransitionsContextProvider } from "../contexts/disableViewTransitionsContext.js";
@@ -78,6 +80,8 @@ class AppHub extends LitElement {
     // console.log("_resetViewport");
     window.scrollTo(0, 1);
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 1;
+    document.body.scrollTop = 1;
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }
@@ -119,7 +123,7 @@ class AppHub extends LitElement {
 
   constructor() {
     super();
-    this.classList.add("mainAxis");
+    this.dataset.axis = "main";
 
     this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (!this._themeColorMeta) {
@@ -386,7 +390,7 @@ class AppHub extends LitElement {
   _doubleTapDistanceSquaredThreshold = 200;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
-    console.log("onTouchEnd", event);
+    // console.log("_onTouchEnd", event);
     const { changedTouches, touches } = event;
 
     if (changedTouches.length != 1) {
@@ -434,11 +438,11 @@ class AppHub extends LitElement {
   /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number}?} */
   _latestTouchMove;
   _ignoreTouchIdentifier;
-  _touchMoveMagnitudeThreshold = 60;
+  _touchMoveMagnitudeThreshold = 50;
   _touchMoveAngleThreshold = 0.6;
   /** @param {TouchEvent} event */
   _onTouchMove = (event) => {
-    console.log("_onTouchMove", event);
+    // console.log("_onTouchMove", event);
     const { targetTouches } = event;
     if (targetTouches.length != 1) {
       return;
@@ -447,7 +451,7 @@ class AppHub extends LitElement {
     const { identifier, screenX, screenY } = touch;
     const { timeStamp } = event;
     if (this._ignoreTouchIdentifier) {
-      console.log("ignoring touch identifier");
+      // console.log("ignoring touch identifier");
       return;
     }
     if (identifier != this._latestTouchMove?.identifier) {
@@ -497,7 +501,7 @@ class AppHub extends LitElement {
 
     this._ignoreTouchIdentifier = true;
 
-    this._onDirectionGesture(direction, true, true);
+    this._onGestureDirection(direction, true, true);
   };
 
   /** @param {KeyboardEvent} event */
@@ -521,7 +525,7 @@ class AppHub extends LitElement {
         break;
     }
     if (direction) {
-      this._onDirectionGesture(direction, false, allowOverflow);
+      this._onGestureDirection(direction, false, allowOverflow);
     }
   };
 
@@ -533,8 +537,12 @@ class AppHub extends LitElement {
    * @param {boolean?} isTouch
    * @param {boolean?} allowOverflow
    */
-  _onDirectionGesture(direction, isTouch, allowOverflow) {
-    console.log("_onDirectionGesture", { direction });
+  _onGestureDirection(direction, isTouch, allowOverflow) {
+    console.log("_onGestureDirection", {
+      direction,
+      isTouch,
+      _touchEnabled: this._touchEnabled,
+    });
 
     const currentTabIndex = tabs.indexOf(this.activeTab);
     let newTabIndex = currentTabIndex;
@@ -550,6 +558,12 @@ class AppHub extends LitElement {
             case "down":
               tabIndexOffset = 1;
               break;
+            case "left":
+              // FILL - hide header
+              break;
+            case "right":
+              // FILL - hide header
+              break;
           }
           if (isTouch) {
             tabIndexOffset *= -1;
@@ -560,10 +574,16 @@ class AppHub extends LitElement {
         {
           switch (direction) {
             case "right":
-              tabIndexOffset = 1;
+              tabIndexOffset = -1;
               break;
             case "left":
-              tabIndexOffset = -1;
+              tabIndexOffset = 1;
+              break;
+            case "down":
+              // FILL - hide header
+              break;
+            case "up":
+              // FILL - hide header
               break;
           }
           if (this._isLeftHanded && this._touchEnabled) {
@@ -592,7 +612,7 @@ class AppHub extends LitElement {
       try {
         const type = tabIndexOffset > 0 ? "next-tab" : "previous-tab";
         const types = [type];
-        console.log({ tabIndexOffset, type, types });
+        // console.log({ tabIndexOffset, type, types });
         navigation.navigate(`/${tabs[newTabIndex]}`, { info: { types } });
       } catch (error) {
         // console.error(error);
@@ -602,18 +622,76 @@ class AppHub extends LitElement {
 
   render() {
     return html`
-      <header id="header" class="crossAxis" @touchmove=${this._onTouchMove}>
-        <nav id="nav" class="crossAxis">
+      <header id="header" data-axis="cross" @touchmove=${this._onTouchMove}>
+        <nav id="nav" data-axis="cross">
           <bw-nav-button-layers></bw-nav-button-layers>
           <bw-nav-button-apps></bw-nav-button-apps>
           <bw-nav-button-devices></bw-nav-button-devices>
           <bw-nav-button-settings></bw-nav-button-settings>
         </nav>
-        <menu id="menu" class="crossAxis">
-          <bw-nav-button-flip></bw-nav-button-flip>
+        <menu id="menu" data-axis="cross">
+          <bw-nav-button-flip data-touch-only></bw-nav-button-flip>
         </menu>
       </header>
-      <main id="main">${this.router.outlet()}</main>
+      <div id="main">
+        <main>${this.router.outlet()}</main>
+
+        <div data-mouse-only data-main-align="start" data-cross-align="start">
+          <button>Start Start.</button>
+        </div>
+        <div data-mouse-only data-main-align="start" data-cross-align="center">
+          <button>Start Center.</button>
+        </div>
+        <div data-mouse-only data-main-align="start" data-cross-align="end">
+          <button>Start End.</button>
+        </div>
+        <div data-mouse-only data-main-align="center" data-cross-align="start">
+          <button>Center Start.</button>
+        </div>
+        <div data-mouse-only data-main-align="center" data-cross-align="center">
+          <button>Center Center.</button>
+        </div>
+        <div data-mouse-only data-main-align="center" data-cross-align="end">
+          <button>Center End.</button>
+        </div>
+        <div data-mouse-only data-main-align="end" data-cross-align="start">
+          <button>End Start.</button>
+        </div>
+        <div data-mouse-only data-main-align="end" data-cross-align="center">
+          <button>End Center.</button>
+        </div>
+        <div data-mouse-only data-main-align="end" data-cross-align="end">
+          <button>End End.</button>
+        </div>
+
+        <div data-touch-only data-main-align="start" data-cross-align="start">
+          <button>Start Start</button>
+        </div>
+        <div data-touch-only data-main-align="start" data-cross-align="center">
+          <button>Start Center</button>
+        </div>
+        <div data-touch-only data-main-align="start" data-cross-align="end">
+          <button>Start End</button>
+        </div>
+        <div data-touch-only data-main-align="center" data-cross-align="start">
+          <button>Center Start</button>
+        </div>
+        <div data-touch-only data-main-align="center" data-cross-align="center">
+          <button>Center Center</button>
+        </div>
+        <div data-touch-only data-main-align="center" data-cross-align="end">
+          <button>Center End</button>
+        </div>
+        <div data-touch-only data-main-align="end" data-cross-align="start">
+          <button>End Start</button>
+        </div>
+        <div data-touch-only data-main-align="end" data-cross-align="center">
+          <button>End Center</button>
+        </div>
+        <div data-touch-only data-main-align="end" data-cross-align="end">
+          <button>End End</button>
+        </div>
+      </div>
     `;
   }
 }

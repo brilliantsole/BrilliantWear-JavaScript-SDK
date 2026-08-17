@@ -194,10 +194,10 @@ export async function createContext(key, options) {
 
         if (save && !dontSave) {
           const serializedState = serialize(newState);
-          console.log({
-            serializedState,
-            newState,
-          });
+          // console.log({
+          //   serializedState,
+          //   newState,
+          // });
           const didSave = await save(serializedState);
           if (!didSave) {
             console.error(`failed to save "${contextKey}"`);

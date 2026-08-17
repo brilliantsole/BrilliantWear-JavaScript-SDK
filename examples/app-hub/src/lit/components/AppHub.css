@@ -14,7 +14,7 @@ legend {
 }
 
 * {
-  touch-action: manipulation;
+  touch-action: pan-x pan-y;
 
   -webkit-tap-highlight-color: transparent; /* Modern syntax */
   -webkit-tap-highlight-color: rgba(
@@ -28,22 +28,100 @@ legend {
   -webkit-user-select: none;
 }
 
-.mainAxis,
-.crossAxis {
-  display: flex;
+@media (orientation: landscape) {
+  [data-portrait-only] {
+    display: none;
+  }
+}
+@media (orientation: portrait) {
+  [data-landscape-only] {
+    display: none;
+  }
+}
+@media (orientation: landscape) {
+  [data-portrait-only] {
+    display: none;
+  }
+}
+@media (orientation: portrait) {
+  [data-landscape-only] {
+    display: none;
+  }
+}
+@media (pointer: coarse) {
+  [data-mouse-only] {
+    display: none;
+  }
+}
+@media (pointer: fine) {
+  [data-touch-only] {
+    display: none;
+  }
 }
 
 :dir(ltr) {
   --flex-direction-lrt: row;
   --flex-direction-rtl: row-reverse;
+
+  --justify-self-start: end;
+  --justify-self-end: start;
 }
 :dir(rtl) {
   --flex-direction-lrt: row-reverse;
   --flex-direction-rtl: row;
+
+  --justify-self-start: start;
+  --justify-self-end: end;
 }
 
-.crossAxis {
+[data-axis] {
+  display: flex;
+}
+[data-axis="cross"] {
   align-items: center;
+}
+
+[data-cross-align],
+[data-main-align] {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  padding: var(--wa-space-2xs);
+  view-transition-class: main-cross;
+}
+
+[data-main-align="start"] {
+  &[data-cross-align="start"] {
+    view-transition-name: main-start-cross-start;
+  }
+  &[data-cross-align="center"] {
+    view-transition-name: main-start-cross-center;
+  }
+  &[data-cross-align="end"] {
+    view-transition-name: main-start-cross-end;
+  }
+}
+[data-main-align="center"] {
+  &[data-cross-align="start"] {
+    view-transition-name: main-center-cross-start;
+  }
+  &[data-cross-align="center"] {
+    view-transition-name: main-center-cross-center;
+  }
+  &[data-cross-align="end"] {
+    view-transition-name: main-center-cross-end;
+  }
+}
+[data-main-align="end"] {
+  &[data-cross-align="start"] {
+    view-transition-name: main-end-cross-start;
+  }
+  &[data-cross-align="center"] {
+    view-transition-name: main-end-cross-center;
+  }
+  &[data-cross-align="end"] {
+    view-transition-name: main-end-cross-end;
+  }
 }
 
 bw-app-hub {
@@ -83,10 +161,16 @@ bw-app-hub {
   --main-padding-bottom-safe: 0px;
 }
 
-#main {
+main {
   overflow-y: scroll;
-  touch-action: pan-x pan-y;
+  width: 100%;
+  height: 100%;
+}
+
+#main {
+  display: grid;
   flex: 1;
+  position: relative;
 
   padding-left: calc(
     var(--main-padding-left-base) + var(--main-padding-left-extra)
@@ -101,11 +185,11 @@ bw-app-hub {
     var(--main-padding-bottom-base) + var(--main-padding-bottom-extra)
   );
 }
+
 #header {
   flex: 0 0 auto;
   background-color: var(--wa-color-surface-default);
   justify-content: space-between;
-  touch-action: pan-x pan-y;
 
   padding-left: calc(
     var(--header-padding-left-base) + var(--header-padding-left-extra)
@@ -164,18 +248,47 @@ bw-app-hub {
 @media (pointer: coarse) {
   @media (orientation: landscape) {
     /* vertical nav on right */
-    .mainAxis {
+    [data-axis="main"] {
       flex-direction: var(--flex-direction-rtl);
     }
-    .crossAxis {
+    [data-axis="cross"] {
       flex-direction: column;
     }
 
+    [data-main-align="center"] {
+      justify-self: center;
+    }
+    [data-main-align="start"] {
+      justify-self: var(--justify-self-start);
+    }
+    [data-main-align="end"] {
+      justify-self: var(--justify-self-end);
+    }
+
+    [data-cross-align="center"] {
+      align-self: center;
+    }
+    [data-cross-align="start"] {
+      align-self: start;
+    }
+    [data-cross-align="end"] {
+      align-self: end;
+    }
+
     html[data-anchor-nav][data-screen-orientation-type="landscape-secondary"]
-      .mainAxis,
-    html[data-left-handed]:not([data-anchor-nav]) .mainAxis {
-      /* vertical nav on left */
-      flex-direction: var(--flex-direction-lrt);
+      [data-axis="main"],
+    html[data-left-handed]:not([data-anchor-nav]) {
+      [data-axis="main"] {
+        /* vertical nav on left */
+        flex-direction: var(--flex-direction-lrt);
+      }
+
+      [data-main-align="start"] {
+        justify-self: var(--justify-self-end);
+      }
+      [data-main-align="end"] {
+        justify-self: var(--justify-self-start);
+      }
     }
 
     :root {
@@ -241,21 +354,57 @@ bw-app-hub {
         flex-direction: column-reverse;
         /* justify-content: center; */
       }
+
+      [data-cross-align="start"] {
+        align-self: end;
+      }
+      [data-cross-align="end"] {
+        align-self: start;
+      }
     }
   }
 
   @media (orientation: portrait) {
     /* horizontal nav on bottom */
-    .mainAxis {
+    [data-axis="main"] {
       flex-direction: column-reverse;
     }
-    .crossAxis {
+    [data-axis="cross"] {
       flex-direction: var(--flex-direction-rtl);
     }
 
-    html[data-left-handed] .crossAxis {
-      /* reversed horizontal nav on bottom */
-      flex-direction: var(--flex-direction-lrt);
+    [data-cross-align="center"] {
+      justify-self: center;
+    }
+    [data-cross-align="start"] {
+      justify-self: var(--justify-self-start);
+    }
+    [data-cross-align="end"] {
+      justify-self: var(--justify-self-end);
+    }
+
+    [data-main-align="center"] {
+      align-self: center;
+    }
+    [data-main-align="start"] {
+      align-self: end;
+    }
+    [data-main-align="end"] {
+      align-self: start;
+    }
+
+    html[data-left-handed] {
+      [data-axis="cross"] {
+        /* reversed horizontal nav on bottom */
+        flex-direction: var(--flex-direction-lrt);
+      }
+
+      [data-cross-align="start"] {
+        justify-self: var(--justify-self-end);
+      }
+      [data-cross-align="end"] {
+        justify-self: var(--justify-self-start);
+      }
     }
 
     @media (max-width: 4in) {
@@ -270,21 +419,61 @@ bw-app-hub {
 @media (pointer: fine) {
   @media (orientation: landscape) {
     /* vertical nav on left */
-    .crossAxis {
+    [data-axis="main"] {
+      flex-direction: row;
+    }
+    [data-axis="cross"] {
       flex-direction: column;
     }
-    .mainAxis {
-      flex-direction: row;
+
+    [data-main-align="start"] {
+      align-self: start;
+    }
+    [data-main-align="center"] {
+      align-self: center;
+    }
+    [data-main-align="end"] {
+      align-self: end;
+    }
+
+    [data-cross-align="start"] {
+      justify-self: start;
+    }
+    [data-cross-align="center"] {
+      justify-self: center;
+    }
+    [data-cross-align="end"] {
+      justify-self: end;
     }
   }
 
   @media (orientation: portrait) {
     /* horizontal nav on top */
-    .crossAxis {
+    [data-axis="main"] {
+      flex-direction: column;
+    }
+    [data-axis="cross"] {
       flex-direction: row;
     }
-    .mainAxis {
-      flex-direction: column;
+
+    [data-main-align="start"] {
+      justify-self: start;
+    }
+    [data-main-align="center"] {
+      justify-self: center;
+    }
+    [data-main-align="end"] {
+      justify-self: end;
+    }
+
+    [data-cross-align="start"] {
+      align-self: start;
+    }
+    [data-cross-align="center"] {
+      align-self: center;
+    }
+    [data-cross-align="end"] {
+      align-self: end;
     }
   }
 }
@@ -292,7 +481,7 @@ bw-app-hub {
 /* BACKGROUND COLORS */
 
 html,
-#main {
+main {
   background-color: var(--background-color);
 }
 
@@ -368,7 +557,7 @@ html:active-view-transition-type(previous-tab, next-tab) {
 }
 
 html:active-view-transition-type(previous-tab, next-tab) {
-  #main {
+  main {
     view-transition-name: main;
   }
   &::view-transition-group(main) {
@@ -556,7 +745,7 @@ html:active-view-transition-type(right-handed, left-handed) {
         width: fit-content;
       }
 
-      #main {
+      main {
         view-transition-name: main;
       }
       &::view-transition-group(main) {

@@ -17,14 +17,6 @@ class NavButtonFlip extends LitElement {
     this._isLeftHandedConsumer = createIsLeftHandedContextConsumer(this);
   }
 
-  static styles = css`
-    @media (pointer: fine) {
-      :host {
-        display: none;
-      }
-    }
-  `;
-
   onClick(event) {
     const { isLeftHanded } = this._isLeftHandedConsumer.value.state;
     this._anchorNavConsumer.value.update({ anchorNav: false });
