@@ -86,7 +86,7 @@ legend {
   width: fit-content;
   height: fit-content;
   position: absolute;
-  padding: var(--wa-space-2xs);
+  padding: var(--wa-space-xs);
   view-transition-class: main-cross;
 }
 
@@ -143,12 +143,13 @@ bw-app-hub {
   --header-padding-top-safe: 0px;
   --header-padding-bottom-safe: 0px;
 
-  --header-padding-side-safe-delta: calc(
-    var(--header-padding-right-safe) - var(--header-padding-left-safe)
+  --header-padding-side-safe-delta: max(
+    calc(var(--header-padding-right-safe) - var(--header-padding-left-safe)),
+    0px
   );
 
-  --main-padding-left-base: var(--wa-space-xs);
-  --main-padding-right-base: var(--wa-space-xs);
+  --main-padding-left-base: 0px;
+  --main-padding-right-base: 0px;
   --main-padding-top-base: 0px;
   --main-padding-bottom-base: 0px;
   --main-padding-left-extra: 0px;
@@ -159,12 +160,28 @@ bw-app-hub {
   --main-padding-right-safe: 0px;
   --main-padding-top-safe: 0px;
   --main-padding-bottom-safe: 0px;
+
+  --main-padding-left: calc(
+    var(--main-padding-left-base) + var(--main-padding-left-extra)
+  );
+  --main-padding-right: calc(
+    var(--main-padding-right-base) + var(--main-padding-right-extra)
+  );
+  --main-padding-top: calc(
+    var(--main-padding-top-base) + var(--main-padding-top-extra)
+  );
+  --main-padding-bottom: calc(
+    var(--main-padding-bottom-base) + var(--main-padding-bottom-extra)
+  );
 }
 
 main {
   overflow-y: scroll;
   width: 100%;
   height: 100%;
+
+  padding-left: var(--wa-space-xs);
+  padding-right: var(--wa-space-xs);
 }
 
 #main {
@@ -172,18 +189,19 @@ main {
   flex: 1;
   position: relative;
 
-  padding-left: calc(
-    var(--main-padding-left-base) + var(--main-padding-left-extra)
+  margin-left: var(--main-padding-left);
+  margin-right: var(--main-padding-right);
+  margin-top: var(--main-padding-top);
+  margin-bottom: var(--main-padding-bottom);
+
+  /* width: calc(
+    100% - calc(var(--main-padding-right) + var(--main-padding-left))
   );
-  padding-right: calc(
-    var(--main-padding-right-base) + var(--main-padding-right-extra)
+  height: calc(
+    100% - calc(var(--main-padding-top) + var(--main-padding-bottom))
   );
-  padding-top: calc(
-    var(--main-padding-top-base) + var(--main-padding-top-extra)
-  );
-  padding-bottom: calc(
-    var(--main-padding-bottom-base) + var(--main-padding-bottom-extra)
-  );
+
+  top: var(--main-padding-top); */
 }
 
 #header {
@@ -230,16 +248,28 @@ main {
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-  :root {
-    --header-padding-bottom-extra: calc(
-      env(safe-area-inset-bottom) - var(--wa-space-2xs)
-    );
+  @media (orientation: portrait) {
+    :root {
+      --header-padding-bottom-extra: max(
+        calc(env(safe-area-inset-bottom) - var(--wa-space-2xs)),
+        0px
+      );
+    }
+  }
+  @media (orientation: landscape) {
+    :root {
+      --main-padding-bottom-extra: max(
+        calc(env(safe-area-inset-bottom) - var(--wa-space-s)),
+        0px
+      );
+    }
   }
 }
 @supports (padding-top: env(safe-area-inset-top)) {
   :root {
-    --main-padding-top-extra: calc(
-      env(safe-area-inset-top) - var(--wa-space-xl)
+    --main-padding-top-extra: max(
+      calc(env(safe-area-inset-top) - var(--wa-space-xl)),
+      0px
     );
   }
 }
