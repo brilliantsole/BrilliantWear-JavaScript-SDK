@@ -636,60 +636,86 @@ class AppHub extends LitElement {
       <div id="main">
         <main>${this.router.outlet()}</main>
 
-        <div data-mouse-only data-main-align="start" data-cross-align="start">
-          <button>Start Start.</button>
-        </div>
-        <div data-mouse-only data-main-align="start" data-cross-align="center">
-          <button>Start Center.</button>
-        </div>
-        <div data-mouse-only data-main-align="start" data-cross-align="end">
-          <button>Start End.</button>
-        </div>
-        <div data-mouse-only data-main-align="center" data-cross-align="start">
-          <button>Center Start.</button>
-        </div>
-        <div data-mouse-only data-main-align="center" data-cross-align="center">
-          <button>Center Center.</button>
-        </div>
-        <div data-mouse-only data-main-align="center" data-cross-align="end">
-          <button>Center End.</button>
-        </div>
-        <div data-mouse-only data-main-align="end" data-cross-align="start">
-          <button>End Start.</button>
-        </div>
-        <div data-mouse-only data-main-align="end" data-cross-align="center">
-          <button>End Center.</button>
-        </div>
-        <div data-mouse-only data-main-align="end" data-cross-align="end">
-          <button>End End.</button>
-        </div>
+        <div id="mainOverlay">
+          <div data-mouse-only data-main-align="start" data-cross-align="start">
+            <button>Start Start.</button>
+          </div>
+          <div
+            data-mouse-only
+            data-main-align="start"
+            data-cross-align="center"
+          >
+            <button>Start Center.</button>
+          </div>
+          <div data-mouse-only data-main-align="start" data-cross-align="end">
+            <button>Start End.</button>
+          </div>
+          <div
+            data-mouse-only
+            data-main-align="center"
+            data-cross-align="start"
+          >
+            <button>Center Start.</button>
+          </div>
+          <div
+            data-mouse-only
+            data-main-align="center"
+            data-cross-align="center"
+          >
+            <button>Center Center.</button>
+          </div>
+          <div data-mouse-only data-main-align="center" data-cross-align="end">
+            <button>Center End.</button>
+          </div>
+          <div data-mouse-only data-main-align="end" data-cross-align="start">
+            <button>End Start.</button>
+          </div>
+          <div data-mouse-only data-main-align="end" data-cross-align="center">
+            <button>End Center.</button>
+          </div>
+          <div data-mouse-only data-main-align="end" data-cross-align="end">
+            <button>End End.</button>
+          </div>
 
-        <div data-touch-only data-main-align="start" data-cross-align="start">
-          <button>Start Start</button>
-        </div>
-        <div data-touch-only data-main-align="start" data-cross-align="center">
-          <button>Start Center</button>
-        </div>
-        <div data-touch-only data-main-align="start" data-cross-align="end">
-          <button>Start End</button>
-        </div>
-        <div data-touch-only data-main-align="center" data-cross-align="start">
-          <button>Center Start</button>
-        </div>
-        <div data-touch-only data-main-align="center" data-cross-align="center">
-          <button>Center Center</button>
-        </div>
-        <div data-touch-only data-main-align="center" data-cross-align="end">
-          <button>Center End</button>
-        </div>
-        <div data-touch-only data-main-align="end" data-cross-align="start">
-          <button>End Start</button>
-        </div>
-        <div data-touch-only data-main-align="end" data-cross-align="center">
-          <button>End Center</button>
-        </div>
-        <div data-touch-only data-main-align="end" data-cross-align="end">
-          <button>End End</button>
+          <div data-touch-only data-main-align="start" data-cross-align="start">
+            <button>Start Start</button>
+          </div>
+          <div
+            data-touch-only
+            data-main-align="start"
+            data-cross-align="center"
+          >
+            <button>Start Center</button>
+          </div>
+          <div data-touch-only data-main-align="start" data-cross-align="end">
+            <button>Start End</button>
+          </div>
+          <div
+            data-touch-only
+            data-main-align="center"
+            data-cross-align="start"
+          >
+            <button>Center Start</button>
+          </div>
+          <div
+            data-touch-only
+            data-main-align="center"
+            data-cross-align="center"
+          >
+            <button>Center Center</button>
+          </div>
+          <div data-touch-only data-main-align="center" data-cross-align="end">
+            <button>Center End</button>
+          </div>
+          <div data-touch-only data-main-align="end" data-cross-align="start">
+            <button>End Start</button>
+          </div>
+          <div data-touch-only data-main-align="end" data-cross-align="center">
+            <button>End Center</button>
+          </div>
+          <div data-touch-only data-main-align="end" data-cross-align="end">
+            <button>End End</button>
+          </div>
         </div>
       </div>
     `;
