@@ -1127,7 +1127,9 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 @keyframes slide-in-from-left-main-landscape {
   from {
-    transform: translateX(calc(-100% - 100dvw - var(--main-padding-side)));
+    transform: translateX(
+      calc(-100% - var(--main-offset) - var(--main-padding-side))
+    );
   }
   to {
     transform: translateX(0);
@@ -1140,8 +1142,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       calc(
         0px - var(--main-length) -
           (var(--header-length) * var(--main-offset-header-scalar) * -1) +
-          100% + var(--main-padding-left) + var(--main-padding-right) +
-          var(--header-padding-left)
+          100% + var(--main-padding-side) - var(--header-padding-left-safe)
       )
     );
   }
