@@ -945,7 +945,7 @@ html:active-view-transition-type(right-handed, left-handed) {
         z-index: 0;
         animation: none;
       }
-      &::view-transition-group(.nav9-button),
+      &::view-transition-group(.nav-button),
       &::view-transition-old(.menu-button),
       &::view-transition-new(.menu-button) {
         animation-duration: var(--animation-duration);
@@ -1142,7 +1142,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       calc(
         0px - var(--main-length) -
           (var(--header-length) * var(--main-offset-header-scalar) * -1) +
-          100% + var(--main-padding-side) - var(--header-padding-left-safe)
+          100% + var(--main-padding-side) - var(--header-padding-left-extra)
       )
     );
   }
