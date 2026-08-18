@@ -77,13 +77,14 @@ class AppHub extends LitElement {
     }
   }
   _resetViewport() {
+    return;
     // console.log("_resetViewport");
-    window.scrollTo(0, 1);
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 1;
-    document.body.scrollTop = 1;
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+
+    requestAnimationFrame(() => {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+    });
   }
 
   get disableViewTransitions() {
@@ -307,6 +308,24 @@ class AppHub extends LitElement {
       this._viewportOrientationProvider.value.state;
     // console.log({ viewportOrientation });
     this._viewportOrientation = viewportOrientation;
+    this._updateCSSVariables();
+  }
+
+  _updateCSSVariables() {
+    const lengthKey =
+      this._viewportOrientation == "landscape" ? "width" : "height";
+    ["header"].forEach((name) => {
+      const element = this.querySelector(name);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const length = rect[lengthKey];
+        console.log(`${name} length: ${length}px`);
+        document.documentElement.style.setProperty(
+          `--${name}-length`,
+          `${length}px`,
+        );
+      }
+    });
   }
 
   get isLeftHanded() {
@@ -325,6 +344,7 @@ class AppHub extends LitElement {
         "data-left-handed",
         isLeftHanded,
       );
+      this._updateCSSVariables();
       this._isLeftHanded = isLeftHanded;
     };
 
@@ -350,6 +370,10 @@ class AppHub extends LitElement {
   firstUpdated() {
     console.log("firstUpdated");
     this._didFirstUpdate = true;
+    requestAnimationFrame(() => {
+      this._updateCSSVariables();
+      this._resetViewport();
+    });
   }
 
   _updateActiveTab() {
@@ -588,7 +612,6 @@ class AppHub extends LitElement {
           }
           if (this._touchEnabled && this._isLeftHanded == isTouch) {
             tabIndexOffset *= -1;
-            console.log("FLIP");
           }
         }
         break;
