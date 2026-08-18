@@ -1142,7 +1142,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       calc(
         0px - var(--main-length) -
           (var(--header-length) * var(--main-offset-header-scalar) * -1) +
-          100% + var(--main-padding-side) - var(--header-padding-left-extra)
+          100% + var(--main-padding-right) - var(--header-padding-right-safe)
       )
     );
   }
