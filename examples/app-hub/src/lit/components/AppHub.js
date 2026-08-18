@@ -574,10 +574,10 @@ class AppHub extends LitElement {
         {
           switch (direction) {
             case "right":
-              tabIndexOffset = -1;
+              tabIndexOffset = 1;
               break;
             case "left":
-              tabIndexOffset = 1;
+              tabIndexOffset = -1;
               break;
             case "down":
               // FILL - hide header
@@ -586,8 +586,9 @@ class AppHub extends LitElement {
               // FILL - hide header
               break;
           }
-          if (this._isLeftHanded && this._touchEnabled) {
+          if (this._touchEnabled && this._isLeftHanded == isTouch) {
             tabIndexOffset *= -1;
+            console.log("FLIP");
           }
         }
         break;

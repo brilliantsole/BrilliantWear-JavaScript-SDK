@@ -87,6 +87,7 @@ legend {
   height: fit-content;
   position: absolute;
   view-transition-class: main-cross;
+  z-index: 0;
 }
 
 [data-main-align="start"] {
@@ -215,6 +216,8 @@ main {
 }
 
 #header {
+  z-index: 1;
+
   flex: 0 0 auto;
   background-color: var(--wa-color-surface-default);
   justify-content: space-between;
