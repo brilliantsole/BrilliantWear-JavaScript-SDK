@@ -322,7 +322,7 @@ class AppHub extends LitElement {
       if (element) {
         const rect = element.getBoundingClientRect();
         const length = rect[lengthKey];
-        // console.log(`${name} length: ${length}px`);
+        console.log(`${name} length: ${length}px`);
         document.documentElement.style.setProperty(
           `--${name}-length`,
           `${length}px`,
