@@ -370,8 +370,8 @@ main {
     }
 
     :root {
-      --header-padding-right-extra: var(--wa-space-2xs);
-      --header-padding-left-extra: var(--wa-space-2xs);
+      --header-padding-right-base: var(--wa-space-2xs);
+      --header-padding-left-base: var(--wa-space-2xs);
     }
 
     @supports (padding-right: env(safe-area-inset-right)) {
@@ -1153,8 +1153,7 @@ html:active-view-transition-type(right-handed, left-handed) {
         0px - var(--main-length) -
           (var(--header-length) * var(--main-offset-header-scalar) * -1) +
           100% + var(--main-padding-side) + var(--header-padding-left) -
-          var(--header-padding-right-extra) -
-          var(--header-padding-side-safe-delta)
+          var(--header-padding-right)
       )
     );
   }
