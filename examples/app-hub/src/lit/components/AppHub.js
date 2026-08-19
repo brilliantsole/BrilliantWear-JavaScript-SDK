@@ -77,13 +77,16 @@ class AppHub extends LitElement {
     }
   }
   _resetViewport() {
-    return;
     // console.log("_resetViewport");
+
+    // document.documentElement.scrollTop = 1;
+    // document.body.scrollTop = 1;
+    // window.scrollTo(0, 1);
 
     requestAnimationFrame(() => {
       document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      window.scrollTo(0, 0);
+      // document.body.scrollTop = 0;
+      // window.scrollTo(0, 0);
     });
   }
 
@@ -319,7 +322,7 @@ class AppHub extends LitElement {
       if (element) {
         const rect = element.getBoundingClientRect();
         const length = rect[lengthKey];
-        console.log(`${name} length: ${length}px`);
+        // console.log(`${name} length: ${length}px`);
         document.documentElement.style.setProperty(
           `--${name}-length`,
           `${length}px`,
@@ -409,7 +412,7 @@ class AppHub extends LitElement {
   };
 
   _lastTouchTime = 0;
-  _doubleTapTimeThreshold = 500;
+  _doubleTapTimeThreshold = 600;
   _lastTouchPosition;
   _doubleTapDistanceSquaredThreshold = 200;
   /** @param {TouchEvent} event */
