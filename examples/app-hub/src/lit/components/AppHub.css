@@ -1119,7 +1119,6 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
 }
 
-/* FIX */
 @keyframes slide-in-from-right-main-landscape {
   from {
     transform: translateX(
@@ -1147,7 +1146,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
-
+/* FIX */
 @keyframes slide-out-to-left-from-right-main-landscape {
   from {
     transform: translateX(
@@ -1162,7 +1161,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(-100dvw);
   }
 }
-
+/* FIX */
 @keyframes slide-out-to-right-from-left-main-landscape {
   from {
     transform: translateX(
