@@ -413,7 +413,7 @@ class AppHub extends LitElement {
   };
 
   _lastTouchTime = 0;
-  _doubleTapTimeThreshold = 600;
+  _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
   _doubleTapDistanceSquaredThreshold = 200;
   /** @param {TouchEvent} event */
