@@ -191,6 +191,9 @@ bw-app-hub {
   --main-padding-side: calc(
     var(--main-padding-left) + var(--main-padding-right)
   );
+  --main-padding-side-base: calc(
+    var(--main-padding-left-base) + var(--main-padding-right-base)
+  );
 
   --header-length: 0px;
   --header-old-length: 0px;
@@ -377,26 +380,27 @@ main {
       --header-padding-left-extra: var(--wa-space-2xs);
     }
 
-    @supports (padding-right: env(safe-area-inset-right)) {
-      :root {
-        --header-padding-right-safe: max(
-          env(safe-area-inset-right) - var(--wa-space-s),
-          0px
-        );
-        --main-padding-right-safe: max(
-          env(safe-area-inset-right) - var(--wa-space-m),
-          0px
-        );
-      }
-    }
-    @supports (padding-left: env(safe-area-inset-left)) {
-      :root {
+    html[data-screen-orientation-type="landscape-primary"] {
+      @supports (padding-left: env(safe-area-inset-left)) {
         --header-padding-left-safe: max(
           env(safe-area-inset-left) - var(--wa-space-s),
           0px
         );
         --main-padding-left-safe: max(
           env(safe-area-inset-left) - var(--wa-space-m),
+          0px
+        );
+      }
+    }
+
+    html[data-screen-orientation-type="landscape-secondary"] {
+      @supports (padding-right: env(safe-area-inset-right)) {
+        --header-padding-right-safe: max(
+          env(safe-area-inset-right) - var(--wa-space-s),
+          0px
+        );
+        --main-padding-right-safe: max(
+          env(safe-area-inset-right) - var(--wa-space-m),
           0px
         );
       }
@@ -1165,26 +1169,18 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(-100dvw);
   }
 }
-/* FIX */
 @keyframes slide-out-to-right-from-left-main-landscape {
   from {
-    /* transform: translateX(
-      calc(
-        var(--main-length) +
-          (var(--header-length) * var(--main-offset-header-scalar)) - 100% -
-          var(--main-padding-side) + max(var(--header-length-delta), 0px)
-      )
-    ); */
     transform: translateX(
       calc(
         0px - var(--main-offset) + var(--main-length) - 100% -
-          (var(--main-padding-left-base) + var(--main-padding-right-base)) +
-          var(--main-offset-opposite) - var(--main-length-delta) -
-          (var(--main-padding-right-safe) - var(--main-padding-right-extra)) -
+          var(--main-padding-side-base) + var(--main-offset-opposite) -
+          var(--main-length-delta) -
           max(
-            var(--main-padding-left-extra) - var(--main-padding-left-safe),
+            var(--main-padding-right-safe) - var(--main-padding-right-extra),
             0px
-          )
+          ) -
+          var(--main-padding-left-extra)
       )
     );
   }
