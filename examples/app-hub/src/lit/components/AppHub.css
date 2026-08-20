@@ -195,6 +195,7 @@ bw-app-hub {
   --header-length: 0px;
   --header-old-length: 0px;
   --main-offset: 0px;
+  --main-offset-opposite: var(--header-old-length);
   --main-offset-header-scalar: 1;
 
   --main-length-delta: calc(var(--main-length) - var(--main-old-length));
@@ -368,6 +369,7 @@ main {
 
       --main-offset-header-scalar: -1;
       --main-offset: var(--header-length);
+      --main-offset-opposite: 0px;
     }
 
     :root {
@@ -526,6 +528,7 @@ main {
     :root {
       --main-offset-header-scalar: -1;
       --main-offset: var(--header-length);
+      --main-offset-opposite: 0px;
     }
   }
 
@@ -561,6 +564,7 @@ main {
     :root {
       --main-offset-header-scalar: -1;
       --main-offset: var(--header-length);
+      --main-offset-opposite: 0px;
     }
   }
 }
@@ -1164,11 +1168,18 @@ html:active-view-transition-type(right-handed, left-handed) {
 /* FIX */
 @keyframes slide-out-to-right-from-left-main-landscape {
   from {
-    transform: translateX(
+    /* transform: translateX(
       calc(
         var(--main-length) +
           (var(--header-length) * var(--main-offset-header-scalar)) - 100% -
           var(--main-padding-side) + max(var(--header-length-delta), 0px)
+      )
+    ); */
+    transform: translateX(
+      calc(
+        0px - var(--main-offset) + var(--main-length) - 100% -
+          var(--main-padding-side) + var(--main-offset-opposite) -
+          var(--main-length-delta)
       )
     );
   }
