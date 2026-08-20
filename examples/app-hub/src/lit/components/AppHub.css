@@ -1180,9 +1180,9 @@ html:active-view-transition-type(right-handed, left-handed) {
         0px - var(--main-offset) + var(--main-length) - 100% -
           (var(--main-padding-left-base) + var(--main-padding-right-base)) +
           var(--main-offset-opposite) - var(--main-length-delta) -
-          (var(--main-padding-right-safe) - var(--main-padding-right-extra)) +
+          (var(--main-padding-right-safe) - var(--main-padding-right-extra)) -
           max(
-            var(--main-padding-left-safe) - var(--main-padding-left-extra),
+            var(--main-padding-left-extra) - var(--main-padding-left-safe),
             0px
           )
       )
