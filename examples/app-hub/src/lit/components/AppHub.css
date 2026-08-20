@@ -1154,18 +1154,19 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
-/* FIX */
 @keyframes slide-out-to-left-from-right-main-landscape {
   from {
     transform: translateX(
       calc(
-        0px - var(--main-length) -
-          (var(--header-length) * var(--main-offset-header-scalar) * -1) +
-          100% + var(--main-padding-side) + max(var(--header-length-delta), 0px)
+        0px + var(--main-offset-opposite) - var(--main-length) + 100% +
+          var(--main-padding-side-base) - var(--main-offset) +
+          var(--main-padding-right-extra) +
+          (var(--main-padding-left-safe) - var(--main-padding-left-extra))
       )
     );
   }
   to {
+    /* FIX */
     transform: translateX(-100dvw);
   }
 }
@@ -1185,7 +1186,8 @@ html:active-view-transition-type(right-handed, left-handed) {
     );
   }
   to {
-    transform: translateX(calc(100dvw + 0px));
+    /* FIX */
+    transform: translateX(calc(100dvw + var(--main-offset-opposite)));
   }
 }
 
