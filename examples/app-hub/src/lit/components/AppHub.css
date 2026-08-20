@@ -829,7 +829,7 @@ html:active-view-transition-type(next-tab) {
 /* LEFT/RIGHT HANDED VIEW TRANSITIONS  */
 
 html:active-view-transition-type(right-handed, left-handed) {
-  --animation-duration: 5000ms;
+  --animation-duration: 300ms;
   --animation-timing-function: ease;
 }
 
@@ -1130,10 +1130,7 @@ html:active-view-transition-type(right-handed, left-handed) {
 @keyframes slide-in-from-right-main-landscape {
   from {
     transform: translateX(
-      calc(
-        100% + var(--header-length) - var(--main-offset) +
-          var(--main-padding-side)
-      )
+      calc(100% + var(--header-length) + var(--main-padding-side-base))
     );
   }
   to {
@@ -1144,50 +1141,61 @@ html:active-view-transition-type(right-handed, left-handed) {
 @keyframes slide-in-from-left-main-landscape {
   from {
     transform: translateX(
-      calc(
-        -100% - var(--main-offset) - var(--main-padding-side) -
-          var(--header-padding-right-safe)
-      )
+      calc(-100% - var(--main-offset) - var(--main-padding-side-base))
     );
   }
   to {
     transform: translateX(0);
   }
 }
+:root {
+  --slide-out-to-left-from-right-main-landscape-offset: calc(
+    0px + var(--main-offset-opposite) - var(--main-length) + 100% +
+      var(--main-padding-side-base) - var(--main-offset) +
+      var(--main-padding-right-extra) + var(--main-padding-left-safe) -
+      var(--main-padding-left-extra)
+  );
+}
 @keyframes slide-out-to-left-from-right-main-landscape {
   from {
     transform: translateX(
-      calc(
-        0px + var(--main-offset-opposite) - var(--main-length) + 100% +
-          var(--main-padding-side-base) - var(--main-offset) +
-          var(--main-padding-right-extra) +
-          (var(--main-padding-left-safe) - var(--main-padding-left-extra))
-      )
+      var(--slide-out-to-left-from-right-main-landscape-offset)
     );
   }
   to {
-    /* FIX */
-    transform: translateX(-100dvw);
+    transform: translateX(
+      calc(
+        var(--slide-out-to-left-from-right-main-landscape-offset) -
+          var(--header-old-length) - var(--main-padding-side-base) - 100%
+      )
+    );
   }
+}
+:root {
+  --slide-out-to-right-from-left-main-landscape-offset: calc(
+    0px - var(--main-offset) + var(--main-length) - 100% -
+      var(--main-padding-side-base) + var(--main-offset-opposite) -
+      var(--main-length-delta) -
+      max(
+        var(--main-padding-right-safe) - var(--main-padding-right-extra),
+        0px
+      ) -
+      var(--main-padding-left-extra)
+  );
 }
 @keyframes slide-out-to-right-from-left-main-landscape {
   from {
     transform: translateX(
-      calc(
-        0px - var(--main-offset) + var(--main-length) - 100% -
-          var(--main-padding-side-base) + var(--main-offset-opposite) -
-          var(--main-length-delta) -
-          max(
-            var(--main-padding-right-safe) - var(--main-padding-right-extra),
-            0px
-          ) -
-          var(--main-padding-left-extra)
-      )
+      var(--slide-out-to-right-from-left-main-landscape-offset)
     );
   }
   to {
-    /* FIX */
-    transform: translateX(calc(100dvw + var(--main-offset-opposite)));
+    transform: translateX(
+      calc(
+        var(--slide-out-to-right-from-left-main-landscape-offset) +
+          var(--header-old-length) + var(--main-padding-side-base) + 100%
+      )
+    );
   }
 }
 
