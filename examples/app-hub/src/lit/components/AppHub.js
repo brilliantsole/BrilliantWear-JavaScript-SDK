@@ -314,7 +314,7 @@ class AppHub extends LitElement {
     this._updateCSSVariables();
   }
 
-  _updateCSSVariables() {
+  _updateCSSVariables(isOld) {
     const lengthKey =
       this._viewportOrientation == "landscape" ? "width" : "height";
     ["header"].forEach((name) => {
@@ -322,9 +322,9 @@ class AppHub extends LitElement {
       if (element) {
         const rect = element.getBoundingClientRect();
         const length = rect[lengthKey];
-        console.log(`${name} length: ${length}px`);
+        console.log(`${isOld ? "old" : "new"} ${name} length: ${length}px`);
         document.documentElement.style.setProperty(
-          `--${name}-length`,
+          `--${name}${isOld ? "-old" : ""}-length`,
           `${length}px`,
         );
       }
@@ -342,7 +342,7 @@ class AppHub extends LitElement {
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
     console.log({ isLeftHanded });
-    const update = () => {
+    const update = (isViewTransition) => {
       document.documentElement.toggleAttribute(
         "data-left-handed",
         isLeftHanded,
@@ -361,6 +361,7 @@ class AppHub extends LitElement {
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
       console.log("types", types);
+      this._updateCSSVariables(true);
       document.startViewTransition({
         update: async () => {
           update();
