@@ -858,6 +858,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       }
       &::view-transition-old(main) {
         animation: none;
+        display: none;
       }
     }
   }
@@ -1045,7 +1046,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(calc(100dvw - 100%));
   }
   to {
-    transform: translateX(100dvw);
+    transform: translateX(calc(100dvw + max(var(--header-length-delta), 0px)));
   }
 }
 @keyframes slide-in-from-right-header-landscape {
@@ -1101,7 +1102,7 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 @keyframes slide-in-to-left-main-landscape {
   from {
-    transform: translateX(calc(100dvw - 100%));
+    transform: translateX(calc(100dvw - 100% + var(--main-length-delta)));
   }
   to {
     transform: translateX(0);
