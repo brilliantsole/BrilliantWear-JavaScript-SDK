@@ -236,6 +236,12 @@ class AppHub extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
+    document.addEventListener(
+      "click",
+      (e) => document.documentElement.requestFullscreen(),
+      { once: true },
+    );
+
     this._abortController = new AbortController();
     /** @type {AddEventListenerOptions} */
     const options = { signal: this._abortController.signal };

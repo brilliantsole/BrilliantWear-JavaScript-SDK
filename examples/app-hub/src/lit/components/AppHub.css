@@ -318,7 +318,7 @@ main {
 @supports (padding-top: env(safe-area-inset-top)) {
   :root {
     --main-padding-top-extra: max(
-      calc(env(safe-area-inset-top) - var(--wa-space-xl)),
+      calc(env(safe-area-inset-top) - var(--wa-space-m)),
       0px
     );
   }
