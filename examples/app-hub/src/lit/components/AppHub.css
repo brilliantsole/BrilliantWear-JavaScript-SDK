@@ -239,8 +239,6 @@ main {
   position: absolute;
   pointer-events: none;
 
-  display: none;
-
   width: calc(
     100% - calc(var(--main-padding-right) + var(--main-padding-left))
   );
@@ -1121,6 +1119,7 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
 }
 
+/* FIX */
 @keyframes slide-in-from-right-main-landscape {
   from {
     transform: translateX(
@@ -1151,37 +1150,30 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 @keyframes slide-out-to-left-from-right-main-landscape {
   from {
-    /* FIX */
-
     transform: translateX(
       calc(
         0px - var(--main-length) -
           (var(--header-length) * var(--main-offset-header-scalar) * -1) +
-          100% + var(--main-padding-side) + var(--header-padding-left) -
-          var(--header-padding-right)
+          100% + var(--main-padding-side) + max(var(--header-length-delta), 0px)
       )
     );
   }
   to {
-    /* FIX */
     transform: translateX(-100dvw);
   }
 }
 
 @keyframes slide-out-to-right-from-left-main-landscape {
   from {
-    /* FIX */
     transform: translateX(
       calc(
         var(--main-length) +
           (var(--header-length) * var(--main-offset-header-scalar)) - 100% -
-          var(--main-padding-side) + var(--header-padding-left) -
-          var(--header-padding-right)
+          var(--main-padding-side) + max(var(--header-length-delta), 0px)
       )
     );
   }
   to {
-    /* FIX */
     transform: translateX(calc(100dvw + 0px));
   }
 }
