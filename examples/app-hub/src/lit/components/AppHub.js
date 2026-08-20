@@ -415,7 +415,6 @@ class AppHub extends LitElement {
   _lastTouchTime = 0;
   _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
-  _doubleTapDistanceSquaredThreshold = 200;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     // console.log("_onTouchEnd", event);
@@ -440,7 +439,7 @@ class AppHub extends LitElement {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this._lastTouchTime;
 
-    // console.log({ tapLength });
+    console.log({ tapLength });
 
     if (
       tapLength < this._doubleTapTimeThreshold &&
@@ -453,9 +452,12 @@ class AppHub extends LitElement {
       };
       const screenDistanceSquared =
         screenDelta.screenX ** 2 + screenDelta.screenY ** 2;
-      // console.log({ screenDistanceSquared });
-      if (screenDistanceSquared < this._doubleTapDistanceSquaredThreshold) {
-        // console.log("double tap detected", event.target);
+      console.log({ screenDistanceSquared });
+      if (
+        true ||
+        screenDistanceSquared < this._doubleTapDistanceSquaredThreshold
+      ) {
+        console.log("double tap detected", event.target);
         event.preventDefault();
       }
     }
