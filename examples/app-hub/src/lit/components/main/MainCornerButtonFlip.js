@@ -6,9 +6,9 @@ const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
-import "./NavButton.js";
+import "./MainCornerButton.js";
 
-class NavButtonFlip extends LitElement {
+class MainCornerButtonFlip extends LitElement {
   constructor() {
     super();
 
@@ -23,13 +23,12 @@ class NavButtonFlip extends LitElement {
   }
 
   render() {
-    return html`<bw-nav-button
+    return html`<bw-main-corner-button
       icon-name="arrow-right-arrow-left"
-      variant="neutral"
-      @click=${this.onClick}
+      label="flip"
+      @click="${this.onClick}"
     >
-      Flip
-    </bw-nav-button>`;
+    </bw-main-corner-button>`;
   }
 }
-customElements.define("bw-nav-button-flip", NavButtonFlip);
+customElements.define("bw-main-corner-button-flip", MainCornerButtonFlip);

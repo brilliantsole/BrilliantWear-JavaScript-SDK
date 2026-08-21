@@ -1,7 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litContext } = await waitForGlobals();
-const { ContextConsumer } = litContext;
+const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
@@ -71,10 +70,6 @@ class NavButton extends LitElement {
     );
   }
 
-  onDoubleClick(event) {
-    event.preventDefault();
-  }
-
   render() {
     const pill =
       this._screenOrientationConsumer.value.state.type.includes("landscape") &&
@@ -87,7 +82,6 @@ class NavButton extends LitElement {
       .appearance=${this.isActive ? "accent" : "plain"}
       .href=${this.href}
       @click=${this.click}
-      @dblclick=${this.onDoubleClick}
     >
       <div class="wa-align-items-center wa-stack wa-gap-2xs">
         <wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon>

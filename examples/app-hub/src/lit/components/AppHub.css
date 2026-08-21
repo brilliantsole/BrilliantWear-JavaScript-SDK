@@ -8,6 +8,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+* {
+  /* Prevents the default iOS long-press callout */
+  -webkit-touch-callout: none;
+
+  /* Prevents the default blue highlight box when tapping elements */
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   position: absolute;
   width: 100%;
@@ -33,6 +41,12 @@ legend {
 
   user-select: none;
   -webkit-user-select: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 @media (orientation: landscape) {
@@ -94,6 +108,11 @@ legend {
   position: absolute;
 }
 
+html[data-disable-main-overlay] {
+  #mainOverlay {
+    display: none;
+  }
+}
 #mainOverlay {
   [data-main-align="start"] {
     &[data-cross-align="start"] {
@@ -298,11 +317,21 @@ main {
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   @media (orientation: portrait) {
-    :root {
-      --header-padding-bottom-extra: max(
-        calc(env(safe-area-inset-bottom) - var(--wa-space-2xs)),
-        0px
-      );
+    @supports (-webkit-touch-callout: none) {
+      :root {
+        --header-padding-bottom-extra: max(
+          calc(env(safe-area-inset-bottom) - var(--wa-space-l)),
+          0px
+        );
+      }
+    }
+    @supports not (-webkit-touch-callout: none) {
+      :root {
+        --header-padding-bottom-extra: max(
+          calc(env(safe-area-inset-bottom) - var(--wa-space-2xs)),
+          0px
+        );
+      }
     }
   }
   @media (orientation: landscape) {
@@ -1358,5 +1387,11 @@ html:active-view-transition-type(right-handed, left-handed) {
         --left-handed-overlay-end-new-animation-name: slide-in-from-right-main-landscape;
       }
     }
+  }
+}
+
+html:not([data-fullscreen-enabled]) {
+  bw-main-corner-button-toggle-fullscreen {
+    display: none;
   }
 }

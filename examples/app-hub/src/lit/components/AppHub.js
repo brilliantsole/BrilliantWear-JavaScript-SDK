@@ -33,6 +33,9 @@ import "./nav/NavButtonDevices.js";
 import "./nav/NavButtonSettings.js";
 import "./nav/NavButtonFlip.js";
 
+import "./main/MainCornerButtonFlip.js";
+import "./main/MainCornerButtonToggleFullscreen.js";
+
 import "./main/MainCornerButton.js";
 
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
@@ -43,6 +46,7 @@ import { createReducedMotionContextProvider } from "../contexts/reducedMotionCon
 import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
 import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
 import { createVisibilityContextProvider } from "../contexts/visibilityContext.js";
+import { createFullscreenContextProvider } from "../contexts/fullscreenContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -154,6 +158,9 @@ class AppHub extends LitElement {
       null,
       () => this._onScreenOrientationUpdate(),
     );
+    this._fullscreenProvider = createFullscreenContextProvider(this, null, () =>
+      this._onFullscreenUpdate(),
+    );
     this._isLeftHandedProvider = createIsLeftHandedContextProvider(
       this,
       null,
@@ -250,6 +257,7 @@ class AppHub extends LitElement {
       passive: false,
     });
 
+    this._onFullscreenUpdate();
     this._onScreenOrientationUpdate();
     this._updateActiveTab();
     this._onIsLeftHandedUpdate();
@@ -294,6 +302,17 @@ class AppHub extends LitElement {
     );
   }
 
+  _onFullscreenUpdate() {
+    // console.log("_onFullscreenUpdate");
+    const { fullscreenEnabled, fullscreenElement } =
+      this._fullscreenProvider.value.state;
+    // console.log({ fullscreenEnabled, fullscreenElement });
+    document.documentElement.toggleAttribute(
+      "data-fullscreen-enabled",
+      fullscreenEnabled,
+    );
+  }
+
   _onReducedMotionUpdate() {
     const { reducedMotion } = this._reducedMotionProvider.value.state;
     // console.log({ reducedMotion });
@@ -322,7 +341,7 @@ class AppHub extends LitElement {
       if (element) {
         const rect = element.getBoundingClientRect();
         const length = rect[lengthKey];
-        console.log(`${isOld ? "old" : "new"} ${name} length: ${length}px`);
+        // console.log(`${isOld ? "old" : "new"} ${name} length: ${length}px`);
         document.documentElement.style.setProperty(
           `--${name}${isOld ? "-old" : ""}-length`,
           `${length}px`,
@@ -415,6 +434,7 @@ class AppHub extends LitElement {
   _lastTouchTime = 0;
   _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
+  _doubleTapDistanceThreshold = 500;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     // console.log("_onTouchEnd", event);
@@ -439,7 +459,7 @@ class AppHub extends LitElement {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this._lastTouchTime;
 
-    console.log({ tapLength });
+    console.log({ tapLength, nodeName: event.target.nodeName });
 
     if (
       tapLength < this._doubleTapTimeThreshold &&
@@ -452,11 +472,11 @@ class AppHub extends LitElement {
       };
       const screenDistanceSquared =
         screenDelta.screenX ** 2 + screenDelta.screenY ** 2;
-      console.log({ screenDistanceSquared });
-      if (
-        true ||
-        screenDistanceSquared < this._doubleTapDistanceSquaredThreshold
-      ) {
+      const screenDistance = Math.sqrt(
+        screenDelta.screenX ** 2 + screenDelta.screenY ** 2,
+      );
+      console.log({ screenDistance });
+      if (screenDistance < this._doubleTapDistanceThreshold) {
         console.log("double tap detected", event.target);
         event.preventDefault();
       }
@@ -667,84 +687,96 @@ class AppHub extends LitElement {
         <main>${this.router.outlet()}</main>
 
         <div id="mainOverlay">
-          <div data-mouse-only data-main-align="start" data-cross-align="start">
-            <button>Start Start.</button>
-          </div>
+          <div
+            data-mouse-only
+            data-main-align="start"
+            data-cross-align="start"
+          ></div>
           <div
             data-mouse-only
             data-main-align="start"
             data-cross-align="center"
-          >
-            <button>Start Center.</button>
-          </div>
-          <div data-mouse-only data-main-align="start" data-cross-align="end">
-            <button>Start End.</button>
-          </div>
+          ></div>
+          <div
+            data-mouse-only
+            data-main-align="start"
+            data-cross-align="end"
+          ></div>
           <div
             data-mouse-only
             data-main-align="center"
             data-cross-align="start"
-          >
-            <button>Center Start.</button>
-          </div>
+          ></div>
           <div
             data-mouse-only
             data-main-align="center"
             data-cross-align="center"
-          >
-            <button>Center Center.</button>
-          </div>
-          <div data-mouse-only data-main-align="center" data-cross-align="end">
-            <button>Center End.</button>
-          </div>
-          <div data-mouse-only data-main-align="end" data-cross-align="start">
-            <button>End Start.</button>
-          </div>
-          <div data-mouse-only data-main-align="end" data-cross-align="center">
-            <button>End Center.</button>
-          </div>
-          <div data-mouse-only data-main-align="end" data-cross-align="end">
-            <button>End End.</button>
-          </div>
+          ></div>
+          <div
+            data-mouse-only
+            data-main-align="center"
+            data-cross-align="end"
+          ></div>
+          <div
+            data-mouse-only
+            data-main-align="end"
+            data-cross-align="start"
+          ></div>
+          <div
+            data-mouse-only
+            data-main-align="end"
+            data-cross-align="center"
+          ></div>
+          <div
+            data-mouse-only
+            data-main-align="end"
+            data-cross-align="end"
+          ></div>
 
           <div data-touch-only data-main-align="start" data-cross-align="start">
-            <button>Start Start</button>
+            <bw-main-corner-button-toggle-fullscreen
+              data-portrait-only
+            ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
             data-touch-only
             data-main-align="start"
             data-cross-align="center"
-          >
-            <button>Start Center</button>
-          </div>
+          ></div>
           <div data-touch-only data-main-align="start" data-cross-align="end">
-            <button>Start End</button>
+            <bw-main-corner-button-toggle-fullscreen
+              data-landscape-only
+            ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
             data-touch-only
             data-main-align="center"
             data-cross-align="start"
-          >
-            <button>Center Start</button>
-          </div>
+          ></div>
           <div
             data-touch-only
             data-main-align="center"
             data-cross-align="center"
-          >
-            <button>Center Center</button>
-          </div>
-          <div data-touch-only data-main-align="center" data-cross-align="end">
-            <button>Center End</button>
-          </div>
-          <div data-touch-only data-main-align="end" data-cross-align="start">
-            <button>End Start</button>
-          </div>
-          <div data-touch-only data-main-align="end" data-cross-align="center">
-            <button>End Center</button>
-          </div>
+          ></div>
+          <div
+            data-touch-only
+            data-main-align="center"
+            data-cross-align="end"
+          ></div>
+          <div
+            data-touch-only
+            data-main-align="end"
+            data-cross-align="start"
+          ></div>
+          <div
+            data-touch-only
+            data-main-align="end"
+            data-cross-align="center"
+          ></div>
           <div data-touch-only data-main-align="end" data-cross-align="end">
-            <button>End End</button>
+            <bw-main-corner-button-flip
+              data-landscape-only
+            ></bw-main-corner-button-flip>
           </div>
         </div>
       </div>

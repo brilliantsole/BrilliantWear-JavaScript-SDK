@@ -1,7 +1,6 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litContext } = await waitForGlobals();
-const { ContextConsumer } = litContext;
+const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
@@ -15,9 +14,8 @@ class MainCornerButton extends LitElement {
     appearance: {},
     iconFamily: { attribute: "icon-family" },
     iconName: { attribute: "icon-name" },
-    label: {},
-    name: {},
     click: { attribute: false },
+    label: {},
     size: {},
   };
 
@@ -27,36 +25,20 @@ class MainCornerButton extends LitElement {
 
   constructor() {
     super();
+    this.pill = true;
+    this.appearance = "accent";
     this.variant = "neutral";
-    this.appearance = "fill-outlined";
-    this.size = "m";
-  }
-
-  _updateViewTransitionName() {
-    console.log("_updateViewTransitionName", this.name);
-    this.style.viewTransitionName = `${this.name}`;
-  }
-
-  onDoubleClick(event) {
-    event.preventDefault();
-  }
-
-  updated(changedProperties) {
-    if (changedProperties.has("name")) {
-      this._updateViewTransitionName();
-    }
+    this.size = "xs";
   }
 
   render() {
-    console.log(this.variant, this.appearance);
     return html`
       <wa-button
-        pill
+        ?pill=${this.pill}
         .size=${this.size}
         .variant=${this.variant}
         .appearance=${this.appearance}
         @click=${this.click}
-        @dblclick=${this.onDoubleClick}
       >
         <wa-icon
           family=${this.iconFamily}
