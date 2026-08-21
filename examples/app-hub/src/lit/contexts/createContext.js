@@ -169,7 +169,7 @@ export async function createContext(key, options) {
   if (load) {
     const serializedState = await load();
     parsedState = parse(serializedState);
-    console.log({ serializedState, parsedState });
+    // console.log({ serializedState, parsedState });
   }
 
   /**

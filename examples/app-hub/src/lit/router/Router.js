@@ -100,7 +100,7 @@ navigation.addEventListener("currententrychange", (event) => {
 });
 
 const saveCurrentNavigationEntryStateToSessionStorage = () => {
-  console.log("saveCurrentNavigationEntryStateToSessionStorage");
+  // console.log("saveCurrentNavigationEntryStateToSessionStorage");
   const { currentEntry } = navigation;
   const currentState = currentEntry.getState();
   const currentStateString = JSON.stringify(currentState);
@@ -147,7 +147,7 @@ if (saveNavigationEntryStatesToSessionStorage) {
 
   /** @param {NavigationHistoryEntry | NavigationDestination} entry */
   const getStateFromSessionStorage = (entry) => {
-    console.log("retrieving entry state from sessionStorage", entry);
+    // console.log("retrieving entry state from sessionStorage", entry);
     if (entry.index == -1) {
       // console.log(
       //   `not saving entry to sessionStorage - invalid index ${entry.index}`,
@@ -159,11 +159,11 @@ if (saveNavigationEntryStatesToSessionStorage) {
       ? `${circularNavigationEntryStateBufferSessionsStorageKeyPrefix}-${getCircularNavigationEntryStateBufferIndex(entry)}`
       : `${navigationEntryStateSessionsStorageKeyPrefix}-${entry[entryKey]}`;
     const stateString = sessionStorage.getItem(key);
-    console.log("sessionStorage", { key, stateString });
+    // console.log("sessionStorage", { key, stateString });
     if (stateString) {
       try {
         const state = JSON.parse(stateString);
-        console.log("sessionStorage state", state);
+        // console.log("sessionStorage state", state);
         return state;
       } catch (error) {
         console.error("failed to parse stateString", error);
@@ -172,19 +172,19 @@ if (saveNavigationEntryStatesToSessionStorage) {
   };
 
   NavigationHistoryEntry.prototype.getState = function () {
-    console.log("entry getState", this);
+    // console.log("entry getState", this);
     const state = _getNavigationHistoryEntryState.call(this);
     if (state) {
-      console.log("existing state", state);
+      // console.log("existing state", state);
       return state;
     }
     return getStateFromSessionStorage(this);
   };
   NavigationDestination.prototype.getState = function () {
-    console.log("destination getState", this);
+    // console.log("destination getState", this);
     const state = _getNavigationDestinationState.call(this);
     if (state) {
-      console.log("existing state", state);
+      // console.log("existing state", state);
       return state;
     }
     return getStateFromSessionStorage(this);

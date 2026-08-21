@@ -1,5 +1,5 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-import { createAnchorNavContextConsumer } from "../../contexts/anchorNavContext.js";
+import { createAnchorHeaderContextConsumer } from "../../contexts/anchorHeaderContext.js";
 import { createIsLeftHandedContextConsumer } from "../../contexts/isLeftHandedContext.js";
 
 const { lit } = await waitForGlobals();
@@ -12,13 +12,13 @@ class MainCornerButtonFlip extends LitElement {
   constructor() {
     super();
 
-    this._anchorNavConsumer = createAnchorNavContextConsumer(this);
+    this._anchorHeaderConsumer = createAnchorHeaderContextConsumer(this);
     this._isLeftHandedConsumer = createIsLeftHandedContextConsumer(this);
   }
 
   onClick(event) {
     const { isLeftHanded } = this._isLeftHandedConsumer.value.state;
-    this._anchorNavConsumer.value.update({ anchorNav: false });
+    this._anchorHeaderConsumer.value.update({ anchorHeader: false });
     this._isLeftHandedConsumer.value.update({ isLeftHanded: !isLeftHanded });
   }
 

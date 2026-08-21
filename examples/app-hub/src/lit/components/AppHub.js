@@ -35,40 +35,45 @@ import "./nav/NavButtonFlip.js";
 
 import "./main/MainCornerButtonFlip.js";
 import "./main/MainCornerButtonToggleFullscreen.js";
+import "./main/MainCornerButtonToggleHeader.js";
 
 import "./main/MainCornerButton.js";
 
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
 import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
 import { createDisableViewTransitionsContextProvider } from "../contexts/disableViewTransitionsContext.js";
-import { createAnchorNavContextProvider } from "../contexts/anchorNavContext.js";
+import { createAnchorHeaderContextProvider } from "../contexts/anchorHeaderContext.js";
 import { createReducedMotionContextProvider } from "../contexts/reducedMotionContext.js";
 import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
 import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
 import { createVisibilityContextProvider } from "../contexts/visibilityContext.js";
 import { createFullscreenContextProvider } from "../contexts/fullscreenContext.js";
+import { createIsHeaderHiddenContextProvider } from "../contexts/isHeaderHiddenContext.js";
+import { createHeaderSideContextProvider } from "../contexts/headerSideContext.js";
+import { isIOS } from "../../utils/environment.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
     return this;
   }
 
-  get anchorNav() {
-    return this._anchorNav;
+  get anchorHeader() {
+    return this._anchorHeader;
   }
-  set anchorNav(newAnchorNav) {
-    this._anchorNavContextProvider.value.update({
-      anchorNav: newAnchorNav,
+  set anchorHeader(newAnchorHeader) {
+    this._anchorHeaderContextProvider.value.update({
+      anchorHeader: newAnchorHeader,
     });
   }
-  _onAnchorNavUpdate() {
-    const { anchorNav } = this._anchorNavContextProvider.value.state;
-    console.log({ anchorNav });
-    this._anchorNav = anchorNav;
+  _onAnchorHeaderUpdate() {
+    const { anchorHeader } = this._anchorHeaderContextProvider.value.state;
+    console.log({ anchorHeader });
+    this._anchorHeader = anchorHeader;
     document.documentElement.toggleAttribute(
-      "data-anchor-nav",
-      this._anchorNav,
+      "data-anchor-header",
+      this._anchorHeader,
     );
+    this._updateHeaderSide();
   }
 
   _hidden = false;
@@ -147,10 +152,10 @@ class AppHub extends LitElement {
       createDisableViewTransitionsContextProvider(this, null, () =>
         this._onDisableViewTransitionsUpdate(),
       );
-    this._anchorNavContextProvider = createAnchorNavContextProvider(
+    this._anchorHeaderContextProvider = createAnchorHeaderContextProvider(
       this,
       null,
-      () => this._onAnchorNavUpdate(),
+      () => this._onAnchorHeaderUpdate(),
     );
     this._activeTabProvider = createActiveTabContextProvider(this);
     this._screenOrientationProvider = createScreenOrientationContextProvider(
@@ -166,6 +171,20 @@ class AppHub extends LitElement {
       null,
       () => {
         this._onIsLeftHandedUpdate();
+      },
+    );
+    this._headerSideProvider = createHeaderSideContextProvider(
+      this,
+      null,
+      () => {
+        this._onHeaderSideUpdate();
+      },
+    );
+    this._isHeaderHiddenProvider = createIsHeaderHiddenContextProvider(
+      this,
+      null,
+      () => {
+        this._onIsHeaderHiddenUpdate();
       },
     );
     this._reducedMotionProvider = createReducedMotionContextProvider(
@@ -272,6 +291,8 @@ class AppHub extends LitElement {
       this._onBatteryChargingTimeChange();
       this._onBatteryDischargingTimeChange();
     }
+
+    this.anchorHeader = true;
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -292,6 +313,8 @@ class AppHub extends LitElement {
     this._updateMetaColor();
   }
 
+  /** @type {OrientationType} */
+  _screenOrientationType;
   _onScreenOrientationUpdate() {
     // console.log("_onScreenOrientationUpdate");
     const { type } = this._screenOrientationProvider.value.state;
@@ -300,6 +323,7 @@ class AppHub extends LitElement {
       "data-screen-orientation-type",
       this._screenOrientationType,
     );
+    this._updateHeaderSide();
   }
 
   _onFullscreenUpdate() {
@@ -322,6 +346,7 @@ class AppHub extends LitElement {
     const { touchEnabled } = this._touchEnabledProvider.value.state;
     // console.log({ touchEnabled });
     this._touchEnabled = touchEnabled;
+    this._updateHeaderSide();
   }
   /** @type {import("../contexts/viewportOrientationContext.js").ViewportOrientation} */
   _viewportOrientation = "landscape";
@@ -368,12 +393,14 @@ class AppHub extends LitElement {
       );
       this._updateCSSVariables();
       this._isLeftHanded = isLeftHanded;
+
+      this._updateHeaderSide();
     };
 
     if (
       !this._didFirstUpdate ||
       this.skipViewTransitions ||
-      this.anchorNav ||
+      this.anchorHeader ||
       !this._touchEnabled
     ) {
       update();
@@ -388,6 +415,62 @@ class AppHub extends LitElement {
         types,
       });
     }
+  }
+
+  _onHeaderSideUpdate() {
+    const { headerSide } = this._headerSideProvider.value.state;
+    console.log({ headerSide });
+  }
+  /** @type {import("../contexts/headerSideContext.js").HeaderSide} */
+  get headerSide() {
+    return this._headerSideProvider.value.state.headerSide;
+  }
+  _updateHeaderSide() {
+    console.log("_updateHeaderSide");
+    let headerSide = "bottom";
+    switch (this._screenOrientationType) {
+      case "landscape-primary":
+      case "landscape-secondary":
+        if (this._anchorHeader) {
+          headerSide =
+            this._screenOrientationType == "landscape-primary"
+              ? "left"
+              : "right";
+        } else {
+          headerSide = this._isLeftHanded ? "left" : "right";
+        }
+        break;
+      case "portrait-primary":
+      case "portrait-secondary":
+        headerSide = this._touchEnabled ? "bottom" : "top";
+        break;
+    }
+    if (this._viewportOrientation == "landscape") {
+      if (this._touchEnabled) {
+      } else {
+        headerSide = "bottom";
+      }
+    } else {
+    }
+    // console.log({ newHeaderSide: headerSide });
+    this._headerSideProvider.value.update({ headerSide });
+  }
+
+  _onIsHeaderHiddenUpdate() {
+    const { isHeaderHidden } = this._isHeaderHiddenProvider.value.state;
+    // console.log({ isHeaderHidden });
+    const update = (isViewTransition) => {
+      document.documentElement.toggleAttribute(
+        "data-hide-header",
+        isHeaderHidden,
+      );
+      this._isHeaderHidden = isHeaderHidden;
+    };
+    update();
+    // FILL - viewTransition
+  }
+  _hideHeader() {
+    this._isHeaderHiddenProvider.value.update({ isHeaderHidden: true });
   }
 
   firstUpdated() {
@@ -413,7 +496,7 @@ class AppHub extends LitElement {
     // console.log("_onBatteryChargingChange");
     const { charging } = this._batteryManagerState;
     // console.log({ charging });
-    // TODO: - flip if horizontal, header is on the "bottom", and !anchorNav
+    // TODO: - flip if horizontal, header is on the "bottom", and !anchorHeader
   };
   _onBatteryLevelChange = () => {
     // console.log("_onBatteryLevelChange");
@@ -434,9 +517,12 @@ class AppHub extends LitElement {
   _lastTouchTime = 0;
   _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
-  _doubleTapDistanceThreshold = 500;
+  _doubleTapDistanceThreshold = 800;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
+    if (!isIOS) {
+      return;
+    }
     // console.log("_onTouchEnd", event);
     const { changedTouches, touches } = event;
 
@@ -459,7 +545,7 @@ class AppHub extends LitElement {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this._lastTouchTime;
 
-    console.log({ tapLength, nodeName: event.target.nodeName });
+    // console.log({ tapLength, nodeName: event.target.nodeName });
 
     if (
       tapLength < this._doubleTapTimeThreshold &&
@@ -609,10 +695,14 @@ class AppHub extends LitElement {
               tabIndexOffset = 1;
               break;
             case "left":
-              // FILL - hide header
+              if (this.headerSide == "left") {
+                this._hideHeader();
+              }
               break;
             case "right":
-              // FILL - hide header
+              if (this.headerSide == "right") {
+                this._hideHeader();
+              }
               break;
           }
           if (isTouch) {
@@ -630,10 +720,14 @@ class AppHub extends LitElement {
               tabIndexOffset = -1;
               break;
             case "down":
-              // FILL - hide header
+              if (this.headerSide == "bottom") {
+                this._hideHeader();
+              }
               break;
             case "up":
-              // FILL - hide header
+              if (this.headerSide == "top") {
+                this._hideHeader();
+              }
               break;
           }
           if (this._touchEnabled && this._isLeftHanded == isTouch) {
@@ -737,6 +831,9 @@ class AppHub extends LitElement {
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
             ></bw-main-corner-button-toggle-fullscreen>
+            <bw-main-corner-button-toggle-header
+              data-portrait-only
+            ></bw-main-corner-button-toggle-header>
           </div>
           <div
             data-touch-only
@@ -747,6 +844,9 @@ class AppHub extends LitElement {
             <bw-main-corner-button-toggle-fullscreen
               data-landscape-only
             ></bw-main-corner-button-toggle-fullscreen>
+            <bw-main-corner-button-toggle-header
+              data-landscape-only
+            ></bw-main-corner-button-toggle-header>
           </div>
           <div
             data-touch-only

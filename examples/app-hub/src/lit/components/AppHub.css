@@ -289,6 +289,13 @@ main {
   padding-right: var(--header-padding-right);
   padding-top: var(--header-padding-top);
   padding-bottom: var(--header-padding-bottom);
+
+  overflow: hidden;
+}
+
+html[data-hide-header] #header {
+  flex-basis: 0;
+  padding: 0;
 }
 
 @media (orientation: landscape) {
@@ -298,6 +305,10 @@ main {
   #nav {
     /* gap: var(--wa-space-2xs); */
   }
+}
+
+html:not([data-hide-header]) bw-main-corner-button-toggle-header {
+  display: none;
 }
 
 @media (orientation: portrait) {
@@ -384,9 +395,8 @@ main {
       align-self: end;
     }
 
-    html[data-anchor-nav][data-screen-orientation-type="landscape-secondary"]
-      [data-axis="main"],
-    html[data-left-handed]:not([data-anchor-nav]) {
+    html[data-anchor-header][data-screen-orientation-type="landscape-secondary"],
+    html[data-left-handed]:not([data-anchor-header]) {
       [data-axis="main"] {
         /* vertical nav on left */
         flex-direction: var(--flex-direction-lrt);
@@ -436,24 +446,24 @@ main {
 
     html[data-screen-orientation-type="landscape-secondary"]:not(
         [data-left-handed],
-        [data-anchor-nav]
+        [data-anchor-header]
       ) {
       --header-padding-right-extra: var(--header-padding-right-safe);
     }
     html[data-screen-orientation-type="landscape-primary"]:not(
-        [data-anchor-nav]
+        [data-anchor-header]
       )[data-left-handed] {
       --header-padding-left-extra: var(--header-padding-left-safe);
     }
 
     html[data-screen-orientation-type="landscape-secondary"]:is(
         [data-left-handed],
-        [data-anchor-nav]
+        [data-anchor-header]
       ) {
       --main-padding-right-extra: var(--main-padding-right-safe);
     }
     html[data-screen-orientation-type="landscape-primary"]:is(
-        [data-anchor-nav],
+        [data-anchor-header],
         :not([data-left-handed])
       ) {
       --main-padding-left-extra: var(--main-padding-left-safe);
