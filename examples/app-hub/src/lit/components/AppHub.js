@@ -1,8 +1,9 @@
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 
-const { lit, litRouter, litContext } = await waitForGlobals();
+const { lit, litRouter, litContext, litRef } = await waitForGlobals();
 
 const { LitElement, html } = lit;
+const { ref, createRef } = litRef;
 const { Routes } = litRouter;
 const { ContextProvider } = litContext;
 
@@ -183,6 +184,8 @@ class AppHub extends LitElement {
     super();
     this.dataset.axis = "main";
 
+    this.headerRef = createRef();
+
     this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (!this._themeColorMeta) {
       this._themeColorMeta = document.createElement("meta");
@@ -315,7 +318,7 @@ class AppHub extends LitElement {
 
     this.addEventListener("bw-flip", this._onFlipEvent, options);
 
-    // document.addEventListener("touchmove", this._onTouchMove, options);
+    document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
 
     this.addEventListener("touchend", this._onTouchEnd, {
@@ -682,6 +685,7 @@ class AppHub extends LitElement {
     }
     const touch = targetTouches[0];
     const { identifier, screenX, screenY } = touch;
+
     const { timeStamp } = event;
     if (this._ignoreTouchIdentifier) {
       // console.log("ignoring touch identifier");
@@ -696,6 +700,14 @@ class AppHub extends LitElement {
       };
       return;
     }
+
+    const { clientX, clientY } = touch;
+    const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+
+    if (!elementsFromPoint.includes(this.headerRef.value)) {
+      return;
+    }
+
     const touchMoveDelta = {
       screenX: screenX - this._latestTouchMove.screenX,
       screenY: screenY - this._latestTouchMove.screenY,
@@ -863,7 +875,7 @@ class AppHub extends LitElement {
 
   render() {
     return html`
-      <header id="header" data-axis="cross" @touchmove=${this._onTouchMove}>
+      <header ${ref(this.headerRef)} id="header" data-axis="cross">
         <nav id="nav" data-axis="cross">
           <bw-nav-button-layers></bw-nav-button-layers>
           <bw-nav-button-apps></bw-nav-button-apps>

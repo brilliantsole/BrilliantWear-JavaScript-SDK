@@ -68,15 +68,18 @@ export async function waitForGlobals() {
     waitForWindowValue("lit"),
     waitForWindowValue("litRouter"),
     waitForWindowValue("litContext"),
-    waitForWindowValue("keyed"),
+    waitForWindowValue("litKeyed"),
+    waitForWindowValue("litRef"),
     waitForWindowValue("BW"),
   ]);
   // console.log("values", values);
 
   /** @type {import("lit")} */
   const lit = window.lit;
-  /** @type {import("lit/directives/keyed.js").Keyed} */
-  const keyed = window.keyed;
+  /** @type {import("lit/directives/keyed.js")} */
+  const litKeyed = window.litKeyed;
+  /** @type {import("lit/directives/ref.js")} */
+  const litRef = window.litRef;
   /** @type {import("@lit-labs/router")} */
   const litRouter = window.litRouter;
   /** @type {import("@lit/context")} */
@@ -85,5 +88,5 @@ export async function waitForGlobals() {
   const BW = window.BW;
 
   // console.log({ lit, litRouter,litContext, BW });
-  return { lit, litRouter, litContext, BW, keyed };
+  return { lit, litRouter, litContext, BW, litKeyed, litRef };
 }

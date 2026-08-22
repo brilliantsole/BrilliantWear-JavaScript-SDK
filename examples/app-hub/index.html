@@ -64,14 +64,29 @@
     </script>
 
     <script type="module">
-      import { keyed } from "https://unpkg.com/lit@3/directives/keyed.js?module"; // FIX
+      import * as litKeyed from "https://unpkg.com/lit@3/directives/keyed.js?module"; // FIX
       // with {
       //   integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",
       //   crossOriginStorage: "*",
       // };
-      console.log("keyed loaded", keyed);
-      window.keyed = keyed;
-      window.dispatchEvent(new CustomEvent("keyed-loaded", { detail: keyed }));
+      console.log("litKeyed loaded", litKeyed);
+      window.litKeyed = litKeyed;
+      window.dispatchEvent(
+        new CustomEvent("lit-keyed-loaded", { detail: litKeyed }),
+      );
+    </script>
+
+    <script type="module">
+      import * as litRef from "https://unpkg.com/lit@3/directives/ref.js?module"; // FIX
+      // with {
+      //   integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",
+      //   crossOriginStorage: "*",
+      // };
+      console.log("litRef loaded", litRef);
+      window.litRef = litRef;
+      window.dispatchEvent(
+        new CustomEvent("lit-ref-loaded", { detail: litRef }),
+      );
     </script>
 
     <script type="module">
