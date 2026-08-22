@@ -824,52 +824,6 @@ class AppHub extends LitElement {
         <main>${this.router.outlet()}</main>
 
         <div id="mainOverlay">
-          <div
-            data-mouse-only
-            data-main-align="start"
-            data-cross-align="start"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="start"
-            data-cross-align="center"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="start"
-            data-cross-align="end"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="center"
-            data-cross-align="start"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="center"
-            data-cross-align="center"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="center"
-            data-cross-align="end"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="end"
-            data-cross-align="start"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="end"
-            data-cross-align="center"
-          ></div>
-          <div
-            data-mouse-only
-            data-main-align="end"
-            data-cross-align="end"
-          ></div>
-
           <div data-touch-only data-main-align="start" data-cross-align="start">
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only

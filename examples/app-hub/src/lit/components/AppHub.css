@@ -414,8 +414,8 @@ html:not([data-hide-header]) bw-main-corner-button-toggle-header {
     }
 
     :root {
-      --header-padding-right-extra: var(--wa-space-2xs);
-      --header-padding-left-extra: var(--wa-space-2xs);
+      --header-padding-right-base: var(--wa-space-2xs);
+      --header-padding-left-base: var(--wa-space-2xs);
     }
 
     html[data-screen-orientation-type="landscape-primary"] {
@@ -655,6 +655,12 @@ html[data-active-tab="devices"] {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
+}
+
+&::view-transition-group(*),
+&::view-transition-old(*),
+&::view-transition-new(*) {
+  animation-fill-mode: forwards;
 }
 
 html[data-disable-view-transitions]:active-view-transition {
@@ -1282,7 +1288,6 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
-    &::view-transition-group(.overlay),
     &::view-transition-old(.overlay),
     &::view-transition-new(.overlay) {
       animation-duration: var(--animation-duration);
