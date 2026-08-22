@@ -197,8 +197,8 @@ bw-app-hub {
     var(--header-padding-bottom-base) + var(--header-padding-bottom-extra)
   );
 
-  --main-padding-left-base: var(--wa-space-xs);
-  --main-padding-right-base: var(--wa-space-xs);
+  --main-padding-left-base: var(--wa-space-s);
+  --main-padding-right-base: var(--wa-space-s);
   --main-padding-top-base: var(--wa-space-xs);
   --main-padding-bottom-base: var(--wa-space-xs);
   --main-padding-left-extra: 0px;
@@ -240,8 +240,8 @@ bw-app-hub {
 }
 @media (orientation: portrait) {
   [data-header-hidden]:fullscreen {
-    --main-padding-left-base: var(--wa-space-s);
-    --main-padding-right-base: var(--wa-space-s);
+    /* --main-padding-left-base: var(--wa-space-s);
+    --main-padding-right-base: var(--wa-space-s); */
   }
 }
 @media (orientation: portrait) {
