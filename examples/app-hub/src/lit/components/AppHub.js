@@ -330,7 +330,6 @@ class AppHub extends LitElement {
       this._onBatteryChargingTimeChange();
       this._onBatteryDischargingTimeChange();
     }
-    this.anchorHeader = true;
   }
   disconnectedCallback() {
     super.disconnectedCallback();
