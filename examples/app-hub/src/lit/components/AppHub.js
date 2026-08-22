@@ -75,7 +75,7 @@ class AppHub extends LitElement {
     }
     document.documentElement.toggleAttribute(
       "data-anchor-header",
-      this._anchorHeader,
+      Boolean(this._anchorHeader),
     );
     this._updateHeaderSide();
   }
@@ -103,9 +103,17 @@ class AppHub extends LitElement {
     });
   }
 
-  _flip(event) {
+  _onFlipEvent(event) {
     const { overrideAnchorHeader } = event.detail;
     // console.log("flip", event, { overrideAnchorHeader });
+    this._flip(overrideAnchorHeader);
+  }
+  _flip(overrideAnchorHeader) {
+    console.log("_flip", { overrideAnchorHeader });
+
+    if (this.anchorHeader && !overrideAnchorHeader) {
+      return;
+    }
 
     let newIsLeftHanded = this.isLeftHanded;
     let newAnchorHeader = this.anchorHeader;
@@ -151,7 +159,7 @@ class AppHub extends LitElement {
     this._disableViewTransitions = disableViewTransitions;
     document.documentElement.toggleAttribute(
       "data-disable-view-transitions",
-      this._disableViewTransitions,
+      Boolean(this._disableViewTransitions),
     );
   }
   get skipViewTransitions() {
@@ -305,7 +313,7 @@ class AppHub extends LitElement {
 
     window.addEventListener("pageshow", this._resetViewport, options);
 
-    this.addEventListener("bw-flip", this._flip, options);
+    this.addEventListener("bw-flip", this._onFlipEvent, options);
 
     // document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
@@ -361,6 +369,10 @@ class AppHub extends LitElement {
       this._screenOrientationType,
     );
     this._updateHeaderSide();
+    // can use a user-defined flag to always have the header face away from the charging port if charging
+    if (false) {
+      this._onBatteryChargingChange();
+    }
   }
 
   _onFullscreenUpdate() {
@@ -370,7 +382,7 @@ class AppHub extends LitElement {
     // console.log({ fullscreenEnabled, fullscreenElement });
     document.documentElement.toggleAttribute(
       "data-fullscreen-enabled",
-      fullscreenEnabled,
+      Boolean(fullscreenEnabled),
     );
   }
 
@@ -426,7 +438,7 @@ class AppHub extends LitElement {
     const update = (isViewTransition) => {
       document.documentElement.toggleAttribute(
         "data-left-handed",
-        isLeftHanded,
+        Boolean(isLeftHanded),
       );
       this._updateCSSVariables();
       this._isLeftHanded = isLeftHanded;
@@ -504,7 +516,7 @@ class AppHub extends LitElement {
     const update = (isViewTransition) => {
       document.documentElement.toggleAttribute(
         "data-hide-header",
-        isHeaderHidden,
+        Boolean(isHeaderHidden),
       );
       this._isHeaderHidden = isHeaderHidden;
     };
@@ -534,11 +546,52 @@ class AppHub extends LitElement {
   get _batteryManagerState() {
     return this._batteryManagerProvider.value.state;
   }
+  _charging;
   _onBatteryChargingChange = () => {
     // console.log("_onBatteryChargingChange");
     const { charging } = this._batteryManagerState;
-    // console.log({ charging });
-    // TODO: - flip if horizontal, header is on the "bottom", and !anchorHeader
+    const firstTime = this._charging == undefined;
+    this._charging = charging;
+    console.log({ charging, firstTime });
+
+    document.documentElement.toggleAttribute(
+      "data-charging",
+      Boolean(charging),
+    );
+
+    let shouldFlip = false;
+    switch (this._screenOrientationType) {
+      case "landscape-primary":
+        switch (this.headerSide) {
+          case "right":
+            shouldFlip = charging;
+            break;
+          case "left":
+            shouldFlip = !charging;
+            break;
+        }
+        break;
+      case "landscape-secondary":
+        switch (this.headerSide) {
+          case "right":
+            shouldFlip = !charging;
+            break;
+          case "left":
+            shouldFlip = charging;
+            break;
+        }
+        break;
+    }
+    console.log({ charging, shouldFlip });
+    if (
+      this._touchEnabled &&
+      charging &&
+      shouldFlip &&
+      this._didFirstUpdate &&
+      !firstTime
+    ) {
+      this._flip();
+    }
   };
   _onBatteryLevelChange = () => {
     // console.log("_onBatteryLevelChange");
