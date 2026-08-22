@@ -239,6 +239,12 @@ bw-app-hub {
   --header-length-delta: calc(var(--header-length) - var(--header-old-length));
 }
 @media (orientation: portrait) {
+  [data-header-hidden]:fullscreen {
+    --main-padding-left-base: var(--wa-space-s);
+    --main-padding-right-base: var(--wa-space-s);
+  }
+}
+@media (orientation: portrait) {
   :root {
     --main-length: calc(100dvh - var(--header-length));
     --main-old-length: calc(100dvh - var(--header-old-length));
@@ -356,6 +362,13 @@ html[data-header-hidden] [data-header-shown-only] {
           0px
         );
       }
+      [data-header-hidden]:fullscreen {
+        --main-padding-bottom-extra: max(
+          calc(env(safe-area-inset-bottom) - var(--wa-space-m)),
+          var(--wa-space-xs)
+        );
+        --main-padding-bottom-base: 0px;
+      }
     }
     @supports not (-webkit-touch-callout: none) {
       :root {
@@ -427,6 +440,13 @@ html[data-header-hidden] [data-header-shown-only] {
       }
       [data-main-align="end"] {
         justify-self: var(--justify-self-start);
+      }
+
+      @supports (-webkit-touch-callout: none) {
+        /* there's an annoying "X" on the top-left when in fullscreen mode on iOS */
+        &:fullscreen {
+          --header-padding-top-base: var(--wa-space-3xl);
+        }
       }
 
       --main-offset: var(--header-length);
