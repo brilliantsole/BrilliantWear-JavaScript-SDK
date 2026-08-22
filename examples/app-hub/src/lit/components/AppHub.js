@@ -674,7 +674,8 @@ class AppHub extends LitElement {
   /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number}?} */
   _latestTouchMove;
   _ignoreTouchIdentifier;
-  _touchMoveMagnitudeThreshold = 50;
+  _touchMoveMagnitudeThreshold = 10;
+  _touchMoveInitialMagnitudeThreshold = 40;
   _touchMoveAngleThreshold = 0.6;
   /** @param {TouchEvent} event */
   _onTouchMove = (event) => {
@@ -697,22 +698,27 @@ class AppHub extends LitElement {
         screenX,
         screenY,
         timeStamp,
+        initialScreenX: screenX,
+        initialScreenY: screenY,
       };
-      return;
-    }
-
-    const { clientX, clientY } = touch;
-    const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
-
-    if (!elementsFromPoint.includes(this.headerRef.value)) {
       return;
     }
 
     const touchMoveDelta = {
       screenX: screenX - this._latestTouchMove.screenX,
       screenY: screenY - this._latestTouchMove.screenY,
+      initialScreenX: screenX - this._latestTouchMove.initialScreenX,
+      initialScreenY: screenY - this._latestTouchMove.initialScreenY,
       timeStamp: timeStamp - this._latestTouchMove.timeStamp,
     };
+    Object.assign(this._latestTouchMove, { screenX, screenY, timeStamp });
+
+    const { clientX, clientY } = touch;
+    const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+    if (!elementsFromPoint.includes(this.headerRef.value)) {
+      return;
+    }
+
     let angle = Math.atan2(touchMoveDelta.screenY, touchMoveDelta.screenX);
     const twoPI = 2 * Math.PI;
     while (angle < 0) {
@@ -722,8 +728,14 @@ class AppHub extends LitElement {
     const magnitude = Math.sqrt(
       touchMoveDelta.screenX ** 2 + touchMoveDelta.screenY ** 2,
     );
-    // console.log({ angle, magnitude });
+    const initialMagnitude = Math.sqrt(
+      touchMoveDelta.initialScreenX ** 2 + touchMoveDelta.initialScreenY ** 2,
+    );
+    // console.log({ angle, magnitude, initialMagnitude });
     if (magnitude < this._touchMoveMagnitudeThreshold) {
+      return;
+    }
+    if (initialMagnitude > this._touchMoveInitialMagnitudeThreshold) {
       return;
     }
 
