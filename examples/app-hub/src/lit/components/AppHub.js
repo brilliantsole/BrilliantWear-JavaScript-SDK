@@ -369,7 +369,8 @@ class AppHub extends LitElement {
       this._screenOrientationType,
     );
     this._updateHeaderSide();
-    // can use a user-defined flag to always have the header face away from the charging port if charging
+
+    // TODO: - user-defined flag to always have header away from charging port if charging
     if (false) {
       this._onBatteryChargingChange();
     }
@@ -515,7 +516,7 @@ class AppHub extends LitElement {
     // console.log({ isHeaderHidden });
     const update = (isViewTransition) => {
       document.documentElement.toggleAttribute(
-        "data-hide-header",
+        "data-header-hidden",
         Boolean(isHeaderHidden),
       );
       this._isHeaderHidden = isHeaderHidden;
@@ -878,12 +879,13 @@ class AppHub extends LitElement {
 
         <div id="mainOverlay">
           <div data-touch-only data-main-align="start" data-cross-align="start">
+            <bw-main-corner-button-toggle-header
+              data-header-hidden-or-fullscreen-only
+              data-portrait-only
+            ></bw-main-corner-button-toggle-header>
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
             ></bw-main-corner-button-toggle-fullscreen>
-            <bw-main-corner-button-toggle-header
-              data-portrait-only
-            ></bw-main-corner-button-toggle-header>
           </div>
           <div
             data-touch-only
@@ -891,10 +893,16 @@ class AppHub extends LitElement {
             data-cross-align="center"
           ></div>
           <div data-touch-only data-main-align="start" data-cross-align="end">
+            <bw-main-corner-button-flip
+              data-portrait-only
+              data-header-hidden-only
+            ></bw-main-corner-button-flip>
+
             <bw-main-corner-button-toggle-fullscreen
               data-landscape-only
             ></bw-main-corner-button-toggle-fullscreen>
             <bw-main-corner-button-toggle-header
+              data-header-hidden-only
               data-landscape-only
             ></bw-main-corner-button-toggle-header>
           </div>
