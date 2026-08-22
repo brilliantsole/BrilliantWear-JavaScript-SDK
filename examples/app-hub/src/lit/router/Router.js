@@ -28,11 +28,11 @@ const latestCircularNavigationEntryStateBufferIndex = Number(
 let currentCircularNavigationEntryStateBufferIndex =
   latestCircularNavigationEntryStateBufferIndex;
 
-console.log({
-  initialNavigationEntryIndex,
-  latestNavigationEntryIndex,
-  currentCircularNavigationEntryStateBufferIndex,
-});
+// console.log({
+//   initialNavigationEntryIndex,
+//   latestNavigationEntryIndex,
+//   currentCircularNavigationEntryStateBufferIndex,
+// });
 const circularNavigationEntryStateBufferSessionsStorageKeyPrefix =
   "circular-navigation-entry-state-buffer";
 
@@ -228,7 +228,7 @@ export class Router extends litRouter.Routes {
     } else {
       const currentEntryIndex = navigation.currentEntry.index;
       const currentEntryState = navigation.currentEntry.getState();
-      console.log({ currentEntryIndex, currentEntryState });
+      // console.log({ currentEntryIndex, currentEntryState });
       // if you pass the navigation.entries() max, it just stores the first n entries instead of the last n entries
       if (false && currentEntryState) {
         console.log("loading currentEntryState", currentEntryState);

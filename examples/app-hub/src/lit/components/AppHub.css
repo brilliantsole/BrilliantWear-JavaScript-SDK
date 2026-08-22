@@ -701,7 +701,6 @@ html:active-view-transition-type(previous-tab, next-tab) {
   #mainOverlay > * {
     view-transition-class: overlay;
   }
-  &::view-transition-group(.overlay),
   &::view-transition-old(.overlay),
   &::view-transition-new(.overlay) {
     animation: none;

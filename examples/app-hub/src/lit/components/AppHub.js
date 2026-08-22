@@ -61,14 +61,18 @@ class AppHub extends LitElement {
     return this._anchorHeader;
   }
   set anchorHeader(newAnchorHeader) {
-    this._anchorHeaderContextProvider.value.update({
+    // console.log("set anchorHeader", { newAnchorHeader });
+    this._anchorHeaderProvider.value.update({
       anchorHeader: newAnchorHeader,
     });
   }
   _onAnchorHeaderUpdate() {
-    const { anchorHeader } = this._anchorHeaderContextProvider.value.state;
-    console.log({ anchorHeader });
+    const { anchorHeader } = this._anchorHeaderProvider.value.state;
+    console.log("_onAnchorHeaderUpdate", { anchorHeader });
     this._anchorHeader = anchorHeader;
+    if (this._overrideAnchorHeader) {
+      return;
+    }
     document.documentElement.toggleAttribute(
       "data-anchor-header",
       this._anchorHeader,
@@ -97,6 +101,39 @@ class AppHub extends LitElement {
       // document.body.scrollTop = 0;
       // window.scrollTo(0, 0);
     });
+  }
+
+  _flip(event) {
+    const { overrideAnchorHeader } = event.detail;
+    // console.log("flip", event, { overrideAnchorHeader });
+
+    let newIsLeftHanded = this.isLeftHanded;
+    let newAnchorHeader = this.anchorHeader;
+
+    switch (this._viewportOrientation) {
+      case "landscape":
+        newIsLeftHanded = this.headerSide != "left";
+        if (this.anchorHeader && overrideAnchorHeader) {
+          newAnchorHeader = false;
+        }
+        break;
+      case "portrait":
+        newIsLeftHanded = !this.isLeftHanded;
+        break;
+    }
+
+    // console.log({ newIsLeftHanded, newAnchorHeader });
+
+    const forceLeftHanded =
+      newAnchorHeader != this.anchorHeader && !newAnchorHeader;
+    this._overrideAnchorHeader = overrideAnchorHeader;
+    this._anchorHeaderProvider.value.update({ anchorHeader: newAnchorHeader });
+    this._isLeftHandedProvider.value.update(
+      {
+        isLeftHanded: newIsLeftHanded,
+      },
+      forceLeftHanded,
+    );
   }
 
   get disableViewTransitions() {
@@ -152,7 +189,7 @@ class AppHub extends LitElement {
       createDisableViewTransitionsContextProvider(this, null, () =>
         this._onDisableViewTransitionsUpdate(),
       );
-    this._anchorHeaderContextProvider = createAnchorHeaderContextProvider(
+    this._anchorHeaderProvider = createAnchorHeaderContextProvider(
       this,
       null,
       () => this._onAnchorHeaderUpdate(),
@@ -268,6 +305,8 @@ class AppHub extends LitElement {
 
     window.addEventListener("pageshow", this._resetViewport, options);
 
+    this.addEventListener("bw-flip", this._flip, options);
+
     // document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
 
@@ -291,7 +330,6 @@ class AppHub extends LitElement {
       this._onBatteryChargingTimeChange();
       this._onBatteryDischargingTimeChange();
     }
-
     this.anchorHeader = true;
   }
   disconnectedCallback() {
@@ -395,6 +433,11 @@ class AppHub extends LitElement {
       this._isLeftHanded = isLeftHanded;
 
       this._updateHeaderSide();
+
+      if (this._overrideAnchorHeader) {
+        document.documentElement.removeAttribute("data-anchor-header");
+        delete this._overrideAnchorHeader;
+      }
     };
 
     if (
@@ -406,7 +449,7 @@ class AppHub extends LitElement {
       update();
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
-      console.log("types", types);
+      // console.log("types", types);
       this._updateCSSVariables(true);
       document.startViewTransition({
         update: async () => {
@@ -419,14 +462,14 @@ class AppHub extends LitElement {
 
   _onHeaderSideUpdate() {
     const { headerSide } = this._headerSideProvider.value.state;
-    console.log({ headerSide });
+    // console.log({ headerSide });
   }
   /** @type {import("../contexts/headerSideContext.js").HeaderSide} */
   get headerSide() {
     return this._headerSideProvider.value.state.headerSide;
   }
   _updateHeaderSide() {
-    console.log("_updateHeaderSide");
+    // console.log("_updateHeaderSide");
     let headerSide = "bottom";
     switch (this._screenOrientationType) {
       case "landscape-primary":
@@ -434,8 +477,8 @@ class AppHub extends LitElement {
         if (this._anchorHeader) {
           headerSide =
             this._screenOrientationType == "landscape-primary"
-              ? "left"
-              : "right";
+              ? "right"
+              : "left";
         } else {
           headerSide = this._isLeftHanded ? "left" : "right";
         }
@@ -520,9 +563,6 @@ class AppHub extends LitElement {
   _doubleTapDistanceThreshold = 800;
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
-    if (!isIOS) {
-      return;
-    }
     // console.log("_onTouchEnd", event);
     const { changedTouches, touches } = event;
 
@@ -546,6 +586,10 @@ class AppHub extends LitElement {
     const tapLength = currentTime - this._lastTouchTime;
 
     // console.log({ tapLength, nodeName: event.target.nodeName });
+
+    if (!isIOS) {
+      return;
+    }
 
     if (
       tapLength < this._doubleTapTimeThreshold &&
