@@ -8,17 +8,24 @@ const { LitElement, html } = lit;
 import "./MainCornerButton.js";
 
 class MainCornerButtonToggleFullscreen extends LitElement {
+  static properties = {
+    isFullscreen: { type: Boolean },
+  };
+
   createRenderRoot() {
     return this;
   }
 
   constructor() {
     super();
-    this._fullscreenConsumer = createFullscreenContextConsumer(this, true);
-  }
-
-  get isFullscreen() {
-    return Boolean(document.fullscreenElement);
+    this.isFullscreen = Boolean(document.fullscreenElement);
+    this._fullscreenConsumer = createFullscreenContextConsumer(
+      this,
+      true,
+      () => {
+        this.isFullscreen = Boolean(document.fullscreenElement);
+      },
+    );
   }
 
   toggleFullScreen() {
@@ -34,10 +41,11 @@ class MainCornerButtonToggleFullscreen extends LitElement {
   }
 
   render() {
+    const iconName = this.isFullscreen
+      ? "down-left-and-up-right-to-center"
+      : "up-right-and-down-left-from-center";
     return html`<bw-main-corner-button
-      icon-name=${this.isFullscreen
-        ? "down-left-and-up-right-to-center"
-        : "up-right-and-down-left-from-center"}
+      icon-name=${iconName}
       label=${this.isFullscreen ? "exit fullscreen" : "enter fullscreen"}
       @click="${this.onClick}"
     >

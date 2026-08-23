@@ -184,7 +184,9 @@ class AppHub extends LitElement {
     super();
     this.dataset.axis = "main";
 
-    this.headerRef = createRef();
+    this.refs = {
+      header: createRef(),
+    };
 
     this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (!this._themeColorMeta) {
@@ -418,7 +420,7 @@ class AppHub extends LitElement {
     const lengthKey =
       this._viewportOrientation == "landscape" ? "width" : "height";
     ["header"].forEach((name) => {
-      const element = this.querySelector(name);
+      const element = this.refs[name].value;
       if (element) {
         const rect = element.getBoundingClientRect();
         const length = rect[lengthKey];
@@ -429,6 +431,31 @@ class AppHub extends LitElement {
         );
       }
     });
+  }
+
+  _updateHeaderCSSVariables() {
+    console.log("_updateHeaderCSSVariables");
+    const header = this.refs.header.value;
+    const children = Array.from(header.querySelectorAll(":scope > * > *"));
+    console.log("children", children);
+    let maxHeight = 0;
+    let maxWidth = 0;
+    children.forEach((child) => {
+      const { width, height } = child.getBoundingClientRect();
+      maxHeight = Math.max(height, maxHeight);
+      maxWidth = Math.max(width, maxWidth);
+    });
+    console.log({ maxWidth, maxHeight });
+
+    const name = "header";
+    document.documentElement.style.setProperty(
+      `--${name}-base-width`,
+      `${maxWidth}px`,
+    );
+    document.documentElement.style.setProperty(
+      `--${name}-base-height`,
+      `${maxHeight}px`,
+    );
   }
 
   get isLeftHanded() {
@@ -539,6 +566,11 @@ class AppHub extends LitElement {
     this._didFirstUpdate = true;
     requestAnimationFrame(() => {
       this._updateCSSVariables();
+      if (!CSS.supports("interpolate-size: allow-keywords")) {
+        this._updateHeaderCSSVariables();
+      } else {
+        this._updateHeaderCSSVariables();
+      }
       this._resetViewport();
     });
   }
@@ -726,7 +758,7 @@ class AppHub extends LitElement {
 
     const { clientX, clientY } = touch;
     const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
-    if (!elementsFromPoint.includes(this.headerRef.value)) {
+    if (!elementsFromPoint.includes(this.refs.header.value)) {
       return;
     }
 
@@ -898,7 +930,7 @@ class AppHub extends LitElement {
 
   render() {
     return html`
-      <header ${ref(this.headerRef)} id="header" data-axis="cross">
+      <header ${ref(this.refs.header)} id="header" data-axis="cross">
         <nav id="nav" data-axis="cross">
           <bw-nav-button-layers></bw-nav-button-layers>
           <bw-nav-button-apps></bw-nav-button-apps>
@@ -923,6 +955,8 @@ class AppHub extends LitElement {
               data-portrait-only
               data-touch-only
             ></bw-main-corner-button-toggle-header>
+            <button>Hello</button>
+            <button>world</button>
           </div>
           <div
             data-touch-only

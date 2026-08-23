@@ -210,6 +210,13 @@ bw-app-hub {
     var(--header-padding-bottom-base) + var(--header-padding-bottom-extra)
   );
 
+  --header-padding-side-vertical: calc(
+    var(--header-padding-top) + var(--header-padding-bottom)
+  );
+  --header-padding-side: calc(
+    var(--header-padding-left) + var(--header-padding-right)
+  );
+
   --main-padding-left-base: var(--wa-space-s);
   --main-padding-right-base: var(--wa-space-s);
   --main-padding-top-base: var(--wa-space-xs);
@@ -274,6 +281,19 @@ main {
   padding-right: var(--main-padding-right);
   padding-top: calc(var(--main-padding-top) - var(--main-padding-top-base));
   padding-bottom: var(--main-padding-bottom);
+
+  transition-duration: var(--header-hidden-transition-duration);
+  transition-timing-function: var(--header-hidden-transition-timing-function);
+}
+@media (orientation: landscape) {
+  main {
+    transition-property: padding;
+  }
+}
+@media (orientation: portrait) {
+  main {
+    transition-property: padding;
+  }
 }
 
 #main {
@@ -302,7 +322,21 @@ main {
   margin-right: var(--main-padding-right);
   margin-top: var(--main-padding-top);
   margin-bottom: var(--main-padding-bottom);
+
+  transition-duration: var(--header-hidden-transition-duration);
+  transition-timing-function: var(--header-hidden-transition-timing-function);
 }
+@media (orientation: landscape) {
+  #mainOverlay {
+    transition-property: margin, width;
+  }
+}
+@media (orientation: portrait) {
+  #mainOverlay {
+    transition-property: margin, height;
+  }
+}
+
 #mainOverlay > * {
   pointer-events: auto;
 }
@@ -335,9 +369,7 @@ html[data-header-hidden] {
     --main-padding-right-extra: var(--main-padding-right-safe);
   }
 }
-html[data-header-hidden] #header {
-  flex-basis: 0;
-}
+
 html:not([data-header-hidden]) [data-header-hidden-only] {
   display: none;
 }
@@ -357,19 +389,63 @@ html[data-header-hidden] [data-header-shown-only] {
 }
 
 :root {
-  --header-hide-animation-duration: 200ms;
+  --header-hidden-transition-duration: 200ms;
+  --header-hidden-transition-timing-function: ease;
+}
+#header {
+  transition-duration: var(--header-hidden-transition-duration);
+  transition-timing-function: var(--header-hidden-transition-timing-function);
 }
 @supports (interpolate-size: allow-keywords) {
   #header {
     interpolate-size: allow-keywords;
-
     transition-property: flex-basis, padding;
-    transition-duration: var(--header-hide-animation-duration);
-    transition-timing-function: ease;
+  }
+  html[data-header-hidden] #header {
+    flex-basis: 0;
   }
 }
+html[data-disable-view-transitions] #header {
+  transition: none !important;
+}
+
 @supports not (interpolate-size: allow-keywords) {
   /* safari currently can't animate flex-basis */
+
+  :root {
+    /* --header-base-width: 0px;
+    --header-base-height: 0px; */
+  }
+
+  @media (orientation: portrait) {
+    :root {
+      --header-height: calc(
+        var(--header-base-height) + var(--header-padding-side-vertical)
+      );
+    }
+    #header {
+      transition-property: max-height, padding;
+      max-height: var(--header-height);
+    }
+    html[data-header-hidden] #header {
+      max-height: 0px;
+    }
+  }
+  @media (orientation: landscape) {
+    :root {
+      --header-width: calc(
+        var(--header-base-width) + var(--header-padding-side)
+      );
+    }
+    #header {
+      transition-property: max-width, padding;
+      max-width: var(--header-width);
+    }
+    html[data-header-hidden] #header {
+      max-width: 0;
+    }
+  }
+
   /* FILL */
 }
 
@@ -773,6 +849,12 @@ html:active-view-transition {
   :root {
     view-transition-name: none;
   }
+
+  #header,
+  #mainOverlay,
+  main {
+    transition-property: none;
+  }
 }
 
 /* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
@@ -958,7 +1040,7 @@ html:active-view-transition-type(next-tab) {
 /* LEFT/RIGHT HANDED VIEW TRANSITIONS  */
 
 html:active-view-transition-type(right-handed, left-handed) {
-  --animation-duration: 300ms;
+  --animation-duration: 5000ms;
   --animation-timing-function: ease;
 
   &[data-header-hidden] #header {
@@ -1304,6 +1386,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     );
   }
 }
+/* FIX */
 :root {
   --slide-out-to-right-from-left-main-landscape-offset: calc(
     0px - var(--main-offset) + var(--main-length) - 100% -
