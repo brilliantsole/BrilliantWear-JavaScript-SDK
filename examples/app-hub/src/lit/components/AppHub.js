@@ -399,6 +399,9 @@ class AppHub extends LitElement {
     const { touchEnabled } = this._touchEnabledProvider.value.state;
     // console.log({ touchEnabled });
     this._touchEnabled = touchEnabled;
+    if (!this._touchEnabled && this._isHeaderHidden) {
+      this._isHeaderHiddenProvider.value.update({ isHeaderHidden: false });
+    }
     this._updateHeaderSide();
   }
   /** @type {import("../contexts/viewportOrientationContext.js").ViewportOrientation} */
@@ -906,9 +909,11 @@ class AppHub extends LitElement {
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-portrait-only
+              data-touch-only
             ></bw-main-corner-button-toggle-header>
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
+              data-touch-only
             ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
@@ -922,13 +927,13 @@ class AppHub extends LitElement {
               data-header-hidden-only
             ></bw-main-corner-button-flip>
 
-            <bw-main-corner-button-toggle-fullscreen
-              data-landscape-only
-            ></bw-main-corner-button-toggle-fullscreen>
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-landscape-only
             ></bw-main-corner-button-toggle-header>
+            <bw-main-corner-button-toggle-fullscreen
+              data-landscape-only
+            ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
             data-touch-only

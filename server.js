@@ -21,7 +21,7 @@ process.on("warning", (e) => console.warn(e.stack));
 // BW.setConsoleLevelFlagsForType("BaseServer", { log: true });
 
 // HTTPS SERVER
-app.use(nocache());
+// app.use(nocache());
 app.use(function (req, res, next) {
   //res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   //res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");

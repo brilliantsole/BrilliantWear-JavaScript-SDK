@@ -113,14 +113,27 @@ textarea {
   align-items: center;
 }
 
-#mainOverlay > [data-main-align="start"] {
-  flex-direction: var(--cross-axis-flex-direction);
+@media (orientation: portrait) {
+  #mainOverlay > [data-cross-align="start"] {
+    flex-direction: var(--cross-axis-flex-direction);
+  }
+  #mainOverlay > [data-cross-align="center"] {
+    flex-direction: var(--main-axis-flex-direction);
+  }
+  #mainOverlay > [data-cross-align="end"] {
+    flex-direction: var(--cross-opposite-axis-flex-direction);
+  }
 }
-#mainOverlay > [data-main-align="center"] {
-  flex-direction: var(--main-axis-flex-direction);
-}
-#mainOverlay > [data-main-align="end"] {
-  flex-direction: var(--cross-opposite-axis-flex-direction);
+@media (orientation: landscape) {
+  #mainOverlay > [data-cross-align="start"] {
+    flex-direction: var(--main-opposite-axis-flex-direction);
+  }
+  #mainOverlay > [data-cross-align="center"] {
+    flex-direction: var(--cross-axis-flex-direction);
+  }
+  #mainOverlay > [data-cross-align="end"] {
+    flex-direction: var(--main-axis-flex-direction);
+  }
 }
 
 html[data-disable-main-overlay] {
@@ -238,12 +251,7 @@ bw-app-hub {
   --main-length-delta: calc(var(--main-length) - var(--main-old-length));
   --header-length-delta: calc(var(--header-length) - var(--header-old-length));
 }
-@media (orientation: portrait) {
-  [data-header-hidden]:fullscreen {
-    /* --main-padding-left-base: var(--wa-space-s);
-    --main-padding-right-base: var(--wa-space-s); */
-  }
-}
+
 @media (orientation: portrait) {
   :root {
     --main-length: calc(100dvh - var(--header-length));
@@ -314,9 +322,21 @@ main {
   overflow: hidden;
 }
 
+html[data-header-hidden] {
+  @media (orientation: portrait) {
+    --header-padding-top: 0px !important;
+    --header-padding-bottom: 0px !important;
+  }
+  @media (orientation: landscape) {
+    --header-padding-left: 0px !important;
+    --header-padding-right: 0px !important;
+
+    --main-padding-left-extra: var(--main-padding-left-safe);
+    --main-padding-right-extra: var(--main-padding-right-safe);
+  }
+}
 html[data-header-hidden] #header {
   flex-basis: 0;
-  padding: 0;
 }
 html:not([data-header-hidden]) [data-header-hidden-only] {
   display: none;
@@ -389,7 +409,7 @@ html[data-header-hidden] [data-header-shown-only] {
   @media (orientation: landscape) {
     :root {
       --main-padding-bottom-extra: max(
-        calc(env(safe-area-inset-bottom) - var(--wa-space-2xs)),
+        calc(env(safe-area-inset-bottom) - var(--wa-space-m)),
         var(--wa-space-xs)
       );
       --main-padding-bottom-base: 0px;
