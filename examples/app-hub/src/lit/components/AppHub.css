@@ -370,6 +370,7 @@ html[data-header-hidden] [data-header-shown-only] {
 }
 @supports not (interpolate-size: allow-keywords) {
   /* safari currently can't animate flex-basis */
+  /* FILL */
 }
 
 @media (orientation: landscape) {

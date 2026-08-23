@@ -666,8 +666,16 @@ class AppHub extends LitElement {
       );
       console.log({ screenDistance });
       if (screenDistance < this._doubleTapDistanceThreshold) {
-        console.log("double tap detected", event.target);
-        event.preventDefault();
+        const { clientX, clientY } = touch;
+        const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+        if (
+          !elementsFromPoint.some((element) =>
+            element.nodeName.includes("BUTTON"),
+          )
+        ) {
+          console.log("double tap detected", elementsFromPoint);
+          event.preventDefault();
+        }
       }
     }
     this._lastTouchTime = currentTime;
