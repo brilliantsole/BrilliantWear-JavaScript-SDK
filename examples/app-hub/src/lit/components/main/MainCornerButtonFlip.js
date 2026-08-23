@@ -6,6 +6,10 @@ const { LitElement, html, css } = lit;
 import "./MainCornerButton.js";
 
 class MainCornerButtonFlip extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   onClick(event) {
     this.dispatchEvent(
       new CustomEvent("bw-flip", {

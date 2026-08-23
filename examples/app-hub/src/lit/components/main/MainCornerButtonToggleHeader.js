@@ -27,6 +27,10 @@ const oppositeChevronDirections = {
 };
 
 class MainCornerButtonToggleHeader extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   constructor() {
     super();
     this._isHeaderHiddenConsumer = createIsHeaderHiddenContextConsumer(

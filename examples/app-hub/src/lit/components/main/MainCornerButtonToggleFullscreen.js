@@ -8,6 +8,10 @@ const { LitElement, html } = lit;
 import "./MainCornerButton.js";
 
 class MainCornerButtonToggleFullscreen extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   constructor() {
     super();
     this._fullscreenConsumer = createFullscreenContextConsumer(this, true);

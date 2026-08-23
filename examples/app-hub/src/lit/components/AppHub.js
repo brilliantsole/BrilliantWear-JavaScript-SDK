@@ -906,15 +906,15 @@ class AppHub extends LitElement {
 
         <div id="mainOverlay">
           <div data-touch-only data-main-align="start" data-cross-align="start">
+            <bw-main-corner-button-toggle-fullscreen
+              data-portrait-only
+              data-touch-only
+            ></bw-main-corner-button-toggle-fullscreen>
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-portrait-only
               data-touch-only
             ></bw-main-corner-button-toggle-header>
-            <bw-main-corner-button-toggle-fullscreen
-              data-portrait-only
-              data-touch-only
-            ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
             data-touch-only
@@ -927,13 +927,13 @@ class AppHub extends LitElement {
               data-header-hidden-only
             ></bw-main-corner-button-flip>
 
+            <bw-main-corner-button-toggle-fullscreen
+              data-landscape-only
+            ></bw-main-corner-button-toggle-fullscreen>
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-landscape-only
             ></bw-main-corner-button-toggle-header>
-            <bw-main-corner-button-toggle-fullscreen
-              data-landscape-only
-            ></bw-main-corner-button-toggle-fullscreen>
           </div>
           <div
             data-touch-only
