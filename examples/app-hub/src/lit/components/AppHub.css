@@ -356,6 +356,22 @@ html[data-header-hidden] [data-header-shown-only] {
   display: none;
 }
 
+:root {
+  --header-hide-animation-duration: 200ms;
+}
+@supports (interpolate-size: allow-keywords) {
+  #header {
+    interpolate-size: allow-keywords;
+
+    transition-property: flex-basis, padding;
+    transition-duration: var(--header-hide-animation-duration);
+    transition-timing-function: ease;
+  }
+}
+@supports not (interpolate-size: allow-keywords) {
+  /* safari currently can't animate flex-basis */
+}
+
 @media (orientation: landscape) {
   :root {
     --header-padding-top-extra: var(--wa-space-2xs);
