@@ -573,9 +573,18 @@ html[data-disable-view-transitions] #header {
       --main-offset-opposite: 0px;
     }
 
-    :root {
-      --header-padding-right-extra: var(--wa-space-2xs);
-      --header-padding-left-extra: var(--wa-space-2xs);
+    /* webkit - what are you gonna do? ¯\_(ツ)_/¯ */
+    @supports (-webkit-touch-callout: none) {
+      :root {
+        --header-padding-right-extra: var(--wa-space-2xs);
+        --header-padding-left-extra: var(--wa-space-2xs);
+      }
+    }
+    @supports not (-webkit-touch-callout: none) {
+      :root {
+        --header-padding-right-base: var(--wa-space-2xs);
+        --header-padding-left-base: var(--wa-space-2xs);
+      }
     }
 
     html[data-screen-orientation-type="landscape-primary"] {
