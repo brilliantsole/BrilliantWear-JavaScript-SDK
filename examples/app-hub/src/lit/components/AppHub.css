@@ -574,8 +574,8 @@ html[data-disable-view-transitions] #header {
     }
 
     :root {
-      --header-padding-right-base: var(--wa-space-2xs);
-      --header-padding-left-base: var(--wa-space-2xs);
+      --header-padding-right-extra: var(--wa-space-2xs);
+      --header-padding-left-extra: var(--wa-space-2xs);
     }
 
     html[data-screen-orientation-type="landscape-primary"] {
