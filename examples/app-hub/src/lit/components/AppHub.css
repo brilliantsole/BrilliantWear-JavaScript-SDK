@@ -255,8 +255,8 @@ bw-app-hub {
   --main-offset: 0px;
   --main-offset-opposite: var(--header-old-length);
 
-  --main-length-delta: calc(var(--main-length) - var(--main-old-length));
   --header-length-delta: calc(var(--header-length) - var(--header-old-length));
+  --main-length-delta: calc(var(--main-length) - var(--main-old-length));
 }
 
 @media (orientation: portrait) {
@@ -598,8 +598,13 @@ html[data-disable-view-transitions] #header {
         --header-padding-left-extra: var(--wa-space-2xs);
       }
     }
+    /* weird Android Chrome issue for rtl on fullscreen :/ */
     @supports not (-webkit-touch-callout: none) {
-      :root {
+      :dir(rtl):fullscreen {
+        --header-padding-right-extra: var(--wa-space-2xs);
+        --header-padding-left-extra: var(--wa-space-2xs);
+      }
+      :dir(ltr) {
         --header-padding-right-base: var(--wa-space-2xs);
         --header-padding-left-base: var(--wa-space-2xs);
       }
@@ -1293,25 +1298,57 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
 }
 
-/* TODO: - fix for :dir(rtl) */
+:dir(ltr) {
+  --zero-if-ltr: 0;
+  --zero-if-rtl: 1;
+  --negative-if-ltr: -1;
+  --negative-if-rtl: 1;
+}
+:dir(rtl) {
+  --zero-if-ltr: 1;
+  --zero-if-rtl: 0;
+  --negative-if-ltr: 1;
+  --negative-if-rtl: -1;
+}
+
 @keyframes slide-out-to-left-from-right-header-landscape {
   from {
-    transform: translateX(calc(-100dvw + 100% + var(--header-length-delta)));
+    /* transform: translateX(calc(-100dvw + 100% + var(--header-length-delta))); */ /* ltr */
+    /* transform: translateX(calc(-100dvw + 100%)); */ /* rtl */
+    transform: translateX(
+      calc(-100dvw + 100% + (var(--header-length-delta) * var(--zero-if-rtl)))
+    );
   }
   to {
-    transform: translateX(calc(-100dvw + min(var(--header-length-delta), 0px)));
+    /* transform: translateX(calc(-100dvw + min(var(--header-length-delta), 0px))); */ /* ltr */
+    /* transform: translateX(calc(-100dvw - max(var(--header-length-delta), 0px))); */ /* rtl */
+    transform: translateX(
+      calc(
+        -100dvw + (var(--zero-if-rtl) * min(var(--header-length-delta), 0px)) -
+          (var(--zero-if-ltr) * max(var(--header-length-delta), 0px))
+      )
+    );
   }
 }
-/* TODO: - fix for :dir(rtl) */
 @keyframes slide-out-to-right-from-left-header-landscape {
   from {
-    transform: translateX(calc(100dvw - 100%));
+    /* transform: translateX(calc(100dvw - 100%)); */ /* ltr */
+    /* transform: translateX(calc(100dvw - 100% - var(--header-length-delta))); */ /* rtl */
+    transform: translateX(
+      calc(100dvw - 100% - (var(--zero-if-ltr) * var(--header-length-delta)))
+    );
   }
   to {
-    transform: translateX(calc(100dvw + max(var(--header-length-delta), 0px)));
+    /* transform: translateX(calc(100dvw + max(var(--header-length-delta), 0px))); */ /* ltr */
+    /* transform: translateX(calc(100dvw - min(var(--header-length-delta), 0px))); */ /* rtl */
+    transform: translateX(
+      calc(
+        100dvw + (var(--zero-if-rtl) * max(var(--header-length-delta), 0px)) -
+          (var(--zero-if-ltr) * min(var(--header-length-delta), 0px))
+      )
+    );
   }
 }
-/* TODO: - fix for :dir(rtl) */
 @keyframes slide-in-from-right-header-landscape {
   from {
     transform: translateX(calc(100% - min(var(--header-length-delta), 0px)));
@@ -1320,7 +1357,6 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
-/* TODO: - fix for :dir(rtl) */
 @keyframes slide-in-from-left-header-landscape {
   from {
     transform: translateX(calc(-100% + min(var(--header-length-delta), 0px)));
