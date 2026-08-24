@@ -1046,7 +1046,7 @@ html:active-view-transition-type(next-tab) {
 /* LEFT/RIGHT HANDED VIEW TRANSITIONS  */
 
 html:active-view-transition-type(right-handed, left-handed) {
-  --animation-duration: 5000ms;
+  --animation-duration: 300ms;
   --animation-timing-function: ease;
 
   &[data-header-hidden] #header {
