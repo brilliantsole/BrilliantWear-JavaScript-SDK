@@ -955,8 +955,6 @@ class AppHub extends LitElement {
               data-portrait-only
               data-touch-only
             ></bw-main-corner-button-toggle-header>
-            <button>Hello</button>
-            <button>world</button>
           </div>
           <div
             data-touch-only
