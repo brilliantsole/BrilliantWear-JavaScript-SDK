@@ -36,6 +36,7 @@ import "./nav/NavButtonFlip.js";
 
 import "./main/MainCornerButtonFlip.js";
 import "./main/MainCornerButtonToggleFullscreen.js";
+import "./main/MainCornerButtonToggleTheme.js";
 import "./main/MainCornerButtonToggleHeader.js";
 
 import "./main/MainCornerButton.js";
@@ -52,6 +53,7 @@ import { createFullscreenContextProvider } from "../contexts/fullscreenContext.j
 import { createIsHeaderHiddenContextProvider } from "../contexts/isHeaderHiddenContext.js";
 import { createHeaderSideContextProvider } from "../contexts/headerSideContext.js";
 import { isIOS } from "../../utils/environment.js";
+import { createThemeContextProvider } from "../contexts/themeContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -99,8 +101,8 @@ class AppHub extends LitElement {
 
     requestAnimationFrame(() => {
       document.documentElement.scrollTop = 0;
-      // document.body.scrollTop = 0;
-      // window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
     });
   }
 
@@ -255,6 +257,9 @@ class AppHub extends LitElement {
       createViewportOrientationContextProvider(this, null, () => {
         this._onViewportOrientationUpdate();
       });
+    this._themeProvider = createThemeContextProvider(this, null, () => {
+      this._onThemeUpdate();
+    });
     this._batteryManagerProvider = createBatteryManagerContextProvider(
       this,
       null,
@@ -336,6 +341,7 @@ class AppHub extends LitElement {
     this._onTouchEnabledUpdate();
     this._onViewportOrientationUpdate();
     this._onVisibilityUpdate();
+    this._onThemeUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -416,6 +422,30 @@ class AppHub extends LitElement {
     this._updateCSSVariables();
   }
 
+  /** @type {import("../contexts/themeContext.js").ThemeContextState} */
+  get _themeState() {
+    return this._themeProvider.value.state;
+  }
+  _onThemeUpdate() {
+    const { themeSelection, systemTheme } = this._themeState;
+
+    console.log({ systemTheme, themeSelection });
+
+    const update = async () => {
+      document.documentElement.classList.toggle(
+        "wa-light",
+        themeSelection == "light" ||
+          (themeSelection == "system" && systemTheme == "light"),
+      );
+      document.documentElement.classList.toggle(
+        "wa-dark",
+        themeSelection == "dark" ||
+          (themeSelection == "system" && systemTheme == "dark"),
+      );
+    };
+    update();
+  }
+
   _updateCSSVariables(isOld) {
     const lengthKey =
       this._viewportOrientation == "landscape" ? "width" : "height";
@@ -434,10 +464,10 @@ class AppHub extends LitElement {
   }
 
   _updateHeaderCSSVariables() {
-    console.log("_updateHeaderCSSVariables");
+    // console.log("_updateHeaderCSSVariables");
     const header = this.refs.header.value;
     const children = Array.from(header.querySelectorAll(":scope > * > *"));
-    console.log("children", children);
+    // console.log("children", children);
     let maxHeight = 0;
     let maxWidth = 0;
     children.forEach((child) => {
@@ -568,8 +598,6 @@ class AppHub extends LitElement {
       this._updateCSSVariables();
       if (!CSS.supports("interpolate-size: allow-keywords")) {
         this._updateHeaderCSSVariables();
-      } else {
-        this._updateHeaderCSSVariables();
       }
       this._resetViewport();
     });
@@ -591,7 +619,7 @@ class AppHub extends LitElement {
     const { charging } = this._batteryManagerState;
     const firstTime = this._charging == undefined;
     this._charging = charging;
-    console.log({ charging, firstTime });
+    // console.log({ charging, firstTime });
 
     document.documentElement.toggleAttribute(
       "data-charging",
@@ -621,7 +649,7 @@ class AppHub extends LitElement {
         }
         break;
     }
-    console.log({ charging, shouldFlip });
+    // console.log({ charging, shouldFlip });
     if (
       this._touchEnabled &&
       charging &&
@@ -696,7 +724,7 @@ class AppHub extends LitElement {
       const screenDistance = Math.sqrt(
         screenDelta.screenX ** 2 + screenDelta.screenY ** 2,
       );
-      console.log({ screenDistance });
+      // console.log({ screenDistance });
       if (screenDistance < this._doubleTapDistanceThreshold) {
         const { clientX, clientY } = touch;
         const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
@@ -948,12 +976,14 @@ class AppHub extends LitElement {
           <div data-touch-only data-main-align="start" data-cross-align="start">
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
-              data-touch-only
             ></bw-main-corner-button-toggle-fullscreen>
+            <bw-main-corner-button-toggle-theme
+              data-portrait-only
+            ></bw-main-corner-button-toggle-theme>
+
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-portrait-only
-              data-touch-only
               data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
@@ -972,6 +1002,9 @@ class AppHub extends LitElement {
             <bw-main-corner-button-toggle-fullscreen
               data-landscape-only
             ></bw-main-corner-button-toggle-fullscreen>
+            <bw-main-corner-button-toggle-theme
+              data-landscape-only
+            ></bw-main-corner-button-toggle-theme>
             <bw-main-corner-button-toggle-header
               data-header-hidden-only
               data-landscape-only
