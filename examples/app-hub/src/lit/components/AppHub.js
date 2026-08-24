@@ -431,6 +431,7 @@ class AppHub extends LitElement {
 
     console.log({ systemTheme, themeSelection });
 
+    // FILL - view transition
     const update = async () => {
       document.documentElement.classList.toggle(
         "wa-light",
@@ -442,6 +443,7 @@ class AppHub extends LitElement {
         themeSelection == "dark" ||
           (themeSelection == "system" && systemTheme == "dark"),
       );
+      this._updateMetaColor();
     };
     update();
   }
