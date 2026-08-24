@@ -4,9 +4,9 @@ const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
-import "https://ka-f.webawesome.com/webawesome@3.11.0/components/badge/badge.js";
-import "https://ka-f.webawesome.com/webawesome@3.11.0/components/button/button.js";
-import "https://ka-f.webawesome.com/webawesome@3.11.0/components/icon/icon.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/badge/badge.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/icon/icon.js";
 
 class MainCornerButton extends LitElement {
   static properties = {

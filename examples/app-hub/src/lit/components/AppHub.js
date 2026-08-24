@@ -954,6 +954,7 @@ class AppHub extends LitElement {
               data-header-hidden-or-fullscreen-only
               data-portrait-only
               data-touch-only
+              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div
@@ -965,6 +966,7 @@ class AppHub extends LitElement {
             <bw-main-corner-button-flip
               data-portrait-only
               data-header-hidden-only
+              data-slide-on-enter
             ></bw-main-corner-button-flip>
 
             <bw-main-corner-button-toggle-fullscreen
@@ -973,6 +975,7 @@ class AppHub extends LitElement {
             <bw-main-corner-button-toggle-header
               data-header-hidden-or-fullscreen-only
               data-landscape-only
+              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div
