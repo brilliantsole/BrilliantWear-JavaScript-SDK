@@ -1373,7 +1373,6 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
-/* FIX */
 :root {
   --slide-out-to-left-from-right-main-landscape-offset: calc(
     0px + var(--main-offset-opposite) - var(--main-length) -
@@ -1392,7 +1391,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(
       calc(
         var(--slide-out-to-left-from-right-main-landscape-offset) -
-          var(--header-old-length) - var(--main-padding-side-base) - 100%
+          var(--header-old-length) - var(--main-padding-side) - 100%
       )
     );
   }
