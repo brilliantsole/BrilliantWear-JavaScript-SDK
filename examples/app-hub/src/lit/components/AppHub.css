@@ -364,8 +364,14 @@ html[data-header-hidden] {
     --header-padding-left: 0px !important;
     --header-padding-right: 0px !important;
 
-    --main-padding-left-extra: var(--main-padding-left-safe);
-    --main-padding-right-extra: var(--main-padding-right-safe);
+    &:dir(ltr) {
+      --main-padding-left-extra: var(--main-padding-left-safe);
+      --main-padding-right-extra: 0px;
+    }
+    &:dir(rtl) {
+      --main-padding-right-extra: var(--main-padding-right-safe);
+      --main-padding-left-extra: 0px;
+    }
   }
 }
 
@@ -453,7 +459,7 @@ html[data-disable-view-transitions] #header {
       max-width: var(--header-width);
     }
     html[data-header-hidden] #header {
-      max-width: 0;
+      max-width: 0px;
     }
   }
 }
