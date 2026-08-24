@@ -364,14 +364,17 @@ html[data-header-hidden] {
     --header-padding-left: 0px !important;
     --header-padding-right: 0px !important;
 
-    &:dir(ltr) {
+    --main-padding-left-extra: var(--main-padding-left-safe);
+    --main-padding-right-extra: var(--main-padding-right-safe);
+
+    /* &:dir(ltr) {
       --main-padding-left-extra: var(--main-padding-left-safe);
       --main-padding-right-extra: 0px;
     }
     &:dir(rtl) {
       --main-padding-right-extra: var(--main-padding-right-safe);
       --main-padding-left-extra: 0px;
-    }
+    } */
   }
 }
 
@@ -1630,7 +1633,7 @@ html:not([data-fullscreen-enabled])
   transition-behavior: allow-discrete;
   transform: translateY(0);
   transition-duration: var(--header-hidden-transition-duration);
-  transition-timing-function: var(--header-hidden-transition-timing-function);
+  transition-timing-function: ease-in;
   transition-property: transform, display;
   @starting-style {
     transform: translateY(var(--slide-on-enter-translate-y));
