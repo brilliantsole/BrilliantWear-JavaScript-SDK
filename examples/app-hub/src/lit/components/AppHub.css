@@ -444,8 +444,6 @@ html[data-disable-view-transitions] #header {
       max-width: 0;
     }
   }
-
-  /* FILL */
 }
 
 @media (orientation: landscape) {
@@ -1364,9 +1362,8 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 @keyframes slide-in-from-right-main-landscape {
   from {
-    /* FIX */
     transform: translateX(
-      calc(100% + var(--header-length) + var(--main-padding-side-base))
+      calc(100% + var(--header-length) + var(--main-padding-side))
     );
   }
   to {
@@ -1375,16 +1372,14 @@ html:active-view-transition-type(right-handed, left-handed) {
 }
 @keyframes slide-in-from-left-main-landscape {
   from {
-    /* FIX */
     transform: translateX(
-      calc(-100% - var(--main-offset) - var(--main-padding-side-base))
+      calc(-100% - var(--main-offset) - var(--main-padding-side))
     );
   }
   to {
     transform: translateX(0);
   }
 }
-/* FIX */
 :root {
   --slide-out-to-left-from-right-main-landscape-offset: calc(
     0px + var(--main-offset-opposite) - var(--main-length) -
@@ -1407,13 +1402,11 @@ html:active-view-transition-type(right-handed, left-handed) {
     );
   }
 }
-/* FIX */
 :root {
   --slide-out-to-right-from-left-main-landscape-offset: calc(
     0px + var(--main-offset-opposite) - var(--main-offset) +
-      var(--main-length) - 100% - var(--main-padding-side-base) -
-      var(--main-padding-right-extra) +
-      max(var(--main-padding-left-safe) - var(--main-padding-left-extra), 0px)
+      var(--main-length) - 100% - var(--main-padding-side) +
+      (var(--main-padding-left-safe) * var(--main-padding-left-safe-scalar))
   );
 }
 @keyframes slide-out-to-right-from-left-main-landscape {
@@ -1426,7 +1419,7 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(
       calc(
         var(--slide-out-to-right-from-left-main-landscape-offset) +
-          var(--header-old-length) + var(--main-padding-side-base) + 100%
+          var(--header-old-length) + var(--main-padding-side) + 100%
       )
     );
   }
