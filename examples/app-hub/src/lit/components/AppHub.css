@@ -1353,6 +1353,7 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 @keyframes slide-in-from-right-main-landscape {
   from {
+    /* FIX */
     transform: translateX(
       calc(100% + var(--header-length) + var(--main-padding-side-base))
     );
@@ -1361,9 +1362,9 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
-
 @keyframes slide-in-from-left-main-landscape {
   from {
+    /* FIX */
     transform: translateX(
       calc(-100% - var(--main-offset) - var(--main-padding-side-base))
     );
@@ -1372,12 +1373,13 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
+/* FIX */
 :root {
   --slide-out-to-left-from-right-main-landscape-offset: calc(
-    0px + var(--main-offset-opposite) - var(--main-length) + 100% +
-      var(--main-padding-side-base) - var(--main-offset) +
-      var(--main-padding-right-extra) + var(--main-padding-left-safe) -
-      var(--main-padding-left-extra)
+    0px + var(--main-offset-opposite) - var(--main-length) -
+      var(--main-offset) + 100% + var(--main-padding-side-base) +
+      var(--main-padding-right-extra) +
+      max(var(--main-padding-left-safe) - var(--main-padding-left-extra), 0px)
   );
 }
 @keyframes slide-out-to-left-from-right-main-landscape {
