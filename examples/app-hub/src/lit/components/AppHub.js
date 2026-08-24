@@ -973,7 +973,7 @@ class AppHub extends LitElement {
               data-landscape-only
             ></bw-main-corner-button-toggle-fullscreen>
             <bw-main-corner-button-toggle-header
-              data-header-hidden-or-fullscreen-only
+              data-header-hidden-only
               data-landscape-only
               data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
