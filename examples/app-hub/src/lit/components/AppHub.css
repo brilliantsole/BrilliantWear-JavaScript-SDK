@@ -355,7 +355,6 @@ main {
 
   overflow: hidden;
 }
-
 html[data-header-hidden] {
   @media (orientation: portrait) {
     --header-padding-top: 0px !important;
@@ -1058,6 +1057,18 @@ html:active-view-transition-type(right-handed, left-handed) {
 }
 
 html:active-view-transition-type(right-handed, left-handed) {
+  &[data-header-hidden] {
+    --main-padding-left-safe-scalar: 0 !important;
+  }
+}
+html:active-view-transition-type(right-handed) {
+  --main-padding-left-safe-scalar: -1;
+}
+html:active-view-transition-type(left-handed) {
+  --main-padding-left-safe-scalar: 1;
+}
+
+html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
     @media (orientation: landscape) {
       &:not([data-header-hidden]) #header {
@@ -1373,12 +1384,12 @@ html:active-view-transition-type(right-handed, left-handed) {
     transform: translateX(0);
   }
 }
+/* FIX */
 :root {
   --slide-out-to-left-from-right-main-landscape-offset: calc(
     0px + var(--main-offset-opposite) - var(--main-length) -
-      var(--main-offset) + 100% + var(--main-padding-side-base) +
-      var(--main-padding-right-extra) +
-      max(var(--main-padding-left-safe) - var(--main-padding-left-extra), 0px)
+      var(--main-offset) + 100% + var(--main-padding-side) +
+      (var(--main-padding-left-safe) * var(--main-padding-left-safe-scalar))
   );
 }
 @keyframes slide-out-to-left-from-right-main-landscape {
@@ -1399,14 +1410,10 @@ html:active-view-transition-type(right-handed, left-handed) {
 /* FIX */
 :root {
   --slide-out-to-right-from-left-main-landscape-offset: calc(
-    0px - var(--main-offset) + var(--main-length) - 100% -
-      var(--main-padding-side-base) + var(--main-offset-opposite) -
-      var(--main-length-delta) -
-      max(
-        var(--main-padding-right-safe) - var(--main-padding-right-extra),
-        0px
-      ) -
-      var(--main-padding-left-extra)
+    0px + var(--main-offset-opposite) - var(--main-offset) +
+      var(--main-length) - 100% - var(--main-padding-side-base) -
+      var(--main-padding-right-extra) +
+      max(var(--main-padding-left-safe) - var(--main-padding-left-extra), 0px)
   );
 }
 @keyframes slide-out-to-right-from-left-main-landscape {

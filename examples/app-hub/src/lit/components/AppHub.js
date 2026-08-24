@@ -992,11 +992,11 @@ class AppHub extends LitElement {
             data-main-align="center"
             data-cross-align="end"
           ></div>
-          <div
-            data-touch-only
-            data-main-align="end"
-            data-cross-align="start"
-          ></div>
+          <div data-touch-only data-main-align="end" data-cross-align="start">
+            <button>A</button>
+            <button>B</button>
+            <button>C</button>
+          </div>
           <div
             data-touch-only
             data-main-align="end"
