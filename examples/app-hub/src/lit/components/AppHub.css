@@ -279,7 +279,7 @@ main {
 
   padding-left: var(--main-padding-left);
   padding-right: var(--main-padding-right);
-  padding-top: calc(var(--main-padding-top) - var(--main-padding-top-base));
+  padding-top: var(--main-padding-top);
   padding-bottom: var(--main-padding-bottom);
 }
 @media (pointer: coarse) {
