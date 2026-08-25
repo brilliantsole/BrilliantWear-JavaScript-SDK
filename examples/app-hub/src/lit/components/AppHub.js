@@ -443,7 +443,7 @@ class AppHub extends LitElement {
     const { selectedTheme, systemTheme } = this._themeState;
     const position = this._lastPointerDownPosition;
 
-    console.log({ systemTheme, selectedTheme, position });
+    console.log({ systemTheme, selectedTheme }, position);
 
     const update = () => {
       document.documentElement.classList.toggle(
@@ -752,11 +752,8 @@ class AppHub extends LitElement {
 
     console.log({ tapLength, nodeName: event.target.nodeName });
 
-    if (!isIOS) {
-      return;
-    }
-
     if (
+      isIOS &&
       tapLength < this._doubleTapTimeThreshold &&
       tapLength > 0 &&
       !event.target.nodeName.includes("BUTTON")
@@ -1020,7 +1017,7 @@ class AppHub extends LitElement {
         <main>${this.router.outlet()}</main>
 
         <div id="mainOverlay">
-          <div data-main-align="start" data-cross-align="start">
+          <div data-touch-only data-main-align="start" data-cross-align="start">
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
             ></bw-main-corner-button-toggle-fullscreen>
