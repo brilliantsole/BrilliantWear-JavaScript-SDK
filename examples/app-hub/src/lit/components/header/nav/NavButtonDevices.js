@@ -6,6 +6,10 @@ const { LitElement, html } = lit;
 import "../HeaderButton.js";
 
 class NavButtonDevices extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   render() {
     return html`<bw-header-button
       href="/devices"

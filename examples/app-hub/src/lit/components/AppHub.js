@@ -33,6 +33,7 @@ import "./header/nav/NavButtonApps.js";
 import "./header/nav/NavButtonDevices.js";
 import "./header/nav/NavButtonSettings.js";
 import "./header/menu/MenuButtonFlip.js";
+import "./header/menu/MenuButtonTheme.js";
 
 import "./main/MainCornerButtonFlip.js";
 import "./main/MainCornerButtonToggleFullscreen.js";
@@ -69,7 +70,7 @@ class AppHub extends LitElement {
   }
   _onAnchorHeaderUpdate() {
     const { anchorHeader } = this._anchorHeaderProvider.value.state;
-    console.log("_onAnchorHeaderUpdate", { anchorHeader });
+    // console.log("_onAnchorHeaderUpdate", { anchorHeader });
     this._anchorHeader = anchorHeader;
     if (this._overrideAnchorHeader) {
       return;
@@ -110,7 +111,7 @@ class AppHub extends LitElement {
     this._flip(overrideAnchorHeader);
   }
   _flip(overrideAnchorHeader) {
-    console.log("_flip", { overrideAnchorHeader });
+    // console.log("_flip", { overrideAnchorHeader });
 
     if (this.anchorHeader && !overrideAnchorHeader) {
       return;
@@ -352,6 +353,7 @@ class AppHub extends LitElement {
     this._onTouchEnabledUpdate();
     this._onViewportOrientationUpdate();
     this._onVisibilityUpdate();
+    this._onAnchorHeaderUpdate();
     this._onThemeUpdate();
 
     if (this._batteryManagerState.isAvailable) {
@@ -1017,6 +1019,7 @@ class AppHub extends LitElement {
         </nav>
         <menu id="menu" data-axis="cross">
           <bw-menu-button-flip data-touch-only></bw-menu-button-flip>
+          <bw-menu-button-theme data-mouse-only></bw-menu-button-theme>
         </menu>
       </header>
       <div id="main">

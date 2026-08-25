@@ -7,6 +7,10 @@ const { LitElement, html } = lit;
 import "../HeaderButton.js";
 
 class NavButtonApps extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
   constructor() {
     super();
     this._viewportOrientationConsumer =
