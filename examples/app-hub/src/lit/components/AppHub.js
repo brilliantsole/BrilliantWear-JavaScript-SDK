@@ -495,7 +495,7 @@ class AppHub extends LitElement {
       );
 
       const types = ["theme"];
-      console.log("types", types, { radius, width, height, x, y });
+      // console.log("types", types, { radius, width, height, x, y });
       await document.startViewTransition({
         update: async () => {
           update();
