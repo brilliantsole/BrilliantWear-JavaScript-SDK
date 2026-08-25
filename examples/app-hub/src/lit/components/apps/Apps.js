@@ -5,10 +5,9 @@ const { lit } = await waitForGlobals();
 const { LitElement, html, css } = lit;
 
 class AppsElement extends LitElement {
-  static styles = css`
-    :host {
-    }
-  `;
+  createRenderRoot() {
+    return this;
+  }
 
   render() {
     return html`<h1>Apps</h1>`;
