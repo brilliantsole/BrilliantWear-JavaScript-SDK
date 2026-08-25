@@ -1682,15 +1682,18 @@ html:not([data-fullscreen-enabled])
 }
 
 :root {
-  --theme-transition-x: 100px;
-  --theme-transition-y: 100px;
-  --theme-transition-radius: 100vmax;
+  --theme-transition-x: 0px;
+  --theme-transition-y: 0px;
+  --theme-transition-radius: 200vmax;
 }
 html:active-view-transition-type(theme) {
   &:root {
     view-transition-name: root;
   }
 
+  &::view-transition-group(root) {
+    animation: none;
+  }
   &::view-transition-old(root) {
     animation: none;
   }

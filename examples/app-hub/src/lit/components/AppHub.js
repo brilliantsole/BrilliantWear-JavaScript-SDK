@@ -331,7 +331,7 @@ class AppHub extends LitElement {
     document.addEventListener(
       "pointerdown",
       (event) => {
-        console.log("pointerdown", event);
+        // console.log("pointerdown", event);
         const { clientX: x, clientY: y } = event;
         this._lastPointerDownPosition = { x, y };
       },
@@ -462,17 +462,21 @@ class AppHub extends LitElement {
       update();
     } else {
       const { x, y } = position;
-      document.documentElement.style.setProperty(
-        `--theme-transition-x`,
-        `${x}px`,
-      );
-      document.documentElement.style.setProperty(
-        `--theme-transition-y`,
-        `${y}px`,
-      );
 
       const width = window.innerWidth;
       const height = window.innerHeight;
+
+      const themeTransitinX = isIOS ? `${x}px` : `${(100 * x) / width}%`;
+      const themeTransitionY = isIOS ? `${y}px` : `${(100 * y) / height}%`;
+
+      document.documentElement.style.setProperty(
+        `--theme-transition-x`,
+        themeTransitinX,
+      );
+      document.documentElement.style.setProperty(
+        `--theme-transition-y`,
+        themeTransitionY,
+      );
 
       const radius = Math.max(
         Math.hypot(x, y), // top-left
@@ -481,13 +485,17 @@ class AppHub extends LitElement {
         Math.hypot(width - x, height - y), // bottom-right
       );
 
+      const themeTransitionRadius = isIOS
+        ? `${radius}px`
+        : `${(100 * radius) / (Math.hypot(width, height) / Math.SQRT2)}%`;
+
       document.documentElement.style.setProperty(
         `--theme-transition-radius`,
-        `${radius}px`,
+        themeTransitionRadius,
       );
 
       const types = ["theme"];
-      // console.log("types", types, position, { radius });
+      console.log("types", types, { radius, width, height, x, y });
       await document.startViewTransition({
         update: async () => {
           update();
@@ -750,7 +758,7 @@ class AppHub extends LitElement {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this._lastTouchTime;
 
-    console.log({ tapLength, nodeName: event.target.nodeName });
+    // console.log({ tapLength, nodeName: event.target.nodeName });
 
     if (
       isIOS &&
