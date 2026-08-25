@@ -52,7 +52,10 @@ import { createFullscreenContextProvider } from "../contexts/fullscreenContext.j
 import { createIsHeaderHiddenContextProvider } from "../contexts/isHeaderHiddenContext.js";
 import { createHeaderSideContextProvider } from "../contexts/headerSideContext.js";
 import { isIOS } from "../../utils/environment.js";
-import { createThemeContextProvider } from "../contexts/themeContext.js";
+import {
+  createThemeContextProvider,
+  getTheme,
+} from "../contexts/themeContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -439,27 +442,35 @@ class AppHub extends LitElement {
   get _themeState() {
     return this._themeProvider.value.state;
   }
+  /** @type {import("../contexts/themeContext.js").ThemeContextValue} */
+  _theme;
   async _onThemeUpdate() {
+    const theme = getTheme(this._themeState);
+    const didThemeChange = this._theme != theme;
+    this._theme = theme;
+    // console.log({ theme, didThemeChange });
+
     const { selectedTheme, systemTheme } = this._themeState;
+
     const position = this._lastPointerDownPosition;
 
-    console.log({ systemTheme, selectedTheme }, position);
+    // console.log({ systemTheme, selectedTheme }, position);
+
+    const showLightClassName =
+      selectedTheme == "light" ||
+      (selectedTheme == "system" && systemTheme == "light");
+    const showDarkClassName =
+      selectedTheme == "dark" ||
+      (selectedTheme == "system" && systemTheme == "dark");
 
     const update = () => {
-      document.documentElement.classList.toggle(
-        "wa-light",
-        selectedTheme == "light" ||
-          (selectedTheme == "system" && systemTheme == "light"),
-      );
-      document.documentElement.classList.toggle(
-        "wa-dark",
-        selectedTheme == "dark" ||
-          (selectedTheme == "system" && systemTheme == "dark"),
-      );
+      document.documentElement.classList.toggle("wa-light", showLightClassName);
+      document.documentElement.classList.toggle("wa-dark", showDarkClassName);
     };
 
-    if (this.skipViewTransitions || !position) {
+    if (this.skipViewTransitions || !position || !didThemeChange) {
       update();
+      this._updateMetaColor();
     } else {
       const { x, y } = position;
 
