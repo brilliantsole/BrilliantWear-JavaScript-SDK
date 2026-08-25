@@ -326,18 +326,19 @@ main {
   margin-top: var(--main-padding-top);
   margin-bottom: var(--main-padding-bottom);
 }
+
 @media (pointer: coarse) {
   #mainOverlay {
     transition-duration: var(--header-hidden-transition-duration);
     transition-timing-function: var(--header-hidden-transition-timing-function);
   }
   @media (orientation: landscape) {
-    main {
+    #mainOverlay {
       transition-property: margin, width;
     }
   }
   @media (orientation: portrait) {
-    main {
+    #mainOverlay {
       transition-property: margin, height;
     }
   }
