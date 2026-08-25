@@ -4,7 +4,7 @@ import { createContext } from "./createContext.js";
 
 /** @typedef {"light" | "dark"} ThemeContextValue */
 /** @typedef {ThemeContextValue | "system"} ThemeContextSelection */
-/** @typedef {{systemTheme: ThemeContextValue, themeSelection: ThemeContextSelection }} ThemeContextState */
+/** @typedef {{systemTheme: ThemeContextValue, selectedTheme: ThemeContextSelection }} ThemeContextState */
 
 const darkColorSchemeMediaQuery = window.matchMedia(
   "(prefers-color-scheme: dark)",
@@ -18,9 +18,9 @@ const getSystemThemeValue = () => {
 /** @param {ThemeContextState} state */
 export const getTheme = (state) => {
   // console.log("getTheme", state);
-  return state.themeSelection == "system"
+  return state.selectedTheme == "system"
     ? state.systemTheme
-    : state.themeSelection;
+    : state.selectedTheme;
 };
 
 const {
@@ -28,7 +28,7 @@ const {
   createContextConsumer: createThemeContextConsumer,
 } = await createContext("theme", {
   defaultState: {
-    themeSelection: "system",
+    selectedTheme: "system",
     systemTheme: getSystemThemeValue(),
   },
   storageType: "localStorage",
@@ -37,7 +37,12 @@ const {
       // console.log("onSystemThemeChange");
       const systemTheme = getSystemThemeValue();
       // console.log({ systemTheme });
-      provider.value.update({ ...provider.value.state, systemTheme });
+      const { theme } = provider.value.state;
+      provider.value.update({
+        ...provider.value.state,
+        systemTheme,
+        position: undefined,
+      });
     };
     darkColorSchemeMediaQuery.addEventListener(
       "change",

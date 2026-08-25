@@ -169,6 +169,9 @@ class AppHub extends LitElement {
     if (!document.startViewTransition) {
       return true;
     }
+    if (!this._didFirstUpdate) {
+      return true;
+    }
     if (this._reducedMotionEnabled) {
       return true;
     }
@@ -325,10 +328,20 @@ class AppHub extends LitElement {
 
     this.addEventListener("bw-flip", this._onFlipEvent, options);
 
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        console.log("pointerdown", event);
+        const { clientX: x, clientY: y } = event;
+        this._lastPointerDownPosition = { x, y };
+      },
+      options,
+    );
+
     document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
 
-    this.addEventListener("touchend", this._onTouchEnd, {
+    document.addEventListener("touchend", this._onTouchEnd, {
       ...options,
       passive: false,
     });
@@ -426,26 +439,63 @@ class AppHub extends LitElement {
   get _themeState() {
     return this._themeProvider.value.state;
   }
-  _onThemeUpdate() {
-    const { themeSelection, systemTheme } = this._themeState;
+  async _onThemeUpdate() {
+    const { selectedTheme, systemTheme } = this._themeState;
+    const position = this._lastPointerDownPosition;
 
-    console.log({ systemTheme, themeSelection });
+    console.log({ systemTheme, selectedTheme, position });
 
-    // FILL - view transition
-    const update = async () => {
+    const update = () => {
       document.documentElement.classList.toggle(
         "wa-light",
-        themeSelection == "light" ||
-          (themeSelection == "system" && systemTheme == "light"),
+        selectedTheme == "light" ||
+          (selectedTheme == "system" && systemTheme == "light"),
       );
       document.documentElement.classList.toggle(
         "wa-dark",
-        themeSelection == "dark" ||
-          (themeSelection == "system" && systemTheme == "dark"),
+        selectedTheme == "dark" ||
+          (selectedTheme == "system" && systemTheme == "dark"),
       );
-      this._updateMetaColor();
     };
-    update();
+
+    if (this.skipViewTransitions || !position) {
+      update();
+    } else {
+      const { x, y } = position;
+      document.documentElement.style.setProperty(
+        `--theme-transition-x`,
+        `${x}px`,
+      );
+      document.documentElement.style.setProperty(
+        `--theme-transition-y`,
+        `${y}px`,
+      );
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const radius = Math.max(
+        Math.hypot(x, y), // top-left
+        Math.hypot(width - x, y), // top-right
+        Math.hypot(x, height - y), // bottom-left
+        Math.hypot(width - x, height - y), // bottom-right
+      );
+
+      document.documentElement.style.setProperty(
+        `--theme-transition-radius`,
+        `${radius}px`,
+      );
+
+      const types = ["theme"];
+      // console.log("types", types, position, { radius });
+      await document.startViewTransition({
+        update: async () => {
+          update();
+        },
+        types,
+      }).finished;
+      this._updateMetaColor();
+    }
   }
 
   _updateCSSVariables(isOld) {
@@ -501,7 +551,7 @@ class AppHub extends LitElement {
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
     console.log({ isLeftHanded });
-    const update = (isViewTransition) => {
+    const update = () => {
       document.documentElement.toggleAttribute(
         "data-left-handed",
         Boolean(isLeftHanded),
@@ -517,12 +567,7 @@ class AppHub extends LitElement {
       }
     };
 
-    if (
-      !this._didFirstUpdate ||
-      this.skipViewTransitions ||
-      this.anchorHeader ||
-      !this._touchEnabled
-    ) {
+    if (this.skipViewTransitions || this.anchorHeader || !this._touchEnabled) {
       update();
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
@@ -579,7 +624,7 @@ class AppHub extends LitElement {
   _onIsHeaderHiddenUpdate() {
     const { isHeaderHidden } = this._isHeaderHiddenProvider.value.state;
     // console.log({ isHeaderHidden });
-    const update = (isViewTransition) => {
+    const update = () => {
       document.documentElement.toggleAttribute(
         "data-header-hidden",
         Boolean(isHeaderHidden),
@@ -587,7 +632,6 @@ class AppHub extends LitElement {
       this._isHeaderHidden = isHeaderHidden;
     };
     update();
-    // FILL - viewTransition
   }
   _hideHeader() {
     this._isHeaderHiddenProvider.value.update({ isHeaderHidden: true });
@@ -706,7 +750,7 @@ class AppHub extends LitElement {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - this._lastTouchTime;
 
-    // console.log({ tapLength, nodeName: event.target.nodeName });
+    console.log({ tapLength, nodeName: event.target.nodeName });
 
     if (!isIOS) {
       return;
@@ -726,10 +770,11 @@ class AppHub extends LitElement {
       const screenDistance = Math.sqrt(
         screenDelta.screenX ** 2 + screenDelta.screenY ** 2,
       );
-      // console.log({ screenDistance });
-      if (screenDistance < this._doubleTapDistanceThreshold) {
+      console.log({ screenDistance });
+      if (true || screenDistance < this._doubleTapDistanceThreshold) {
         const { clientX, clientY } = touch;
         const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+        console.log("elementsFromPoint", elementsFromPoint);
         const button = elementsFromPoint.find((element) =>
           element.nodeName.includes("BUTTON"),
         );
@@ -975,7 +1020,7 @@ class AppHub extends LitElement {
         <main>${this.router.outlet()}</main>
 
         <div id="mainOverlay">
-          <div data-touch-only data-main-align="start" data-cross-align="start">
+          <div data-main-align="start" data-cross-align="start">
             <bw-main-corner-button-toggle-fullscreen
               data-portrait-only
             ></bw-main-corner-button-toggle-fullscreen>

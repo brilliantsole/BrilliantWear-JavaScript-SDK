@@ -91,7 +91,7 @@ class _ContextConsumer extends ContextConsumer {
 /** @typedef {() => Promise<any?>} LoadContextState */
 /** @typedef {() => Promise<boolean>} ClearContextState */
 
-/** @typedef {(newValue: boolean, oldValue: boolean) => boolean} HasContextStateChangedCallback */
+/** @typedef {(newValue: any, oldValue: any) => boolean} HasContextStateChangedCallback */
 
 /** @typedef {"localStorage" | "sessionStorage"} ContextStorageType */
 

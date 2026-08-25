@@ -281,18 +281,21 @@ main {
   padding-right: var(--main-padding-right);
   padding-top: calc(var(--main-padding-top) - var(--main-padding-top-base));
   padding-bottom: var(--main-padding-bottom);
-
-  transition-duration: var(--header-hidden-transition-duration);
-  transition-timing-function: var(--header-hidden-transition-timing-function);
 }
-@media (orientation: landscape) {
+@media (pointer: coarse) {
   main {
-    transition-property: padding;
+    transition-duration: var(--header-hidden-transition-duration);
+    transition-timing-function: var(--header-hidden-transition-timing-function);
   }
-}
-@media (orientation: portrait) {
-  main {
-    transition-property: padding;
+  @media (orientation: landscape) {
+    main {
+      transition-property: padding;
+    }
+  }
+  @media (orientation: portrait) {
+    main {
+      transition-property: padding;
+    }
   }
 }
 
@@ -322,18 +325,21 @@ main {
   margin-right: var(--main-padding-right);
   margin-top: var(--main-padding-top);
   margin-bottom: var(--main-padding-bottom);
-
-  transition-duration: var(--header-hidden-transition-duration);
-  transition-timing-function: var(--header-hidden-transition-timing-function);
 }
-@media (orientation: landscape) {
+@media (pointer: coarse) {
   #mainOverlay {
-    transition-property: margin, width;
+    transition-duration: var(--header-hidden-transition-duration);
+    transition-timing-function: var(--header-hidden-transition-timing-function);
   }
-}
-@media (orientation: portrait) {
-  #mainOverlay {
-    transition-property: margin, height;
+  @media (orientation: landscape) {
+    main {
+      transition-property: margin, width;
+    }
+  }
+  @media (orientation: portrait) {
+    main {
+      transition-property: margin, height;
+    }
   }
 }
 
@@ -412,57 +418,61 @@ html[data-header-hidden] [data-header-shown-only] {
   --header-hidden-transition-duration: 150ms;
   --header-hidden-transition-timing-function: ease;
 }
-#header {
-  transition-duration: var(--header-hidden-transition-duration);
-  transition-timing-function: var(--header-hidden-transition-timing-function);
-}
-@supports (interpolate-size: allow-keywords) {
+
+@media (pointer: coarse) {
   #header {
-    interpolate-size: allow-keywords;
-    transition-property: flex-basis, padding;
+    transition-duration: var(--header-hidden-transition-duration);
+    transition-timing-function: var(--header-hidden-transition-timing-function);
   }
-  html[data-header-hidden] #header {
-    flex-basis: 0;
+
+  @supports (interpolate-size: allow-keywords) {
+    #header {
+      interpolate-size: allow-keywords;
+      transition-property: flex-basis, padding;
+    }
+    html[data-header-hidden] #header {
+      flex-basis: 0;
+    }
   }
-}
-html[data-disable-view-transitions] #header {
-  transition: none !important;
-}
+  html[data-disable-view-transitions] #header {
+    transition: none !important;
+  }
 
-@supports not (interpolate-size: allow-keywords) {
-  /* safari currently can't animate flex-basis */
+  @supports not (interpolate-size: allow-keywords) {
+    /* safari currently can't animate flex-basis */
 
-  :root {
-    /* --header-base-width: 0px;
+    :root {
+      /* --header-base-width: 0px;
     --header-base-height: 0px; */
-  }
+    }
 
-  @media (orientation: portrait) {
-    :root {
-      --header-height: calc(
-        var(--header-base-height) + var(--header-padding-side-vertical)
-      );
+    @media (orientation: portrait) {
+      :root {
+        --header-height: calc(
+          var(--header-base-height) + var(--header-padding-side-vertical)
+        );
+      }
+      #header {
+        transition-property: max-height, padding;
+        max-height: var(--header-height);
+      }
+      html[data-header-hidden] #header {
+        max-height: 0px;
+      }
     }
-    #header {
-      transition-property: max-height, padding;
-      max-height: var(--header-height);
-    }
-    html[data-header-hidden] #header {
-      max-height: 0px;
-    }
-  }
-  @media (orientation: landscape) {
-    :root {
-      --header-width: calc(
-        var(--header-base-width) + var(--header-padding-side)
-      );
-    }
-    #header {
-      transition-property: max-width, padding;
-      max-width: var(--header-width);
-    }
-    html[data-header-hidden] #header {
-      max-width: 0px;
+    @media (orientation: landscape) {
+      :root {
+        --header-width: calc(
+          var(--header-base-width) + var(--header-padding-side)
+        );
+      }
+      #header {
+        transition-property: max-width, padding;
+        max-width: var(--header-width);
+      }
+      html[data-header-hidden] #header {
+        max-width: 0px;
+      }
     }
   }
 }
@@ -845,12 +855,6 @@ html[data-active-tab="devices"] {
 }
 :root {
   view-transition-name: none;
-}
-
-::view-transition-group(root),
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
 }
 
 &::view-transition-group(*),
@@ -1673,5 +1677,38 @@ html:not([data-fullscreen-enabled])
   transition-property: transform, display;
   @starting-style {
     transform: translateY(var(--slide-on-enter-translate-y));
+  }
+}
+
+:root {
+  --theme-transition-x: 100px;
+  --theme-transition-y: 100px;
+  --theme-transition-radius: 100vmax;
+}
+html:active-view-transition-type(theme) {
+  &:root {
+    view-transition-name: root;
+  }
+
+  &::view-transition-old(root) {
+    animation: none;
+  }
+  &::view-transition-new(root) {
+    animation: 300ms ease-out theme-transition-radial-reveal;
+  }
+}
+
+@keyframes theme-transition-radial-reveal {
+  from {
+    clip-path: circle(
+      0px at var(--theme-transition-x) var(--theme-transition-y)
+    );
+  }
+
+  to {
+    clip-path: circle(
+      var(--theme-transition-radius) at var(--theme-transition-x)
+        var(--theme-transition-y)
+    );
   }
 }

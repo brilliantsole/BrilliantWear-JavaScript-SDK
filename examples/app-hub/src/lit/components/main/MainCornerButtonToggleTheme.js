@@ -37,11 +37,11 @@ class MainCornerButtonToggleTheme extends LitElement {
   }
 
   toggleTheme() {
-    this.themeState.themeSelection = this.isDarkTheme ? "light" : "dark";
+    this.themeState.selectedTheme = this.isDarkTheme ? "light" : "dark";
     this._themeConsumer.value.update(this.themeState, true);
   }
 
-  onClick(event) {
+  onClick() {
     this.toggleTheme();
   }
 
