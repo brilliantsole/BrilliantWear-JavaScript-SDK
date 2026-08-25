@@ -1,11 +1,11 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
-import "./NavButton.js";
+import "../HeaderButton.js";
 
-class NavButtonFlip extends LitElement {
+class MenuButtonFlip extends LitElement {
   onClick(event) {
     this.dispatchEvent(
       new CustomEvent("bw-flip", {
@@ -16,13 +16,13 @@ class NavButtonFlip extends LitElement {
   }
 
   render() {
-    return html`<bw-nav-button
+    return html`<bw-header-button
       icon-name="arrow-right-arrow-left"
       variant="neutral"
       @click=${this.onClick}
     >
       Flip
-    </bw-nav-button>`;
+    </bw-header-button>`;
   }
 }
-customElements.define("bw-nav-button-flip", NavButtonFlip);
+customElements.define("bw-menu-button-flip", MenuButtonFlip);

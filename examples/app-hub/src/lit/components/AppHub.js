@@ -28,18 +28,16 @@ const tabRenders = {
   settings: () => html`<bw-settings></bw-settings>`,
 };
 
-import "./nav/NavButtonLayers.js";
-import "./nav/NavButtonApps.js";
-import "./nav/NavButtonDevices.js";
-import "./nav/NavButtonSettings.js";
-import "./nav/NavButtonFlip.js";
+import "./header/nav/NavButtonLayers.js";
+import "./header/nav/NavButtonApps.js";
+import "./header/nav/NavButtonDevices.js";
+import "./header/nav/NavButtonSettings.js";
+import "./header/menu/MenuButtonFlip.js";
 
 import "./main/MainCornerButtonFlip.js";
 import "./main/MainCornerButtonToggleFullscreen.js";
 import "./main/MainCornerButtonToggleTheme.js";
 import "./main/MainCornerButtonToggleHeader.js";
-
-import "./main/MainCornerButton.js";
 
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
 import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
@@ -1018,7 +1016,7 @@ class AppHub extends LitElement {
           <bw-nav-button-settings></bw-nav-button-settings>
         </nav>
         <menu id="menu" data-axis="cross">
-          <bw-nav-button-flip data-touch-only></bw-nav-button-flip>
+          <bw-menu-button-flip data-touch-only></bw-menu-button-flip>
         </menu>
       </header>
       <div id="main">

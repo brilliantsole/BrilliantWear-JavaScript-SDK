@@ -12,7 +12,7 @@ import { createActiveTabContextConsumer } from "../../contexts/activeTabContext.
 import { createScreenOrientationContextConsumer } from "../../contexts/screenOrientationContext.js";
 import { createTouchEnabledContextConsumer } from "../../contexts/touchEnabledContext.js";
 
-class NavButton extends LitElement {
+class HeaderButton extends LitElement {
   static properties = {
     href: {},
     variant: {},
@@ -90,4 +90,4 @@ class NavButton extends LitElement {
     </wa-button>`;
   }
 }
-customElements.define("bw-nav-button", NavButton);
+customElements.define("bw-header-button", HeaderButton);

@@ -1,20 +1,20 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 
-import "./NavButton.js";
+import "../HeaderButton.js";
 
 class NavButtonDevices extends LitElement {
   render() {
-    return html`<bw-nav-button
+    return html`<bw-header-button
       href="/devices"
       icon-name="bluetooth"
       icon-family="brands"
       variant="brand"
     >
       Devices
-    </bw-nav-button>`;
+    </bw-header-button>`;
   }
 }
 customElements.define("bw-nav-button-devices", NavButtonDevices);

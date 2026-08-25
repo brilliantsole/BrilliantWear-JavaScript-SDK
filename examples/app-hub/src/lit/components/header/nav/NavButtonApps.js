@@ -1,10 +1,10 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-import { createViewportOrientationContextConsumer } from "../../contexts/viewportOrientationContext.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { createViewportOrientationContextConsumer } from "../../../contexts/viewportOrientationContext.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 
-import "./NavButton.js";
+import "../HeaderButton.js";
 
 class NavButtonApps extends LitElement {
   constructor() {
@@ -21,13 +21,13 @@ class NavButtonApps extends LitElement {
   render() {
     const iconName =
       this.viewportOrientation == "landscape" ? "grip" : "grip-vertical";
-    return html`<bw-nav-button
+    return html`<bw-header-button
       href="/apps"
       icon-name=${iconName}
       variant="warning"
     >
       Apps
-    </bw-nav-button>`;
+    </bw-header-button>`;
   }
 }
 customElements.define("bw-nav-button-apps", NavButtonApps);
