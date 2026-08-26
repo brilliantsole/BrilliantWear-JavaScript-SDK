@@ -9,10 +9,10 @@ const { ContextProvider } = litContext;
 
 import { Router } from "../router/Router.js";
 
-import "./layers/Layers.js";
-import "./apps/Apps.js";
-import "./devices/Devices.js";
-import "./settings/Settings.js";
+import "./tabs/layers/LayersTab.js";
+import "./tabs/apps/AppsTab.js";
+import "./tabs/devices/DevicesTab.js";
+import "./tabs/settings/SettingsTab.js";
 
 export const defaultTab = "layers";
 export const defaultPath = `/${defaultTab}`;
@@ -22,10 +22,10 @@ import { createScreenOrientationContextProvider } from "../contexts/screenOrient
 
 export const tabs = ["layers", "apps", "devices", "settings"];
 const tabRenders = {
-  layers: () => html`<bw-layers></bw-layers>`,
-  apps: () => html`<bw-apps></bw-apps>`,
-  devices: () => html`<bw-devices></bw-devices>`,
-  settings: () => html`<bw-settings></bw-settings>`,
+  layers: () => html`<bw-layers-tab></bw-layers-tab>`,
+  apps: () => html`<bw-apps-tab></bw-apps-tab>`,
+  devices: () => html`<bw-devices-tab></bw-devices-tab>`,
+  settings: () => html`<bw-settings-tab></bw-settings-tab>`,
 };
 
 import "./header/nav/NavButtonLayers.js";
@@ -56,6 +56,7 @@ import {
   createThemeContextProvider,
   getTheme,
 } from "../contexts/themeContext.js";
+import { createNavigationStateContextProvider } from "../contexts/navigationStateContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -215,6 +216,7 @@ class AppHub extends LitElement {
       () => this._onAnchorHeaderUpdate(),
     );
     this._activeTabProvider = createActiveTabContextProvider(this);
+    this._navigationStateProvider = createNavigationStateContextProvider(this);
     this._screenOrientationProvider = createScreenOrientationContextProvider(
       this,
       null,
@@ -299,6 +301,9 @@ class AppHub extends LitElement {
         defaultPath,
         beforeGoto: (pathname, activeTab) => {
           this._activeTabProvider.value.update({ activeTab });
+          this._navigationStateProvider.value.update(
+            navigation.currentEntry.getState(),
+          );
           this._lastTouchTime = 0;
         },
         afterGoto: (pathname, activeTab) => {

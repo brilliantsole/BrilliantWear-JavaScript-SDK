@@ -70,6 +70,7 @@ export async function waitForGlobals() {
     waitForWindowValue("litContext"),
     waitForWindowValue("litKeyed"),
     waitForWindowValue("litRef"),
+    waitForWindowValue("litRepeat"),
     waitForWindowValue("BW"),
   ]);
   // console.log("values", values);
@@ -84,9 +85,11 @@ export async function waitForGlobals() {
   const litRouter = window.litRouter;
   /** @type {import("@lit/context")} */
   const litContext = window.litContext;
+  /** @type {import("lit/directives/repeat.js")} */
+  const litRepeat = window.litRepeat;
   /** @type {import("../brilliantwear/brilliantwear.module.min.js")} */
   const BW = window.BW;
 
   // console.log({ lit, litRouter,litContext, BW });
-  return { lit, litRouter, litContext, BW, litKeyed, litRef };
+  return { lit, litRouter, litContext, BW, litKeyed, litRef, litRepeat };
 }

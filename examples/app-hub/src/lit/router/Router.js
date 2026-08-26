@@ -93,10 +93,10 @@ navigation.addEventListener("currententrychange", (event) => {
   }
   currentCircularNavigationEntryStateBufferIndex %=
     circularNavigationEntryStateBufferLength;
-  console.log({
-    indexOffset,
-    currentCircularNavigationEntryStateBufferIndex,
-  });
+  // console.log({
+  //   indexOffset,
+  //   currentCircularNavigationEntryStateBufferIndex,
+  // });
 });
 
 const saveCurrentNavigationEntryStateToSessionStorage = () => {
@@ -197,7 +197,7 @@ export class Router extends litRouter.Routes {
     super(host, routes, options);
     this._defaultRoute = options?.defaultPath ?? "/";
     this._host = host;
-    console.log("Router", this, options);
+    // console.log("Router", this, options);
 
     this._beforeGoto = options?.beforeGoto;
     this._afterGoto = options?.afterGoto;
@@ -217,10 +217,10 @@ export class Router extends litRouter.Routes {
     if (entries.length == 1) {
       const state = entries[0].getState();
       if (state) {
-        console.log("loading state", state);
+        // console.log("loading state", state);
         this.goto(state.route);
       } else {
-        console.log("setting initial state");
+        // console.log("setting initial state");
         const state = { route: this._defaultRoute };
         navigation.updateCurrentEntry({ state });
         this.goto(state.route);
@@ -231,7 +231,7 @@ export class Router extends litRouter.Routes {
       // console.log({ currentEntryIndex, currentEntryState });
       // if you pass the navigation.entries() max, it just stores the first n entries instead of the last n entries
       if (false && currentEntryState) {
-        console.log("loading currentEntryState", currentEntryState);
+        // console.log("loading currentEntryState", currentEntryState);
         this.goto(currentEntryState.route);
       } else {
         try {
@@ -239,18 +239,18 @@ export class Router extends litRouter.Routes {
             latestNavigationEntryStateSessionStorageKey,
           );
           const state = JSON.parse(stateString);
-          console.log("session state", state);
+          // console.log("session state", state);
           navigation.updateCurrentEntry({ state });
           this.goto(state.route);
         } catch (error) {
-          console.log("no sessionStorage - traversing to latest");
+          // console.log("no sessionStorage - traversing to latest");
           for (let i = entries.length; i >= 0; i--) {
             entries;
           }
           entries.reverse().some((entry) => {
             const state = entry.getState();
             if (state) {
-              console.log("using prior state");
+              // console.log("using prior state");
               navigation.updateCurrentEntry({ state });
               this.goto(state.route);
               return true;
@@ -282,7 +282,7 @@ export class Router extends litRouter.Routes {
     const { currentEntry } = navigation;
     const currentState = currentEntry.getState();
     if (!currentState) {
-      console.log("currentState not defined - updating");
+      // console.log("currentState not defined - updating");
       const state = { route: this._defaultRoute };
       navigation.updateCurrentEntry({ state });
     }
@@ -294,7 +294,7 @@ export class Router extends litRouter.Routes {
   _onNavigate = (e) => {
     const { destination, navigationType, info } = e;
     const { currentEntry } = navigation;
-    console.log("_onNavigate", destination, { navigationType, info });
+    // console.log("_onNavigate", destination, { navigationType, info });
 
     const url = new URL(destination.url);
 
@@ -334,12 +334,12 @@ export class Router extends litRouter.Routes {
     const isBase = url.pathname == baseUrl.pathname;
     const route = destinationState?.route ?? url.pathname;
 
-    console.log({
-      urlPathname: url.pathname,
-      baseUrlPathname: baseUrl.pathname,
-      isBase,
-      route,
-    });
+    // console.log({
+    //   urlPathname: url.pathname,
+    //   baseUrlPathname: baseUrl.pathname,
+    //   isBase,
+    //   route,
+    // });
 
     if (currentState.route == route) {
       console.log("redundant route - skipping");

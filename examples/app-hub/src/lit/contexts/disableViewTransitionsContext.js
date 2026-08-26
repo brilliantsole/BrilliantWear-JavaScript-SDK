@@ -1,4 +1,3 @@
-import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 import { createContext } from "./createContext.js";
 
 /** @typedef {{disableViewTransitions: boolean }} DisableViewTransitionsContextState */

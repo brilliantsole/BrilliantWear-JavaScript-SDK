@@ -1685,6 +1685,8 @@ html:not([data-fullscreen-enabled])
   --theme-transition-x: 0px;
   --theme-transition-y: 0px;
   --theme-transition-radius: 200vmax;
+  --theme-transition-duration: 300ms;
+  --theme-transition-timing-function: ease-out;
 }
 html:active-view-transition-type(theme) {
   &:root {
@@ -1698,7 +1700,8 @@ html:active-view-transition-type(theme) {
     animation: none;
   }
   &::view-transition-new(root) {
-    animation: 300ms ease-out theme-transition-radial-reveal;
+    animation: var(--theme-transition-duration)
+      var(--theme-transition-timing-function) theme-transition-radial-reveal;
   }
 }
 
