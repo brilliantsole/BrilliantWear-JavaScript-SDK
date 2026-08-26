@@ -12,6 +12,7 @@ import "../HeaderButton.js";
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/dropdown/dropdown.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/dropdown-item/dropdown-item.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/divider/divider.js";
 
 class MenuButtonTheme extends LitElement {
   static properties = {
@@ -100,6 +101,7 @@ class MenuButtonTheme extends LitElement {
         <wa-icon slot="icon" name="moon"></wa-icon>
         Dark
       </wa-dropdown-item>
+      <wa-divider></wa-divider>
       <wa-dropdown-item
         value="system"
         type="checkbox"

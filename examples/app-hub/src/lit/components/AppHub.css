@@ -838,9 +838,26 @@ html[data-active-tab="layers"] {
 }
 
 html[data-active-tab="apps"] {
-  --background-color: hsl(
+  --apps-background-color-dark: hsl(
     from var(--wa-color-warning-fill-quiet) h calc(s * 0.1) l
   );
+  --apps-background-color-light: hsl(
+    from var(--wa-color-warning-fill-quiet) h calc(s * 0.35) l
+  );
+
+  @media (prefers-color-scheme: light) {
+    --background-color: var(--apps-background-color-light);
+    &.wa-dark {
+      --background-color: var(--apps-background-color-dark);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    --background-color: var(--apps-background-color-dark);
+    &.wa-light {
+      --background-color: var(--apps-background-color-light);
+    }
+  }
 }
 
 html[data-active-tab="devices"] {

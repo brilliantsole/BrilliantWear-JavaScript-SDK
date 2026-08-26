@@ -103,9 +103,9 @@ class AppHub extends LitElement {
     // window.scrollTo(0, 1);
 
     requestAnimationFrame(() => {
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      window.scrollTo(0, 0);
+      // document.documentElement.scrollTop = 0;
+      // document.body.scrollTop = 0;
+      // window.scrollTo(0, 0);
     });
   }
 
