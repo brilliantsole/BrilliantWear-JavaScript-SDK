@@ -838,32 +838,33 @@ html[data-active-tab="layers"] {
 }
 
 html[data-active-tab="apps"] {
-  --apps-background-color-dark: hsl(
+  --background-color: hsl(
     from var(--wa-color-warning-fill-quiet) h calc(s * 0.1) l
   );
-  --apps-background-color-light: hsl(
-    from var(--wa-color-warning-fill-quiet) h calc(s * 0.35) l
-  );
-
-  @media (prefers-color-scheme: light) {
-    --background-color: var(--apps-background-color-light);
-    &.wa-dark {
-      --background-color: var(--apps-background-color-dark);
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    --background-color: var(--apps-background-color-dark);
-    &.wa-light {
-      --background-color: var(--apps-background-color-light);
-    }
-  }
 }
 
 html[data-active-tab="devices"] {
   --background-color: hsl(
     from var(--wa-color-brand-fill-quiet) h calc(s * 0.4) l
   );
+}
+
+:root {
+  --bw-breadcrumb-divider-color: var(--wa-color-surface-border);
+  --bw-breadcrumb-divider-color-normal: var(--wa-color-neutral-border-normal);
+}
+html[data-active-tab="apps"] {
+  @media (prefers-color-scheme: light) {
+    &:not(.wa-dark) {
+      --bw-breadcrumb-divider-color: var(--bw-breadcrumb-divider-color-normal);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &.wa-light {
+      --bw-breadcrumb-divider-color: var(--bw-breadcrumb-divider-color-normal);
+    }
+  }
 }
 
 /* VIEW TRANSITIONS */

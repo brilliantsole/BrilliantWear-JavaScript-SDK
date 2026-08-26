@@ -72,7 +72,9 @@ class TabBreadcrumb extends LitElement {
             )}
           </wa-breadcrumb>
         </div>
-        <wa-divider></wa-divider>
+        <wa-divider
+          style="--color: var(--bw-breadcrumb-divider-color);"
+        ></wa-divider>
       </div>
     `;
   }
