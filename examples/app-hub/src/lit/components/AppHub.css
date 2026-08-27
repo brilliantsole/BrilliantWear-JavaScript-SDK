@@ -274,8 +274,6 @@ bw-app-hub {
 }
 
 main {
-  overflow-x: hidden;
-  overflow-y: scroll;
   width: 100%;
   height: 100%;
 
@@ -286,6 +284,9 @@ main {
 
   container-type: size;
   container-name: main;
+
+  display: flex;
+  flex-direction: column;
 }
 @media (pointer: coarse) {
   main {
@@ -1758,10 +1759,10 @@ html:active-view-transition-type(theme) {
 }
 
 bw-tab-breadcrumb {
-  position: sticky;
-  display: block;
-  top: 0;
   background-color: var(--background-color);
   padding-top: var(--main-padding-top);
-  view-transition-name: bw-tab-breadcrumb;
+}
+
+main :nth-child(2) {
+  overflow-y: scroll;
 }
