@@ -1,7 +1,7 @@
 // based on https://github.com/lit/lit/blob/c42ee1e96b8fd61f7256f61d715daef572e76e52/packages/labs/router/src/router.ts
 
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
-import { defaultPath, tabs } from "../components/AppHub.js";
+import { defaultPath, tabs } from "../components/tabs/tabs.js";
 const { litRouter } = await waitForGlobals();
 
 const origin = location.origin || location.protocol + "//" + location.host;
@@ -288,6 +288,8 @@ export class Router extends litRouter.Routes {
     }
 
     saveCurrentNavigationEntryStateToSessionStorage();
+
+    // FILL - scrollTo
   }
 
   /** @param {NavigationEventMap["navigate"]} e */

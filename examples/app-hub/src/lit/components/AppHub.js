@@ -9,18 +9,13 @@ const { ContextProvider } = litContext;
 
 import { Router } from "../router/Router.js";
 
-import "./tabs/layers/LayersTab.js";
-import "./tabs/apps/AppsTab.js";
-import "./tabs/devices/DevicesTab.js";
-import "./tabs/settings/SettingsTab.js";
-
-export const defaultTab = "layers";
-export const defaultPath = `/${defaultTab}`;
+import { defaultPath, tabs } from "./tabs/tabs.js";
+/** @typedef {import("./tabs/tabs.js").Tab} Tab */
 
 import { createActiveTabContextProvider } from "../contexts/activeTabContext.js";
 import { createScreenOrientationContextProvider } from "../contexts/screenOrientationContext.js";
 
-export const tabs = ["layers", "apps", "devices", "settings"];
+/** @type {Record<Tab, TemplateResult<1>>} */
 const tabRenders = {
   layers: () => html`<bw-layers-tab></bw-layers-tab>`,
   apps: () => html`<bw-apps-tab></bw-apps-tab>`,
@@ -28,17 +23,8 @@ const tabRenders = {
   settings: () => html`<bw-settings-tab></bw-settings-tab>`,
 };
 
-import "./header/nav/NavButtonLayers.js";
-import "./header/nav/NavButtonApps.js";
-import "./header/nav/NavButtonDevices.js";
-import "./header/nav/NavButtonSettings.js";
-import "./header/menu/MenuButtonFlip.js";
-import "./header/menu/MenuButtonTheme.js";
-
-import "./main/MainCornerButtonFlip.js";
-import "./main/MainCornerButtonToggleFullscreen.js";
-import "./main/MainCornerButtonToggleTheme.js";
-import "./main/MainCornerButtonToggleHeader.js";
+import "./header/header.js";
+import "./main/main.js";
 
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
 import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
@@ -103,9 +89,9 @@ class AppHub extends LitElement {
     // window.scrollTo(0, 1);
 
     requestAnimationFrame(() => {
-      // document.documentElement.scrollTop = 0;
-      // document.body.scrollTop = 0;
-      // window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
     });
   }
 
@@ -363,6 +349,7 @@ class AppHub extends LitElement {
     this._onVisibilityUpdate();
     this._onAnchorHeaderUpdate();
     this._onThemeUpdate();
+    this._onDisableViewTransitionsUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -1039,7 +1026,10 @@ class AppHub extends LitElement {
         </menu>
       </header>
       <div id="main">
-        <main>${this.router.outlet()}</main>
+        <main>
+          <bw-tab-breadcrumb></bw-tab-breadcrumb>
+          ${this.router.outlet()}
+        </main>
 
         <div id="mainOverlay">
           <div data-touch-only data-main-align="start" data-cross-align="start">

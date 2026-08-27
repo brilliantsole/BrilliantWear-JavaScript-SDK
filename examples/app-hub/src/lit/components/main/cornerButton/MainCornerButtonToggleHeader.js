@@ -1,6 +1,6 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-import { createIsHeaderHiddenContextConsumer } from "../../contexts/isHeaderHiddenContext.js";
-import { createHeaderSideContextConsumer } from "../../contexts/headerSideContext.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { createIsHeaderHiddenContextConsumer } from "../../../contexts/isHeaderHiddenContext.js";
+import { createHeaderSideContextConsumer } from "../../../contexts/headerSideContext.js";
 
 const { lit } = await waitForGlobals();
 
@@ -9,7 +9,7 @@ const { LitElement, html } = lit;
 import "./MainCornerButton.js";
 
 /** @typedef {"left" | "right" | "top" | "bottom"} ChevronDirection */
-/** @typedef {import("../../contexts/headerSideContext.js").HeaderSide} HeaderSide */
+/** @typedef {import("../../../contexts/headerSideContext.js").HeaderSide} HeaderSide */
 
 /** @type {Record<HeaderSide, ChevronDirection>} */
 const chevronDirections = {

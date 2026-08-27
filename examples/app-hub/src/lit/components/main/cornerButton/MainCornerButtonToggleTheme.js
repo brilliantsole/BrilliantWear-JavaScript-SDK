@@ -1,8 +1,8 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 import {
   createThemeContextConsumer,
   getTheme,
-} from "../../contexts/themeContext.js";
+} from "../../../contexts/themeContext.js";
 
 const { lit } = await waitForGlobals();
 
@@ -26,11 +26,11 @@ class MainCornerButtonToggleTheme extends LitElement {
     );
   }
 
-  /** @type {import("../../contexts/themeContext.js").ThemeContextState} */
+  /** @type {import("../../../contexts/themeContext.js").ThemeContextState} */
   get themeState() {
     return this._themeConsumer.value.state;
   }
-  /** @type {import("../../contexts/themeContext.js").ThemeContextValue} */
+  /** @type {import("../../../contexts/themeContext.js").ThemeContextValue} */
   theme;
   get isDarkTheme() {
     return this.theme == "dark";

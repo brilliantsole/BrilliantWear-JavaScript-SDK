@@ -1,4 +1,5 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { tabIcons, tabVariants } from "../../tabs/tabs.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
@@ -11,10 +12,12 @@ class NavButtonLayers extends LitElement {
   }
 
   render() {
+    const { name } = tabIcons["layers"];
+
     return html`<bw-header-button
       href="/layers"
-      icon-name="window-restore"
-      variant="success"
+      icon-name=${name}
+      variant=${tabVariants["layers"]}
     >
       Layers
     </bw-header-button>`;

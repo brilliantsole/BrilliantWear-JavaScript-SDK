@@ -1,5 +1,6 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 import { createViewportOrientationContextConsumer } from "../../../contexts/viewportOrientationContext.js";
+import { tabIcons, tabVariants } from "../../tabs/tabs.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
@@ -23,12 +24,11 @@ class NavButtonApps extends LitElement {
   }
 
   render() {
-    const iconName =
-      this.viewportOrientation == "landscape" ? "grip" : "grip-vertical";
+    const { name } = tabIcons["apps"][this.viewportOrientation];
     return html`<bw-header-button
       href="/apps"
-      icon-name=${iconName}
-      variant="warning"
+      icon-name=${name}
+      variant=${tabVariants["apps"]}
     >
       Apps
     </bw-header-button>`;

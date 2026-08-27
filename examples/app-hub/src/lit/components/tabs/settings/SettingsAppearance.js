@@ -13,6 +13,7 @@ class SettingsAppearanceElement extends LitElement {
     return html`
       <div class="wa-stack">
         <h3>Appearance</h3>
+        <p>Hello World</p>
       </div>
     `;
   }

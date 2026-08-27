@@ -17,13 +17,8 @@ class DevicesTab extends LitElement {
 
   render() {
     return html`
-      <div class="wa-stack wa-gap-xs">
-        <bw-tab-breadcrumb icon-name="bluetooth" icon-family="brands">
-        </bw-tab-breadcrumb>
-
-        <div>
-          <h3>Devices</h3>
-        </div>
+      <div>
+        <h3>Hello World</h3>
       </div>
     `;
   }

@@ -1,4 +1,5 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { tabIcons, tabVariants } from "../../tabs/tabs.js";
 const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
@@ -11,11 +12,13 @@ class NavButtonDevices extends LitElement {
   }
 
   render() {
+    const { name, family } = tabIcons["devices"];
+
     return html`<bw-header-button
       href="/devices"
-      icon-name="bluetooth"
-      icon-family="brands"
-      variant="brand"
+      icon-name=${name}
+      icon-family=${family}
+      variant=${tabVariants["devices"]}
     >
       Devices
     </bw-header-button>`;

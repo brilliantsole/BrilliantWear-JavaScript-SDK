@@ -1,5 +1,5 @@
-import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
-import { createFullscreenContextConsumer } from "../../contexts/fullscreenContext.js";
+import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { createFullscreenContextConsumer } from "../../../contexts/fullscreenContext.js";
 
 const { lit } = await waitForGlobals();
 
