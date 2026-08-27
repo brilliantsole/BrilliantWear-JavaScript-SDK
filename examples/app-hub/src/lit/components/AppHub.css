@@ -448,7 +448,7 @@ html[data-header-hidden] [data-header-shown-only] {
       flex-basis: 0;
     }
   }
-  html[data-disable-view-transitions] :is(#header, [data-slide-on-enter]) {
+  html[data-disable-transitions] :is(#header, [data-slide-on-enter]) {
     transition: none !important;
   }
 

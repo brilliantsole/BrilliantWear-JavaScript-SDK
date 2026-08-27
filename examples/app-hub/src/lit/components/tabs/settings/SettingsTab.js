@@ -4,7 +4,7 @@ const { lit } = await waitForGlobals();
 
 const { LitElement, html, css } = lit;
 
-import "./SettingsAppearance.js";
+import "./appearance/SettingsAppearance.js";
 
 class SettingsTab extends LitElement {
   createRenderRoot() {
@@ -14,20 +14,6 @@ class SettingsTab extends LitElement {
   render() {
     return html`
       <div class="bw-stack">
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
         <bw-settings-appearance></bw-settings-appearance>
       </div>
     `;

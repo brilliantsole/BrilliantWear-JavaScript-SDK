@@ -43,6 +43,7 @@ import {
   getTheme,
 } from "../contexts/themeContext.js";
 import { createNavigationStateContextProvider } from "../contexts/navigationStateContext.js";
+import { createDisableTransitionsContextProvider } from "../contexts/disableTransitionsContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -136,14 +137,16 @@ class AppHub extends LitElement {
     );
   }
 
-  get disableViewTransitions() {
-    return this._disableViewTransitions;
+  _onDisableTransitionsUpdate() {
+    const { disableTransitions } = this._disableTransitionsProvider.value.state;
+    console.log({ disableTransitions });
+    this._disableTransitions = disableTransitions;
+    document.documentElement.toggleAttribute(
+      "data-disable-transitions",
+      Boolean(this._disableTransitions),
+    );
   }
-  set disableViewTransitions(newDisableViewTransitions) {
-    this._disableViewTransitionsProvider.value.update({
-      disableViewTransitions: newDisableViewTransitions,
-    });
-  }
+
   _onDisableViewTransitionsUpdate() {
     const { disableViewTransitions } =
       this._disableViewTransitionsProvider.value.state;
@@ -164,7 +167,7 @@ class AppHub extends LitElement {
     if (this._reducedMotionEnabled) {
       return true;
     }
-    if (this.disableViewTransitions) {
+    if (this._disableViewTransitions) {
       return true;
     }
     if (this._hidden) {
@@ -196,6 +199,11 @@ class AppHub extends LitElement {
       createDisableViewTransitionsContextProvider(this, null, () =>
         this._onDisableViewTransitionsUpdate(),
       );
+    this._disableTransitionsProvider = createDisableTransitionsContextProvider(
+      this,
+      null,
+      () => this._onDisableTransitionsUpdate(),
+    );
     this._anchorHeaderProvider = createAnchorHeaderContextProvider(
       this,
       null,
@@ -324,9 +332,33 @@ class AppHub extends LitElement {
     document.addEventListener(
       "pointerdown",
       (event) => {
-        // console.log("pointerdown", event);
-        const { clientX: x, clientY: y } = event;
-        this._lastPointerDownPosition = { x, y };
+        const { clientX, clientY, screenX, screenY, pageX, pageY } = event;
+        const { innerWidth, innerHeight, outerWidth, outerHeight } = window;
+        const { width, height, availHeight, availWidth } = screen;
+        // console.log("pointerdown", {
+        //   clientX,
+        //   clientY,
+        //   screenX,
+        //   screenY,
+        //   pageX,
+        //   pageY,
+        //   innerWidth,
+        //   innerHeight,
+        //   outerWidth,
+        //   outerHeight,
+        //   width,
+        //   height,
+        //   availHeight,
+        //   availWidth,
+        // });
+        this._lastPointerDownPosition = {
+          clientX,
+          clientY,
+          screenX,
+          screenY,
+          pageX,
+          pageY,
+        };
       },
       options,
     );
@@ -350,6 +382,7 @@ class AppHub extends LitElement {
     this._onAnchorHeaderUpdate();
     this._onThemeUpdate();
     this._onDisableViewTransitionsUpdate();
+    this._onDisableTransitionsUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -464,17 +497,27 @@ class AppHub extends LitElement {
       update();
       this._updateMetaColor();
     } else {
-      const { x, y } = position;
+      let { clientX: x, clientY: y } = position;
 
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      const { innerWidth, innerHeight, outerWidth, outerHeight } = window;
 
-      const themeTransitinX = isIOS ? `${x}px` : `${(100 * x) / width}%`;
-      const themeTransitionY = isIOS ? `${y}px` : `${(100 * y) / height}%`;
+      const useOuterWidth = !isIOS && this._touchEnabled;
+
+      const width = useOuterWidth ? outerWidth : innerWidth;
+      const height = useOuterWidth ? outerHeight : innerHeight;
+
+      if (useOuterWidth) {
+        y += window.outerHeight - window.innerHeight;
+      }
+
+      const isRelative = !isIOS;
+
+      const themeTransitionX = isRelative ? `${(100 * x) / width}%` : `${x}px`;
+      const themeTransitionY = isRelative ? `${(100 * y) / height}%` : `${y}px`;
 
       document.documentElement.style.setProperty(
         `--theme-transition-x`,
-        themeTransitinX,
+        themeTransitionX,
       );
       document.documentElement.style.setProperty(
         `--theme-transition-y`,
@@ -498,7 +541,15 @@ class AppHub extends LitElement {
       );
 
       const types = ["theme"];
-      // console.log("types", types, { radius, width, height, x, y });
+      console.log("types", types, {
+        radius,
+        width,
+        height,
+        x,
+        y,
+        isRelative,
+        useOuterWidth,
+      });
       await document.startViewTransition({
         update: async () => {
           update();
@@ -737,6 +788,7 @@ class AppHub extends LitElement {
   _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
   _doubleTapDistanceThreshold = 800;
+  _allowedNodeNames = ["BUTTON", "SWITCH"];
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     // console.log("_onTouchEnd", event);
@@ -784,7 +836,9 @@ class AppHub extends LitElement {
         const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
         console.log("elementsFromPoint", elementsFromPoint);
         const button = elementsFromPoint.find((element) =>
-          element.nodeName.includes("BUTTON"),
+          this._allowedNodeNames.some((nodeName) =>
+            element.nodeName.includes(nodeName),
+          ),
         );
         if (button) {
           button.click();
