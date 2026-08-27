@@ -288,6 +288,13 @@ main {
   display: flex;
   flex-direction: column;
 }
+:dir(ltr) main {
+  padding-right: var(--main-padding-right-extra);
+}
+:dir(rtl) main {
+  padding-left: var(--main-padding-left-extra);
+}
+
 @media (pointer: coarse) {
   main {
     transition-duration: var(--header-hidden-transition-duration);
@@ -921,7 +928,7 @@ html:active-view-transition {
 /* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
 
 html:active-view-transition-type(previous-tab, next-tab) {
-  --animation-duration: 3000ms;
+  --animation-duration: 300ms;
   --animation-timing-function: ease;
 }
 
@@ -1759,10 +1766,10 @@ html:active-view-transition-type(theme) {
 }
 
 bw-tab-breadcrumb {
-  background-color: var(--background-color);
   padding-top: var(--main-padding-top);
 }
 
-main :nth-child(2) {
+main > :nth-child(2) {
   overflow-y: scroll;
+  padding-top: var(--main-padding-top-base);
 }
