@@ -77,11 +77,7 @@ class SettingsAnimationsTreeElement extends LitElement {
 
     if (this.ref.value) {
       this.ref.value.indeterminate = this.indeterminate;
-      if (this.indeterminate) {
-        delete this.ref.value.checked;
-      } else {
-        this.ref.value.checked = this.checked;
-      }
+      this.ref.value.checked = this.checked;
     }
   }
 
@@ -107,8 +103,13 @@ class SettingsAnimationsTreeElement extends LitElement {
           ?checked=${this.checked}
           >Animations</wa-checkbox
         >
-        <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
-        <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
+        <div
+          class="wa-stack wa-gap-xs"
+          style="padding-inline-start: var(--wa-space-l);"
+        >
+          <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
+          <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
+        </div>
       </div>
     `;
   }

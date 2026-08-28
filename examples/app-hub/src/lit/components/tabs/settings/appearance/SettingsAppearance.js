@@ -15,7 +15,7 @@ class SettingsAppearance extends LitElement {
   render() {
     return html`
       <div class="wa-stack">
-        <h3>Appearance</h3>
+        <h3 class="wa-heading-l">Appearance</h3>
         <bw-settings-theme-toggle></bw-settings-theme-toggle>
         <bw-settings-animations-tree></bw-settings-animations-tree>
       </div>
