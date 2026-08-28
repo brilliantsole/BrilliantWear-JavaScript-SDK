@@ -597,7 +597,21 @@ class AppHub extends LitElement {
     };
 
     if (this.skipViewTransitions || this.anchorHeader || !this._touchEnabled) {
+      const disableTransitions = !this._disableTransitions;
+
+      if (disableTransitions) {
+        document.documentElement.toggleAttribute(
+          "data-disable-transitions",
+          true,
+        );
+      }
       update();
+      if (disableTransitions) {
+        document.documentElement.toggleAttribute(
+          "data-disable-transitions",
+          false,
+        );
+      }
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
       // console.log("types", types);

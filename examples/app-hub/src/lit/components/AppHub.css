@@ -277,8 +277,8 @@ main {
   width: 100%;
   height: 100%;
 
-  /* padding-left: var(--main-padding-left);
-  padding-right: var(--main-padding-right); */
+  /* padding-left: var(--main-padding-left); */
+  /* padding-right: var(--main-padding-right); */
   /* padding-top: var(--main-padding-top); */
   /* padding-bottom: var(--main-padding-bottom); */
 
@@ -444,7 +444,14 @@ html[data-header-hidden] [data-header-shown-only] {
     }
   }
   html[data-disable-transitions]
-    :is(#header, [data-slide-on-enter], main, #mainOverlay) {
+    :is(
+      #header,
+      [data-slide-on-enter],
+      main,
+      #mainOverlay,
+      #tab,
+      bw-tab-breadcrumb
+    ) {
     transition: none !important;
   }
 
@@ -477,7 +484,7 @@ html[data-header-hidden] [data-header-shown-only] {
         );
       }
       #header {
-        transition-property: max-width, padding, border-top-width;
+        transition-property: max-width, padding;
         max-width: var(--header-width);
       }
       html[data-header-hidden] #header {
@@ -922,7 +929,9 @@ html:active-view-transition {
 
   #header,
   #mainOverlay,
-  main {
+  main,
+  #tab,
+  bw-tab-breadcrumb {
     transition-property: none;
   }
 }
@@ -1790,6 +1799,26 @@ bw-tab-breadcrumb {
 bw-tab-breadcrumb {
   padding-left: var(--main-padding-left);
   padding-right: var(--main-padding-right);
+}
+
+@media (pointer: coarse) {
+  #tab,
+  bw-tab-breadcrumb {
+    transition-duration: var(--header-hidden-transition-duration);
+    transition-timing-function: var(--header-hidden-transition-timing-function);
+  }
+  @media (orientation: landscape) {
+    #tab,
+    bw-tab-breadcrumb {
+      transition-property: padding;
+    }
+  }
+  @media (orientation: portrait) {
+    #tab,
+    bw-tab-breadcrumb {
+      transition-property: padding;
+    }
+  }
 }
 
 wa-card {
