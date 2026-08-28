@@ -179,8 +179,9 @@ export async function createContext(key, options) {
    */
   const createContextProvider = (host, initialState, callback) => {
     // console.log("createContextProvider", host, initialState, callback);
+    initialState = { ...defaultState, ...initialState };
     const value = {
-      state: { ...defaultState, ...initialState, ...parsedState },
+      state: { ...initialState, ...parsedState },
       update: async (newState, force, dontSave) => {
         // console.log("update", newState);
         const oldState = value.state;
@@ -210,6 +211,7 @@ export async function createContext(key, options) {
         if (!didClear) {
           console.error(`failed to clear "${contextKey}"`);
         }
+        value.update({ ...initialState });
         return didClear;
       },
     };
