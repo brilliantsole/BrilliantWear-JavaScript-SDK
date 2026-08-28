@@ -25,16 +25,9 @@ class MenuButtonTheme extends LitElement {
     }
   `;
 
-  constructor() {
-    super();
-    this._themeConsumer = createThemeContextConsumer(
-      this,
-      true,
-      (themeState) => {
-        this.theme = getTheme(themeState);
-      },
-    );
-  }
+  _themeConsumer = createThemeContextConsumer(this, true, (themeState) => {
+    this.theme = getTheme(themeState);
+  });
 
   /** @type {import("../../../contexts/themeContext.js").ThemeContextState} */
   get themeState() {

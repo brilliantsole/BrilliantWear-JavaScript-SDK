@@ -1753,7 +1753,7 @@ html:active-view-transition-type(theme) {
   }
 }
 
-.bw-stack {
+.bw-grid-lanes {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 
   @supports (display: grid-lanes) {
@@ -1771,7 +1771,7 @@ bw-tab-breadcrumb {
   padding-top: var(--main-padding-top);
 }
 
-main > :nth-child(2) {
+#tab {
   overflow-y: scroll;
   padding-top: var(--main-padding-top-base);
 }

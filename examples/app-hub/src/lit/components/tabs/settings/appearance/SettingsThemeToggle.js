@@ -6,30 +6,24 @@ const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/switch/switch.js";
+
 import {
   createThemeContextConsumer,
   getTheme,
 } from "../../../../contexts/themeContext.js";
 
-class SettingsThemeToggleElement extends LitElement {
+class SettingsThemeToggle extends LitElement {
   createRenderRoot() {
     return this;
   }
 
-  constructor() {
-    super();
-    this.ref = createRef();
-    this._themeConsumer = createThemeContextConsumer(
-      this,
-      true,
-      (themeState) => {
-        this.theme = getTheme(themeState);
-        if (this.ref.value) {
-          this.ref.value.checked = this.isDarkTheme;
-        }
-      },
-    );
-  }
+  ref = createRef();
+  _themeConsumer = createThemeContextConsumer(this, true, (themeState) => {
+    this.theme = getTheme(themeState);
+    if (this.ref.value) {
+      this.ref.value.checked = this.checked;
+    }
+  });
 
   /** @type {import("../../../../contexts/themeContext.js").ThemeContextState} */
   get themeState() {
@@ -42,20 +36,25 @@ class SettingsThemeToggleElement extends LitElement {
   }
 
   _onChange(event) {
-    this.themeState.selectedTheme = event.target.checked ? "dark" : "light";
-    event.target.checked = this.isDarkTheme;
+    const { checked } = event.target;
+    event.target.checked = this.checked;
+    this.themeState.selectedTheme = checked ? "dark" : "light";
     this._themeConsumer.value.update(this.themeState, true);
+  }
+
+  get checked() {
+    return this.isDarkTheme;
   }
 
   render() {
     console.log({ isDarkTheme: this.isDarkTheme });
     return html`<wa-switch
       ${ref(this.ref)}
-      ?checked=${this.isDarkTheme}
+      ?checked=${this.checked}
       @change=${this._onChange}
       >Dark Mode</wa-switch
     >`;
   }
 }
 
-customElements.define("bw-settings-theme-toggle", SettingsThemeToggleElement);
+customElements.define("bw-settings-theme-toggle", SettingsThemeToggle);

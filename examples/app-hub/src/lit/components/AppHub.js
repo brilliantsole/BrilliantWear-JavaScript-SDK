@@ -59,6 +59,9 @@ class AppHub extends LitElement {
       anchorHeader: newAnchorHeader,
     });
   }
+  _anchorHeaderProvider = createAnchorHeaderContextProvider(this, null, () =>
+    this._onAnchorHeaderUpdate(),
+  );
   _onAnchorHeaderUpdate() {
     const { anchorHeader } = this._anchorHeaderProvider.value.state;
     // console.log("_onAnchorHeaderUpdate", { anchorHeader });
@@ -74,6 +77,9 @@ class AppHub extends LitElement {
   }
 
   _hidden = false;
+  _visibilityProvider = createVisibilityContextProvider(this, null, () =>
+    this._onVisibilityUpdate(),
+  );
   _onVisibilityUpdate() {
     const { hidden } = this._visibilityProvider.value.state;
     // console.log({ hidden });
@@ -137,6 +143,11 @@ class AppHub extends LitElement {
     );
   }
 
+  _disableTransitionsProvider = createDisableTransitionsContextProvider(
+    this,
+    null,
+    () => this._onDisableTransitionsUpdate(),
+  );
   _onDisableTransitionsUpdate() {
     const { disableTransitions } = this._disableTransitionsProvider.value.state;
     console.log({ disableTransitions });
@@ -147,6 +158,11 @@ class AppHub extends LitElement {
     );
   }
 
+  _disableViewTransitionsProvider = createDisableViewTransitionsContextProvider(
+    this,
+    null,
+    () => this._onDisableViewTransitionsUpdate(),
+  );
   _onDisableViewTransitionsUpdate() {
     const { disableViewTransitions } =
       this._disableViewTransitionsProvider.value.state;
@@ -177,13 +193,36 @@ class AppHub extends LitElement {
     return false;
   }
 
+  refs = {
+    header: createRef(),
+  };
+
+  _navigationStateProvider = createNavigationStateContextProvider(this);
+  router = new Router(
+    this,
+    tabs.map((tab) => ({
+      path: `/${tab}`,
+      render: tabRenders[tab],
+    })),
+    {
+      defaultPath,
+      beforeGoto: (pathname, activeTab) => {
+        this._activeTabProvider.value.update({ activeTab });
+        this._navigationStateProvider.value.update(
+          navigation.currentEntry.getState(),
+        );
+        this._lastTouchTime = 0;
+      },
+      afterGoto: (pathname, activeTab) => {
+        console.log("after", pathname, { activeTab });
+        this.activeTab = activeTab;
+      },
+    },
+  );
+
   constructor() {
     super();
     this.dataset.axis = "main";
-
-    this.refs = {
-      header: createRef(),
-    };
 
     this._themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (!this._themeColorMeta) {
@@ -192,120 +231,6 @@ class AppHub extends LitElement {
       document.head.appendChild(this._themeColorMeta);
     }
 
-    this._visibilityProvider = createVisibilityContextProvider(this, null, () =>
-      this._onVisibilityUpdate(),
-    );
-    this._disableViewTransitionsProvider =
-      createDisableViewTransitionsContextProvider(this, null, () =>
-        this._onDisableViewTransitionsUpdate(),
-      );
-    this._disableTransitionsProvider = createDisableTransitionsContextProvider(
-      this,
-      null,
-      () => this._onDisableTransitionsUpdate(),
-    );
-    this._anchorHeaderProvider = createAnchorHeaderContextProvider(
-      this,
-      null,
-      () => this._onAnchorHeaderUpdate(),
-    );
-    this._activeTabProvider = createActiveTabContextProvider(this);
-    this._navigationStateProvider = createNavigationStateContextProvider(this);
-    this._screenOrientationProvider = createScreenOrientationContextProvider(
-      this,
-      null,
-      () => this._onScreenOrientationUpdate(),
-    );
-    this._fullscreenProvider = createFullscreenContextProvider(this, null, () =>
-      this._onFullscreenUpdate(),
-    );
-    this._isLeftHandedProvider = createIsLeftHandedContextProvider(
-      this,
-      null,
-      () => {
-        this._onIsLeftHandedUpdate();
-      },
-    );
-    this._headerSideProvider = createHeaderSideContextProvider(
-      this,
-      null,
-      () => {
-        this._onHeaderSideUpdate();
-      },
-    );
-    this._isHeaderHiddenProvider = createIsHeaderHiddenContextProvider(
-      this,
-      null,
-      () => {
-        this._onIsHeaderHiddenUpdate();
-      },
-    );
-    this._reducedMotionProvider = createReducedMotionContextProvider(
-      this,
-      null,
-      () => {
-        this._onReducedMotionUpdate();
-      },
-    );
-    this._touchEnabledProvider = createTouchEnabledContextProvider(
-      this,
-      null,
-      () => {
-        this._onTouchEnabledUpdate();
-      },
-    );
-    this._viewportOrientationProvider =
-      createViewportOrientationContextProvider(this, null, () => {
-        this._onViewportOrientationUpdate();
-      });
-    this._themeProvider = createThemeContextProvider(this, null, () => {
-      this._onThemeUpdate();
-    });
-    this._batteryManagerProvider = createBatteryManagerContextProvider(
-      this,
-      null,
-      () => {
-        // console.log("batteryManagerState", this._batteryManagerState);
-        this._batteryManagerState.changes.forEach((change) => {
-          switch (change) {
-            case "charging":
-              this._onBatteryChargingChange();
-              break;
-            case "level":
-              this._onBatteryLevelChange();
-              break;
-            case "chargingTime":
-              this._onBatteryChargingTimeChange();
-              break;
-            case "dischargingTime":
-              this._onBatteryDischargingTimeChange();
-              break;
-          }
-        });
-      },
-    );
-
-    this.router = new Router(
-      this,
-      tabs.map((tab) => ({
-        path: `/${tab}`,
-        render: tabRenders[tab],
-      })),
-      {
-        defaultPath,
-        beforeGoto: (pathname, activeTab) => {
-          this._activeTabProvider.value.update({ activeTab });
-          this._navigationStateProvider.value.update(
-            navigation.currentEntry.getState(),
-          );
-          this._lastTouchTime = 0;
-        },
-        afterGoto: (pathname, activeTab) => {
-          console.log("after", pathname, { activeTab });
-          this.activeTab = activeTab;
-        },
-      },
-    );
     console.log("AppHub", this);
   }
 
@@ -396,6 +321,7 @@ class AppHub extends LitElement {
     this._abortController.abort();
   }
 
+  _activeTabProvider = createActiveTabContextProvider(this);
   #activeTab;
   get activeTab() {
     return this.#activeTab;
@@ -410,6 +336,11 @@ class AppHub extends LitElement {
     this._updateMetaColor();
   }
 
+  _screenOrientationProvider = createScreenOrientationContextProvider(
+    this,
+    null,
+    () => this._onScreenOrientationUpdate(),
+  );
   /** @type {OrientationType} */
   _screenOrientationType;
   _onScreenOrientationUpdate() {
@@ -428,6 +359,10 @@ class AppHub extends LitElement {
     }
   }
 
+  _fullscreenProvider = createFullscreenContextProvider(this, null, () =>
+    this._onFullscreenUpdate(),
+  );
+
   _onFullscreenUpdate() {
     // console.log("_onFullscreenUpdate");
     const { fullscreenEnabled, fullscreenElement } =
@@ -439,11 +374,22 @@ class AppHub extends LitElement {
     );
   }
 
+  _reducedMotionProvider = createReducedMotionContextProvider(
+    this,
+    null,
+    () => {
+      this._onReducedMotionUpdate();
+    },
+  );
   _onReducedMotionUpdate() {
     const { reducedMotion } = this._reducedMotionProvider.value.state;
     // console.log({ reducedMotion });
     this._reducedMotion = reducedMotion;
   }
+
+  _touchEnabledProvider = createTouchEnabledContextProvider(this, null, () => {
+    this._onTouchEnabledUpdate();
+  });
   _onTouchEnabledUpdate() {
     const { touchEnabled } = this._touchEnabledProvider.value.state;
     // console.log({ touchEnabled });
@@ -453,6 +399,14 @@ class AppHub extends LitElement {
     }
     this._updateHeaderSide();
   }
+
+  _viewportOrientationProvider = createViewportOrientationContextProvider(
+    this,
+    null,
+    () => {
+      this._onViewportOrientationUpdate();
+    },
+  );
   /** @type {import("../contexts/viewportOrientationContext.js").ViewportOrientation} */
   _viewportOrientation = "landscape";
   _onViewportOrientationUpdate() {
@@ -463,6 +417,9 @@ class AppHub extends LitElement {
     this._updateCSSVariables();
   }
 
+  _themeProvider = createThemeContextProvider(this, null, () => {
+    this._onThemeUpdate();
+  });
   /** @type {import("../contexts/themeContext.js").ThemeContextState} */
   get _themeState() {
     return this._themeProvider.value.state;
@@ -609,6 +566,9 @@ class AppHub extends LitElement {
     );
   }
 
+  _isLeftHandedProvider = createIsLeftHandedContextProvider(this, null, () => {
+    this._onIsLeftHandedUpdate();
+  });
   get isLeftHanded() {
     return this._isLeftHanded;
   }
@@ -651,6 +611,9 @@ class AppHub extends LitElement {
     }
   }
 
+  _headerSideProvider = createHeaderSideContextProvider(this, null, () => {
+    this._onHeaderSideUpdate();
+  });
   _onHeaderSideUpdate() {
     const { headerSide } = this._headerSideProvider.value.state;
     // console.log({ headerSide });
@@ -690,6 +653,13 @@ class AppHub extends LitElement {
     this._headerSideProvider.value.update({ headerSide });
   }
 
+  _isHeaderHiddenProvider = createIsHeaderHiddenContextProvider(
+    this,
+    null,
+    () => {
+      this._onIsHeaderHiddenUpdate();
+    },
+  );
   _onIsHeaderHiddenUpdate() {
     const { isHeaderHidden } = this._isHeaderHiddenProvider.value.state;
     // console.log({ isHeaderHidden });
@@ -728,7 +698,6 @@ class AppHub extends LitElement {
         "--theme-transition-duration",
       ),
     );
-    console.log(this._themeTransitionDuration);
   }
 
   _updateActiveTab() {
@@ -736,6 +705,30 @@ class AppHub extends LitElement {
     const { activeTab } = this._activeTabProvider.value.state;
     console.log({ activeTab });
   }
+
+  _batteryManagerProvider = createBatteryManagerContextProvider(
+    this,
+    null,
+    () => {
+      // console.log("batteryManagerState", this._batteryManagerState);
+      this._batteryManagerState.changes.forEach((change) => {
+        switch (change) {
+          case "charging":
+            this._onBatteryChargingChange();
+            break;
+          case "level":
+            this._onBatteryLevelChange();
+            break;
+          case "chargingTime":
+            this._onBatteryChargingTimeChange();
+            break;
+          case "dischargingTime":
+            this._onBatteryDischargingTimeChange();
+            break;
+        }
+      });
+    },
+  );
 
   /** @type {import("../contexts/batteryManagerContext.js").BatteryManagerContextState} */
   get _batteryManagerState() {
@@ -808,7 +801,7 @@ class AppHub extends LitElement {
   _doubleTapTimeThreshold = 700;
   _lastTouchPosition;
   _doubleTapDistanceThreshold = 800;
-  _allowedNodeNames = ["BUTTON", "SWITCH"];
+  _allowedNodeNames = ["BUTTON", "SWITCH", "CHECKBOX"];
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     // console.log("_onTouchEnd", event);
@@ -1102,7 +1095,7 @@ class AppHub extends LitElement {
       <div id="main">
         <main>
           <bw-tab-breadcrumb></bw-tab-breadcrumb>
-          ${this.router.outlet()}
+          <div id="tab">${this.router.outlet()}</div>
         </main>
 
         <div id="mainOverlay">

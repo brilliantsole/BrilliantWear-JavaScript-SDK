@@ -13,7 +13,7 @@ class SettingsTab extends LitElement {
 
   render() {
     return html`
-      <div class="bw-stack">
+      <div class="bw-grid-lanes">
         <bw-settings-appearance></bw-settings-appearance>
       </div>
     `;

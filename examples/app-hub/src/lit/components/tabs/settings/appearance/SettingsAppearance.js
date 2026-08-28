@@ -5,11 +5,9 @@ const { lit } = await waitForGlobals();
 const { LitElement, html } = lit;
 
 import "./SettingsThemeToggle.js";
-import "./SettingsViewTransitionsToggle.js";
-import "./SettingsTransitionsToggle.js";
-import "./SettingsAnimationsToggle.js";
+import "./SettingsAnimationsTree.js";
 
-class SettingsAppearanceElement extends LitElement {
+class SettingsAppearance extends LitElement {
   createRenderRoot() {
     return this;
   }
@@ -19,12 +17,10 @@ class SettingsAppearanceElement extends LitElement {
       <div class="wa-stack">
         <h3>Appearance</h3>
         <bw-settings-theme-toggle></bw-settings-theme-toggle>
-        <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
-        <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
-        <bw-settings-animations-toggle></bw-settings-animations-toggle>
+        <bw-settings-animations-tree></bw-settings-animations-tree>
       </div>
     `;
   }
 }
 
-customElements.define("bw-settings-appearance", SettingsAppearanceElement);
+customElements.define("bw-settings-appearance", SettingsAppearance);

@@ -1,0 +1,120 @@
+import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
+
+const { lit, litRef } = await waitForGlobals();
+
+const { LitElement, html } = lit;
+const { ref, createRef } = litRef;
+
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
+
+import { createDisableTransitionsContextConsumer } from "../../../../contexts/disableTransitionsContext.js";
+import { createDisableViewTransitionsContextConsumer } from "../../../../contexts/disableViewTransitionsContext.js";
+
+import "./SettingsTransitionsToggle.js";
+import "./SettingsViewTransitionsToggle.js";
+
+class SettingsAnimationsTreeElement extends LitElement {
+  createRenderRoot() {
+    return this;
+  }
+
+  ref = createRef();
+
+  _transitionsConsumer = createDisableTransitionsContextConsumer(
+    this,
+    true,
+    () => {
+      this._updateChecked();
+    },
+  );
+  _viewTransitionsConsumer = createDisableViewTransitionsContextConsumer(
+    this,
+    true,
+    () => {
+      this._updateChecked();
+    },
+  );
+
+  /** @type {import("../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
+  get disableTransitionsContextState() {
+    return this._transitionsConsumer.value.state;
+  }
+  get isTransitionsDisabled() {
+    return this.disableTransitionsContextState.disableTransitions;
+  }
+
+  /** @type {import("../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
+  get disableViewTransitionsContextState() {
+    return this._viewTransitionsConsumer.value.state;
+  }
+  get isViewTransitionsDisabled() {
+    return this.disableViewTransitionsContextState.disableViewTransitions;
+  }
+
+  _onChange(event) {
+    const { checked } = event.target;
+    const isAnimationsEnabled = checked;
+
+    this.disableTransitionsContextState.disableTransitions =
+      !isAnimationsEnabled;
+    this._transitionsConsumer.value.update(
+      this.disableTransitionsContextState,
+      true,
+    );
+
+    this.disableViewTransitionsContextState.disableViewTransitions =
+      !isAnimationsEnabled;
+    this._viewTransitionsConsumer.value.update(
+      this.disableViewTransitionsContextState,
+      true,
+    );
+  }
+
+  _updateChecked() {
+    if (!this._didFirstUpdate) {
+      return;
+    }
+
+    if (this.ref.value) {
+      this.ref.value.indeterminate = this.indeterminate;
+      if (this.indeterminate) {
+        delete this.ref.value.checked;
+      } else {
+        this.ref.value.checked = this.checked;
+      }
+    }
+  }
+
+  get checked() {
+    return !this.isViewTransitionsDisabled && !this.isTransitionsDisabled;
+  }
+  get indeterminate() {
+    return this.isViewTransitionsDisabled != this.isTransitionsDisabled;
+  }
+
+  firstUpdated() {
+    this._didFirstUpdate = true;
+    this._updateChecked();
+  }
+
+  render() {
+    return html`
+      <div class="wa-stack wa-gap-xs">
+        <wa-checkbox
+          @change=${this._onChange}
+          ${ref(this.ref)}
+          ?indeterminate=${this.indeterminate}
+          ?checked=${this.checked}
+          >Animations</wa-checkbox
+        >
+        <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
+        <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
+      </div>
+    `;
+  }
+}
+
+customElements.define(
+  "bw-settings-animations-tree",
+  SettingsAnimationsTreeElement,
+);
