@@ -535,6 +535,9 @@ class AppHub extends LitElement {
         ? `${radius}px`
         : `${(100 * radius) / (Math.hypot(width, height) / Math.SQRT2)}%`;
 
+      const heightRadiusRatio = y / radius;
+      console.log({ heightRadiusRatio });
+
       document.documentElement.style.setProperty(
         `--theme-transition-radius`,
         themeTransitionRadius,
@@ -550,6 +553,10 @@ class AppHub extends LitElement {
         isRelative,
         useOuterWidth,
       });
+
+      setTimeout(() => {
+        this._updateMetaColor();
+      }, this._themeTransitionDuration * heightRadiusRatio);
       await document.startViewTransition({
         update: async () => {
           update();
@@ -708,7 +715,20 @@ class AppHub extends LitElement {
         this._updateHeaderCSSVariables();
       }
       this._resetViewport();
+      this._getCSSVariables();
     });
+  }
+
+  /** @type {CSSStyleDeclaration} */
+  _documentComputedStyle;
+  _getCSSVariables() {
+    this._documentComputedStyle = getComputedStyle(document.documentElement);
+    this._themeTransitionDuration = parseFloat(
+      this._documentComputedStyle.getPropertyValue(
+        "--theme-transition-duration",
+      ),
+    );
+    console.log(this._themeTransitionDuration);
   }
 
   _updateActiveTab() {

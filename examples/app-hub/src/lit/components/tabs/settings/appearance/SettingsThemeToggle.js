@@ -1,8 +1,9 @@
 import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
 
-const { lit } = await waitForGlobals();
+const { lit, litRef } = await waitForGlobals();
 
 const { LitElement, html } = lit;
+const { ref, createRef } = litRef;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/switch/switch.js";
 import {
@@ -17,11 +18,15 @@ class SettingsThemeToggleElement extends LitElement {
 
   constructor() {
     super();
+    this.ref = createRef();
     this._themeConsumer = createThemeContextConsumer(
       this,
       true,
       (themeState) => {
         this.theme = getTheme(themeState);
+        if (this.ref.value) {
+          this.ref.value.checked = this.isDarkTheme;
+        }
       },
     );
   }
@@ -38,12 +43,14 @@ class SettingsThemeToggleElement extends LitElement {
 
   _onChange(event) {
     this.themeState.selectedTheme = event.target.checked ? "dark" : "light";
+    event.target.checked = this.isDarkTheme;
     this._themeConsumer.value.update(this.themeState, true);
   }
 
   render() {
     console.log({ isDarkTheme: this.isDarkTheme });
     return html`<wa-switch
+      ${ref(this.ref)}
       ?checked=${this.isDarkTheme}
       @change=${this._onChange}
       >Dark Mode</wa-switch

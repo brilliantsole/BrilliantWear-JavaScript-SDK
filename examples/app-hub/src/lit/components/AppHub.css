@@ -444,11 +444,13 @@ html[data-header-hidden] [data-header-shown-only] {
       interpolate-size: allow-keywords;
       transition-property: flex-basis, padding;
     }
+
     html[data-header-hidden] #header {
       flex-basis: 0;
     }
   }
-  html[data-disable-transitions] :is(#header, [data-slide-on-enter]) {
+  html[data-disable-transitions]
+    :is(#header, [data-slide-on-enter], main, #mainOverlay) {
     transition: none !important;
   }
 
