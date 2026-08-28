@@ -7,6 +7,8 @@ const { LitElement, html } = lit;
 import "./SettingsThemeToggle.js";
 import "./SettingsAnimationsTree.js";
 
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/card/card.js";
+
 class SettingsAppearance extends LitElement {
   createRenderRoot() {
     return this;
@@ -14,11 +16,22 @@ class SettingsAppearance extends LitElement {
 
   render() {
     return html`
-      <div class="wa-stack">
-        <h3 class="wa-heading-l">Appearance</h3>
-        <bw-settings-theme-toggle></bw-settings-theme-toggle>
-        <bw-settings-animations-tree></bw-settings-animations-tree>
-      </div>
+      <wa-card class="card-header">
+        <h3 slot="header" class="wa-heading-l">Appearance</h3>
+
+        <div class="wa-stack wa-gap-s">
+          <bw-settings-theme-toggle></bw-settings-theme-toggle>
+          <bw-settings-animations-tree></bw-settings-animations-tree>
+        </div>
+
+        <wa-button appearance="plain" slot="header-actions" size="m">
+          <wa-icon
+            name="rotate-left"
+            variant="solid"
+            label="reset settings"
+          ></wa-icon>
+        </wa-button>
+      </wa-card>
     `;
   }
 }

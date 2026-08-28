@@ -6,6 +6,7 @@ const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/switch/switch.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
 
 import {
   createThemeContextConsumer,
@@ -16,6 +17,14 @@ class SettingsThemeToggle extends LitElement {
   createRenderRoot() {
     return this;
   }
+
+  createRenderRoot() {
+    return this;
+  }
+
+  static properties = {
+    switch: { type: Boolean, reflect: true },
+  };
 
   ref = createRef();
   _themeConsumer = createThemeContextConsumer(this, true, (themeState) => {
@@ -46,14 +55,24 @@ class SettingsThemeToggle extends LitElement {
     return this.isDarkTheme;
   }
 
+  _label = "Dark Mode";
+
   render() {
-    console.log({ isDarkTheme: this.isDarkTheme });
-    return html`<wa-switch
-      ${ref(this.ref)}
-      ?checked=${this.checked}
-      @change=${this._onChange}
-      >Dark Mode</wa-switch
-    >`;
+    if (this.switch) {
+      return html`<wa-switch
+        ${ref(this.ref)}
+        ?checked=${this.checked}
+        @change=${this._onChange}
+        >${this._label}</wa-switch
+      >`;
+    } else {
+      return html`<wa-checkbox
+        ${ref(this.ref)}
+        ?checked=${this.checked}
+        @change=${this._onChange}
+        >${this._label}</wa-checkbox
+      >`;
+    }
   }
 }
 
