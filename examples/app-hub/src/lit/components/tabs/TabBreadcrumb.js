@@ -50,7 +50,7 @@ class TabBreadcrumb extends LitElement {
 
   render() {
     // console.log("routeSegments", this.routeSegments);
-    console.log("tab", this.tab);
+    // console.log("tab", this.tab);
 
     let icons = tabIcons[this.tab];
     if (this.viewportOrientation in icons) {

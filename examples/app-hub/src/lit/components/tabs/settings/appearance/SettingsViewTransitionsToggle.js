@@ -53,7 +53,7 @@ class SettingsViewTransitionsToggle extends LitElement {
     );
   }
 
-  _label = "Enable View Transitions";
+  _label = "View Transitions";
 
   render() {
     if (this.switch) {

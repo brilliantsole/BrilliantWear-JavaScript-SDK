@@ -45,6 +45,8 @@ import {
 import { createNavigationStateContextProvider } from "../contexts/navigationStateContext.js";
 import { createDisableTransitionsContextProvider } from "../contexts/disableTransitionsContext.js";
 
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/resize-observer/resize-observer.js";
+
 class AppHub extends LitElement {
   createRenderRoot() {
     return this;
@@ -194,6 +196,8 @@ class AppHub extends LitElement {
   }
 
   refs = {
+    tabContent: createRef(),
+    tabContentResizeObserver: createRef(),
     header: createRef(),
   };
 
@@ -212,10 +216,18 @@ class AppHub extends LitElement {
           navigation.currentEntry.getState(),
         );
         this._lastTouchTime = 0;
+
+        document.documentElement.style.setProperty(
+          "--tab-content-height",
+          `${0}px`,
+        );
       },
       afterGoto: (pathname, activeTab) => {
         console.log("after", pathname, { activeTab });
         this.activeTab = activeTab;
+
+        this._updateTabContentScrollOnResize = true;
+        this._updateTabContentScroll();
       },
     },
   );
@@ -398,6 +410,7 @@ class AppHub extends LitElement {
       this._isHeaderHiddenProvider.value.update({ isHeaderHidden: false });
     }
     this._updateHeaderSide();
+    this._updateTabResizeObserver(true);
   }
 
   _viewportOrientationProvider = createViewportOrientationContextProvider(
@@ -415,6 +428,7 @@ class AppHub extends LitElement {
     // console.log({ viewportOrientation });
     this._viewportOrientation = viewportOrientation;
     this._updateCSSVariables();
+    this._updateTabResizeObserver(true);
   }
 
   _themeProvider = createThemeContextProvider(this, null, () => {
@@ -1092,6 +1106,47 @@ class AppHub extends LitElement {
     }
   }
 
+  _updateTabResizeObserver(updateScroll) {
+    const disabled =
+      this._viewportOrientation != "portrait" || this._touchEnabled;
+    console.log("_updateTabResizeObserver", { disabled });
+    this.refs.tabContentResizeObserver.value?.toggleAttribute(
+      "disabled",
+      disabled,
+    );
+    if (updateScroll) {
+      this._updateTabContentScroll();
+    }
+  }
+  _tabContentHeight = 0;
+  _onTabContentResize(event) {
+    /** @type {DOMRectReadOnly} */
+    const rect = event.detail.entries[0].contentRect;
+    // console.log("_onTabContentResize", rect);
+    const { height } = rect;
+
+    if (height != this._tabContentHeight) {
+      this._tabContentHeight = height;
+      console.log("_tabContentHeight", this._tabContentHeight);
+      document.documentElement.style.setProperty(
+        "--tab-content-height",
+        `${height}px`,
+      );
+      if (this._updateTabContentScrollOnResize) {
+        this._updateTabContentScrollOnResize = false;
+        this._updateTabContentScroll();
+      }
+    }
+  }
+  _updateTabContentScroll() {
+    console.log("_updateTabContentScroll");
+    // FILL
+
+    requestAnimationFrame(() => {
+      this.refs.tabContent.value.scrollIntoView();
+    });
+  }
+
   render() {
     return html`
       <header ${ref(this.refs.header)} id="header" data-axis="cross">
@@ -1109,7 +1164,20 @@ class AppHub extends LitElement {
       <div id="main">
         <main>
           <bw-tab-breadcrumb></bw-tab-breadcrumb>
-          <div id="tab">${this.router.outlet()}</div>
+          <div id="tab">
+            <wa-resize-observer>
+              <div id="tabBefore"></div>
+            </wa-resize-observer>
+            <wa-resize-observer
+              @wa-resize=${this._onTabContentResize}
+              ${ref(this.refs.tabContentResizeObserver)}
+            >
+              <div id="tabContent" ${ref(this.refs.tabContent)}>
+                ${this.router.outlet()}
+              </div>
+            </wa-resize-observer>
+            <div id="tabAfter"></div>
+          </div>
         </main>
 
         <div id="mainOverlay">

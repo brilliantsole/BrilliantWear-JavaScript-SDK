@@ -309,7 +309,6 @@ main {
 #main {
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
   flex: 1;
   position: relative;
   display: grid;
@@ -1763,7 +1762,8 @@ html:active-view-transition-type(theme) {
 }
 
 .bw-grid-lanes {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+  grid-template-columns: repeat(auto-fill, 300px);
 
   @supports (display: grid-lanes) {
     display: grid-lanes;
@@ -1783,11 +1783,14 @@ bw-tab-breadcrumb {
   padding-top: var(--main-padding-top);
 }
 
+:root {
+  --tab-padding-bottom: var(--wa-space-xl);
+}
 #tab {
   overflow-y: scroll;
 
   padding-top: var(--main-padding-top-base);
-  padding-bottom: var(--wa-space-xl);
+  padding-bottom: var(--tab-padding-bottom);
 }
 #tab {
   /* transition-property: width, height;
@@ -1827,4 +1830,36 @@ wa-card {
 }
 wa-card h3 {
   margin: 0;
+}
+
+:root {
+  --tab-content-height: 0px;
+
+  --tab-vertical-padding-before: 0px;
+  --tab-vertical-padding-after: 0px;
+
+  --tab-vertical-padding-before-offset: 250px;
+}
+#tabBefore {
+  height: var(--tab-vertical-padding-before);
+}
+#tabAfter {
+  height: var(--tab-vertical-padding-after);
+}
+#tab {
+  scroll-padding-top: var(--main-padding-top-base);
+}
+/* apply vertical padding for portrait handheld touchscreens */
+@media screen and (pointer: coarse) {
+  @media (orientation: portrait) {
+    :root {
+      --tab-vertical-padding-before: calc(
+        100cqh - var(--tab-vertical-padding-before-offset)
+      );
+      --tab-vertical-padding-after: calc(
+        100cqh - var(--tab-content-height) - var(--tab-padding-bottom) -
+          var(--wa-space-xl)
+      );
+    }
+  }
 }

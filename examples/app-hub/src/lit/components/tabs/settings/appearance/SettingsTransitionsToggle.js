@@ -53,7 +53,7 @@ class SettingsTransitionsToggle extends LitElement {
     );
   }
 
-  _label = "Enable Transitions";
+  _label = "Transitions";
 
   render() {
     if (this.switch) {

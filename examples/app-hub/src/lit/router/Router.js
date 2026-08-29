@@ -288,8 +288,6 @@ export class Router extends litRouter.Routes {
     }
 
     saveCurrentNavigationEntryStateToSessionStorage();
-
-    // FILL - scrollTo
   }
 
   /** @param {NavigationEventMap["navigate"]} e */
