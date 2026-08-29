@@ -515,15 +515,15 @@ class AppHub extends LitElement {
       );
 
       const types = ["theme"];
-      console.log("types", types, {
-        radius,
-        width,
-        height,
-        x,
-        y,
-        isRelative,
-        useOuterWidth,
-      });
+      // console.log("types", types, {
+      //   radius,
+      //   width,
+      //   height,
+      //   x,
+      //   y,
+      //   isRelative,
+      //   useOuterWidth,
+      // });
 
       setTimeout(() => {
         this._updateMetaColor();
@@ -1127,7 +1127,7 @@ class AppHub extends LitElement {
 
     if (height != this._tabContentHeight) {
       this._tabContentHeight = height;
-      console.log("_tabContentHeight", this._tabContentHeight);
+      // console.log("_tabContentHeight", this._tabContentHeight);
       document.documentElement.style.setProperty(
         "--tab-content-height",
         `${height}px`,
@@ -1139,9 +1139,7 @@ class AppHub extends LitElement {
     }
   }
   _updateTabContentScroll() {
-    console.log("_updateTabContentScroll");
-    // FILL
-
+    // console.log("_updateTabContentScroll");
     requestAnimationFrame(() => {
       this.refs.tabContent.value.scrollIntoView();
     });
