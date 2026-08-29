@@ -391,6 +391,7 @@ class AppHub extends LitElement {
       },
       { once: true },
     );
+    this._updateTabContentScroll();
   }
 
   _reducedMotionProvider = createReducedMotionContextProvider(
