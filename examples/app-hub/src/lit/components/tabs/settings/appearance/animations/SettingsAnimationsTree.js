@@ -1,4 +1,4 @@
-import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../../../../utils/cross-origin-storage-utils.js";
 
 const { lit, litRef } = await waitForGlobals();
 
@@ -7,8 +7,8 @@ const { ref, createRef } = litRef;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
 
-import { createDisableTransitionsContextConsumer } from "../../../../contexts/disableTransitionsContext.js";
-import { createDisableViewTransitionsContextConsumer } from "../../../../contexts/disableViewTransitionsContext.js";
+import { createDisableTransitionsContextConsumer } from "../../../../../contexts/disableTransitionsContext.js";
+import { createDisableViewTransitionsContextConsumer } from "../../../../../contexts/disableViewTransitionsContext.js";
 
 import "./SettingsTransitionsToggle.js";
 import "./SettingsViewTransitionsToggle.js";
@@ -35,7 +35,7 @@ class SettingsAnimationsTreeElement extends LitElement {
     },
   );
 
-  /** @type {import("../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
+  /** @type {import("../../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
   get disableTransitionsContextState() {
     return this._transitionsConsumer.value.state;
   }
@@ -43,7 +43,7 @@ class SettingsAnimationsTreeElement extends LitElement {
     return this.disableTransitionsContextState.disableTransitions;
   }
 
-  /** @type {import("../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
+  /** @type {import("../../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
   get disableViewTransitionsContextState() {
     return this._viewTransitionsConsumer.value.state;
   }

@@ -1,5 +1,9 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
-import { createFullscreenContextConsumer } from "../../../contexts/fullscreenContext.js";
+import {
+  createFullscreenContextConsumer,
+  getIsFullscreen,
+  toggleFullscreen,
+} from "../../../contexts/fullscreenContext.js";
 
 const { lit } = await waitForGlobals();
 
@@ -18,19 +22,11 @@ class MainCornerButtonToggleFullscreen extends LitElement {
   }
 
   get isFullscreen() {
-    return Boolean(document.fullscreenElement);
-  }
-
-  toggleFullScreen() {
-    if (this.isFullscreen) {
-      document.exitFullscreen();
-    } else {
-      document.documentElement.requestFullscreen();
-    }
+    return getIsFullscreen();
   }
 
   onClick(event) {
-    this.toggleFullScreen();
+    toggleFullscreen();
   }
 
   render() {

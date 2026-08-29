@@ -8,6 +8,24 @@ const getFullscreenState = () => {
   return { fullscreenEnabled, fullscreenElement };
 };
 
+export const getIsFullscreen = () => {
+  return Boolean(document.fullscreenElement);
+};
+export const enterFullscreen = () => {
+  document.documentElement.requestFullscreen();
+};
+export const exitFullscreen = () => {
+  document.exitFullscreen();
+};
+export const toggleFullscreen = (force) => {
+  const shouldEnterFullscreen = force ?? !getIsFullscreen();
+  if (shouldEnterFullscreen) {
+    enterFullscreen();
+  } else {
+    exitFullscreen();
+  }
+};
+
 const {
   createContextProvider: createFullscreenContextProvider,
   createContextConsumer: createFullscreenContextConsumer,

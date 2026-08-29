@@ -1855,14 +1855,6 @@ bw-tab-breadcrumb {
   }
 }
 
-wa-card {
-  padding: 0;
-  --spacing: var(--wa-space-s);
-}
-wa-card h3 {
-  margin: 0;
-}
-
 :root {
   --tab-content-height: 0px;
 

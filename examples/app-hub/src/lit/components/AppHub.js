@@ -376,13 +376,20 @@ class AppHub extends LitElement {
   );
 
   _onFullscreenUpdate() {
-    // console.log("_onFullscreenUpdate");
+    console.log("_onFullscreenUpdate");
     const { fullscreenEnabled, fullscreenElement } =
       this._fullscreenProvider.value.state;
     // console.log({ fullscreenEnabled, fullscreenElement });
     document.documentElement.toggleAttribute(
       "data-fullscreen-enabled",
       Boolean(fullscreenEnabled),
+    );
+    window.addEventListener(
+      "resize",
+      () => {
+        this._updateTabContentScroll();
+      },
+      { once: true },
     );
   }
 
@@ -507,7 +514,7 @@ class AppHub extends LitElement {
         : `${(100 * radius) / (Math.hypot(width, height) / Math.SQRT2)}%`;
 
       const heightRadiusRatio = y / radius;
-      console.log({ heightRadiusRatio });
+      // console.log({ heightRadiusRatio });
 
       document.documentElement.style.setProperty(
         `--theme-transition-radius`,
@@ -567,7 +574,7 @@ class AppHub extends LitElement {
       maxHeight = Math.max(height, maxHeight);
       maxWidth = Math.max(width, maxWidth);
     });
-    console.log({ maxWidth, maxHeight });
+    // console.log({ maxWidth, maxHeight });
 
     const name = "header";
     document.documentElement.style.setProperty(
@@ -874,7 +881,8 @@ class AppHub extends LitElement {
       console.log({ screenDistance });
       if (true || screenDistance < this._doubleTapDistanceThreshold) {
         const { clientX, clientY } = touch;
-        const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+        const elementsFromPoint =
+          event.composedPath() || document.elementsFromPoint(clientX, clientY);
         console.log("elementsFromPoint", elementsFromPoint);
         const button = elementsFromPoint.find((element) =>
           this._allowedNodeNames.some((nodeName) =>
@@ -1139,7 +1147,7 @@ class AppHub extends LitElement {
     }
   }
   _updateTabContentScroll() {
-    // console.log("_updateTabContentScroll");
+    console.log("_updateTabContentScroll");
     requestAnimationFrame(() => {
       this.refs.tabContent.value.scrollIntoView();
     });

@@ -1,14 +1,13 @@
-import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
+import { waitForGlobals } from "../../../../../../utils/cross-origin-storage-utils.js";
 
 const { lit, litRef } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
 
-import "https://ka-f.webawesome.com/webawesome@3.12.0/components/switch/switch.js";
-import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
+import "../../../../utils/Toggle.js";
 
-import { createDisableTransitionsContextConsumer } from "../../../../contexts/disableTransitionsContext.js";
+import { createDisableTransitionsContextConsumer } from "../../../../../contexts/disableTransitionsContext.js";
 
 class SettingsTransitionsToggle extends LitElement {
   createRenderRoot() {
@@ -16,7 +15,7 @@ class SettingsTransitionsToggle extends LitElement {
   }
 
   static properties = {
-    switch: { type: Boolean, reflect: true },
+    switch: { type: Boolean },
   };
 
   ref = createRef();
@@ -53,24 +52,14 @@ class SettingsTransitionsToggle extends LitElement {
     );
   }
 
-  _label = "Transitions";
-
   render() {
-    if (this.switch) {
-      return html`<wa-switch
-        ${ref(this.ref)}
-        ?checked=${this.checked}
-        @change=${this._onChange}
-        >${this._label}</wa-switch
-      >`;
-    } else {
-      return html`<wa-checkbox
-        ${ref(this.ref)}
-        ?checked=${this.checked}
-        @change=${this._onChange}
-        >${this._label}</wa-checkbox
-      >`;
-    }
+    return html`<bw-toggle
+      ${ref(this.ref)}
+      ?checked=${this.checked}
+      @change=${this._onChange}
+      label="Transitions"
+      ?switch=${this.switch}
+    ></bw-toggle>`;
   }
 }
 
