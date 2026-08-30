@@ -1129,6 +1129,9 @@ html:active-view-transition-type(right-handed, left-handed) {
     view-transition-name: match-element;
     view-transition-class: bw-grid-lanes;
   }
+  bw-tab-breadcrumb {
+    view-transition-name: bw-tab-breadcrumb;
+  }
 }
 
 html:active-view-transition-type(right-handed, left-handed) {
@@ -1148,6 +1151,10 @@ html:active-view-transition-type(right-handed, left-handed) {
     &::view-transition-group(.bw-grid-lanes) {
       animation-duration: var(--animation-duration);
       animation-timing-function: var(--animation-timing-function);
+    }
+    &::view-transition-group(bw-tab-breadcrumb) {
+      animation: none;
+      z-index: 2;
     }
 
     @media (orientation: portrait) {
@@ -1265,7 +1272,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       bw-nav-button-settings {
         view-transition-name: nav-button-settings;
       }
-      bw-nav-button-flip {
+      bw-menu-button-flip {
         view-transition-name: nav-button-flip;
       }
 
@@ -1282,7 +1289,7 @@ html:active-view-transition-type(right-handed, left-handed) {
         z-index: 1;
       }
       &::view-transition-group(.menu-button) {
-        z-index: 0;
+        z-index: 1;
         animation: none;
       }
       &::view-transition-group(.nav-button),
@@ -1812,6 +1819,7 @@ html:active-view-transition-type(theme) {
 
 bw-tab-breadcrumb {
   padding-top: var(--main-padding-top);
+  background-color: var(--background-color);
 }
 
 :root {

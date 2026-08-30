@@ -1,6 +1,6 @@
 import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 
-const { lit, litRouter, litContext, litRef } = await waitForGlobals();
+const { lit, litRouter, litContext, litRef, BW } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
@@ -388,14 +388,7 @@ class AppHub extends LitElement {
       "data-fullscreen-enabled",
       Boolean(fullscreenEnabled),
     );
-    window.addEventListener(
-      "resize",
-      () => {
-        this._updateTabContentScroll();
-      },
-      { once: true },
-    );
-    this._updateTabContentScroll();
+    this._updateTabContentScroll(true);
   }
 
   _reducedMotionProvider = createReducedMotionContextProvider(
@@ -440,7 +433,7 @@ class AppHub extends LitElement {
     // console.log({ viewportOrientation });
     this._viewportOrientation = viewportOrientation;
     this._updateCSSVariables();
-    this._updateTabResizeObserver(true);
+    this._updateTabResizeObserver(true, true);
   }
 
   _themeProvider = createThemeContextProvider(this, null, () => {
@@ -1151,16 +1144,16 @@ class AppHub extends LitElement {
     }
   }
 
-  _updateTabResizeObserver(updateScroll) {
+  _updateTabResizeObserver(updateScroll, waitForResize) {
     const disabled =
-      this._viewportOrientation != "portrait" || this._touchEnabled;
+      this._viewportOrientation != "portrait" || !this._touchEnabled;
     // console.log("_updateTabResizeObserver", { disabled });
     this.refs.tabContentResizeObserver.value?.toggleAttribute(
       "disabled",
       disabled,
     );
     if (updateScroll) {
-      this._updateTabContentScroll();
+      this._updateTabContentScroll(waitForResize);
     }
   }
   _tabContentHeight = 0;
@@ -1183,12 +1176,58 @@ class AppHub extends LitElement {
       }
     }
   }
-  _updateTabContentScroll() {
-    // console.log("_updateTabContentScroll");
-    requestAnimationFrame(() => {
-      this.refs.tabContent.value.scrollIntoView();
-    });
-  }
+  /** @type {AbortController} */
+  _scrollOnResizeAbortController;
+  _scrollOnResizeAbortControllerTimeoutInterval = 200;
+  _updateTabContentScroll = BW.ThrottleUtils.throttle(
+    (waitForResize) => {
+      // console.log("_updateTabContentScroll", { waitForResize });
+
+      if (waitForResize) {
+        if (this._scrollOnResizeAbortController) {
+          this._scrollOnResizeAbortController.abort();
+          this._scrollOnResizeAbortController = undefined;
+        }
+        this._scrollOnResizeAbortController = new AbortController();
+        this._scrollOnResizeAbortController.signal.addEventListener(
+          "abort",
+          () => {
+            // console.log("_scrollOnResizeAbortController aborted");
+            this._scrollOnResizeAbortController = undefined;
+          },
+        );
+
+        window.addEventListener(
+          "resize",
+          () => {
+            this._updateTabContentScroll();
+          },
+          { signal: this._scrollOnResizeAbortController.signal },
+        );
+
+        setTimeout(() => {
+          if (!this._scrollOnResizeAbortController) {
+            return;
+          }
+          this._scrollOnResizeAbortController.abort();
+          this._scrollOnResizeAbortController = undefined;
+        }, this._scrollOnResizeAbortControllerTimeoutInterval);
+      }
+
+      if (this._waitingForAnimationFrameToScrollTabContent) {
+        // console.log("waiting for animation frame");
+        return;
+      }
+      this._waitingForAnimationFrameToScrollTabContent = true;
+      requestAnimationFrame(() => {
+        this._waitingForAnimationFrameToScrollTabContent = false;
+        console.log("tabContent scrollIntoView");
+        this.refs.tabContent.value.scrollIntoView();
+      });
+    },
+    50,
+    true,
+  );
 
   render() {
     return html`
