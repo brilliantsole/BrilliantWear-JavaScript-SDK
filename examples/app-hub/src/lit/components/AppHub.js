@@ -303,6 +303,10 @@ class AppHub extends LitElement {
     document.addEventListener("touchmove", this._onTouchMove, options);
     document.addEventListener("keydown", this._onKeyDown, options);
 
+    document.addEventListener("touchstart", this._onTouchStart, {
+      ...options,
+      passive: true,
+    });
     document.addEventListener("touchend", this._onTouchEnd, {
       ...options,
       passive: false,
@@ -838,6 +842,30 @@ class AppHub extends LitElement {
   _lastTouchPosition;
   _doubleTapDistanceThreshold = 800;
   _allowedNodeNames = ["BUTTON", "SWITCH", "CHECKBOX"];
+  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number}?} */
+  _initialTouchPosition;
+  /** @param {TouchEvent} event */
+  _onTouchStart = (event) => {
+    // console.log("_onTouchStart", event);
+    const { changedTouches, targetTouches } = event;
+
+    if (changedTouches.length != 1) {
+      return;
+    }
+    if (targetTouches.length != 1) {
+      return;
+    }
+
+    const touch = targetTouches[0];
+    const { identifier, screenX, screenY } = touch;
+    const { timeStamp } = event;
+    this._initialTouchPosition = {
+      identifier,
+      screenX,
+      screenY,
+      timeStamp,
+    };
+  };
   /** @param {TouchEvent} event */
   _onTouchEnd = (event) => {
     // console.log("_onTouchEnd", event);
@@ -874,23 +902,31 @@ class AppHub extends LitElement {
         screenX: screenX - this._lastTouchPosition.screenX,
         screenY: screenY - this._lastTouchPosition.screenY,
       };
-      const screenDistanceSquared =
-        screenDelta.screenX ** 2 + screenDelta.screenY ** 2;
       const screenDistance = Math.sqrt(
         screenDelta.screenX ** 2 + screenDelta.screenY ** 2,
       );
-      console.log({ screenDistance });
+
+      // console.log("this._initialTouchPosition", this._initialTouchPosition);
+      const initialScreenDelta = {
+        screenX: screenX - this._initialTouchPosition.screenX,
+        screenY: screenY - this._initialTouchPosition.screenY,
+      };
+      const initialScreenDistance = Math.sqrt(
+        initialScreenDelta.screenX ** 2 + initialScreenDelta.screenY ** 2,
+      );
+
+      // console.log({ screenDistance, initialScreenDistance });
       if (true || screenDistance < this._doubleTapDistanceThreshold) {
         const { clientX, clientY } = touch;
         const elementsFromPoint =
           event.composedPath() || document.elementsFromPoint(clientX, clientY);
-        console.log("elementsFromPoint", elementsFromPoint);
+        // console.log("elementsFromPoint", elementsFromPoint);
         const button = elementsFromPoint.find((element) =>
           this._allowedNodeNames.some((nodeName) =>
-            element.nodeName.includes(nodeName),
+            element.nodeName?.includes(nodeName),
           ),
         );
-        if (button) {
+        if (button && initialScreenDistance < 10) {
           button.click();
         }
         console.log("double tap detected", elementsFromPoint);
@@ -901,7 +937,7 @@ class AppHub extends LitElement {
     this._lastTouchPosition = { screenX, screenY };
   };
 
-  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number}?} */
+  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number, initialScreenX: number, initialScreenY: number}?} */
   _latestTouchMove;
   _ignoreTouchIdentifier;
   _touchMoveMagnitudeThreshold = 10;

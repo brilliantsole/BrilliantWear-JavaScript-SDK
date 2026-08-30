@@ -33,7 +33,7 @@ class SettingsAppearance extends LitElement {
   render() {
     return html`
       <bw-settings-card label="Appearance" @clear=${this.clear}>
-        <bw-settings-theme-toggle></bw-settings-theme-toggle>
+        <bw-settings-theme-toggle switch></bw-settings-theme-toggle>
         <bw-settings-animations-tree></bw-settings-animations-tree>
       </bw-settings-card>
     `;
