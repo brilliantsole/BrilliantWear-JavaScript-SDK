@@ -1148,13 +1148,12 @@ html:active-view-transition-type(left-handed) {
 
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
-    &::view-transition-group(.bw-grid-lanes) {
+    &::view-transition-group(.bw-grid-lanes, bw-tab-breadcrumb) {
       animation-duration: var(--animation-duration);
       animation-timing-function: var(--animation-timing-function);
     }
     &::view-transition-group(bw-tab-breadcrumb) {
-      animation: none;
-      z-index: 2;
+      z-index: 1;
     }
 
     @media (orientation: portrait) {
@@ -1794,7 +1793,7 @@ html:active-view-transition-type(theme) {
   --hand-direction: ltr;
 }
 .bw-grid-lanes {
-  grid-template-columns: repeat(auto-fill, 200px);
+  grid-template-columns: repeat(auto-fill, fit-content(200px));
   /* grid-template-columns: repeat(auto-fill, 300px); */
 
   @supports (display: grid-lanes) {

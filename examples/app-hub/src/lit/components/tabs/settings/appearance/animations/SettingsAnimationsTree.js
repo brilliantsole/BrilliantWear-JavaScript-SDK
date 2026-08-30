@@ -18,6 +18,10 @@ class SettingsAnimationsTreeElement extends LitElement {
     return this;
   }
 
+  static properties = {
+    switch: { type: Boolean },
+  };
+
   ref = createRef();
 
   _transitionsConsumer = createDisableTransitionsContextConsumer(
@@ -93,25 +97,36 @@ class SettingsAnimationsTreeElement extends LitElement {
     this._updateChecked();
   }
 
+  _label = "Animations";
+
+  renderToggle() {
+    return html`<bw-toggle
+      ${ref(this.ref)}
+      ?checked=${this.checked}
+      @change=${this._onChange}
+      label="${this._label}"
+      ?switch=${this.switch}
+    ></bw-toggle>`;
+  }
+
   render() {
-    return html`
-      <div class="wa-stack wa-gap-xs">
-        <wa-checkbox
-          @change=${this._onChange}
-          ${ref(this.ref)}
-          ?indeterminate=${this.indeterminate}
-          ?checked=${this.checked}
-          >Animations</wa-checkbox
-        >
-        <div
-          class="wa-stack wa-gap-xs"
-          style="padding-inline-start: var(--wa-space-l);"
-        >
-          <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
-          <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
+    const toggle = this.renderToggle();
+    if (this.switch) {
+      return toggle;
+    } else {
+      return html`
+        <div class="wa-stack wa-gap-xs">
+          ${toggle}
+          <div
+            class="wa-stack wa-gap-xs"
+            style="padding-inline-start: var(--wa-space-l);"
+          >
+            <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
+            <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   }
 }
 

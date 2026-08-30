@@ -6,12 +6,14 @@ const { LitElement, html, css } = lit;
 
 import "../SettingsCard.js";
 
+import "./SettingsFullscreenToggle.js";
 import "./SettingsThemeToggle.js";
 import "./animations/SettingsAnimationsTree.js";
 
 import { createThemeContextConsumer } from "../../../../contexts/themeContext.js";
 import { createDisableTransitionsContextConsumer } from "../../../../contexts/disableTransitionsContext.js";
 import { createDisableViewTransitionsContextConsumer } from "../../../../contexts/disableViewTransitionsContext.js";
+import { exitFullscreen } from "../../../../contexts/fullscreenContext.js";
 
 class SettingsAppearance extends LitElement {
   _themeConsumer = createThemeContextConsumer(this);
@@ -24,6 +26,7 @@ class SettingsAppearance extends LitElement {
     this._themeConsumer.value.clear();
     this._disableTransitionsConsumer.value.clear();
     this._disableViewTransitionsConsumer.value.clear();
+    exitFullscreen();
   }
 
   createRenderRoot() {
@@ -33,8 +36,9 @@ class SettingsAppearance extends LitElement {
   render() {
     return html`
       <bw-settings-card label="Appearance" @clear=${this.clear}>
+        <bw-settings-fullscreen-toggle switch></bw-settings-fullscreen-toggle>
+        <bw-settings-animations-tree switch></bw-settings-animations-tree>
         <bw-settings-theme-toggle switch></bw-settings-theme-toggle>
-        <bw-settings-animations-tree></bw-settings-animations-tree>
       </bw-settings-card>
     `;
   }
