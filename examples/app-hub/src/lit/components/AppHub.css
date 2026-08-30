@@ -1810,8 +1810,14 @@ html:active-view-transition-type(theme) {
   row-gap: var(--wa-space-xs);
   column-gap: var(--wa-space-xs);
 
-  justify-items: start;
-  direction: var(--hand-direction);
+  justify-items: stretch;
+  @media (pointer: coarse) and (orientation: portrait) {
+    justify-items: start;
+  }
+
+  @media (pointer: coarse) {
+    direction: var(--hand-direction);
+  }
 }
 .bw-grid-lanes > * {
   direction: initial;

@@ -12,29 +12,6 @@ class SettingsCard extends LitElement {
   };
 
   static styles = css`
-    .bw-grid-lanes {
-      grid-template-columns: repeat(auto-fill, 200px);
-
-      @supports (display: grid-lanes) {
-        display: grid-lanes;
-      }
-      @supports not (display: grid-lanes) {
-        display: grid;
-      }
-      @supports (grid-template-rows: masonry) {
-        grid-template-rows: masonry;
-      }
-
-      row-gap: var(--wa-space-xs);
-      column-gap: var(--wa-space-xs);
-
-      justify-items: start;
-      direction: var(--hand-direction);
-    }
-    .bw-grid-lanes > * {
-      direction: initial;
-    }
-
     [class*="wa-stack"] {
       display: flex;
       flex-direction: column;

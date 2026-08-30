@@ -389,6 +389,9 @@ class AppHub extends LitElement {
       Boolean(fullscreenEnabled),
     );
     this._updateTabContentScroll(true);
+    setTimeout(() => {
+      this._updateTabContentScroll(true);
+    }, 200);
   }
 
   _reducedMotionProvider = createReducedMotionContextProvider(
@@ -924,6 +927,7 @@ class AppHub extends LitElement {
         }
         console.log("double tap detected", elementsFromPoint);
         event.preventDefault();
+        // can detect if accidentally zoomed in via window.visualViewport.scale;
       }
     }
     this._lastTouchTime = currentTime;
@@ -1181,7 +1185,7 @@ class AppHub extends LitElement {
   _scrollOnResizeAbortControllerTimeoutInterval = 200;
   _updateTabContentScroll = BW.ThrottleUtils.throttle(
     (waitForResize) => {
-      // console.log("_updateTabContentScroll", { waitForResize });
+      console.log("_updateTabContentScroll", { waitForResize });
 
       if (waitForResize) {
         if (this._scrollOnResizeAbortController) {
@@ -1197,7 +1201,7 @@ class AppHub extends LitElement {
           },
         );
 
-        window.addEventListener(
+        visualViewport.addEventListener(
           "resize",
           () => {
             this._updateTabContentScroll();
