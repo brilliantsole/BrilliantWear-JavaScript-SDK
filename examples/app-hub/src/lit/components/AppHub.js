@@ -601,7 +601,7 @@ class AppHub extends LitElement {
   }
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
-    console.log({ isLeftHanded });
+    // console.log({ isLeftHanded });
     const update = () => {
       document.documentElement.toggleAttribute(
         "data-left-handed",
@@ -1118,7 +1118,7 @@ class AppHub extends LitElement {
   _updateTabResizeObserver(updateScroll) {
     const disabled =
       this._viewportOrientation != "portrait" || this._touchEnabled;
-    console.log("_updateTabResizeObserver", { disabled });
+    // console.log("_updateTabResizeObserver", { disabled });
     this.refs.tabContentResizeObserver.value?.toggleAttribute(
       "disabled",
       disabled,
@@ -1148,7 +1148,7 @@ class AppHub extends LitElement {
     }
   }
   _updateTabContentScroll() {
-    console.log("_updateTabContentScroll");
+    // console.log("_updateTabContentScroll");
     requestAnimationFrame(() => {
       this.refs.tabContent.value.scrollIntoView();
     });
@@ -1172,9 +1172,7 @@ class AppHub extends LitElement {
         <main>
           <bw-tab-breadcrumb></bw-tab-breadcrumb>
           <div id="tab">
-            <wa-resize-observer>
-              <div id="tabBefore"></div>
-            </wa-resize-observer>
+            <div id="tabBefore"></div>
             <wa-resize-observer
               @wa-resize=${this._onTabContentResize}
               ${ref(this.refs.tabContentResizeObserver)}

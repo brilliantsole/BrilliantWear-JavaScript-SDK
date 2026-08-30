@@ -1881,7 +1881,7 @@ bw-tab-breadcrumb {
       );
       --tab-vertical-padding-after: calc(
         100cqh - var(--tab-content-height) - var(--tab-padding-bottom) -
-          var(--wa-space-xl)
+          var(--main-padding-top) - var(--wa-space-xl)
       );
     }
   }
