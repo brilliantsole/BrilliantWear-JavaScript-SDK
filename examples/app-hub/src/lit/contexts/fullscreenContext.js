@@ -12,9 +12,15 @@ export const getIsFullscreen = () => {
   return Boolean(document.fullscreenElement);
 };
 export const enterFullscreen = () => {
+  if (getIsFullscreen()) {
+    return;
+  }
   document.documentElement.requestFullscreen();
 };
 export const exitFullscreen = () => {
+  if (!getIsFullscreen()) {
+    return;
+  }
   document.exitFullscreen();
 };
 export const toggleFullscreen = (force) => {
