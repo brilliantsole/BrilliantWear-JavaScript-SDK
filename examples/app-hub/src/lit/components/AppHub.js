@@ -618,17 +618,17 @@ class AppHub extends LitElement {
       }
     };
 
-    if (this.skipViewTransitions || this.anchorHeader || !this._touchEnabled) {
-      const disableTransitions = !this._disableTransitions;
+    if (this.skipViewTransitions || !this._touchEnabled) {
+      const disableTransitionsDuringViewTransition = !this._disableTransitions;
 
-      if (disableTransitions) {
+      if (disableTransitionsDuringViewTransition) {
         document.documentElement.toggleAttribute(
           "data-disable-transitions",
           true,
         );
       }
       update();
-      if (disableTransitions) {
+      if (disableTransitionsDuringViewTransition) {
         document.documentElement.toggleAttribute(
           "data-disable-transitions",
           false,
@@ -704,9 +704,26 @@ class AppHub extends LitElement {
         "data-header-hidden",
         Boolean(isHeaderHidden),
       );
+      this._updateCSSVariables();
       this._isHeaderHidden = isHeaderHidden;
     };
-    update();
+
+    if (this.skipViewTransitions || this._viewportOrientation == "portrait") {
+      update();
+    } else {
+      const types = [
+        isHeaderHidden ? "header-hidden" : "header-visible",
+        `header-${this.headerSide}`,
+      ];
+      console.log("types", types);
+      this._updateCSSVariables(true);
+      document.startViewTransition({
+        update: async () => {
+          update();
+        },
+        types,
+      });
+    }
   }
   _hideHeader() {
     this._isHeaderHiddenProvider.value.update({ isHeaderHidden: true });

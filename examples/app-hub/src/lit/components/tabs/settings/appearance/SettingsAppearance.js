@@ -37,8 +37,8 @@ class SettingsAppearance extends LitElement {
     return html`
       <bw-settings-card label="Appearance" @clear=${this.clear}>
         <bw-settings-fullscreen-toggle switch></bw-settings-fullscreen-toggle>
-        <bw-settings-animations-tree switch></bw-settings-animations-tree>
         <bw-settings-theme-toggle switch></bw-settings-theme-toggle>
+        <bw-settings-animations-tree></bw-settings-animations-tree>
       </bw-settings-card>
     `;
   }

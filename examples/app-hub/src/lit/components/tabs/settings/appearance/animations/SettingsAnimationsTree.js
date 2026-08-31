@@ -10,6 +10,8 @@ import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkb
 import { createDisableTransitionsContextConsumer } from "../../../../../contexts/disableTransitionsContext.js";
 import { createDisableViewTransitionsContextConsumer } from "../../../../../contexts/disableViewTransitionsContext.js";
 
+import "../../../../utils/Toggle.js";
+
 import "./SettingsTransitionsToggle.js";
 import "./SettingsViewTransitionsToggle.js";
 
@@ -80,7 +82,9 @@ class SettingsAnimationsTreeElement extends LitElement {
     }
 
     if (this.ref.value) {
-      this.ref.value.indeterminate = this.indeterminate;
+      if (!this.switch) {
+        this.ref.value.indeterminate = this.indeterminate;
+      }
       this.ref.value.checked = this.checked;
     }
   }
@@ -106,6 +110,7 @@ class SettingsAnimationsTreeElement extends LitElement {
       @change=${this._onChange}
       label="${this._label}"
       ?switch=${this.switch}
+      ?indeterminate=${this.indeterminate}
     ></bw-toggle>`;
   }
 

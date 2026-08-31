@@ -17,6 +17,7 @@ class Toggle extends LitElement {
     switch: { type: Boolean },
     label: {},
     checked: { type: Boolean },
+    indeterminate: { type: Boolean },
   };
 
   ref = createRef();
@@ -43,7 +44,10 @@ class Toggle extends LitElement {
         >${this.label}</wa-switch
       >`;
     } else {
-      return html`<wa-checkbox ${ref(this.ref)} ?checked=${this.checked}
+      return html`<wa-checkbox
+        ?indeterminate=${this.indeterminate}
+        ${ref(this.ref)}
+        ?checked=${this.checked}
         >${this.label}</wa-checkbox
       >`;
     }
