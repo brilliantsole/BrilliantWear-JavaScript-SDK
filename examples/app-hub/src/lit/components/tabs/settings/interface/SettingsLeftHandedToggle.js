@@ -46,6 +46,7 @@ class SettingsThemeToggle extends LitElement {
 
   render() {
     return html`<bw-toggle
+      data-touch-only
       ${ref(this.ref)}
       ?checked=${this.checked}
       @change=${this._onChange}

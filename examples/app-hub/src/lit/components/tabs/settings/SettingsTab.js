@@ -1,4 +1,5 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { createTouchEnabledContextConsumer } from "../../../contexts/touchEnabledContext.js";
 
 const { lit } = await waitForGlobals();
 
@@ -12,13 +13,20 @@ class SettingsTab extends LitElement {
     return this;
   }
 
+  _touchEnabledConsumer = createTouchEnabledContextConsumer(this, true);
+  get touchEnabled() {
+    return this._touchEnabledConsumer.value.state.touchEnabled;
+  }
+
   render() {
+    const settingsInterface = this.touchEnabled
+      ? html`<bw-settings-interface></bw-settings-interface>`
+      : "";
+
     return html`
       <div class="bw-grid-lanes">
         <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-interface></bw-settings-interface>
-        <bw-settings-appearance></bw-settings-appearance>
-        <bw-settings-appearance></bw-settings-appearance>
+        ${settingsInterface}
       </div>
     `;
   }
