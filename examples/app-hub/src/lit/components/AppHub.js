@@ -269,7 +269,8 @@ class AppHub extends LitElement {
     document.addEventListener(
       "pointerdown",
       (event) => {
-        const { clientX, clientY, screenX, screenY, pageX, pageY } = event;
+        const { clientX, clientY, screenX, screenY, pageX, pageY, timeStamp } =
+          event;
         const { innerWidth, innerHeight, outerWidth, outerHeight } = window;
         const { width, height, availHeight, availWidth } = screen;
         // console.log("pointerdown", {
@@ -295,6 +296,7 @@ class AppHub extends LitElement {
           screenY,
           pageX,
           pageY,
+          timeStamp,
         };
       },
       options,
@@ -457,8 +459,12 @@ class AppHub extends LitElement {
     const { selectedTheme, systemTheme } = this._themeState;
 
     const position = this._lastPointerDownPosition;
+    let isPositionTooLate = true;
+    if (position) {
+      isPositionTooLate = performance.now() - position.timeStamp > 500;
+    }
 
-    // console.log({ systemTheme, selectedTheme }, position);
+    console.log({ systemTheme, selectedTheme, isPositionTooLate }, position);
 
     const showLightClassName =
       selectedTheme == "light" ||
@@ -472,7 +478,12 @@ class AppHub extends LitElement {
       document.documentElement.classList.toggle("wa-dark", showDarkClassName);
     };
 
-    if (this.skipViewTransitions || !position || !didThemeChange) {
+    if (
+      this.skipViewTransitions ||
+      !position ||
+      !didThemeChange ||
+      isPositionTooLate
+    ) {
       update();
       this._updateMetaColor();
     } else {

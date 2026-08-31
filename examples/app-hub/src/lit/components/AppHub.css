@@ -2050,11 +2050,12 @@ html:active-view-transition-type(theme) {
   column-gap: var(--wa-space-xs);
 
   justify-items: stretch;
-  @media (pointer: coarse) and (orientation: portrait) {
-    justify-items: var(--justify-start);
+  @media (pointer: coarse) {
+    @media (orientation: portrait) {
+      justify-items: var(--justify-start);
+    }
+    justify-content: var(--justify-start);
   }
-
-  justify-content: var(--justify-start);
 }
 @media (pointer: coarse) {
   html[data-left-handed] .bw-grid-lanes {
