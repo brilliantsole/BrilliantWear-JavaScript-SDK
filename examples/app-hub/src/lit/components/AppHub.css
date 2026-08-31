@@ -2051,13 +2051,18 @@ html:active-view-transition-type(theme) {
 
   justify-items: stretch;
   @media (pointer: coarse) and (orientation: portrait) {
-    justify-items: start;
+    justify-items: var(--justify-start);
   }
 
   justify-content: var(--justify-start);
 }
-html[data-left-handed] .bw-grid-lanes {
-  justify-content: var(--justify-end);
+@media (pointer: coarse) {
+  html[data-left-handed] .bw-grid-lanes {
+    justify-content: var(--justify-end);
+    @media (orientation: portrait) {
+      justify-items: var(--justify-end);
+    }
+  }
 }
 
 @media (pointer: coarse) {
