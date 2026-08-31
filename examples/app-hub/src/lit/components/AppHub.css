@@ -1955,16 +1955,16 @@ html:active-view-transition-type(header-visible) {
 
 :root {
   --slide-in-to-left-overlay-start-translate-x: translateX(
-    calc(1 * var(--header-old-length))
+    calc(1 * var(--header-old-length) - var(--main-padding-left-extra))
   );
   --slide-in-to-right-overlay-start-translate-x: translateX(
-    calc(-1 * var(--header-old-length))
+    calc(-1 * var(--header-old-length) + var(--main-padding-right-extra))
   );
   --slide-out-to-right-overlay-start-translate-x: translateX(
-    calc(-1 * var(--header-length))
+    calc(-1 * var(--header-length) + var(--main-padding-left-safe))
   );
   --slide-out-to-left-overlay-start-translate-x: translateX(
-    calc(1 * var(--header-length))
+    calc(1 * var(--header-length) - var(--main-padding-right-safe))
   );
 }
 @keyframes slide-in-to-left-overlay-start {
