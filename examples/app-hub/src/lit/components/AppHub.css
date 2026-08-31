@@ -1889,8 +1889,12 @@ html:active-view-transition-type(header-visible, header-hidden) {
     display: none;
   }
 
-  &::view-transition-group(.overlay-end) {
+  &::view-transition-new(.overlay-end),
+  &::view-transition-old(.overlay-end) {
     animation: none;
+  }
+  &::view-transition-old(.overlay-end) {
+    display: none;
   }
 
   &::view-transition-group(.slide-on-enter) {
