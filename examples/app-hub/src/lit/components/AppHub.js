@@ -50,6 +50,7 @@ import { createDisableTransitionsContextProvider } from "../contexts/disableTran
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/resize-observer/resize-observer.js";
 import { createFlipOnChargeContextProvider } from "../contexts/flipOnChargeContext.js";
+import { createScrollAssistContextProvider } from "../contexts/scrollAssistContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -253,7 +254,7 @@ class AppHub extends LitElement {
     const metaContentColor = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
-    console.log({ metaContentColor });
+    // console.log({ metaContentColor });
     this._themeColorMeta.removeAttribute("content");
     if (this._metaTimeout != undefined) {
       window.clearTimeout(this._metaTimeout);
@@ -337,6 +338,7 @@ class AppHub extends LitElement {
     this._onThemeUpdate();
     this._onDisableViewTransitionsUpdate();
     this._onDisableTransitionsUpdate();
+    this._onScrollAssistUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -890,6 +892,26 @@ class AppHub extends LitElement {
   /** @type {import("../contexts/flipOnChargeContext.js").FlipOnChargeContextState} */
   get _flipOnChargeState() {
     return this._flipOnChargeProvider.value.state;
+  }
+
+  _scrollAssistProvider = createScrollAssistContextProvider(this, null, () => {
+    this._onScrollAssistUpdate();
+  });
+  /** @type {import("../contexts/scrollAssistContext.js").ScrollAssistContextState} */
+  get _scrollAssistState() {
+    return this._scrollAssistProvider.value.state;
+  }
+  _onScrollAssistUpdate() {
+    // console.log("_onScrollAssistUpdate");
+    document.documentElement.toggleAttribute(
+      "data-scroll-assist",
+      Boolean(this._scrollAssistState.scrollAssist),
+    );
+    this._updateTabContentScroll();
+  }
+  /** @type {import("../contexts/scrollAssistContext.js").ScrollAssistContextState} */
+  get _scrollAssistState() {
+    return this._scrollAssistProvider.value.state;
   }
 
   _lastTouchTime = 0;

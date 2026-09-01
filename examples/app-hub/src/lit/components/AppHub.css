@@ -2277,6 +2277,9 @@ bw-tab-breadcrumb {
 #tab {
   scroll-padding-top: var(--main-padding-top-base);
 }
+html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
+  display: none;
+}
 /* apply vertical padding for portrait handheld touchscreens */
 @media screen and (pointer: coarse) {
   @media (orientation: portrait) {

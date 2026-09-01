@@ -11,16 +11,22 @@ import "./SettingsLeftHandedToggle.js";
 import "./SettingsHideHeaderToggle.js";
 import "./SettingsAnchorHeaderToggle.js";
 import "./SettingsFlipOnChargeToggle.js";
+import "./SettingsScrollAssistToggle.js";
 
 import { createAnchorHeaderContextConsumer } from "../../../../contexts/anchorHeaderContext.js";
 import { createIsHeaderHiddenContextConsumer } from "../../../../contexts/isHeaderHiddenContext.js";
 import { createBatteryManagerContextConsumer } from "../../../../contexts/batteryManagerContext.js";
 import { createTouchEnabledContextConsumer } from "../../../../contexts/touchEnabledContext.js";
+import { createFlipOnChargeContextConsumer } from "../../../../contexts/flipOnChargeContext.js";
+import { createScrollAssistContextConsumer } from "../../../../contexts/scrollAssistContext.js";
 
 class SettingsInterface extends LitElement {
   _isLeftHandedConsumer = createIsLeftHandedContextConsumer(this);
   _isHeaderHiddenConsumer = createIsHeaderHiddenContextConsumer(this);
   _anchorHeaderConsumer = createAnchorHeaderContextConsumer(this);
+  _flipOnChargeConsumer = createFlipOnChargeContextConsumer(this);
+  _scrollAssistConsumer = createScrollAssistContextConsumer(this);
+
   _batteryManagerConsumer = createBatteryManagerContextConsumer(this, true);
   _touchEnabledConsumer = createTouchEnabledContextConsumer(this, true);
 
@@ -29,6 +35,8 @@ class SettingsInterface extends LitElement {
     this._isLeftHandedConsumer.value.clear();
     this._isHeaderHiddenConsumer.value.clear();
     this._anchorHeaderConsumer.value.clear();
+    this._flipOnChargeConsumer.value.clear();
+    this._scrollAssistConsumer.value.clear();
   }
 
   createRenderRoot() {
@@ -61,6 +69,9 @@ class SettingsInterface extends LitElement {
           switch
         ></bw-settings-anchor-header-toggle>
         ${flipOnCharge}
+        <bw-settings-scroll-assist-toggle
+          switch
+        ></bw-settings-scroll-assist-toggle>
       </bw-settings-card>
     `;
   }
