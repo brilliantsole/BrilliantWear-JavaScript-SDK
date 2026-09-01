@@ -49,6 +49,7 @@ import { createNavigationStateContextProvider } from "../contexts/navigationStat
 import { createDisableTransitionsContextProvider } from "../contexts/disableTransitionsContext.js";
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/resize-observer/resize-observer.js";
+import { createFlipOnChargeContextProvider } from "../contexts/flipOnChargeContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -831,6 +832,10 @@ class AppHub extends LitElement {
       Boolean(charging),
     );
 
+    if (!this._flipOnChargeState.flipOnCharge) {
+      return;
+    }
+
     let shouldFlip = false;
     switch (this._screenOrientationType) {
       case "landscape-primary":
@@ -880,6 +885,12 @@ class AppHub extends LitElement {
     const { dischargingTime } = this._batteryManagerState;
     // console.log({ dischargingTime });
   };
+
+  _flipOnChargeProvider = createFlipOnChargeContextProvider(this);
+  /** @type {import("../contexts/flipOnChargeContext.js").FlipOnChargeContextState} */
+  get _flipOnChargeState() {
+    return this._flipOnChargeProvider.value.state;
+  }
 
   _lastTouchTime = 0;
   _doubleTapTimeThreshold = 700;
