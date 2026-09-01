@@ -94,7 +94,7 @@ class AppHub extends LitElement {
     }
   }
   _resetViewport() {
-    console.log("_resetViewport");
+    // console.log("_resetViewport");
 
     requestAnimationFrame(() => {
       document.documentElement.scrollTop = 1;
