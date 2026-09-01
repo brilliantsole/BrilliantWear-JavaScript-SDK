@@ -738,7 +738,7 @@ class AppHub extends LitElement {
         isHeaderHidden ? "header-hidden" : "header-visible",
         `header-${this.headerSide}`,
       ];
-      console.log("types", types);
+      // console.log("types", types);
       this._updateCSSVariables(true);
       document.startViewTransition({
         update: async () => {

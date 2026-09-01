@@ -2175,6 +2175,8 @@ html:active-view-transition-type(theme) {
 }
 .bw-grid-lanes {
   grid-template-columns: repeat(auto-fit, 200px);
+  flow-tolerance: 1em;
+  height: 100%;
   /* grid-template-columns: repeat(auto-fill, 300px); */
   @supports (display: grid-lanes) {
     display: grid-lanes;
