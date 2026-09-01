@@ -10,13 +10,19 @@ import "../SettingsCard.js";
 import "./SettingsLeftHandedToggle.js";
 import "./SettingsHideHeaderToggle.js";
 import "./SettingsAnchorHeaderToggle.js";
+import { createAnchorHeaderContextConsumer } from "../../../../contexts/anchorHeaderContext.js";
+import { createIsHeaderHiddenContextConsumer } from "../../../../contexts/isHeaderHiddenContext.js";
 
 class SettingsInterface extends LitElement {
   _isLeftHandedConsumer = createIsLeftHandedContextConsumer(this);
+  _isHeaderHiddenConsumer = createIsHeaderHiddenContextConsumer(this);
+  _anchorHeaderConsumer = createAnchorHeaderContextConsumer(this);
 
   clear() {
     console.log("clear interface settings");
     this._isLeftHandedConsumer.value.clear();
+    this._isHeaderHiddenConsumer.value.clear();
+    this._anchorHeaderConsumer.value.clear();
   }
 
   createRenderRoot() {

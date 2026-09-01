@@ -410,6 +410,7 @@ html[data-header-hidden] [data-header-shown-only] {
       flex-basis: 0;
     }
   }
+
   html[data-disable-transitions]
     :is(
       #header,
@@ -1117,11 +1118,14 @@ html:active-view-transition-type(left-handed) {
 
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
-    &::view-transition-group(.bw-grid-lanes),
-    &::view-transition-new(bw-tab-breadcrumb) {
-      animation-duration: var(--animation-duration);
-      animation-timing-function: var(--animation-timing-function);
+    &:not([data-anchor-header]) {
+      &::view-transition-group(.bw-grid-lanes),
+      &::view-transition-new(bw-tab-breadcrumb) {
+        animation-duration: var(--animation-duration);
+        animation-timing-function: var(--animation-timing-function);
+      }
     }
+
     &::view-transition-group(bw-tab-breadcrumb) {
       z-index: 1;
       animation: none;
@@ -1140,7 +1144,7 @@ html:active-view-transition-type(right-handed, left-handed) {
       }
     }
     @media (orientation: landscape) {
-      &:not([data-header-hidden]) #header {
+      &:not([data-header-hidden]):not([data-anchor-header]) #header {
         view-transition-name: header;
       }
       &::view-transition-group(header) {
@@ -1161,10 +1165,12 @@ html:active-view-transition-type(right-handed, left-handed) {
         z-index: 0;
         animation: none;
       }
-      &::view-transition-old(main),
-      &::view-transition-new(main) {
-        animation-duration: var(--animation-duration);
-        animation-timing-function: var(--animation-timing-function);
+      &:not([data-anchor-header]) {
+        &::view-transition-old(main),
+        &::view-transition-new(main) {
+          animation-duration: var(--animation-duration);
+          animation-timing-function: var(--animation-timing-function);
+        }
       }
       &::view-transition-old(main) {
         animation: none;
@@ -1196,6 +1202,7 @@ html:active-view-transition-type(left-handed) {
 html:active-view-transition-type(right-handed) {
   --right-handed-header-old-animation-name: none;
   --right-handed-header-new-animation-name: none;
+
   &::view-transition-old(header) {
     animation-name: var(--right-handed-header-old-animation-name);
   }
@@ -1592,10 +1599,12 @@ html:active-view-transition-type(right-handed, left-handed) {
 
 html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
-    &::view-transition-old(.overlay),
-    &::view-transition-new(.overlay) {
-      animation-duration: var(--animation-duration);
-      animation-timing-function: var(--animation-timing-function);
+    &:not([data-anchor-header]) {
+      &::view-transition-old(.overlay),
+      &::view-transition-new(.overlay) {
+        animation-duration: var(--animation-duration);
+        animation-timing-function: var(--animation-timing-function);
+      }
     }
 
     &::view-transition-group(.overlay-not-center) {
@@ -2167,7 +2176,6 @@ html:active-view-transition-type(theme) {
 .bw-grid-lanes {
   grid-template-columns: repeat(auto-fit, 200px);
   /* grid-template-columns: repeat(auto-fill, 300px); */
-
   @supports (display: grid-lanes) {
     display: grid-lanes;
   }

@@ -207,9 +207,12 @@ export async function createContext(key, options) {
         return true;
       },
       clear: async () => {
-        const didClear = await clear();
-        if (!didClear) {
-          console.error(`failed to clear "${contextKey}"`);
+        let didClear = true;
+        if (clear) {
+          didClear = await clear();
+          if (!didClear) {
+            console.error(`failed to clear "${contextKey}"`);
+          }
         }
         value.update({ ...initialState });
         return didClear;

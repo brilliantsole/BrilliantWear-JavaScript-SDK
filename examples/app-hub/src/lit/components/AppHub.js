@@ -69,16 +69,18 @@ class AppHub extends LitElement {
   );
   _onAnchorHeaderUpdate() {
     const { anchorHeader } = this._anchorHeaderProvider.value.state;
-    // console.log("_onAnchorHeaderUpdate", { anchorHeader });
+    console.log("_onAnchorHeaderUpdate", { anchorHeader });
     this._anchorHeader = anchorHeader;
     if (this._overrideAnchorHeader) {
       return;
     }
+    this._beforeUpdate();
     document.documentElement.toggleAttribute(
       "data-anchor-header",
       Boolean(this._anchorHeader),
     );
     this._updateHeaderSide();
+    this._afterUpdate();
   }
 
   _hidden = false;
@@ -96,6 +98,10 @@ class AppHub extends LitElement {
   _resetViewport() {
     // console.log("_resetViewport");
 
+    // document.documentElement.scrollTop = 0;
+    // document.body.scrollTop = 0;
+    // window.scrollTo(0, 0);
+
     requestAnimationFrame(() => {
       document.documentElement.scrollTop = 1;
       document.body.scrollTop = 1;
@@ -109,11 +115,7 @@ class AppHub extends LitElement {
     this._flip(overrideAnchorHeader);
   }
   _flip(overrideAnchorHeader) {
-    // console.log("_flip", { overrideAnchorHeader });
-
-    if (this.anchorHeader && !overrideAnchorHeader) {
-      return;
-    }
+    console.log("_flip", { overrideAnchorHeader });
 
     let newIsLeftHanded = this.isLeftHanded;
     let newAnchorHeader = this.anchorHeader;
@@ -130,7 +132,7 @@ class AppHub extends LitElement {
         break;
     }
 
-    // console.log({ newIsLeftHanded, newAnchorHeader });
+    console.log({ newIsLeftHanded, newAnchorHeader });
 
     const forceLeftHanded =
       newAnchorHeader != this.anchorHeader && !newAnchorHeader;
@@ -612,7 +614,7 @@ class AppHub extends LitElement {
   }
   _onIsLeftHandedUpdate() {
     const { isLeftHanded } = this._isLeftHandedProvider.value.state;
-    // console.log({ isLeftHanded });
+    console.log({ isLeftHanded });
     const update = () => {
       document.documentElement.toggleAttribute(
         "data-left-handed",
@@ -630,21 +632,9 @@ class AppHub extends LitElement {
     };
 
     if (this.skipViewTransitions || !this._touchEnabled) {
-      const disableTransitionsDuringViewTransition = !this._disableTransitions;
-
-      if (disableTransitionsDuringViewTransition) {
-        document.documentElement.toggleAttribute(
-          "data-disable-transitions",
-          true,
-        );
-      }
+      this._beforeUpdate();
       update();
-      if (disableTransitionsDuringViewTransition) {
-        document.documentElement.toggleAttribute(
-          "data-disable-transitions",
-          false,
-        );
-      }
+      this._afterUpdate();
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
       // console.log("types", types);
@@ -654,6 +644,28 @@ class AppHub extends LitElement {
           update();
         },
         types,
+      });
+    }
+  }
+
+  _beforeUpdate() {
+    if (!this._disableTransitions) {
+      console.log("temporarily disabling transitions");
+      const value = document.documentElement.toggleAttribute(
+        "data-disable-transitions",
+        true,
+      );
+      console.log("re-enabling transitions", value);
+    }
+  }
+  _afterUpdate() {
+    if (!this._disableTransitions) {
+      requestAnimationFrame(() => {
+        const value = document.documentElement.toggleAttribute(
+          "data-disable-transitions",
+          false,
+        );
+        console.log("re-enabling transitions", value);
       });
     }
   }
@@ -1179,7 +1191,7 @@ class AppHub extends LitElement {
   _updateTabResizeObserver(updateScroll, waitForResize) {
     const disabled =
       this._viewportOrientation != "portrait" || !this._touchEnabled;
-    // console.log("_updateTabResizeObserver", { disabled });
+    console.log("_updateTabResizeObserver", { disabled });
     this.refs.tabContentResizeObserver.value?.toggleAttribute(
       "disabled",
       disabled,
@@ -1265,7 +1277,7 @@ class AppHub extends LitElement {
     if (!isIOS) {
       return;
     }
-    // console.log("scroll", window.scrollY);
+    console.log("scroll", window.scrollY);
     if (window.scrollY == 1) {
       return;
     }

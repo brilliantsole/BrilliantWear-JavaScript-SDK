@@ -45,6 +45,7 @@ class SettingsAnchorHeaderToggle extends LitElement {
   }
 
   render() {
+    // console.log("checked", this.checked);
     return html`<bw-toggle
       data-touch-only
       ${ref(this.ref)}

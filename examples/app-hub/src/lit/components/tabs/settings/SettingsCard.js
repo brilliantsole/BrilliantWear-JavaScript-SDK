@@ -21,6 +21,10 @@ class SettingsCard extends LitElement {
       padding: 0;
       --spacing: var(--wa-space-s);
     }
+    wa-card::part(header) {
+      padding-top: var(--wa-space-3xs);
+      padding-bottom: var(--wa-space-3xs);
+    }
     wa-card h3 {
       margin: 0;
     }
