@@ -34,7 +34,10 @@ import { createReducedMotionContextProvider } from "../contexts/reducedMotionCon
 import { createTouchEnabledContextProvider } from "../contexts/touchEnabledContext.js";
 import { createViewportOrientationContextProvider } from "../contexts/viewportOrientationContext.js";
 import { createVisibilityContextProvider } from "../contexts/visibilityContext.js";
-import { createFullscreenContextProvider } from "../contexts/fullscreenContext.js";
+import {
+  createFullscreenContextProvider,
+  getIsFullscreen,
+} from "../contexts/fullscreenContext.js";
 import { createIsHeaderHiddenContextProvider } from "../contexts/isHeaderHiddenContext.js";
 import { createHeaderSideContextProvider } from "../contexts/headerSideContext.js";
 import { isIOS } from "../../utils/environment.js";
@@ -91,16 +94,12 @@ class AppHub extends LitElement {
     }
   }
   _resetViewport() {
-    // console.log("_resetViewport");
-
-    // document.documentElement.scrollTop = 1;
-    // document.body.scrollTop = 1;
-    // window.scrollTo(0, 1);
+    console.log("_resetViewport");
 
     requestAnimationFrame(() => {
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 1;
+      document.body.scrollTop = 1;
+      window.scrollTo(0, 1);
     });
   }
 
@@ -263,6 +262,7 @@ class AppHub extends LitElement {
     const options = { signal: this._abortController.signal };
 
     window.addEventListener("pageshow", this._resetViewport, options);
+    document.addEventListener("scroll", this._onScroll, options);
 
     this.addEventListener("bw-flip", this._onFlipEvent, options);
 
@@ -1260,6 +1260,20 @@ class AppHub extends LitElement {
     50,
     true,
   );
+
+  _onScroll = BW.ThrottleUtils.debounce((event) => {
+    if (!isIOS) {
+      return;
+    }
+    // console.log("scroll", window.scrollY);
+    if (window.scrollY == 1) {
+      return;
+    }
+    if (window.scrollY == 0 && getIsFullscreen()) {
+      return;
+    }
+    this._resetViewport();
+  }, 100);
 
   render() {
     return html`
