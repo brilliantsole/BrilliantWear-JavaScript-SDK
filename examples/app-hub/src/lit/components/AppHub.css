@@ -2175,8 +2175,7 @@ html:active-view-transition-type(theme) {
 }
 .bw-grid-lanes {
   grid-template-columns: repeat(auto-fit, 200px);
-  flow-tolerance: 1em;
-  height: 100%;
+  flow-tolerance: 1rem;
   /* grid-template-columns: repeat(auto-fill, 300px); */
   @supports (display: grid-lanes) {
     display: grid-lanes;
@@ -2227,6 +2226,12 @@ bw-tab-breadcrumb {
 
   padding-top: var(--main-padding-top-base);
   padding-bottom: var(--tab-padding-bottom);
+
+  container-type: size;
+  container-name: main;
+
+  width: 100%;
+  height: 100%;
 }
 
 #tab,
@@ -2261,7 +2266,7 @@ bw-tab-breadcrumb {
   --tab-vertical-padding-before: 0px;
   --tab-vertical-padding-after: 0px;
 
-  --tab-vertical-padding-before-offset: 250px;
+  --tab-vertical-padding-before-offset: 150px;
 }
 #tabBefore {
   height: var(--tab-vertical-padding-before);
@@ -2279,10 +2284,7 @@ bw-tab-breadcrumb {
       --tab-vertical-padding-before: calc(
         100cqh - var(--tab-vertical-padding-before-offset)
       );
-      --tab-vertical-padding-after: calc(
-        100cqh - var(--tab-content-height) - var(--tab-padding-bottom) -
-          var(--main-padding-top) - var(--wa-space-xl)
-      );
+      --tab-vertical-padding-after: calc(100cqh - var(--tab-content-height));
     }
   }
 }
