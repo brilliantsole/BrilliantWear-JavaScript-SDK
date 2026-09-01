@@ -907,7 +907,9 @@ class AppHub extends LitElement {
       "data-scroll-assist",
       Boolean(this._scrollAssistState.scrollAssist),
     );
-    this._updateTabContentScroll();
+    if (this._viewportOrientation == "portrait") {
+      this._updateTabContentScroll();
+    }
   }
   /** @type {import("../contexts/scrollAssistContext.js").ScrollAssistContextState} */
   get _scrollAssistState() {
