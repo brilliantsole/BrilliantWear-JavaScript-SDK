@@ -20,6 +20,7 @@ class SettingsCard extends LitElement {
     wa-card {
       padding: 0;
       --spacing: var(--wa-space-s);
+      /* width: fit-content; */
     }
     wa-card::part(header) {
       padding-top: var(--wa-space-3xs);
@@ -42,7 +43,8 @@ class SettingsCard extends LitElement {
       font-family: var(--wa-font-family-heading);
       font-weight: var(--wa-font-weight-heading);
       line-height: var(--wa-line-height-condensed);
-      text-wrap: balance;
+      /*text-wrap: balance;*/
+      text-wrap: nowrap;
     }
   `;
 

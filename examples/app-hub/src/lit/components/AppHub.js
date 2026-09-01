@@ -219,7 +219,7 @@ class AppHub extends LitElement {
           navigation.currentEntry.getState(),
         );
         this._lastTouchTime = 0;
-
+        this.__tabContentHeight = 0;
         document.documentElement.style.setProperty(
           "--tab-content-height",
           `${0}px`,
@@ -231,6 +231,11 @@ class AppHub extends LitElement {
 
         this._updateTabContentScrollOnResize = true;
         this._updateTabContentScroll();
+        requestAnimationFrame(() => {
+          if (this.__tabContentHeight == 0) {
+            this._updateTabContentHeight();
+          }
+        });
       },
     },
   );
@@ -395,7 +400,7 @@ class AppHub extends LitElement {
   );
 
   _onFullscreenUpdate() {
-    console.log("_onFullscreenUpdate");
+    // console.log("_onFullscreenUpdate");
     const { fullscreenEnabled, fullscreenElement } =
       this._fullscreenProvider.value.state;
     // console.log({ fullscreenEnabled, fullscreenElement });
@@ -1244,24 +1249,28 @@ class AppHub extends LitElement {
     }
   }
   _tabContentHeight = 0;
+  __tabContentHeight = 0;
+  _updateTabContentHeight(height) {
+    if (height != undefined) {
+      this._tabContentHeight = height;
+    }
+    this.__tabContentHeight = this._tabContentHeight;
+    console.log("_tabContentHeight", this._tabContentHeight);
+    document.documentElement.style.setProperty(
+      "--tab-content-height",
+      `${this._tabContentHeight}px`,
+    );
+    if (this._updateTabContentScrollOnResize) {
+      this._updateTabContentScrollOnResize = false;
+      this._updateTabContentScroll();
+    }
+  }
   _onTabContentResize(event) {
     /** @type {DOMRectReadOnly} */
     const rect = event.detail.entries[0].contentRect;
-    // console.log("_onTabContentResize", rect);
+    console.log("_onTabContentResize", rect);
     const { height } = rect;
-
-    if (height != this._tabContentHeight) {
-      this._tabContentHeight = height;
-      // console.log("_tabContentHeight", this._tabContentHeight);
-      document.documentElement.style.setProperty(
-        "--tab-content-height",
-        `${height}px`,
-      );
-      if (this._updateTabContentScrollOnResize) {
-        this._updateTabContentScrollOnResize = false;
-        this._updateTabContentScroll();
-      }
-    }
+    this._updateTabContentHeight(height);
   }
   /** @type {AbortController} */
   _scrollOnResizeAbortController;
@@ -1308,7 +1317,7 @@ class AppHub extends LitElement {
       this._waitingForAnimationFrameToScrollTabContent = true;
       requestAnimationFrame(() => {
         this._waitingForAnimationFrameToScrollTabContent = false;
-        console.log("tabContent scrollIntoView");
+        // console.log("tabContent scrollIntoView");
         this.refs.tabContent.value.scrollIntoView();
       });
     },

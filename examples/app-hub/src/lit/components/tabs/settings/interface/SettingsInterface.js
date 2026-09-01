@@ -1,5 +1,4 @@
 import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
-import { createIsLeftHandedContextConsumer } from "../../../../contexts/isLeftHandedContext.js";
 
 const { lit } = await waitForGlobals();
 
@@ -13,6 +12,7 @@ import "./SettingsAnchorHeaderToggle.js";
 import "./SettingsFlipOnChargeToggle.js";
 import "./SettingsScrollAssistToggle.js";
 
+import { createIsLeftHandedContextConsumer } from "../../../../contexts/isLeftHandedContext.js";
 import { createAnchorHeaderContextConsumer } from "../../../../contexts/anchorHeaderContext.js";
 import { createIsHeaderHiddenContextConsumer } from "../../../../contexts/isHeaderHiddenContext.js";
 import { createBatteryManagerContextConsumer } from "../../../../contexts/batteryManagerContext.js";

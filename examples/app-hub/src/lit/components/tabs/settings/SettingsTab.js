@@ -7,6 +7,8 @@ const { LitElement, html, css } = lit;
 
 import "./appearance/SettingsAppearance.js";
 import "./interface/SettingsInterface.js";
+import "./gestures/SettingsGestures.js";
+import "./action-buttons/SettingsActionButtons.js";
 
 class SettingsTab extends LitElement {
   createRenderRoot() {
@@ -22,11 +24,17 @@ class SettingsTab extends LitElement {
     const settingsInterface = this.touchEnabled
       ? html`<bw-settings-interface></bw-settings-interface>`
       : "";
+    const settingsActionButtons = this.touchEnabled
+      ? html`<bw-settings-action-buttons></bw-settings-action-buttons>`
+      : "";
+    const settingsGestures = this.touchEnabled
+      ? html`<bw-settings-gestures></bw-settings-gestures>`
+      : "";
 
     return html`
       <div class="bw-grid-lanes">
         <bw-settings-appearance></bw-settings-appearance>
-        ${settingsInterface}
+        ${settingsInterface} ${settingsActionButtons} ${settingsGestures}
       </div>
     `;
   }
