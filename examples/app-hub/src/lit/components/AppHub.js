@@ -248,12 +248,20 @@ class AppHub extends LitElement {
   }
 
   _updateMetaColor() {
-    // console.log("_updateMetaColor");
+    console.log("_updateMetaColor");
     const metaContentColor = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
-    // console.log({ metaContentColor });
-    this._themeColorMeta.setAttribute("content", metaContentColor);
+    console.log({ metaContentColor });
+    this._themeColorMeta.removeAttribute("content");
+    if (this._metaTimeout != undefined) {
+      window.clearTimeout(this._metaTimeout);
+      this._metaTimeout = undefined;
+    }
+
+    this._metaTimeout = setTimeout(() => {
+      this._themeColorMeta.setAttribute("content", metaContentColor);
+    }, 100);
   }
 
   connectedCallback() {
@@ -1278,7 +1286,7 @@ class AppHub extends LitElement {
       return;
     }
     console.log("scroll", window.scrollY);
-    if (window.scrollY == 1) {
+    if (window.scrollY == 1 || window.scrollY == 0) {
       return;
     }
     if (window.scrollY == 0 && getIsFullscreen()) {
