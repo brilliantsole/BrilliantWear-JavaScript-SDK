@@ -26,13 +26,21 @@ class SettingsAnimationsTreeElement extends LitElement {
 
   ref = createRef();
 
-  _transitionsConsumer = createDisableTransitionsContextConsumer(
+  disableTransitionsConsumer = createDisableTransitionsContextConsumer(
     this,
     true,
     () => {
       this._updateChecked();
     },
   );
+  /** @type {import("../../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
+  get disableTransitionsState() {
+    return this.disableTransitionsConsumer.value.state;
+  }
+  get isTransitionsDisabled() {
+    return this.disableTransitionsState.disableTransitions;
+  }
+
   _viewTransitionsConsumer = createDisableViewTransitionsContextConsumer(
     this,
     true,
@@ -40,38 +48,28 @@ class SettingsAnimationsTreeElement extends LitElement {
       this._updateChecked();
     },
   );
-
-  /** @type {import("../../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
-  get disableTransitionsContextState() {
-    return this._transitionsConsumer.value.state;
-  }
-  get isTransitionsDisabled() {
-    return this.disableTransitionsContextState.disableTransitions;
-  }
-
   /** @type {import("../../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
-  get disableViewTransitionsContextState() {
+  get disableViewTransitionsState() {
     return this._viewTransitionsConsumer.value.state;
   }
   get isViewTransitionsDisabled() {
-    return this.disableViewTransitionsContextState.disableViewTransitions;
+    return this.disableViewTransitionsState.disableViewTransitions;
   }
 
   _onChange(event) {
     const { checked } = event.target;
     const isAnimationsEnabled = checked;
 
-    this.disableTransitionsContextState.disableTransitions =
-      !isAnimationsEnabled;
-    this._transitionsConsumer.value.update(
-      this.disableTransitionsContextState,
+    this.disableTransitionsState.disableTransitions = !isAnimationsEnabled;
+    this.disableTransitionsConsumer.value.update(
+      this.disableTransitionsState,
       true,
     );
 
-    this.disableViewTransitionsContextState.disableViewTransitions =
+    this.disableViewTransitionsState.disableViewTransitions =
       !isAnimationsEnabled;
     this._viewTransitionsConsumer.value.update(
-      this.disableViewTransitionsContextState,
+      this.disableViewTransitionsState,
       true,
     );
   }

@@ -30,12 +30,12 @@ class SettingsViewTransitionsToggle extends LitElement {
     },
   );
 
-  /** @type {import("../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
-  get disableViewTransitionsContextState() {
+  /** @type {import("../../../../../contexts/disableViewTransitionsContext.js").DisableViewTransitionsContextState} */
+  get disableViewTransitionsState() {
     return this._viewTransitionsConsumer.value.state;
   }
   get isViewTransitionsDisabled() {
-    return this.disableViewTransitionsContextState.disableViewTransitions;
+    return this.disableViewTransitionsState.disableViewTransitions;
   }
 
   get checked() {
@@ -45,10 +45,10 @@ class SettingsViewTransitionsToggle extends LitElement {
   _onChange(event) {
     const { checked } = event.target;
     event.target.checked = this.checked;
-    this.disableViewTransitionsContextState.disableViewTransitions = !checked;
+    this.disableViewTransitionsState.disableViewTransitions = !checked;
 
     this._viewTransitionsConsumer.value.update(
-      this.disableViewTransitionsContextState,
+      this.disableViewTransitionsState,
       true,
     );
   }

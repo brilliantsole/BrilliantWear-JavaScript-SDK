@@ -19,7 +19,7 @@ class SettingsTransitionsToggle extends LitElement {
   };
 
   ref = createRef();
-  _transitionsConsumer = createDisableTransitionsContextConsumer(
+  disableTransitionsConsumer = createDisableTransitionsContextConsumer(
     this,
     true,
     () => {
@@ -30,11 +30,11 @@ class SettingsTransitionsToggle extends LitElement {
   );
 
   /** @type {import("../../../../contexts/disableTransitionsContext.js").DisableTransitionsContextState} */
-  get disableTransitionsContextState() {
-    return this._transitionsConsumer.value.state;
+  get disableTransitionsState() {
+    return this.disableTransitionsConsumer.value.state;
   }
   get isTransitionsDisabled() {
-    return this.disableTransitionsContextState.disableTransitions;
+    return this.disableTransitionsState.disableTransitions;
   }
 
   get checked() {
@@ -44,10 +44,10 @@ class SettingsTransitionsToggle extends LitElement {
   _onChange(event) {
     const { checked } = event.target;
     event.target.checked = this.checked;
-    this.disableTransitionsContextState.disableTransitions = !checked;
+    this.disableTransitionsState.disableTransitions = !checked;
 
-    this._transitionsConsumer.value.update(
-      this.disableTransitionsContextState,
+    this.disableTransitionsConsumer.value.update(
+      this.disableTransitionsState,
       true,
     );
   }

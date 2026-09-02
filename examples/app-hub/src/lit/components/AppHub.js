@@ -51,6 +51,8 @@ import { createDisableTransitionsContextProvider } from "../contexts/disableTran
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/resize-observer/resize-observer.js";
 import { createFlipOnChargeContextProvider } from "../contexts/flipOnChargeContext.js";
 import { createScrollAssistContextProvider } from "../contexts/scrollAssistContext.js";
+import { createSwipeToChangeTabGestureContextProvider } from "../contexts/swipeToChangeTabGestureContext.js";
+import { createSwipeToHideHeaderGestureContextProvider } from "../contexts/swipeToHideHeaderGestureContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -1155,24 +1157,32 @@ class AppHub extends LitElement {
     const currentTabIndex = tabs.indexOf(this.activeTab);
     let newTabIndex = currentTabIndex;
     let tabIndexOffset = 0;
+    const allowSwipeToHideHeader =
+      this.isSwipeToHideHeaderGestureEnabled && this._touchEnabled;
+    const allowSwipeToChangeTab =
+      this.isSwipeToChangeTabGestureEnabled && this._touchEnabled;
     // console.log({ key, currentTabIndex });
     switch (this._viewportOrientation) {
       case "landscape":
         {
           switch (direction) {
             case "up":
-              tabIndexOffset = -1;
+              if (isTouch && allowSwipeToChangeTab) {
+                tabIndexOffset = -1;
+              }
               break;
             case "down":
-              tabIndexOffset = 1;
+              if (isTouch && allowSwipeToChangeTab) {
+                tabIndexOffset = 1;
+              }
               break;
             case "left":
-              if (this.headerSide == "left") {
+              if (this.headerSide == "left" && allowSwipeToHideHeader) {
                 this._hideHeader();
               }
               break;
             case "right":
-              if (this.headerSide == "right") {
+              if (this.headerSide == "right" && allowSwipeToHideHeader) {
                 this._hideHeader();
               }
               break;
@@ -1186,18 +1196,22 @@ class AppHub extends LitElement {
         {
           switch (direction) {
             case "right":
-              tabIndexOffset = 1;
+              if (isTouch && allowSwipeToChangeTab) {
+                tabIndexOffset = 1;
+              }
               break;
             case "left":
-              tabIndexOffset = -1;
+              if (isTouch && allowSwipeToChangeTab) {
+                tabIndexOffset = -1;
+              }
               break;
             case "down":
-              if (this.headerSide == "bottom") {
+              if (this.headerSide == "bottom" && allowSwipeToHideHeader) {
                 this._hideHeader();
               }
               break;
             case "up":
-              if (this.headerSide == "top") {
+              if (this.headerSide == "top" && allowSwipeToHideHeader) {
                 this._hideHeader();
               }
               break;
@@ -1234,6 +1248,26 @@ class AppHub extends LitElement {
         // console.error(error);
       }
     }
+  }
+
+  _swipeToChangeTabGestureProvider =
+    createSwipeToChangeTabGestureContextProvider(this);
+  /** @type {import("../contexts/swipeToChangeTabGestureContext.js").SwipeToChangeTabGestureContextState} */
+  get _swipeToChangeTabGestureState() {
+    return this._swipeToChangeTabGestureProvider.value.state;
+  }
+  get isSwipeToChangeTabGestureEnabled() {
+    return this._swipeToChangeTabGestureState.isSwipeToChangeTabEnabled;
+  }
+
+  _swipeToHideHeaderGestureProvider =
+    createSwipeToHideHeaderGestureContextProvider(this);
+  /** @type {import("../contexts/swipeToHideHeaderGestureContext.js").SwipeToHideHeaderGestureContextState} */
+  get _swipeToHideHeaderGestureState() {
+    return this._swipeToHideHeaderGestureProvider.value.state;
+  }
+  get isSwipeToHideHeaderGestureEnabled() {
+    return this._swipeToHideHeaderGestureState.isSwipeToHideHeaderEnabled;
   }
 
   _updateTabResizeObserver(updateScroll, waitForResize) {
