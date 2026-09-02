@@ -32,7 +32,7 @@ class SettingsTab extends LitElement {
       : "";
 
     return html`
-      <div class="bw-grid-lanes">
+      <div class="bw-grid-lanes bw-hand-direction">
         <bw-settings-appearance></bw-settings-appearance>
         ${settingsInterface} ${settingsGestures} ${settingsActionButtons}
       </div>

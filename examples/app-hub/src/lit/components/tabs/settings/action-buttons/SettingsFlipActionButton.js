@@ -57,7 +57,7 @@ class SettingsFlipActionButtonToggle extends LitElement {
       ${ref(this.ref)}
       ?checked=${this.checked}
       @change=${this._onChange}
-      label="Flip"
+      label="Flip (Landscape)"
       ?switch=${this.switch}
     ></bw-toggle>`;
   }

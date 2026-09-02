@@ -2181,7 +2181,7 @@ html:active-view-transition-type(theme) {
     grid-template-columns: repeat(auto-fit, min-content);
   }
 
-  flow-tolerance: 1em;
+  flow-tolerance: 50px;
   /* grid-template-columns: repeat(auto-fill, 300px); */
   @supports (display: grid-lanes) {
     display: grid-lanes;
@@ -2211,11 +2211,14 @@ html:active-view-transition-type(theme) {
 }
 
 @media (pointer: coarse) {
-  .bw-hand-direction {
-    direction: var(--hand-direction);
-  }
-  .bw-hand-direction > * {
-    direction: initial;
+  @media (orientation: landscape) {
+    .bw-hand-direction {
+      direction: var(--hand-direction);
+      & > * {
+        direction: initial;
+      }
+      justify-content: start;
+    }
   }
 }
 
@@ -2299,16 +2302,16 @@ html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
 }
 
 html:not([data-flip-action-button]) bw-main-corner-button-flip {
-  display: none !important;
+  display: none;
 }
 html:not([data-toggle-fullscreen-action-button])
   bw-main-corner-button-toggle-fullscreen {
-  display: none !important;
+  display: none;
 }
 html:not([data-toggle-theme-action-button]) bw-main-corner-button-toggle-theme {
-  display: none !important;
+  display: none;
 }
 html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
   bw-main-corner-button-toggle-header {
-  display: none !important;
+  display: none;
 }

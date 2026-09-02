@@ -225,6 +225,7 @@ class AppHub extends LitElement {
           navigation.currentEntry.getState(),
         );
         this._lastTouchTime = 0;
+        // console.log("clearing _tabContentHeight...");
         this.__tabContentHeight = 0;
         document.documentElement.style.setProperty(
           "--tab-content-height",
@@ -237,11 +238,14 @@ class AppHub extends LitElement {
 
         this._updateTabContentScrollOnResize = true;
         this._updateTabContentScroll();
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           if (this.__tabContentHeight == 0) {
+            // console.log(
+            //   "__tabContentHeight didn't updated - updating manually",
+            // );
             this._updateTabContentHeight();
           }
-        });
+        }, 10);
       },
     },
   );
@@ -1033,12 +1037,12 @@ class AppHub extends LitElement {
     this._lastTouchPosition = { screenX, screenY };
   };
 
-  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number, initialScreenX: number, initialScreenY: number}?} */
+  /** @type {{identifier: number, screenX: number, screenY: number, timeStamp: number, initialScreenX: number, initialScreenY: number, initialTouchedHeader?: boolean, distanceToHeader: number}?} */
   _latestTouchMove;
   _ignoreTouchIdentifier;
-  _touchMoveMagnitudeThreshold = 10;
-  _touchMoveInitialMagnitudeThreshold = 40;
+  _touchMoveMagnitudeThreshold = 8;
   _touchMoveAngleThreshold = 0.6;
+  _touchMoveDistanceToHeaderThreshold = 40;
   /** @param {TouchEvent} event */
   _onTouchMove = (event) => {
     // console.log("_onTouchMove", event);
@@ -1054,6 +1058,11 @@ class AppHub extends LitElement {
       // console.log("ignoring touch identifier");
       return;
     }
+
+    const { clientX, clientY } = touch;
+    const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
+    const touchedHeader = elementsFromPoint.includes(this.refs.header.value);
+
     if (identifier != this._latestTouchMove?.identifier) {
       this._latestTouchMove = {
         identifier,
@@ -1062,6 +1071,8 @@ class AppHub extends LitElement {
         timeStamp,
         initialScreenX: screenX,
         initialScreenY: screenY,
+        initialTouchedHeader: touchedHeader,
+        distanceToHeader: touchedHeader ? 0 : Infinity,
       };
       return;
     }
@@ -1075,9 +1086,7 @@ class AppHub extends LitElement {
     };
     Object.assign(this._latestTouchMove, { screenX, screenY, timeStamp });
 
-    const { clientX, clientY } = touch;
-    const elementsFromPoint = document.elementsFromPoint(clientX, clientY);
-    if (!elementsFromPoint.includes(this.refs.header.value)) {
+    if (!touchedHeader) {
       return;
     }
 
@@ -1090,14 +1099,22 @@ class AppHub extends LitElement {
     const magnitude = Math.sqrt(
       touchMoveDelta.screenX ** 2 + touchMoveDelta.screenY ** 2,
     );
-    const initialMagnitude = Math.sqrt(
-      touchMoveDelta.initialScreenX ** 2 + touchMoveDelta.initialScreenY ** 2,
-    );
-    // console.log({ angle, magnitude, initialMagnitude });
+    if (this._latestTouchMove.distanceToHeader == Infinity) {
+      const distanceToHeader = Math.sqrt(
+        touchMoveDelta.initialScreenX ** 2 + touchMoveDelta.initialScreenY ** 2,
+      );
+      console.log({ distanceToHeader });
+      this._latestTouchMove.distanceToHeader = distanceToHeader;
+    }
+    console.log({ angle, magnitude });
     if (magnitude < this._touchMoveMagnitudeThreshold) {
       return;
     }
-    if (initialMagnitude > this._touchMoveInitialMagnitudeThreshold) {
+    if (
+      !this._latestTouchMove.initialTouchedHeader &&
+      this._latestTouchMove.distanceToHeader >
+        this._touchMoveDistanceToHeaderThreshold
+    ) {
       return;
     }
 
@@ -1300,7 +1317,7 @@ class AppHub extends LitElement {
       this._tabContentHeight = height;
     }
     this.__tabContentHeight = this._tabContentHeight;
-    console.log("_tabContentHeight", this._tabContentHeight);
+    // console.log("_tabContentHeight", this._tabContentHeight);
     document.documentElement.style.setProperty(
       "--tab-content-height",
       `${this._tabContentHeight}px`,
@@ -1313,7 +1330,7 @@ class AppHub extends LitElement {
   _onTabContentResize(event) {
     /** @type {DOMRectReadOnly} */
     const rect = event.detail.entries[0].contentRect;
-    console.log("_onTabContentResize", rect);
+    // console.log("_onTabContentResize", rect);
     const { height } = rect;
     this._updateTabContentHeight(height);
   }
@@ -1322,7 +1339,7 @@ class AppHub extends LitElement {
   _scrollOnResizeAbortControllerTimeoutInterval = 200;
   _updateTabContentScroll = BW.ThrottleUtils.throttle(
     (waitForResize) => {
-      console.log("_updateTabContentScroll", { waitForResize });
+      // console.log("_updateTabContentScroll", { waitForResize });
 
       if (waitForResize) {
         if (this._scrollOnResizeAbortController) {
@@ -1390,7 +1407,7 @@ class AppHub extends LitElement {
     () => this._onFlipActionButtonUpdate(),
   );
   _onFlipActionButtonUpdate() {
-    console.log("_onFlipActionButtonUpdate");
+    // console.log("_onFlipActionButtonUpdate");
     document.documentElement.toggleAttribute(
       "data-flip-action-button",
       Boolean(this._flipActionButtonProvider.value.state.visible),
@@ -1401,7 +1418,7 @@ class AppHub extends LitElement {
       this._onToggleThemeActionButtonUpdate(),
     );
   _onToggleThemeActionButtonUpdate() {
-    console.log("_onToggleThemeActionButtonUpdate");
+    // console.log("_onToggleThemeActionButtonUpdate");
     document.documentElement.toggleAttribute(
       "data-toggle-theme-action-button",
       Boolean(this._toggleThemeActionButtonProvider.value.state.visible),
@@ -1412,7 +1429,7 @@ class AppHub extends LitElement {
       this._onToggleFullscreenActionButtonUpdate(),
     );
   _onToggleFullscreenActionButtonUpdate() {
-    console.log("_onToggleFullscreenActionButtonUpdate");
+    // console.log("_onToggleFullscreenActionButtonUpdate");
     document.documentElement.toggleAttribute(
       "data-toggle-fullscreen-action-button",
       Boolean(this._toggleFullscreenActionButtonProvider.value.state.visible),
@@ -1423,7 +1440,7 @@ class AppHub extends LitElement {
       this._onToggleHeaderHiddenActionButtonUpdate(),
     );
   _onToggleHeaderHiddenActionButtonUpdate() {
-    console.log("_onToggleHeaderHiddenActionButtonUpdate");
+    // console.log("_onToggleHeaderHiddenActionButtonUpdate");
     document.documentElement.toggleAttribute(
       "data-toggle-header-hidden-action-button",
       Boolean(this._toggleHeaderHiddenActionButtonProvider.value.state.visible),
@@ -1472,9 +1489,7 @@ class AppHub extends LitElement {
             ></bw-main-corner-button-toggle-theme>
 
             <bw-main-corner-button-toggle-header
-              data-header-hidden-or-fullscreen-only
               data-portrait-only
-              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div
@@ -1486,7 +1501,6 @@ class AppHub extends LitElement {
             <bw-main-corner-button-flip
               data-portrait-only
               data-header-hidden-only
-              data-slide-on-enter
             ></bw-main-corner-button-flip>
 
             <bw-main-corner-button-toggle-fullscreen
@@ -1497,7 +1511,6 @@ class AppHub extends LitElement {
             ></bw-main-corner-button-toggle-theme>
             <bw-main-corner-button-toggle-header
               data-landscape-only
-              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div
