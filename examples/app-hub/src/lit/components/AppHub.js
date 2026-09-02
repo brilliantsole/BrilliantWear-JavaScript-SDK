@@ -781,6 +781,7 @@ class AppHub extends LitElement {
       this._resetViewport();
       this._getCSSVariables();
     });
+    this._updateTabResizeObserver(true);
   }
 
   /** @type {CSSStyleDeclaration} */
@@ -908,19 +909,18 @@ class AppHub extends LitElement {
   get _scrollAssistState() {
     return this._scrollAssistProvider.value.state;
   }
+  get isScrollAssistEnabled() {
+    return this._scrollAssistState.enabled;
+  }
   _onScrollAssistUpdate() {
     // console.log("_onScrollAssistUpdate");
     document.documentElement.toggleAttribute(
       "data-scroll-assist",
-      Boolean(this._scrollAssistState.scrollAssist),
+      Boolean(this._scrollAssistState.enabled),
     );
     if (this._viewportOrientation == "portrait") {
-      this._updateTabContentScroll();
+      this._updateTabResizeObserver(true);
     }
-  }
-  /** @type {import("../contexts/scrollAssistContext.js").ScrollAssistContextState} */
-  get _scrollAssistState() {
-    return this._scrollAssistProvider.value.state;
   }
 
   _lastTouchTime = 0;
@@ -1272,7 +1272,9 @@ class AppHub extends LitElement {
 
   _updateTabResizeObserver(updateScroll, waitForResize) {
     const disabled =
-      this._viewportOrientation != "portrait" || !this._touchEnabled;
+      this._viewportOrientation != "portrait" ||
+      !this._touchEnabled ||
+      !this.isScrollAssistEnabled;
     console.log("_updateTabResizeObserver", { disabled });
     this.refs.tabContentResizeObserver.value?.toggleAttribute(
       "disabled",
@@ -1395,6 +1397,7 @@ class AppHub extends LitElement {
             <wa-resize-observer
               @wa-resize=${this._onTabContentResize}
               ${ref(this.refs.tabContentResizeObserver)}
+              disabled
             >
               <div id="tabContent" ${ref(this.refs.tabContent)}>
                 ${this.router.outlet()}

@@ -1,12 +1,12 @@
 import { createContext } from "./createContext.js";
 
-/** @typedef {{scrollAssist: boolean }} ScrollAssistContextState */
+/** @typedef {{enabled: boolean }} ScrollAssistContextState */
 
 const {
   createContextProvider: createScrollAssistContextProvider,
   createContextConsumer: createScrollAssistContextConsumer,
 } = await createContext("scrollAssist", {
-  defaultState: { scrollAssist: false },
+  defaultState: { enabled: false },
   storageType: "localStorage",
 });
 

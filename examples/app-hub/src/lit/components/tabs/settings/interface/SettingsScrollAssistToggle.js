@@ -30,13 +30,13 @@ class SettingsThemeToggle extends LitElement {
     return this._scrollAssistConsumer.value.state;
   }
   get scrollAssist() {
-    return this.scrollAssistState.scrollAssist;
+    return this.scrollAssistState.enabled;
   }
 
   _onChange(event) {
     const { checked } = event.target;
     event.target.checked = this.checked;
-    this.scrollAssistState.scrollAssist = checked;
+    this.scrollAssistState.enabled = checked;
     this._scrollAssistConsumer.value.update(this.scrollAssistState, true);
   }
 
