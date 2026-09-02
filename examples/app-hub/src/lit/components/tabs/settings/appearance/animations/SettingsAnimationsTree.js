@@ -5,8 +5,6 @@ const { lit, litRef } = await waitForGlobals();
 const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
 
-import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
-
 import { createDisableTransitionsContextConsumer } from "../../../../../contexts/disableTransitionsContext.js";
 import { createDisableViewTransitionsContextConsumer } from "../../../../../contexts/disableViewTransitionsContext.js";
 

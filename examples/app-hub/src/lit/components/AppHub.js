@@ -53,6 +53,10 @@ import { createFlipOnChargeContextProvider } from "../contexts/flipOnChargeConte
 import { createScrollAssistContextProvider } from "../contexts/scrollAssistContext.js";
 import { createSwipeToChangeTabGestureContextProvider } from "../contexts/swipeToChangeTabGestureContext.js";
 import { createSwipeToHideHeaderGestureContextProvider } from "../contexts/swipeToHideHeaderGestureContext.js";
+import { createFlipActionButtonContextProvider } from "../contexts/flipActionButtonContext.js";
+import { createToggleThemeActionButtonContextProvider } from "../contexts/toggleThemeActionButtonContext.js";
+import { createToggleFullscreenActionButtonContextProvider } from "../contexts/toggleFullscreenActionButtonContext.js";
+import { createToggleHeaderHiddenActionButtonContextProvider } from "../contexts/toggleHeaderHiddenActionButtonContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -257,7 +261,7 @@ class AppHub extends LitElement {
   }
 
   _updateMetaColor() {
-    console.log("_updateMetaColor");
+    // console.log("_updateMetaColor");
     const metaContentColor = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();
@@ -346,6 +350,11 @@ class AppHub extends LitElement {
     this._onDisableViewTransitionsUpdate();
     this._onDisableTransitionsUpdate();
     this._onScrollAssistUpdate();
+
+    this._onFlipActionButtonUpdate();
+    this._onToggleFullscreenActionButtonUpdate();
+    this._onToggleHeaderHiddenActionButtonUpdate();
+    this._onToggleThemeActionButtonUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -1375,6 +1384,52 @@ class AppHub extends LitElement {
     this._resetViewport();
   }, 100);
 
+  _flipActionButtonProvider = createFlipActionButtonContextProvider(
+    this,
+    null,
+    () => this._onFlipActionButtonUpdate(),
+  );
+  _onFlipActionButtonUpdate() {
+    console.log("_onFlipActionButtonUpdate");
+    document.documentElement.toggleAttribute(
+      "data-flip-action-button",
+      Boolean(this._flipActionButtonProvider.value.state.visible),
+    );
+  }
+  _toggleThemeActionButtonProvider =
+    createToggleThemeActionButtonContextProvider(this, null, () =>
+      this._onToggleThemeActionButtonUpdate(),
+    );
+  _onToggleThemeActionButtonUpdate() {
+    console.log("_onToggleThemeActionButtonUpdate");
+    document.documentElement.toggleAttribute(
+      "data-toggle-theme-action-button",
+      Boolean(this._toggleThemeActionButtonProvider.value.state.visible),
+    );
+  }
+  _toggleFullscreenActionButtonProvider =
+    createToggleFullscreenActionButtonContextProvider(this, null, () =>
+      this._onToggleFullscreenActionButtonUpdate(),
+    );
+  _onToggleFullscreenActionButtonUpdate() {
+    console.log("_onToggleFullscreenActionButtonUpdate");
+    document.documentElement.toggleAttribute(
+      "data-toggle-fullscreen-action-button",
+      Boolean(this._toggleFullscreenActionButtonProvider.value.state.visible),
+    );
+  }
+  _toggleHeaderHiddenActionButtonProvider =
+    createToggleHeaderHiddenActionButtonContextProvider(this, null, () =>
+      this._onToggleHeaderHiddenActionButtonUpdate(),
+    );
+  _onToggleHeaderHiddenActionButtonUpdate() {
+    console.log("_onToggleHeaderHiddenActionButtonUpdate");
+    document.documentElement.toggleAttribute(
+      "data-toggle-header-hidden-action-button",
+      Boolean(this._toggleHeaderHiddenActionButtonProvider.value.state.visible),
+    );
+  }
+
   render() {
     return html`
       <header ${ref(this.refs.header)} id="header" data-axis="cross">
@@ -1441,7 +1496,6 @@ class AppHub extends LitElement {
               data-landscape-only
             ></bw-main-corner-button-toggle-theme>
             <bw-main-corner-button-toggle-header
-              data-header-hidden-only
               data-landscape-only
               data-slide-on-enter
             ></bw-main-corner-button-toggle-header>

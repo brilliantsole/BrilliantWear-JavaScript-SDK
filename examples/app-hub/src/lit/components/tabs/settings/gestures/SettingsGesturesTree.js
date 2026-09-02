@@ -5,8 +5,6 @@ const { lit, litRef } = await waitForGlobals();
 const { LitElement, html } = lit;
 const { ref, createRef } = litRef;
 
-import "https://ka-f.webawesome.com/webawesome@3.12.0/components/checkbox/checkbox.js";
-
 import "../../../utils/Toggle.js";
 import { createSwipeToChangeTabGestureContextConsumer } from "../../../../contexts/swipeToChangeTabGestureContext.js";
 import { createSwipeToHideHeaderGestureContextConsumer } from "../../../../contexts/swipeToHideHeaderGestureContext.js";
@@ -51,17 +49,17 @@ class SettingsGesturesTreeElement extends LitElement {
 
   _onChange(event) {
     const { checked } = event.target;
-    const isGesturesEnabled = checked;
+    const areGesturesEnabled = checked;
 
     this.swipeToChangeTabGestureState.isSwipeToChangeTabEnabled =
-      isGesturesEnabled;
+      areGesturesEnabled;
     this._swipeToChangeTabGestureConsumer.value.update(
       this.swipeToChangeTabGestureState,
       true,
     );
 
     this.swipeToHideHeaderGestureState.isSwipeToHideHeaderEnabled =
-      isGesturesEnabled;
+      areGesturesEnabled;
     this._swipeToHideHeaderGestureConsumer.value.update(
       this.swipeToHideHeaderGestureState,
       true,
@@ -81,14 +79,14 @@ class SettingsGesturesTreeElement extends LitElement {
     }
   }
 
-  get _booleans() {
+  get booleans() {
     return [this.isSwipeToChangeTabEnabled, this.isSwipeToHideHeaderEnabled];
   }
   get checked() {
-    return this._booleans.every(Boolean);
+    return this.booleans.every(Boolean);
   }
   get indeterminate() {
-    return !this._booleans.every(Boolean) && this._booleans.some(Boolean);
+    return !this.booleans.every(Boolean) && this.booleans.some(Boolean);
   }
 
   firstUpdated() {

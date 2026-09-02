@@ -2297,3 +2297,18 @@ html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
     }
   }
 }
+
+html:not([data-flip-action-button]) bw-main-corner-button-flip {
+  display: none !important;
+}
+html:not([data-toggle-fullscreen-action-button])
+  bw-main-corner-button-toggle-fullscreen {
+  display: none !important;
+}
+html:not([data-toggle-theme-action-button]) bw-main-corner-button-toggle-theme {
+  display: none !important;
+}
+html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
+  bw-main-corner-button-toggle-header {
+  display: none !important;
+}
