@@ -57,6 +57,7 @@ import { createFlipActionButtonContextProvider } from "../contexts/flipActionBut
 import { createToggleThemeActionButtonContextProvider } from "../contexts/toggleThemeActionButtonContext.js";
 import { createToggleFullscreenActionButtonContextProvider } from "../contexts/toggleFullscreenActionButtonContext.js";
 import { createToggleHeaderHiddenActionButtonContextProvider } from "../contexts/toggleHeaderHiddenActionButtonContext.js";
+import { createDirectionContextProvider } from "../contexts/directionContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -473,6 +474,8 @@ class AppHub extends LitElement {
     this._updateCSSVariables();
     this._updateTabResizeObserver(true, true);
   }
+
+  _directionProvider = createDirectionContextProvider(this);
 
   _themeProvider = createThemeContextProvider(this, null, () => {
     this._onThemeUpdate();
@@ -1106,7 +1109,7 @@ class AppHub extends LitElement {
       console.log({ distanceToHeader });
       this._latestTouchMove.distanceToHeader = distanceToHeader;
     }
-    console.log({ angle, magnitude });
+    // console.log({ angle, magnitude });
     if (magnitude < this._touchMoveMagnitudeThreshold) {
       return;
     }

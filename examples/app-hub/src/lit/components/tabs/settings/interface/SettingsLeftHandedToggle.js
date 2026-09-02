@@ -8,6 +8,7 @@ const { ref, createRef } = litRef;
 import "../../../utils/Toggle.js";
 
 import { createIsLeftHandedContextConsumer } from "../../../../contexts/isLeftHandedContext.js";
+import { createDirectionContextConsumer } from "../../../../contexts/directionContext.js";
 
 class SettingsThemeToggle extends LitElement {
   createRenderRoot() {
@@ -18,12 +19,27 @@ class SettingsThemeToggle extends LitElement {
     switch: { type: Boolean },
   };
 
+  _directionConsumer = createDirectionContextConsumer(this, true, () => {
+    this._updateChecked();
+  });
+  /** @type {import("../../../../contexts/directionContext.js").DirectionContextState} */
+  get directionState() {
+    return this._directionConsumer.value.state;
+  }
+  get isLeftToRight() {
+    return this.directionState.isLeftToRight;
+  }
+
   ref = createRef();
   _isLeftHandedConsumer = createIsLeftHandedContextConsumer(this, true, () => {
+    this._updateChecked();
+  });
+
+  _updateChecked() {
     if (this.ref.value) {
       this.ref.value.checked = this.checked;
     }
-  });
+  }
 
   /** @type {import("../../../../contexts/isLeftHandedContext.js").IsLeftHandedContextState} */
   get isLeftHandedState() {
@@ -35,13 +51,14 @@ class SettingsThemeToggle extends LitElement {
 
   _onChange(event) {
     const { checked } = event.target;
+    const isLeftHanded = this.isLeftToRight ? !checked : checked;
     event.target.checked = this.checked;
-    this.isLeftHandedState.isLeftHanded = !checked;
+    this.isLeftHandedState.isLeftHanded = isLeftHanded;
     this._isLeftHandedConsumer.value.update(this.isLeftHandedState, true);
   }
 
   get checked() {
-    return !this.isLeftHanded;
+    return this.isLeftToRight ? !this.isLeftHanded : this.isLeftHanded;
   }
 
   render() {
@@ -50,7 +67,7 @@ class SettingsThemeToggle extends LitElement {
       ${ref(this.ref)}
       ?checked=${this.checked}
       @change=${this._onChange}
-      label="Right Handed"
+      label=${this.isLeftToRight ? "Right Handed" : "Left Handed"}
       ?switch=${this.switch}
     ></bw-toggle>`;
   }
