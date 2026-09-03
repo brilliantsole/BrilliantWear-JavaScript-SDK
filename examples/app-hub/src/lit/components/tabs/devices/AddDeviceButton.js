@@ -2,7 +2,7 @@ import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js"
 
 const { lit, BW } = await waitForGlobals();
 
-const { LitElement, html } = lit;
+const { LitElement, html, css } = lit;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/spinner/spinner.js";

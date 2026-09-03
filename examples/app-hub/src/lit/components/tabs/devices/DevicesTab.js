@@ -13,8 +13,14 @@ class DevicesTab extends LitElement {
 
   render() {
     return html`
-      <div>
+      <div class="bw-overlay">
         <bw-add-device-button></bw-add-device-button>
+
+        <div
+          data-main-align="start"
+          data-cross-align="end"
+          data-tab-view-transition
+        ></div>
       </div>
     `;
   }

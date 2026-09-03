@@ -391,7 +391,7 @@ html[data-header-hidden] [data-header-shown-only] {
 }
 
 :root {
-  --header-hidden-transition-duration: 200ms;
+  --header-hidden-transition-duration: 2000ms;
   --header-hidden-transition-timing-function: ease;
 }
 
@@ -597,12 +597,12 @@ html[data-header-hidden] [data-header-shown-only] {
     /* weird Android Chrome issue for rtl on fullscreen :/ */
     @supports not (-webkit-touch-callout: none) {
       :dir(rtl):fullscreen {
-        --header-padding-right-extra: var(--wa-space-2xs);
-        --header-padding-left-extra: var(--wa-space-2xs);
+        --header-padding-right-base: var(--wa-space-2xs);
+        --header-padding-left-base: var(--wa-space-2xs);
       }
       :dir(ltr) {
-        --header-padding-right-extra: var(--wa-space-2xs);
-        --header-padding-left-extra: var(--wa-space-2xs);
+        --header-padding-right-base: var(--wa-space-2xs);
+        --header-padding-left-base: var(--wa-space-2xs);
       }
     }
 
@@ -1102,6 +1102,16 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
   bw-tab-breadcrumb {
     view-transition-name: bw-tab-breadcrumb;
+  }
+
+  [data-tab-view-transition] {
+    view-transition-name: attr(
+      data-tab-view-transition type(<custom-ident>),
+      match-element
+    );
+  }
+  [data-tab-view-transition-class] {
+    view-transition-class: attr(data-tab-view-transition-class);
   }
 }
 
@@ -2211,7 +2221,7 @@ bw-tab-breadcrumb {
 }
 
 :root {
-  --tab-padding-bottom: var(--wa-space-xl);
+  --tab-padding-bottom: var(--wa-space-3xl);
 }
 #tab {
   overflow-y: scroll;
@@ -2299,5 +2309,23 @@ html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
   display: none;
   &[data-slide-on-enter] {
     transform: var(--slide-on-enter-translate-y);
+  }
+}
+
+.bw-overlay {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  position: relative;
+}
+
+html:active-view-transition-type(
+  right-handed,
+  left-handed,
+  header-visible,
+  header-hidden
+) {
+  [data-tab-view-transition] {
+    view-transition-name: match-element;
   }
 }
