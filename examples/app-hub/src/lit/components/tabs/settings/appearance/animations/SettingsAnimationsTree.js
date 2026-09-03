@@ -110,6 +110,14 @@ class SettingsAnimationsTreeElement extends LitElement {
     ></bw-toggle>`;
   }
 
+  _renderViewTransitionsToggle() {
+    if (document.startViewTransition) {
+      return html`<bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>`;
+    } else {
+      return html``;
+    }
+  }
+
   render() {
     const toggle = this.renderToggle();
     if (this.switch) {
@@ -122,7 +130,7 @@ class SettingsAnimationsTreeElement extends LitElement {
             class="wa-stack wa-gap-xs"
             style="padding-inline-start: var(--wa-space-l);"
           >
-            <bw-settings-view-transitions-toggle></bw-settings-view-transitions-toggle>
+            ${this._renderViewTransitionsToggle()}
             <bw-settings-transitions-toggle></bw-settings-transitions-toggle>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 const { lit } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 
 import "./MainCornerButton.js";
 

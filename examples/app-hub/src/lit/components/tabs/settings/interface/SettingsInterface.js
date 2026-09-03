@@ -2,7 +2,7 @@ import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.
 
 const { lit } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 
 import "../SettingsCard.js";
 

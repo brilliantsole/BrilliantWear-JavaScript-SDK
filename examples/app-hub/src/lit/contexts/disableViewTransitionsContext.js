@@ -6,7 +6,9 @@ const {
   createContextProvider: createDisableViewTransitionsContextProvider,
   createContextConsumer: createDisableViewTransitionsContextConsumer,
 } = await createContext("disableViewTransitions", {
-  defaultState: { disableViewTransitions: false },
+  defaultState: {
+    disableViewTransitions: !Boolean(document.startViewTransition),
+  },
   storageType: "localStorage",
 });
 

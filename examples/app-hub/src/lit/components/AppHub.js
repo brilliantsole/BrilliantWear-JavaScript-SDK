@@ -83,13 +83,13 @@ class AppHub extends LitElement {
     if (this._overrideAnchorHeader) {
       return;
     }
-    this._beforeUpdate();
+    this._disableTransitionsBeforeUpdate();
     document.documentElement.toggleAttribute(
       "data-anchor-header",
       Boolean(this._anchorHeader),
     );
     this._updateHeaderSide();
-    this._afterUpdate();
+    this._enableTransitionsAfterUpdate();
   }
 
   _hidden = false;
@@ -405,10 +405,12 @@ class AppHub extends LitElement {
     );
     this._updateHeaderSide();
 
-    // TODO: - user-defined flag to always have header away from charging port if charging
-    if (false) {
-      this._onBatteryChargingChange();
-    }
+    this._disableTransitionsBeforeUpdate();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this._enableTransitionsAfterUpdate();
+      });
+    });
   }
 
   _fullscreenProvider = createFullscreenContextProvider(this, null, () =>
@@ -666,9 +668,9 @@ class AppHub extends LitElement {
     };
 
     if (this.skipViewTransitions || !this._touchEnabled) {
-      this._beforeUpdate();
+      this._disableTransitionsBeforeUpdate();
       update();
-      this._afterUpdate();
+      this._enableTransitionsAfterUpdate();
     } else {
       const types = [isLeftHanded ? "left-handed" : "right-handed"];
       // console.log("types", types);
@@ -682,24 +684,34 @@ class AppHub extends LitElement {
     }
   }
 
-  _beforeUpdate() {
+  _isTemporarilyDisablingTransitions = false;
+  _disableTransitionsBeforeUpdate() {
     if (!this._disableTransitions) {
-      console.log("temporarily disabling transitions");
+      if (this._isTemporarilyDisablingTransitions) {
+        return;
+      }
+      this._isTemporarilyDisablingTransitions = true;
+
       const value = document.documentElement.toggleAttribute(
         "data-disable-transitions",
         true,
       );
-      console.log("re-enabling transitions", value);
+      // console.log("temporarily disabling transitions", value);
     }
   }
-  _afterUpdate() {
+  _enableTransitionsAfterUpdate() {
     if (!this._disableTransitions) {
       requestAnimationFrame(() => {
+        if (!this._isTemporarilyDisablingTransitions) {
+          return;
+        }
+        this._isTemporarilyDisablingTransitions = false;
+
         const value = document.documentElement.toggleAttribute(
           "data-disable-transitions",
           false,
         );
-        console.log("re-enabling transitions", value);
+        // console.log("re-enabling transitions", value);
       });
     }
   }
@@ -789,6 +801,7 @@ class AppHub extends LitElement {
   firstUpdated() {
     console.log("firstUpdated");
     this._didFirstUpdate = true;
+    this._updateTabResizeObserver(true);
     requestAnimationFrame(() => {
       this._updateCSSVariables();
       if (!CSS.supports("interpolate-size: allow-keywords")) {
@@ -796,9 +809,7 @@ class AppHub extends LitElement {
       }
       this._resetViewport();
       this._getCSSVariables();
-    });
-    this._updateTabResizeObserver(true);
-    requestAnimationFrame(() => {
+
       document.documentElement.setAttribute("data-loaded", true);
     });
   }

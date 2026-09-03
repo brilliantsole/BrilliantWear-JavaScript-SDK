@@ -3,7 +3,7 @@ import { createTouchEnabledContextConsumer } from "../../../contexts/touchEnable
 
 const { lit } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 
 import "./appearance/SettingsAppearance.js";
 import "./interface/SettingsInterface.js";

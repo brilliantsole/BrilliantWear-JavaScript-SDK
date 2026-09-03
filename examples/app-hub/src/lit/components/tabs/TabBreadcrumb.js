@@ -2,7 +2,7 @@ import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
 const { lit, litRepeat } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 const { repeat } = litRepeat;
 
 import { createNavigationStateContextConsumer } from "../../contexts/navigationStateContext.js";

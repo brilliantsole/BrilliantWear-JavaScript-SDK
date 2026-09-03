@@ -57,6 +57,7 @@ class SettingsViewTransitionsToggle extends LitElement {
       @change=${this._onChange}
       label="View Transitions"
       ?switch=${this.switch}
+      ?disabled=${!Boolean(document.startViewTransition)}
     ></bw-toggle>`;
   }
 }

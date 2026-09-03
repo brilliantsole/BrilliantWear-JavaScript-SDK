@@ -6,7 +6,7 @@ import { createToggleThemeActionButtonContextConsumer } from "../../../../contex
 
 const { lit } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html } = lit;
 
 import "../SettingsCard.js";
 import "./SettingsActionButtonsTree.js";
