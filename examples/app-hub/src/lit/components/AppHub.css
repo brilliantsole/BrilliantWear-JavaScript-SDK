@@ -391,7 +391,7 @@ html[data-header-hidden] [data-header-shown-only] {
 }
 
 :root {
-  --header-hidden-transition-duration: 2000ms;
+  --header-hidden-transition-duration: 200ms;
   --header-hidden-transition-timing-function: ease;
 }
 
@@ -1105,10 +1105,7 @@ html:active-view-transition-type(right-handed, left-handed) {
   }
 
   [data-tab-view-transition] {
-    view-transition-name: attr(
-      data-tab-view-transition type(<custom-ident>),
-      match-element
-    );
+    view-transition-name: match-element;
   }
   [data-tab-view-transition-class] {
     view-transition-class: attr(data-tab-view-transition-class);
@@ -2221,8 +2218,18 @@ bw-tab-breadcrumb {
 }
 
 :root {
-  --tab-padding-bottom: var(--wa-space-3xl);
+  --tab-padding-bottom: calc(var(--main-padding-bottom));
 }
+@media (orientation: portrait) {
+  :root {
+    /* FILL - extra padding on bottom corners if there are action buttons */
+    /* --tab-padding-bottom: calc(var(--wa-space-3xl)); */
+  }
+  html[data-header-hidden] {
+    --tab-padding-bottom: calc(var(--wa-space-3xl));
+  }
+}
+
 #tab {
   overflow-y: scroll;
 
@@ -2312,11 +2319,19 @@ html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
   }
 }
 
-.bw-overlay {
-  width: 100%;
-  height: 100%;
+:has(> .bw-overlay) {
   display: grid;
-  position: relative;
+}
+.bw-overlay {
+  z-index: 0;
+  display: grid;
+  position: absolute;
+  pointer-events: none;
+
+  width: 100cqw;
+  height: 100cqh;
+}
+.bw-overlay > :is([data-main-align], [data-cross-align]) {
 }
 
 html:active-view-transition-type(
