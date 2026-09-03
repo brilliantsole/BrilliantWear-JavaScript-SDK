@@ -43,7 +43,7 @@ const {
     );
 
     directionMediaQueries.forEach((mediaQuery) => {
-      console.log(mediaQuery);
+      // console.log(mediaQuery);
       mediaQuery.addEventListener(
         "change",
         () => {

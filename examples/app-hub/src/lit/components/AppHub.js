@@ -798,6 +798,9 @@ class AppHub extends LitElement {
       this._getCSSVariables();
     });
     this._updateTabResizeObserver(true);
+    requestAnimationFrame(() => {
+      document.documentElement.setAttribute("data-loaded", true);
+    });
   }
 
   /** @type {CSSStyleDeclaration} */
@@ -1177,11 +1180,11 @@ class AppHub extends LitElement {
    * @param {boolean?} allowOverflow
    */
   _onGestureDirection(direction, isTouch, allowOverflow) {
-    console.log("_onGestureDirection", {
-      direction,
-      isTouch,
-      _touchEnabled: this._touchEnabled,
-    });
+    // console.log("_onGestureDirection", {
+    //   direction,
+    //   isTouch,
+    //   _touchEnabled: this._touchEnabled,
+    // });
 
     const currentTabIndex = tabs.indexOf(this.activeTab);
     let newTabIndex = currentTabIndex;
@@ -1304,7 +1307,7 @@ class AppHub extends LitElement {
       this._viewportOrientation != "portrait" ||
       !this._touchEnabled ||
       !this.isScrollAssistEnabled;
-    console.log("_updateTabResizeObserver", { disabled });
+    // console.log("_updateTabResizeObserver", { disabled });
     this.refs.tabContentResizeObserver.value?.toggleAttribute(
       "disabled",
       disabled,
@@ -1493,6 +1496,7 @@ class AppHub extends LitElement {
 
             <bw-main-corner-button-toggle-header
               data-portrait-only
+              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div
@@ -1504,6 +1508,7 @@ class AppHub extends LitElement {
             <bw-main-corner-button-flip
               data-portrait-only
               data-header-hidden-only
+              data-slide-on-enter
             ></bw-main-corner-button-flip>
 
             <bw-main-corner-button-toggle-fullscreen
@@ -1514,6 +1519,7 @@ class AppHub extends LitElement {
             ></bw-main-corner-button-toggle-theme>
             <bw-main-corner-button-toggle-header
               data-landscape-only
+              data-slide-on-enter
             ></bw-main-corner-button-toggle-header>
           </div>
           <div

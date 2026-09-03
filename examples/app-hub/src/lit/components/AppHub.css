@@ -365,6 +365,7 @@ html:not([data-header-hidden]) [data-header-hidden-only] {
     transform: var(--slide-on-enter-translate-y);
   }
 }
+
 @supports (-webkit-touch-callout: none) {
   html:not([data-header-hidden]):not(:fullscreen)
     [data-header-hidden-or-fullscreen-only] {
@@ -1335,15 +1336,15 @@ html:active-view-transition-type(right-handed, left-handed) {
   @media (pointer: coarse) {
     @media (orientation: portrait) {
       &:active-view-transition-type(right-handed) {
-        --right-handed-nav-button-old-animation-name: none; /*tilt-right;*/
-        --right-handed-nav-button-new-animation-name: none; /*tilt-right;*/
+        --right-handed-nav-button-old-animation-name: none;
+        --right-handed-nav-button-new-animation-name: none;
 
         --right-handed-menu-button-old-animation-name: slide-out-to-right-from-left;
         --right-handed-menu-button-new-animation-name: slide-in-from-left;
       }
       &:active-view-transition-type(left-handed) {
-        --left-handed-nav-button-old-animation-name: none; /*tilt-left;*/
-        --left-handed-nav-button-new-animation-name: none; /*tilt-left;*/
+        --left-handed-nav-button-old-animation-name: none;
+        --left-handed-nav-button-new-animation-name: none;
 
         --left-handed-menu-button-old-animation-name: slide-out-to-left-from-right;
         --left-handed-menu-button-new-animation-name: slide-in-from-right;
@@ -1548,35 +1549,6 @@ html:active-view-transition-type(right-handed, left-handed) {
           var(--header-old-length) + var(--main-padding-side) + 100%
       )
     );
-  }
-}
-
-:root {
-  --tilt-angle: 3deg;
-  --jump-height: var(--wa-space-2xs);
-}
-@keyframes tilt-left {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(calc(-1 * var(--jump-height)))
-      rotate(calc(-1 * var(--tilt-angle)));
-  }
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-}
-@keyframes tilt-right {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(calc(-1 * var(--jump-height)))
-      rotate(calc(1 * var(--tilt-angle)));
-  }
-  100% {
-    transform: translateY(0) rotate(0deg);
   }
 }
 
@@ -2121,10 +2093,15 @@ html:not([data-fullscreen-enabled])
   transition-behavior: allow-discrete;
   transform: translateY(0);
   transition-duration: var(--header-hidden-transition-duration);
-  transition-timing-function: ease-in;
+  transition-timing-function: ease;
   transition-property: transform, display;
   @starting-style {
     transform: var(--slide-on-enter-translate-y);
+  }
+}
+html:not([data-loaded]) [data-slide-on-enter] {
+  @starting-style {
+    transform: none !important;
   }
 }
 
@@ -2314,4 +2291,7 @@ html:not([data-toggle-theme-action-button]) bw-main-corner-button-toggle-theme {
 html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
   bw-main-corner-button-toggle-header {
   display: none;
+  &[data-slide-on-enter] {
+    transform: var(--slide-on-enter-translate-y);
+  }
 }
