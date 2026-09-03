@@ -1834,6 +1834,7 @@ html:active-view-transition-type(header-hidden, header-visible) {
       animation-name: slide-main-landscape-header-visibility;
     }
 
+    &::view-transition-new(main),
     &::view-transition-new(bw-tab-breadcrumb) {
       --main-padding-side-offset: calc(
         var(--main-padding-left-safe) * var(--negative-if-header-hidden)
@@ -1852,6 +1853,11 @@ html:active-view-transition-type(header-visible, header-hidden) {
   [data-slide-on-enter] {
     view-transition-name: match-element;
     view-transition-class: slide-on-enter;
+  }
+  &[data-toggle-header-hidden-action-button]
+    bw-main-corner-button-toggle-header {
+    view-transition-name: none;
+    view-transition-class: none;
   }
 
   &::view-transition-group(.overlay) {
