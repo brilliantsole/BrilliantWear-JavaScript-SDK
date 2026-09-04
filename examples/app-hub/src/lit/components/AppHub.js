@@ -1479,23 +1479,6 @@ class AppHub extends LitElement {
         </menu>
       </header>
       <div id="main">
-        <main>
-          <bw-tab-breadcrumb></bw-tab-breadcrumb>
-          <div id="tab">
-            <div id="tabBefore"></div>
-            <wa-resize-observer
-              @wa-resize=${this._onTabContentResize}
-              ${ref(this.refs.tabContentResizeObserver)}
-              disabled
-            >
-              <div id="tabContent" ${ref(this.refs.tabContent)}>
-                ${this.router.outlet()}
-              </div>
-            </wa-resize-observer>
-            <div id="tabAfter"></div>
-          </div>
-        </main>
-
         <div id="mainOverlay">
           <div data-touch-only data-main-align="start" data-cross-align="start">
             <bw-main-corner-button-toggle-fullscreen
@@ -1564,6 +1547,23 @@ class AppHub extends LitElement {
             ></bw-main-corner-button-flip>
           </div>
         </div>
+
+        <main>
+          <bw-tab-breadcrumb></bw-tab-breadcrumb>
+          <div id="tab">
+            <div id="tabBefore"></div>
+            <wa-resize-observer
+              @wa-resize=${this._onTabContentResize}
+              ${ref(this.refs.tabContentResizeObserver)}
+              disabled
+            >
+              <div id="tabContent" ${ref(this.refs.tabContent)}>
+                ${this.router.outlet()}
+              </div>
+            </wa-resize-observer>
+            <div id="tabAfter"></div>
+          </div>
+        </main>
       </div>
     `;
   }

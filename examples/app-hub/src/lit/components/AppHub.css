@@ -287,7 +287,7 @@ main {
 }
 
 #mainOverlay {
-  z-index: 0;
+  z-index: 1;
   display: grid;
   position: absolute;
   pointer-events: none;
@@ -327,7 +327,7 @@ main {
 }
 
 #header {
-  z-index: 1;
+  z-index: 2;
 
   flex: 0 0 auto;
   background-color: var(--wa-color-surface-default);
