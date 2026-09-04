@@ -1536,9 +1536,11 @@ class AppHub extends LitElement {
             >
               <bw-main-corner-button-toggle-fullscreen
                 data-portrait-only
+                data-slide-on-enter
               ></bw-main-corner-button-toggle-fullscreen>
               <bw-main-corner-button-toggle-theme
                 data-portrait-only
+                data-slide-on-enter
               ></bw-main-corner-button-toggle-theme>
 
               <bw-main-corner-button-toggle-header
@@ -1574,9 +1576,11 @@ class AppHub extends LitElement {
 
               <bw-main-corner-button-toggle-fullscreen
                 data-landscape-only
+                data-slide-on-enter
               ></bw-main-corner-button-toggle-fullscreen>
               <bw-main-corner-button-toggle-theme
                 data-landscape-only
+                data-slide-on-enter
               ></bw-main-corner-button-toggle-theme>
               <bw-main-corner-button-toggle-header
                 data-landscape-only
@@ -1653,6 +1657,7 @@ class AppHub extends LitElement {
             <div data-touch-only data-main-align="end" data-cross-align="end">
               <bw-main-corner-button-flip
                 data-landscape-only
+                data-slide-on-enter
               ></bw-main-corner-button-flip>
             </div>
           </wa-resize-observer>
