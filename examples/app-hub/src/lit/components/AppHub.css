@@ -2338,6 +2338,10 @@ html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
 .bw-overlay > :is([data-main-align], [data-cross-align]) {
 }
 
+.bw-overlay > * {
+  pointer-events: auto;
+}
+
 html:active-view-transition-type(
   right-handed,
   left-handed,
