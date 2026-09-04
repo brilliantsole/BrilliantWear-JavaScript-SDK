@@ -2286,15 +2286,37 @@ html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
 }
 :root {
 }
-.bw-overlay > :is([data-main-align], [data-cross-align]) {
-  transition-property: padding-bottom;
-  transition-duration: 100ms;
-  transition-timing-function: ease-in;
-  padding-bottom: var(--main-overlay-start-start-height);
-}
-
 .bw-overlay > * {
   pointer-events: auto;
+}
+
+:root {
+  --bw-overlay-transition-duration: 100ms;
+  --bw-overlay-transition-timing-function: ease-in;
+}
+@media (orientation: portrait) and (pointer: coarse) {
+  .bw-overlay {
+    & > [data-main-align="start"] {
+      transition-property: padding-bottom;
+      transition-duration: var(--bw-overlay-transition-duration);
+      transition-timing-function: var(--bw-overlay-transition-timing-function);
+
+      &[data-cross-align="start"] {
+        --main-overlay-start-height: var(--main-overlay-start-start-height);
+      }
+      &[data-cross-align="center"] {
+        --main-overlay-start-height: var(--main-overlay-start-center-height);
+      }
+      &[data-cross-align="end"] {
+        --main-overlay-start-height: var(--main-overlay-start-end-height);
+      }
+      --padding: calc(
+        var(--main-overlay-start-height) +
+          (var(--wa-space-xs) * sign(abs(var(--main-overlay-start-height))))
+      );
+      padding-bottom: var(--padding);
+    }
+  }
 }
 
 html:active-view-transition-type(
