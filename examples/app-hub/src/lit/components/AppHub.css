@@ -115,6 +115,10 @@ textarea {
   align-items: center;
 }
 
+wa-button {
+  transform: translateZ(0);
+}
+
 @media (orientation: portrait) {
   [data-cross-align="start"] {
     flex-direction: var(--cross-axis-flex-direction);
