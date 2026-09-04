@@ -31,6 +31,8 @@ class DevicesTab extends LitElement {
           data-main-align="start"
           data-cross-align="start"
           data-tab-view-transition
+          data-portrait-only
+          data-touch-only
         >
           <bw-add-device-button></bw-add-device-button>
         </div>

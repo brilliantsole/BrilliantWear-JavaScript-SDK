@@ -164,7 +164,7 @@ class AppHub extends LitElement {
     const { disableTransitions } = this._disableTransitionsProvider.value.state;
     console.log({ disableTransitions });
     this._disableTransitions = disableTransitions;
-    document.documentElement.toggleAttribute(
+    const value = document.documentElement.toggleAttribute(
       "data-disable-transitions",
       Boolean(this._disableTransitions),
     );
@@ -700,20 +700,18 @@ class AppHub extends LitElement {
     }
   }
   _enableTransitionsAfterUpdate() {
-    if (!this._disableTransitions) {
-      requestAnimationFrame(() => {
-        if (!this._isTemporarilyDisablingTransitions) {
-          return;
-        }
-        this._isTemporarilyDisablingTransitions = false;
+    requestAnimationFrame(() => {
+      if (!this._isTemporarilyDisablingTransitions) {
+        return;
+      }
+      this._isTemporarilyDisablingTransitions = false;
 
-        const value = document.documentElement.toggleAttribute(
-          "data-disable-transitions",
-          false,
-        );
-        // console.log("re-enabling transitions", value);
-      });
-    }
+      const value = document.documentElement.toggleAttribute(
+        "data-disable-transitions",
+        this._disableTransitions,
+      );
+      // console.log("re-enabling transitions", value);
+    });
   }
 
   _headerSideProvider = createHeaderSideContextProvider(this, null, () => {
@@ -811,6 +809,8 @@ class AppHub extends LitElement {
       this._getCSSVariables();
 
       document.documentElement.setAttribute("data-loaded", true);
+
+      this._updateMainOverlayResizeObservers();
     });
   }
 
@@ -1120,7 +1120,7 @@ class AppHub extends LitElement {
       const distanceToHeader = Math.sqrt(
         touchMoveDelta.initialScreenX ** 2 + touchMoveDelta.initialScreenY ** 2,
       );
-      console.log({ distanceToHeader });
+      // console.log({ distanceToHeader });
       this._latestTouchMove.distanceToHeader = distanceToHeader;
     }
     // console.log({ angle, magnitude });
@@ -1464,6 +1464,49 @@ class AppHub extends LitElement {
     );
   }
 
+  /** @type {Record<string, import("lit/directives/ref.js").Ref} */
+  _mainOverlayRefs = (() => {
+    const overlayValues = ["start", "center", "end"];
+    const _mainOverlayRefs = {};
+    overlayValues.forEach((value1) => {
+      overlayValues.forEach((value2) => {
+        _mainOverlayRefs[[value1, value2].join("-")] = createRef();
+      });
+    });
+    console.log("_mainOverlayRefs", _mainOverlayRefs);
+    return _mainOverlayRefs;
+  })();
+  _updateMainOverlayResizeObservers() {
+    Object.entries(this._mainOverlayRefs).forEach(([string, ref]) => {
+      const [mainAlign, crossAlign] = string.split("-");
+      const disabled = false;
+      // console.log("_updateMainOverlayResizeObserver", {
+      //   mainAlign,
+      //   crossAlign,
+      //   disabled,
+      // });
+      ref.value?.toggleAttribute("disabled", disabled);
+    });
+  }
+
+  _onMainOverlayResize(event) {
+    /** @type {DOMRectReadOnly} */
+    const rect = event.detail.entries[0].contentRect;
+    let { mainAlign, crossAlign, touchOnly, mouseOnly } =
+      event.target.children[0].dataset;
+    touchOnly = touchOnly != undefined;
+    mouseOnly = mouseOnly != undefined;
+    // console.log("_onMainOverlayResize", rect, {
+    //   mainAlign,
+    //   crossAlign,
+    // });
+
+    document.documentElement.style.setProperty(
+      `--main-overlay-${mainAlign}-${crossAlign}-height`,
+      `${rect.height}px`,
+    );
+  }
+
   render() {
     return html`
       <header ${ref(this.refs.header)} id="header" data-axis="cross">
@@ -1478,74 +1521,141 @@ class AppHub extends LitElement {
           <bw-menu-button-theme data-mouse-only></bw-menu-button-theme>
         </menu>
       </header>
+
       <div id="main">
         <div id="mainOverlay">
-          <div data-touch-only data-main-align="start" data-cross-align="start">
-            <bw-main-corner-button-toggle-fullscreen
-              data-portrait-only
-            ></bw-main-corner-button-toggle-fullscreen>
-            <bw-main-corner-button-toggle-theme
-              data-portrait-only
-            ></bw-main-corner-button-toggle-theme>
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["start-start"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="start"
+              data-cross-align="start"
+            >
+              <bw-main-corner-button-toggle-fullscreen
+                data-portrait-only
+              ></bw-main-corner-button-toggle-fullscreen>
+              <bw-main-corner-button-toggle-theme
+                data-portrait-only
+              ></bw-main-corner-button-toggle-theme>
 
-            <bw-main-corner-button-toggle-header
-              data-portrait-only
-              data-slide-on-enter
-            ></bw-main-corner-button-toggle-header>
-          </div>
-          <div
-            data-touch-only
-            data-main-align="start"
-            data-cross-align="center"
-          ></div>
-          <div data-touch-only data-main-align="start" data-cross-align="end">
-            <bw-main-corner-button-flip
-              data-portrait-only
-              data-header-hidden-only
-              data-slide-on-enter
-            ></bw-main-corner-button-flip>
+              <bw-main-corner-button-toggle-header
+                data-portrait-only
+                data-slide-on-enter
+              ></bw-main-corner-button-toggle-header>
+            </div>
+          </wa-resize-observer>
 
-            <bw-main-corner-button-toggle-fullscreen
-              data-landscape-only
-            ></bw-main-corner-button-toggle-fullscreen>
-            <bw-main-corner-button-toggle-theme
-              data-landscape-only
-            ></bw-main-corner-button-toggle-theme>
-            <bw-main-corner-button-toggle-header
-              data-landscape-only
-              data-slide-on-enter
-            ></bw-main-corner-button-toggle-header>
-          </div>
-          <div
-            data-touch-only
-            data-main-align="center"
-            data-cross-align="start"
-          ></div>
-          <div
-            data-touch-only
-            data-main-align="center"
-            data-cross-align="center"
-          ></div>
-          <div
-            data-touch-only
-            data-main-align="center"
-            data-cross-align="end"
-          ></div>
-          <div
-            data-touch-only
-            data-main-align="end"
-            data-cross-align="start"
-          ></div>
-          <div
-            data-touch-only
-            data-main-align="end"
-            data-cross-align="center"
-          ></div>
-          <div data-touch-only data-main-align="end" data-cross-align="end">
-            <bw-main-corner-button-flip
-              data-landscape-only
-            ></bw-main-corner-button-flip>
-          </div>
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["start-center"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="start"
+              data-cross-align="center"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["start-end"])}
+            disabled
+          >
+            <div data-touch-only data-main-align="start" data-cross-align="end">
+              <bw-main-corner-button-flip
+                data-portrait-only
+                data-header-hidden-only
+                data-slide-on-enter
+              ></bw-main-corner-button-flip>
+
+              <bw-main-corner-button-toggle-fullscreen
+                data-landscape-only
+              ></bw-main-corner-button-toggle-fullscreen>
+              <bw-main-corner-button-toggle-theme
+                data-landscape-only
+              ></bw-main-corner-button-toggle-theme>
+              <bw-main-corner-button-toggle-header
+                data-landscape-only
+                data-slide-on-enter
+              ></bw-main-corner-button-toggle-header>
+            </div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["center-start"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="center"
+              data-cross-align="start"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["center-center"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="center"
+              data-cross-align="center"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["center-end"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="center"
+              data-cross-align="end"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["end-start"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="end"
+              data-cross-align="start"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["end-center"])}
+            disabled
+          >
+            <div
+              data-touch-only
+              data-main-align="end"
+              data-cross-align="center"
+            ></div>
+          </wa-resize-observer>
+
+          <wa-resize-observer
+            @wa-resize=${this._onMainOverlayResize}
+            ${ref(this._mainOverlayRefs["end-end"])}
+            disabled
+          >
+            <div data-touch-only data-main-align="end" data-cross-align="end">
+              <bw-main-corner-button-flip
+                data-landscape-only
+              ></bw-main-corner-button-flip>
+            </div>
+          </wa-resize-observer>
         </div>
 
         <main>

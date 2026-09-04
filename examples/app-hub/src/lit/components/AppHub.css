@@ -423,7 +423,9 @@ html[data-header-hidden] [data-header-shown-only] {
       main,
       #mainOverlay,
       #tab,
-      bw-tab-breadcrumb
+      bw-tab-breadcrumb,
+      [data-main-align],
+      [data-cross-align]
     ) {
     transition: none !important;
   }
@@ -2058,7 +2060,6 @@ html:active-view-transition-type(header-visible) {
     transform: translateX(0) translateY(0);
   }
 }
-/* FIX */
 @keyframes slide-down-right-slide-on-enter {
   from {
     transform: translateX(0) translateY(0);
@@ -2224,15 +2225,6 @@ bw-tab-breadcrumb {
 :root {
   --tab-padding-bottom: calc(var(--main-padding-bottom));
 }
-@media (orientation: portrait) {
-  :root {
-    /* FILL - extra padding on bottom corners if there are action buttons */
-    /* --tab-padding-bottom: calc(var(--wa-space-3xl)); */
-  }
-  html[data-header-hidden] {
-    --tab-padding-bottom: calc(var(--wa-space-3xl));
-  }
-}
 
 #tab {
   overflow-y: scroll;
@@ -2335,7 +2327,13 @@ html:not([data-toggle-header-hidden-action-button]):not([data-header-hidden])
   width: 100cqw;
   height: 100cqh;
 }
+:root {
+}
 .bw-overlay > :is([data-main-align], [data-cross-align]) {
+  transition-property: padding-bottom;
+  transition-duration: 100ms;
+  transition-timing-function: ease-in;
+  padding-bottom: var(--main-overlay-start-start-height);
 }
 
 .bw-overlay > * {
