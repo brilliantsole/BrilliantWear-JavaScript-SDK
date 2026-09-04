@@ -1,8 +1,9 @@
 import { waitForGlobals } from "../../../utils/cross-origin-storage-utils.js";
 
-const { lit } = await waitForGlobals();
+const { lit, litStyleMap } = await waitForGlobals();
 
-const { LitElement, html, css } = lit;
+const { LitElement, html, css, nothing } = lit;
+const { styleMap } = litStyleMap;
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/badge/badge.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.js";
@@ -20,6 +21,7 @@ class HeaderButton extends LitElement {
     iconName: { attribute: "icon-name" },
     isActive: { type: Boolean },
     click: { attribute: false },
+    saturation: { type: Number },
   };
 
   static styles = css`
@@ -43,6 +45,10 @@ class HeaderButton extends LitElement {
     wa-button::part(button) {
       padding: 0
         calc(var(--wa-form-control-padding-inline) - var(--wa-space-3xs));
+    }
+
+    wa-button[data-saturation]::part(button) {
+      filter: saturate(var(--button-saturation));
     }
   `;
 
@@ -75,6 +81,11 @@ class HeaderButton extends LitElement {
       this._screenOrientationConsumer.value.state.type.includes("landscape") &&
       this.touchEnabled;
     // console.log("render", { isActive: this.isActive }, this);
+
+    const styles = {
+      "--button-saturation": this.saturation ?? 1,
+    };
+
     return html`<wa-button
       ?pill=${pill}
       size="l"
@@ -82,6 +93,8 @@ class HeaderButton extends LitElement {
       .appearance=${this.isActive ? "accent" : "plain"}
       .href=${this.href}
       @click=${this.click}
+      data-saturation=${this.saturation ?? nothing}
+      style="${styleMap(styles)}"
     >
       <div class="wa-align-items-center wa-stack wa-gap-2xs">
         <wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon>

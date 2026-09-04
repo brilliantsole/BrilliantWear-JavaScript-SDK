@@ -58,6 +58,7 @@ import { createToggleThemeActionButtonContextProvider } from "../contexts/toggle
 import { createToggleFullscreenActionButtonContextProvider } from "../contexts/toggleFullscreenActionButtonContext.js";
 import { createToggleHeaderHiddenActionButtonContextProvider } from "../contexts/toggleHeaderHiddenActionButtonContext.js";
 import { createDirectionContextProvider } from "../contexts/directionContext.js";
+import { createBluetoothContextProvider } from "../contexts/bluetoothContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -360,6 +361,7 @@ class AppHub extends LitElement {
     this._onToggleFullscreenActionButtonUpdate();
     this._onToggleHeaderHiddenActionButtonUpdate();
     this._onToggleThemeActionButtonUpdate();
+    this._onBluetoothUpdate();
 
     if (this._batteryManagerState.isAvailable) {
       this._onBatteryChargingChange();
@@ -1504,6 +1506,36 @@ class AppHub extends LitElement {
     document.documentElement.style.setProperty(
       `--main-overlay-${mainAlign}-${crossAlign}-height`,
       `${rect.height}px`,
+    );
+  }
+
+  _bluetoothProvider = createBluetoothContextProvider(this, null, () =>
+    this._onBluetoothUpdate(),
+  );
+
+  /** @type {import("../contexts/bluetoothContext.js").BluetoothContextState} */
+  get _bluetoothState() {
+    return this._bluetoothProvider.value.state;
+  }
+  _onBluetoothUpdate() {
+    const { isBluetoothAvailable, isBluetoothEnabled, isBluetoothScanning } =
+      this._bluetoothState;
+    console.log({
+      isBluetoothAvailable,
+      isBluetoothEnabled,
+      isBluetoothScanning,
+    });
+    document.documentElement.toggleAttribute(
+      "data-bluetooth-available",
+      isBluetoothAvailable,
+    );
+    document.documentElement.toggleAttribute(
+      "data-bluetooth-enabled",
+      isBluetoothEnabled,
+    );
+    document.documentElement.toggleAttribute(
+      "data-bluetooth-scanning",
+      isBluetoothScanning,
     );
   }
 

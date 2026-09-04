@@ -82,6 +82,19 @@
     </script>
 
     <script type="module">
+      import * as litStyleMap from "https://unpkg.com/lit@3/directives/style-map.js?module"; // FIX
+      // with {
+      //   integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",
+      //   crossOriginStorage: "*",
+      // };
+      console.log("litStyleMap loaded", litStyleMap);
+      window.litStyleMap = litStyleMap;
+      window.dispatchEvent(
+        new CustomEvent("lit-style-map-loaded", { detail: litStyleMap }),
+      );
+    </script>
+
+    <script type="module">
       import * as litRepeat from "https://unpkg.com/lit@3/directives/repeat.js?module"; // FIX
       // with {
       //   integrity: "sha256-eK3/5RBY+Loru6HNC4BBBnPvZ1FnJsyTy/s2Cs48ldc=",

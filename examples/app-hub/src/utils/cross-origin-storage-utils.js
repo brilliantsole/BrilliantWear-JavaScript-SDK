@@ -79,6 +79,8 @@ export async function waitForGlobals() {
   const lit = window.lit;
   /** @type {import("lit/directives/keyed.js")} */
   const litKeyed = window.litKeyed;
+  /** @type {import("lit/directives/style-map.js")} */
+  const litStyleMap = window.litStyleMap;
   /** @type {import("lit/directives/ref.js")} */
   const litRef = window.litRef;
   /** @type {import("@lit-labs/router")} */
@@ -92,5 +94,14 @@ export async function waitForGlobals() {
   const BW = window.BW;
 
   // console.log({ lit, litRouter,litContext, BW });
-  return { lit, litRouter, litContext, BW, litKeyed, litRef, litRepeat };
+  return {
+    lit,
+    litRouter,
+    litContext,
+    BW,
+    litKeyed,
+    litRef,
+    litRepeat,
+    litStyleMap,
+  };
 }

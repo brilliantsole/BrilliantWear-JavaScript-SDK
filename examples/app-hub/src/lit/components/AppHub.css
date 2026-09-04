@@ -2144,14 +2144,13 @@ html:active-view-transition-type(theme) {
   --hand-direction: ltr;
 }
 .bw-grid-lanes {
-  @supports (-webkit-touch-callout: none) {
+  @supports (-webkit-appearance: none) {
     grid-template-columns: repeat(auto-fit, 210px);
   }
-  @supports not (-webkit-touch-callout: none) {
+  @supports not (-webkit-appearance: none) {
     grid-template-columns: repeat(auto-fit, min-content);
   }
 
-  flow-tolerance: 1em;
   /* grid-template-columns: repeat(auto-fill, 300px); */
   @supports (display: grid-lanes) {
     display: grid-lanes;
@@ -2328,4 +2327,14 @@ html:active-view-transition-type(
   [data-tab-view-transition] {
     view-transition-name: match-element;
   }
+}
+
+html:not([data-bluetooth-enabled]) [data-bluetooth-enabled-only] {
+  display: none;
+}
+html:not([data-bluetooth-available]) [data-bluetooth-available-only] {
+  display: none;
+}
+html:not([data-bluetooth-scanning]) [data-bluetooth-scanning-only] {
+  display: none;
 }
