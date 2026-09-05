@@ -2145,7 +2145,7 @@ html:active-view-transition-type(theme) {
 }
 .bw-grid-lanes {
   @supports (hanging-punctuation: first) and (-webkit-appearance: none) {
-    grid-template-columns: repeat(auto-fit, 210px);
+    grid-template-columns: repeat(auto-fit, 13em);
   }
   @supports not ((hanging-punctuation: first) and (-webkit-appearance: none)) {
     grid-template-columns: repeat(auto-fit, min-content);
@@ -2197,7 +2197,26 @@ bw-tab-breadcrumb {
 }
 
 :root {
-  --tab-padding-bottom: calc(var(--main-padding-bottom));
+  --tab-padding-bottom-extra: 0px;
+  --tab-padding-bottom: calc(
+    var(--main-padding-bottom) + var(--tab-padding-bottom-extra) +
+      (var(--wa-space-xs) * sign(abs(var(--tab-padding-bottom-extra))))
+  );
+
+  @media (pointer: coarse) {
+    @media (orientation: landscape) {
+      --tab-padding-bottom-extra: max(
+        var(--main-overlay-end-end-height),
+        var(--main-overlay-start-end-height)
+      );
+    }
+    @media (orientation: portrait) {
+      --tab-padding-bottom-extra: max(
+        var(--main-overlay-start-start-height),
+        var(--main-overlay-start-end-height)
+      );
+    }
+  }
 }
 
 #tab {
@@ -2245,7 +2264,7 @@ bw-tab-breadcrumb {
   --tab-vertical-padding-before: 0px;
   --tab-vertical-padding-after: 0px;
 
-  --tab-vertical-padding-before-offset: 150px;
+  --tab-vertical-padding-before-offset: 9em;
 }
 #tabBefore {
   height: var(--tab-vertical-padding-before);
@@ -2282,6 +2301,8 @@ html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
 
   width: 100cqw;
   height: 100cqh;
+
+  bottom: var(--main-padding-bottom);
 }
 :root {
 }

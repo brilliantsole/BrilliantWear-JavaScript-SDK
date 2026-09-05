@@ -5,6 +5,7 @@ const { lit, litStyleMap } = await waitForGlobals();
 const { LitElement, html, css, nothing } = lit;
 const { styleMap } = litStyleMap;
 
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/badge/badge.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/icon/icon.js";
 
@@ -48,6 +49,10 @@ class HeaderButton extends LitElement {
 
     wa-button[data-saturation]::part(button) {
       filter: saturate(var(--button-saturation));
+    }
+
+    wa-badge {
+      translate: -0em 0em;
     }
   `;
 
@@ -103,3 +108,12 @@ class HeaderButton extends LitElement {
   }
 }
 customElements.define("bw-header-button", HeaderButton);
+
+/**
+<wa-badge
+        variant="danger"
+        style="font-size: var(--wa-font-size-3xs);"
+        pill
+        ><wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon
+      ></wa-badge>
+ */
