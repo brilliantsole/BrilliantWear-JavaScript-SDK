@@ -2144,10 +2144,10 @@ html:active-view-transition-type(theme) {
   --hand-direction: ltr;
 }
 .bw-grid-lanes {
-  @supports (-webkit-appearance: none) {
+  @supports (hanging-punctuation: first) and (-webkit-appearance: none) {
     grid-template-columns: repeat(auto-fit, 210px);
   }
-  @supports not (-webkit-appearance: none) {
+  @supports not ((hanging-punctuation: first) and (-webkit-appearance: none)) {
     grid-template-columns: repeat(auto-fit, min-content);
   }
 
@@ -2332,9 +2332,20 @@ html:active-view-transition-type(
 html:not([data-bluetooth-enabled]) [data-bluetooth-enabled-only] {
   display: none;
 }
+html[data-bluetooth-enabled] [data-bluetooth-not-enabled-only] {
+  display: none;
+}
+
 html:not([data-bluetooth-available]) [data-bluetooth-available-only] {
   display: none;
 }
+html[data-bluetooth-available] [data-bluetooth-not-available-only] {
+  display: none;
+}
+
 html:not([data-bluetooth-scanning]) [data-bluetooth-scanning-only] {
+  display: none;
+}
+html[data-bluetooth-scanning] [data-bluetooth-not-scanning-only] {
   display: none;
 }

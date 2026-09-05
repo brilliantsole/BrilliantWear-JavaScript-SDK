@@ -68,10 +68,10 @@ class SettingsInterface extends LitElement {
         <bw-settings-anchor-header-toggle
           switch
         ></bw-settings-anchor-header-toggle>
-        ${flipOnCharge}
         <bw-settings-scroll-assist-toggle
           switch
         ></bw-settings-scroll-assist-toggle>
+        ${flipOnCharge}
       </bw-settings-card>
     `;
   }

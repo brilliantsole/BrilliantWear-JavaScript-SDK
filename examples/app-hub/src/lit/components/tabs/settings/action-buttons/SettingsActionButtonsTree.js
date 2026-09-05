@@ -164,9 +164,9 @@ class SettingsActionButtonsTreeElement extends LitElement {
           ${toggle}
           <div class="wa-stack wa-gap-xs">
             <bw-settings-flip-action-button-toggle></bw-settings-flip-action-button-toggle>
-            <bw-settings-toggle-theme-action-button-toggle></bw-settings-toggle-theme-action-button-toggle>
-            <bw-settings-toggle-fullscreen-action-button-toggle></bw-settings-toggle-fullscreen-action-button-toggle>
             <bw-settings-toggle-header-hidden-action-button-toggle></bw-settings-toggle-header-hidden-action-button-toggle>
+            <bw-settings-toggle-fullscreen-action-button-toggle></bw-settings-toggle-fullscreen-action-button-toggle>
+            <bw-settings-toggle-theme-action-button-toggle></bw-settings-toggle-theme-action-button-toggle>
           </div>
         </div>
       `;

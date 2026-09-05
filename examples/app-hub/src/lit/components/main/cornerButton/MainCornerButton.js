@@ -4,7 +4,6 @@ const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 
-import "https://ka-f.webawesome.com/webawesome@3.12.0/components/badge/badge.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.js";
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/icon/icon.js";
 

@@ -23,18 +23,12 @@ class DevicesTab extends LitElement {
 
   render() {
     return html`
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
-      <h1>Hello</h1>
+      <p data-bluetooth-not-available-only>Bluetooth is not available</p>
+      <p data-bluetooth-available-only data-bluetooth-not-enabled-only>
+        Bluetooth is not enabled
+      </p>
+
+      <bw-add-device-button data-landscape-only></bw-add-device-button>
 
       <div class="bw-overlay">
         <div
@@ -43,9 +37,7 @@ class DevicesTab extends LitElement {
           data-tab-view-transition
           data-portrait-only
         >
-          <bw-add-device-button
-            data-bluetooth-available-only
-          ></bw-add-device-button>
+          <bw-add-device-button></bw-add-device-button>
         </div>
       </div>
     `;
