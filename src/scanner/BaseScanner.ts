@@ -134,6 +134,23 @@ abstract class BaseScanner {
   }
 
   // SCANNING
+  #onExpiredDiscoveredDevice(bluetoothId: string) {
+    _console.log({ expiredBluetoothDeviceId: bluetoothId });
+    const discoveredDevice = this.#discoveredDevices[bluetoothId];
+    if (!discoveredDevice) {
+      _console.warn(`no discoveredDevice found with id "${bluetoothId}"`);
+      return;
+    }
+    if (discoveredDevice.isConnected) {
+      return;
+    }
+    _console.log({ expiredDiscoveredDevice: discoveredDevice });
+    delete this.#discoveredDevices[bluetoothId];
+    delete this.#discoveredDeviceTimestamps[bluetoothId];
+    discoveredDevice._expire();
+    this.#dispatchEvent("expiredDiscoveredDevice", { discoveredDevice });
+  }
+
   #isScanning = false;
   get isScanning() {
     return this.#isScanning;
@@ -148,8 +165,9 @@ abstract class BaseScanner {
     _console.log("isScanning", this.isScanning);
 
     if (this.isScanning) {
-      this.#discoveredDevices = {};
-      this.#discoveredDeviceTimestamps = {};
+      for (const bluetoothId in this.#discoveredDevices) {
+        this.#onExpiredDiscoveredDevice(bluetoothId);
+      }
     } else {
       this.#checkDiscoveredDevicesExpirationTimer.stop();
     }
@@ -271,17 +289,15 @@ abstract class BaseScanner {
       return;
     }
     const now = Date.now();
-    entries.forEach(([id, discoveredDevice]) => {
-      const timestamp = this.#discoveredDeviceTimestamps[id];
+
+    entries.forEach(([bluetoothId, discoveredDevice]) => {
+      const timestamp = this.#discoveredDeviceTimestamps[bluetoothId];
       if (
         now - timestamp > this.#discoveredDeviceExpirationTimeout &&
         !discoveredDevice.isConnected
       ) {
         _console.log("discovered device timeout");
-        delete this.#discoveredDevices[id];
-        delete this.#discoveredDeviceTimestamps[id];
-        discoveredDevice._expire();
-        this.#dispatchEvent("expiredDiscoveredDevice", { discoveredDevice });
+        this.#onExpiredDiscoveredDevice(bluetoothId);
       }
     });
   }

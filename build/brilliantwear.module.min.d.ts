@@ -3246,9 +3246,9 @@ declare class ServerManager {
     constructor();
     get servers(): Server[];
     getServerByClient(client: ServerClient): Server | undefined;
-    get addEventListener(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T, listener: (event: ListenerEvent<ServerManager, "server" | "server*" | "serverClientConnected" | "serverClientNotConnected" | "servers", ServerManagerEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T, listener: (event: ListenerEvent<ServerManager, "server" | "server*" | "serverClientConnected" | "serverClientNotConnected" | "servers", ServerManagerEventMessages, T>) => void) => void;
-    get removeEventListeners(): <T extends "*" | "server" | "server*" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T) => void;
+    get addEventListener(): <T extends "*" | "server*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T, listener: (event: ListenerEvent<ServerManager, "server*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers", ServerManagerEventMessages, T>) => void, options?: EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "*" | "server*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T, listener: (event: ListenerEvent<ServerManager, "server*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers", ServerManagerEventMessages, T>) => void) => void;
+    get removeEventListeners(): <T extends "*" | "server*" | "server" | "serverClientConnected" | "serverClientNotConnected" | "servers">(type: T) => void;
     private broadcast;
     clientToServerGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
     serverToClientGuardManager: GuardManager<[BaseServerClientGuardManagerArg]>;
