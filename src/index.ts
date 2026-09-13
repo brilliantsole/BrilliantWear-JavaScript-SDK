@@ -411,8 +411,9 @@ export {
 import {
   WildcardEventType,
   wildcardEventType,
+  EventDispatcherOptions,
 } from "./utils/EventDispatcher.ts";
-export { WildcardEventType, wildcardEventType };
+export { WildcardEventType, wildcardEventType, EventDispatcherOptions };
 
 /** BROWSER_START */
 import {

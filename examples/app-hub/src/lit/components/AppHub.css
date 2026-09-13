@@ -2286,6 +2286,7 @@ bw-tab-breadcrumb {
 
 #tab {
   overflow-y: scroll;
+  overflow-x: hidden;
 
   container-type: size;
   container-name: tab;
@@ -2508,12 +2509,12 @@ html:active-view-transition-type(add-client, remove-client) {
   --animation-duration: var(--appear-transition-duration);
   --animation-timing-function: var(--appear-transition-timing-function);
 
-  bw-client-input {
+  :is(bw-client-input, bw-device-card) {
     view-transition-name: match-element;
     &:not([data-pop-on-enter]) {
       view-transition-class: existing-element;
     }
-    &[data-pop-on-enter] {
+    &:is(bw-client-input)[data-pop-on-enter] {
       view-transition-class: appearing-element;
     }
   }

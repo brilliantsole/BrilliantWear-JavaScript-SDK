@@ -226,7 +226,7 @@ class ClientInput extends SignalWatcher(LitElement) {
         this._didUpdateEffectTrigger = true;
         return;
       }
-      console.log({ isAddingClient });
+      // console.log({ isAddingClient });
       if (isAddingClient && this.inputRef.value) {
         this.inputRef.value.scrollIntoView({ behavior: "smooth" });
       }

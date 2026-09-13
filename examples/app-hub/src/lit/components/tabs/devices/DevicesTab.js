@@ -125,6 +125,10 @@ class DevicesTab extends SignalWatcher(LitElement) {
       "--bw-grid-lane-width": "17em",
       "justify-items": "stretch !important",
     };
+    const devicesStyles = {
+      "--bw-grid-lane-width": "17em",
+      "justify-items": "stretch !important",
+    };
 
     return html`
       <!--
@@ -170,7 +174,7 @@ class DevicesTab extends SignalWatcher(LitElement) {
 
         <div
           class="bw-grid-lanes"
-          style="${styleMap(clientsStyles)}"
+          style="${styleMap(devicesStyles)}"
           data-manual-width
         >
           ${repeat(
