@@ -2572,6 +2572,6 @@ html:active-view-transition-type(add-client, remove-client) {
 }
 
 wa-button::part(button) {
-  padding-top: var(--wa-space-x);
-  padding-bottom: var(--wa-space-x);
+  padding-left: var(--wa-space-s);
+  padding-right: var(--wa-space-s);
 }
