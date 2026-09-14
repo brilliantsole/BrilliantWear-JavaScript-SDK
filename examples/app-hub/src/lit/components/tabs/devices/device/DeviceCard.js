@@ -139,7 +139,7 @@ class DeviceCard extends LitElement {
   }
 
   renderIcon() {
-    const deviceType = "generic" ?? this._deviceType;
+    const deviceType = this._deviceType;
     switch (deviceType) {
       case "leftInsole":
       case "rightInsole":
