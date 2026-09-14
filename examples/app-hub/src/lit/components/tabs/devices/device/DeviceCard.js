@@ -213,7 +213,7 @@ class DeviceCard extends LitElement {
       case "rightInsole":
         return html`<wa-icon
           src="./assets/icons/shoe.svg"
-          style="font-size: 0.8rem;"
+          style="font-size: 0.8rem; margin-inline-end: 0.15em; margin-inline-start: 0.3em;"
           flip=${deviceType == "leftInsole" ? "x" : ""}
         ></wa-icon>`;
         break;
@@ -278,11 +278,11 @@ class DeviceCard extends LitElement {
     return html`<wa-card>
       <div class="wa-stack wa-gap-2xs">
         <div class="wa-cluster wa-gap-2xs">
-          <div>${this.renderSourceTypeIcon()}</div>
+          ${this.renderSourceTypeIcon()}
           <h3 class="wa-heading-l">${this.name}</h3>
         </div>
         <div class="wa-cluster wa-gap-2xs">
-          <div>${this.renderDeviceTypeIcon()}</div>
+          ${this.renderDeviceTypeIcon()}
           <p class="wa-body-m">${this.deviceTypeLabel}</p>
         </div>
         <div>Connect/Disconnect</div>
