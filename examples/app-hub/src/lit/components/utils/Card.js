@@ -25,6 +25,7 @@ class Card extends LitElement {
     wa-card::part(header) {
       padding-top: var(--wa-space-3xs);
       padding-bottom: var(--wa-space-3xs);
+      padding-inline-end: 0px;
     }
     wa-card h3 {
       margin: 0;
