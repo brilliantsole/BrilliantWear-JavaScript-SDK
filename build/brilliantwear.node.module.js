@@ -21345,8 +21345,20 @@ class DiscoveredDevice {
     get rssi() {
         return this.#_rssi;
     }
+    #lastTimeRssiUpdated = Date.now();
     set #rssi(newRssi) {
+        const oldRssi = this.#_rssi;
         this.#_rssi = newRssi;
+        const now = Date.now();
+        if (this.#lastTimeRssiUpdated != undefined) {
+            const rssiInterval = now - this.#lastTimeRssiUpdated;
+            this.#lastTimeRssiUpdated = now;
+            _console$j.log({ oldRssi, newRssi, rssiInterval });
+            if (oldRssi == newRssi && rssiInterval < 6) {
+                _console$j.log("skipping rssi event - redundant");
+                return;
+            }
+        }
         if (this.rssi != undefined) {
             this.#dispatchEvent("rssi", { rssi: this.rssi });
         }

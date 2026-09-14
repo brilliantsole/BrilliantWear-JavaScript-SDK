@@ -22,6 +22,16 @@ class DeviceCard extends LitElement {
   static properties = {
     bluetoothId: {},
     deviceType: {},
+    name: {},
+    rssi: { type: Number },
+    rssiInterval: { type: Number },
+    isCharging: { type: Boolean },
+    batteryLevel: { type: Number },
+    connectionStatus: {},
+    ipAddress: {},
+    name: {},
+    source: {},
+    isWifiSecure: { type: Boolean },
   };
 
   getDevice() {
@@ -60,6 +70,13 @@ class DeviceCard extends LitElement {
       },
       options,
     );
+    this._device.addEventListener(
+      "getName",
+      () => {
+        this.name = this._device.name;
+      },
+      options,
+    );
   }
   /** @type {DiscoveredDevice?} */
   _discoveredDevice;
@@ -76,12 +93,63 @@ class DeviceCard extends LitElement {
     }
     this._discoveredDeviceAbortController = new AbortController();
     /** @type {AddEventListenerOptions} */
-    const options = { signal: this._discoveredDeviceAbortController.signal };
+    const options = {
+      signal: this._discoveredDeviceAbortController.signal,
+      immediate: true,
+    };
 
     this._discoveredDevice.addEventListener(
       "deviceType",
       () => {
         this.deviceType = this._discoveredDevice.deviceType;
+      },
+      options,
+    );
+    this._discoveredDevice.addEventListener(
+      "name",
+      () => {
+        this.name = this._discoveredDevice.name;
+      },
+      options,
+    );
+    this._discoveredDevice.addEventListener(
+      "connectionStatus",
+      () => {
+        this.connectionStatus = this._discoveredDevice.connectionStatus;
+      },
+      options,
+    );
+    this._discoveredDevice.addEventListener(
+      "isConnected",
+      () => {
+        this.connectionStatus = this._discoveredDevice.isConnected;
+      },
+      options,
+    );
+    this._discoveredDevice.addEventListener(
+      "ipAddress",
+      () => {
+        this.ipAddress = this._discoveredDevice.ipAddress;
+      },
+      options,
+    );
+    this._discoveredDevice.addEventListener(
+      "isWifiSecure",
+      () => {
+        this.isWifiSecure = this._discoveredDevice.isWifiSecure;
+      },
+      options,
+    );
+    this._lastRssiTimestamp = undefined;
+    this._discoveredDevice.addEventListener(
+      "rssi",
+      () => {
+        this.rssi = this._discoveredDevice.rssi;
+        const now = Date.now();
+        if (this._lastRssiTimestamp != undefined) {
+          this.rssiInterval = now - this._lastRssiTimestamp;
+        }
+        this._lastRssiTimestamp = now;
       },
       options,
     );
@@ -138,7 +206,7 @@ class DeviceCard extends LitElement {
     return this.deviceType;
   }
 
-  renderIcon() {
+  renderDeviceTypeIcon() {
     const deviceType = this._deviceType;
     switch (deviceType) {
       case "leftInsole":
@@ -173,14 +241,50 @@ class DeviceCard extends LitElement {
     }
   }
 
+  get deviceTypeLabel() {
+    const deviceType = this._deviceType;
+    switch (deviceType) {
+      case "leftInsole":
+        return "left insole";
+        break;
+      case "rightInsole":
+        return "right insole";
+        break;
+      case "leftGlove":
+        return "left glove";
+        break;
+      case "rightGlove":
+        return "right glove";
+        break;
+      case "glasses":
+        return "glasses";
+        break;
+      case "generic":
+        return "generic device";
+        break;
+    }
+  }
+
+  renderSourceTypeIcon() {
+    // FILL
+    if (false) {
+      return html`<wa-icon name="globe"></wa-icon>`;
+    } else {
+      return html`<wa-icon name="bluetooth" family="brands"></wa-icon> `;
+    }
+  }
+
   render() {
     return html`<wa-card>
-      <div class="wa-stack wa-gap-xs">
-        <div class="wa-cluster wa-gap-xs">
-          <div>${this.renderIcon()}</div>
-          <div>${"Name"}</div>
+      <div class="wa-stack wa-gap-2xs">
+        <div class="wa-cluster wa-gap-2xs">
+          <div>${this.renderSourceTypeIcon()}</div>
+          <h3 class="wa-heading-l">${this.name}</h3>
         </div>
-        <div class="wa-cluster wa-gap-xs"></div>
+        <div class="wa-cluster wa-gap-2xs">
+          <div>${this.renderDeviceTypeIcon()}</div>
+          <p class="wa-body-m">${this.deviceTypeLabel}</p>
+        </div>
         <div>Connect/Disconnect</div>
       </div>
     </wa-card>`;
