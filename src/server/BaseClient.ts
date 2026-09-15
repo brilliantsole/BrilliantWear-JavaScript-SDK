@@ -102,6 +102,10 @@ abstract class BaseClient {
     BaseClient.OnClient(this);
   }
 
+  get isClient() {
+    return true;
+  }
+
   static get clientMtu() {
     return serverMtus[this.type];
   }

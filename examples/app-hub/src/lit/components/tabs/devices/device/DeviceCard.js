@@ -1,9 +1,9 @@
 import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.js";
 
-const { lit, BW, litSignals, litRepeat, litStyleMap } = await waitForGlobals();
+const { lit, BW, litSignals, litRepeat, litClassMap } = await waitForGlobals();
 const { SignalWatcher, signal } = litSignals;
 const { repeat } = litRepeat;
-const { styleMap } = litStyleMap;
+const { classMap } = litClassMap;
 
 const { LitElement, html, nothing } = lit;
 
@@ -28,6 +28,7 @@ class DeviceCard extends LitElement {
     isCharging: { type: Boolean },
     batteryLevel: { type: Number },
     connectionStatus: {},
+    isDeviceConnected: { type: Boolean },
     ipAddress: {},
     name: {},
     source: {},
@@ -77,6 +78,20 @@ class DeviceCard extends LitElement {
       },
       options,
     );
+    this._device.addEventListener(
+      "isCharging",
+      () => {
+        this.isCharging = this._device.isCharging;
+      },
+      options,
+    );
+    this._device.addEventListener(
+      "batteryLevel",
+      () => {
+        this.batteryLevel = this._device.batteryLevel;
+      },
+      options,
+    );
   }
   /** @type {DiscoveredDevice?} */
   _discoveredDevice;
@@ -122,7 +137,7 @@ class DeviceCard extends LitElement {
     this._discoveredDevice.addEventListener(
       "isConnected",
       () => {
-        this.connectionStatus = this._discoveredDevice.isConnected;
+        this.isDeviceConnected = this._discoveredDevice.isConnected;
       },
       options,
     );
@@ -151,7 +166,7 @@ class DeviceCard extends LitElement {
         }
         this._lastRssiTimestamp = now;
       },
-      options,
+      { ...options, immediate: false },
     );
   }
 
@@ -197,10 +212,6 @@ class DeviceCard extends LitElement {
     this._deviceAbortController?.abort();
   }
 
-  get rssi() {
-    return this._discoveredDevice?.rssi;
-  }
-
   /** @type {DeviceType} */
   get _deviceType() {
     return this.deviceType;
@@ -213,7 +224,6 @@ class DeviceCard extends LitElement {
       case "rightInsole":
         return html`<wa-icon
           src="./assets/icons/shoe.svg"
-          style="font-size: 0.8rem; margin-inline-end: 0.15em; margin-inline-start: 0.3em;"
           flip=${deviceType == "leftInsole" ? "x" : ""}
         ></wa-icon>`;
         break;
@@ -266,30 +276,89 @@ class DeviceCard extends LitElement {
   }
 
   renderSourceTypeIcon() {
-    // FILL
-    if (false) {
+    if (this._discoveredDevice?.scanner?.isClient) {
       return html`<wa-icon name="globe"></wa-icon>`;
     } else {
-      return html`<wa-icon name="bluetooth" family="brands"></wa-icon> `;
+      return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
     }
+  }
+
+  _renderLabelWrapper(content) {
+    return html`<div class="wa-cluster wa-gap-2xs">${content}</div>`;
+  }
+
+  renderRssi() {
+    if (this.isDeviceConnected || this.rssi == undefined) {
+      return nothing;
+    }
+    return this._renderLabelWrapper(
+      html`<wa-icon name="signal"></wa-icon>
+        <div style="width: 1.5em;">${this.rssi}</div>`,
+    );
+  }
+  renderRssiInterval() {
+    if (this.isDeviceConnected || this.rssiInterval == undefined) {
+      return nothing;
+    }
+    return this._renderLabelWrapper(
+      html`<wa-icon name="clock" variant="regular"></wa-icon>
+        <div style="width: 2em;">${this.rssiInterval}</div>`,
+    );
+  }
+  renderIpAddress() {
+    if (this.ipAddress == undefined) {
+      return nothing;
+    }
+    // TODO - add lock if secure
+    return this._renderLabelWrapper(
+      html`<wa-icon name="wifi"></wa-icon>
+        <div>${this.ipAddress}</div>`,
+    );
+  }
+  renderBattery() {
+    if (!this.isConnected || this.batteryLevel == undefined) {
+      return nothing;
+    }
+    let iconName = "battery-full";
+    if (this.batteryLevel < 5) {
+      iconName = "battery-empty";
+    } else if (this.batteryLevel < 30) {
+      iconName = "battery-quarter";
+    } else if (this.batteryLevel < 55) {
+      iconName = "battery-half";
+    } else if (this.batteryLevel < 80) {
+      iconName = "battery-three-quarters";
+    }
+    const classes = {
+      "wa-success": !this.isCharging,
+      "bw-wa-color": true,
+    };
+
+    return this._renderLabelWrapper(
+      html`<wa-icon name=${iconName} class=${classMap(classes)}></wa-icon>
+        <div class=${classMap(classes)}>${this.batteryLevel}%</div>`,
+    );
   }
 
   render() {
     return html`<wa-card>
       <div class="wa-stack wa-gap-2xs">
-        <div class="wa-cluster wa-gap-2xs">
+        <div class="wa-cluster wa-gap-2xs bw-flex-nowrap">
           ${this.renderSourceTypeIcon()}
-          <h3 class="wa-heading-l">${this.name}</h3>
+          <h3 class="wa-heading-l bw-text-ellipsis">${this.name}</h3>
         </div>
-        <div class="wa-cluster wa-gap-2xs">
+        <div class="wa-cluster wa-gap-2xs bw-flex-nowrap">
           ${this.renderDeviceTypeIcon()}
-          <p class="wa-body-m">${this.deviceTypeLabel}</p>
+          <p class="wa-body-m bw-text-ellipsis">${this.deviceTypeLabel}</p>
         </div>
         <div>Connect/Disconnect</div>
+        <div class="wa-cluster wa-gap-s bw-flex-nowrap">
+          ${this.renderRssi()} ${this.renderRssiInterval()}
+          ${this.renderIpAddress()} ${this.renderBattery()}
+        </div>
       </div>
     </wa-card>`;
   }
 }
-// <wa-button appearance="filled">Name</wa-button>
 
 customElements.define("bw-device-card", DeviceCard);

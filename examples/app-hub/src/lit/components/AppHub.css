@@ -2575,3 +2575,19 @@ wa-button::part(button) {
   padding-left: var(--wa-space-s);
   padding-right: var(--wa-space-s);
 }
+
+.bw-flex-nowrap {
+  flex-wrap: nowrap;
+}
+.bw-flex-nowrap {
+  flex-wrap: nowrap;
+}
+.bw-text-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.bw-wa-color {
+  color: var(--wa-color-on-quiet);
+}

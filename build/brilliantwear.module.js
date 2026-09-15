@@ -36267,6 +36267,9 @@ class BaseScanner {
     get isSupported() {
         return this.baseConstructor.isSupported;
     }
+    get isClient() {
+        return false;
+    }
     #assertIsSupported() {
         _console$j.assertWithError(this.isSupported, `${this.constructor.name} is not supported`);
     }
@@ -36753,6 +36756,9 @@ class BaseClient {
     static OnClient;
     constructor() {
         _a$1.OnClient(this);
+    }
+    get isClient() {
+        return true;
     }
     static get clientMtu() {
         return serverMtus[this.type];

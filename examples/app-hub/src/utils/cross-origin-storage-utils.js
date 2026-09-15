@@ -72,6 +72,7 @@ export async function waitForGlobals() {
     waitForWindowValue("litRef"),
     waitForWindowValue("litRepeat"),
     waitForWindowValue("litSignals"),
+    waitForWindowValue("litClassMap"),
     waitForWindowValue("BW"),
   ]);
   // console.log("values", values);
@@ -88,6 +89,8 @@ export async function waitForGlobals() {
   const litRouter = window.litRouter;
   /** @type {import("@lit-labs/signals")} */
   const litSignals = window.litSignals;
+  /** @type {import("lit/directives/class-map.js")} */
+  const litClassMap = window.litClassMap;
   /** @type {import("@lit/context")} */
   const litContext = window.litContext;
   /** @type {import("lit/directives/repeat.js")} */
@@ -107,5 +110,6 @@ export async function waitForGlobals() {
     litRepeat,
     litStyleMap,
     litSignals,
+    litClassMap,
   };
 }
