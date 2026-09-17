@@ -102,9 +102,7 @@ abstract class BaseClient {
     BaseClient.OnClient(this);
   }
 
-  get isClient() {
-    return true;
-  }
+  readonly isClient = true;
 
   static get clientMtu() {
     return serverMtus[this.type];
@@ -601,6 +599,7 @@ abstract class BaseClient {
   #createDevice(bluetoothId: string) {
     const device = new Device();
     const clientConnectionManager = new ClientConnectionManager();
+    // @ts-expect-error
     clientConnectionManager.client = this;
     clientConnectionManager.bluetoothId = bluetoothId;
     clientConnectionManager.sendClientMessage = this.sendDeviceMessage.bind(

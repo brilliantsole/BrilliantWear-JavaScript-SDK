@@ -7,12 +7,21 @@ const { classMap } = litClassMap;
 
 const { LitElement, html, nothing } = lit;
 
+/** @typedef {import("../../../../../../../../build/brilliantwear.module.js").ConnectionStatus} ConnectionStatus */
 /** @typedef {import("../../../../../../../../build/brilliantwear.module.js").EventDispatcherOptions} EventDispatcherOptions */
 /** @typedef {import("../../../../../../../../build/brilliantwear.module.js").DeviceType} DeviceType */
 /** @typedef {import("../../../../../../../../build/brilliantwear.module.js").Device} Device */
 /** @typedef {import("../../../../../../../../build/brilliantwear.module.js").DiscoveredDevice} DiscoveredDevice */
 
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/card/card.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/spinner/spinner.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/animation/animation.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button-group/button-group.js";
+import "https://ka-f.webawesome.com/webawesome@3.12.0/components/divider/divider.js";
+
+import { createIsLeftHandedContextConsumer } from "../../../../contexts/isLeftHandedContext.js";
+import { createTouchEnabledContextConsumer } from "../../../../contexts/touchEnabledContext.js";
+import { waitForAnimationFrames } from "../../../../../utils/rendering.js";
 
 class DeviceCard extends LitElement {
   createRenderRoot() {
@@ -33,7 +42,36 @@ class DeviceCard extends LitElement {
     name: {},
     source: {},
     isWifiSecure: { type: Boolean },
+    isScanning: { type: Boolean },
+    isLeftHanded: { type: Boolean },
+    touchEnabled: { type: Boolean },
+    includeRssiInterval: { type: Boolean },
   };
+
+  _isLeftHandedConsumer = createIsLeftHandedContextConsumer(
+    this,
+    true,
+    async () => {
+      await waitForAnimationFrames(2);
+      this.isLeftHanded = this.isLeftHandedState.isLeftHanded;
+    },
+  );
+  /** @type {import("../../../../contexts/isLeftHandedContext.js").IsLeftHandedContextState} */
+  get isLeftHandedState() {
+    return this._isLeftHandedConsumer.value.state;
+  }
+
+  _touchEnabledConsumer = createTouchEnabledContextConsumer(
+    this,
+    true,
+    async () => {
+      this.touchEnabled = this.touchEnabledState.touchEnabled;
+    },
+  );
+  /** @type {import("../../../../contexts/touchEnabledContext.js").TouchEnabledContextState} */
+  get touchEnabledState() {
+    return this._touchEnabledConsumer.value.state;
+  }
 
   getDevice() {
     return BW.DeviceManager.availableDevices.find(
@@ -92,6 +130,21 @@ class DeviceCard extends LitElement {
       },
       options,
     );
+
+    this._device.addEventListener(
+      "connectionStatus",
+      () => {
+        this.connectionStatus = this._device.connectionStatus;
+      },
+      options,
+    );
+    this._device.addEventListener(
+      "isConnected",
+      () => {
+        this.isDeviceConnected = this._device.isConnected;
+      },
+      options,
+    );
   }
   /** @type {DiscoveredDevice?} */
   _discoveredDevice;
@@ -120,6 +173,17 @@ class DeviceCard extends LitElement {
       },
       options,
     );
+
+    if (this._discoveredDevice.scanner.isClient) {
+      this._discoveredDevice.scanner.addEventListener("isScanning", (event) => {
+        this.isScanning = event.message.isScanning;
+      });
+    } else {
+      this._discoveredDevice.scanner.addEventListener("isScanning", (event) => {
+        this.isScanning = event.message.isScanning;
+      });
+    }
+
     this._discoveredDevice.addEventListener(
       "name",
       () => {
@@ -161,9 +225,10 @@ class DeviceCard extends LitElement {
       () => {
         this.rssi = this._discoveredDevice.rssi;
         const now = Date.now();
-        if (this._lastRssiTimestamp != undefined) {
+        if (this.includeRssiInterval && this._lastRssiTimestamp != undefined) {
           this.rssiInterval = now - this._lastRssiTimestamp;
         }
+        // console.log({ rssiInterval: this.rssiInterval, rssi: this.rssi });
         this._lastRssiTimestamp = now;
       },
       { ...options, immediate: false },
@@ -275,20 +340,15 @@ class DeviceCard extends LitElement {
     }
   }
 
-  renderSourceTypeIcon() {
-    if (this._discoveredDevice?.scanner?.isClient) {
-      return html`<wa-icon name="globe"></wa-icon>`;
-    } else {
-      return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
-    }
-  }
-
   _renderLabelWrapper(content) {
     return html`<div class="wa-cluster wa-gap-2xs">${content}</div>`;
   }
 
   renderRssi() {
-    if (this.isDeviceConnected || this.rssi == undefined) {
+    if (this._connectionStatus != "notConnected" || this.rssi == undefined) {
+      return nothing;
+    }
+    if (!this._discoveredDevice.scanner?.isScanning) {
       return nothing;
     }
     return this._renderLabelWrapper(
@@ -297,7 +357,10 @@ class DeviceCard extends LitElement {
     );
   }
   renderRssiInterval() {
-    if (this.isDeviceConnected || this.rssiInterval == undefined) {
+    if (
+      this._connectionStatus != "notConnected" ||
+      this.rssiInterval == undefined
+    ) {
       return nothing;
     }
     return this._renderLabelWrapper(
@@ -309,52 +372,232 @@ class DeviceCard extends LitElement {
     if (this.ipAddress == undefined) {
       return nothing;
     }
-    // TODO - add lock if secure
+
+    const classes = {
+      "bw-wa-color": true,
+    };
+    if (this.isDeviceConnected && this._device.connectionType == "webSocket") {
+      if (this._device.isWifiSecure) {
+        classes["wa-success"] = true;
+      } else {
+        classes["wa-brand"] = true;
+      }
+    }
+
     return this._renderLabelWrapper(
-      html`<wa-icon name="wifi"></wa-icon>
-        <div>${this.ipAddress}</div>`,
+      html`<wa-icon name="wifi" class=${classMap(classes)}></wa-icon>
+        <div class=${classMap(classes)}>${this.ipAddress}</div>`,
+    );
+  }
+  renderClientIpAddress() {
+    const client = this.getClient();
+    if (client?.type != "webSocket") {
+      return nothing;
+    }
+    return this._renderLabelWrapper(
+      html`<wa-icon name="globe"></wa-icon>
+        <div>
+          ${client.url.protocol}//${client.url.host}${client.url.port
+            ? `:${client.url.port}`
+            : nothing}
+        </div>`,
     );
   }
   renderBattery() {
-    if (!this.isConnected || this.batteryLevel == undefined) {
+    if (!this.isDeviceConnected || this.batteryLevel == undefined) {
       return nothing;
     }
-    let iconName = "battery-full";
+
+    const classes = {
+      "bw-wa-color": true,
+    };
+    let colorName;
+
+    let iconName;
     if (this.batteryLevel < 5) {
       iconName = "battery-empty";
+      colorName = "wa-danger";
     } else if (this.batteryLevel < 30) {
       iconName = "battery-quarter";
+      colorName = "wa-warning";
     } else if (this.batteryLevel < 55) {
       iconName = "battery-half";
     } else if (this.batteryLevel < 80) {
       iconName = "battery-three-quarters";
+      colorName = "wa-warning";
+    } else {
+      iconName = "battery-full";
+      colorName = "wa-success";
     }
-    const classes = {
-      "wa-success": !this.isCharging,
-      "bw-wa-color": true,
-    };
+
+    const greenIfCharging = true;
+    if (greenIfCharging) {
+      if (this.isCharging) {
+        classes["wa-success"] = true;
+      }
+    } else {
+      classes[colorName] = true;
+    }
 
     return this._renderLabelWrapper(
       html`<wa-icon name=${iconName} class=${classMap(classes)}></wa-icon>
-        <div class=${classMap(classes)}>${this.batteryLevel}%</div>`,
+        <div class=${classMap(classes)}>${this.batteryLevel}%</div>
+        ${!greenIfCharging && this.isCharging
+          ? html`<wa-icon name="bolt" class=${classMap(classes)}></wa-icon>`
+          : nothing} `,
     );
+  }
+
+  /** @type {ConnectionStatus} */
+  get _connectionStatus() {
+    return this.connectionStatus ?? "notConnected";
+  }
+  toggleConnection() {
+    console.log("toggleConnection");
+    if (this._device) {
+      this._device.toggleConnection();
+    } else {
+      this._discoveredDevice.connect();
+    }
+  }
+
+  buttonSize = "s";
+  renderConnection() {
+    const size = this.buttonSize;
+    const variant = "brand";
+    const disconnectVariant = "danger";
+    switch (this._connectionStatus) {
+      case "notConnected":
+        // FILL - dropdown
+        if (true) {
+          return html` <wa-button
+            @click=${this.toggleConnection}
+            size=${size}
+            variant=${variant}
+            >Connect</wa-button
+          >`;
+        } else {
+          return html`<wa-button
+            @click=${this.toggleConnection}
+            size=${size}
+            variant=${variant}
+            >Connect</wa-button
+          >`;
+        }
+        break;
+      case "connecting":
+        return html`<wa-animation
+          name="pulse"
+          easing="ease-in-out"
+          duration="2000"
+          play
+          ><wa-button
+            @click=${this.toggleConnection}
+            size=${size}
+            variant=${variant}
+          >
+            <wa-spinner slot="start"></wa-spinner>
+            Connecting
+          </wa-button>
+        </wa-animation>`;
+        break;
+      case "connected":
+        return html`<wa-button
+          @click=${this.toggleConnection}
+          size=${size}
+          variant=${disconnectVariant}
+          >Disconnect</wa-button
+        >`;
+        break;
+      case "disconnecting":
+        return html`<wa-animation
+          name="pulse"
+          easing="ease-in-out"
+          duration="2000"
+          play
+          ><wa-button
+            @click=${this.toggleConnection}
+            size=${size}
+            variant=${disconnectVariant}
+          >
+            <wa-spinner slot="start"></wa-spinner>
+            Disconnecting
+          </wa-button>
+        </wa-animation>`;
+        break;
+    }
+  }
+  renderSelect() {
+    if (this._connectionStatus != "connected") {
+      return nothing;
+    }
+    const size = this.buttonSize;
+    return html`<wa-button size=${size}>Select</wa-button>`;
+  }
+
+  getClient() {
+    if (this._discoveredDevice) {
+      if (this._discoveredDevice.scanner.isClient) {
+        return this._discoveredDevice.scanner;
+      }
+    } else {
+      if (this._device.connectionManager?.type == "client") {
+        return this._device.connectionManager.client;
+      }
+    }
+  }
+
+  renderConnectionTypeIcon() {
+    const client = this.getClient();
+    if (client) {
+      if (this.isDeviceConnected) {
+        switch (client.type) {
+          case "webSocket":
+            return html`<wa-icon name="globe"></wa-icon>`;
+            break;
+          case "window":
+            return html`<wa-icon name="window-maximize"></wa-icon>`;
+            break;
+        }
+      } else {
+        return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
+      }
+    } else {
+      switch (this._device.connectionType) {
+        case "webBluetooth":
+          return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
+          break;
+        case "webSocket":
+          return html`<wa-icon name="wifi"></wa-icon>`;
+          break;
+        case "client":
+          return html`<wa-icon name="globe"></wa-icon>`;
+        case "none":
+          return nothing;
+          break;
+      }
+    }
   }
 
   render() {
     return html`<wa-card>
       <div class="wa-stack wa-gap-2xs">
-        <div class="wa-cluster wa-gap-2xs bw-flex-nowrap">
-          ${this.renderSourceTypeIcon()}
-          <h3 class="wa-heading-l bw-text-ellipsis">${this.name}</h3>
+        <div class="wa-cluster wa-gap-2xs wa-flex-nowrap wa-heading-m">
+          ${this.renderConnectionTypeIcon()}
+          <div class="wa-text-truncate">${this.name}</div>
         </div>
-        <div class="wa-cluster wa-gap-2xs bw-flex-nowrap">
+        <div class="wa-cluster wa-gap-2xs wa-flex-nowrap wa-body-m">
           ${this.renderDeviceTypeIcon()}
-          <p class="wa-body-m bw-text-ellipsis">${this.deviceTypeLabel}</p>
+          <div>${this.deviceTypeLabel}</div>
         </div>
-        <div>Connect/Disconnect</div>
-        <div class="wa-cluster wa-gap-s bw-flex-nowrap">
-          ${this.renderRssi()} ${this.renderRssiInterval()}
-          ${this.renderIpAddress()} ${this.renderBattery()}
+        <wa-divider></wa-divider>
+        <div class="wa-cluster wa-gap-xs wa-flex-nowrap">
+          ${this.renderConnection()} ${this.renderSelect()}
+        </div>
+        <div class="wa-cluster wa-gap-m bw-row-gap-normal">
+          ${this.renderClientIpAddress()} ${this.renderBattery()}
+          ${this.renderIpAddress()} ${this.renderRssi()}
+          ${this.includeRssiInterval ? this.renderRssiInterval() : nothing}
         </div>
       </div>
     </wa-card>`;

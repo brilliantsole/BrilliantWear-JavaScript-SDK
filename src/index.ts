@@ -533,6 +533,8 @@ import {
   ConnectionEventTypes,
   TxRxMessageType,
   TxRxMessageTypes,
+  ConnectionStatus,
+  ConnectionStatuses,
 } from "./connection/BaseConnectionManager.ts";
 export {
   ConnectionMessageType,
@@ -541,6 +543,8 @@ export {
   ConnectionEventTypes,
   TxRxMessageType,
   TxRxMessageTypes,
+  ConnectionStatus,
+  ConnectionStatuses,
 };
 
 import {

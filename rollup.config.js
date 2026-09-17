@@ -33,7 +33,7 @@ function header() {
   };
 }
 
-/** @param {"node" | "browser" | "ls"} context  */
+/** @param {"node" | "browser"} context  */
 function removeLines(context) {
   const isInBrowser = context == "browser";
   const isInNode = context == "node";
@@ -41,13 +41,13 @@ function removeLines(context) {
   /**
    *
    * @param {string} string
-   * @param {boolean | () => boolean} condition
+   * @param {boolean | () => boolean} exception
    * @returns
    */
-  const remove = (string, condition) => {
-    condition = typeof condition == "function" ? condition() : condition;
+  const remove = (string, exception) => {
+    exception = typeof exception == "function" ? exception() : exception;
     return {
-      [string]: condition ? string : "",
+      [string]: exception ? string : "",
     };
   };
 
@@ -61,6 +61,10 @@ function removeLines(context) {
       "/** NODE_END */": isInNode ? "" : "NODE_END */",
       ...remove("typeof WebSocketServer, typeof UDPServer", isInNode),
       ...remove("typeof WindowServer", isInBrowser),
+      ...remove(
+        "typeof NobleConnectionManager, typeof UDPConnectionManager",
+        isInNode,
+      ),
     },
   });
 }

@@ -108,8 +108,8 @@ export declare const ThrottleUtils: {
 };
 import { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, Led } from "./led/LedManager.ts";
 export { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, Led, };
-import { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes } from "./connection/BaseConnectionManager.ts";
-export { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, };
+import { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses } from "./connection/BaseConnectionManager.ts";
+export { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses, };
 import { ConnectionManager, ConnectionManagers } from "./connection/ConnectionManager.ts";
 export { ConnectionManager, ConnectionManagers };
 import { default as DiscoveredDevice, DiscoveredDeviceMetadata } from "./scanner/DiscoveredDevice.ts";

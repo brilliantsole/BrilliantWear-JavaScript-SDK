@@ -10,7 +10,7 @@ import { parseMessage } from "../utils/ParseUtils.ts";
 import { DeviceInformationTypes } from "../DeviceInformationManager.ts";
 import { DeviceEventType } from "../Device.ts";
 import { ClientDeviceMessage } from "../server/ServerUtils.ts";
-import BaseClient from "../server/BaseClient.ts";
+import { Client } from "../server/Client.ts";
 import { DiscoveredDevice } from "../index.ts";
 
 const _console = createConsole("ClientConnectionManager", { log: false });
@@ -43,7 +43,7 @@ class ClientConnectionManager extends BaseConnectionManager {
     return false;
   }
 
-  client!: BaseClient;
+  client!: Client;
   discoveredDevice!: DiscoveredDevice;
 
   #bluetoothId!: string;

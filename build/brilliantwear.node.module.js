@@ -16748,6 +16748,7 @@ createServerMessage("discoveredDevices");
 
 const _console$u = createConsole("BaseConnectionManager", { log: false });
 const ConnectionTypes = [
+    "none",
     "webBluetooth",
     "noble",
     "client",
@@ -19541,7 +19542,7 @@ class Device {
     }
     #reconnectIntervalId;
     get connectionType() {
-        return this.connectionManager?.type;
+        return this.connectionManager?.type ?? "none";
     }
     async disconnect() {
         if (this.connectionStatus == "notConnected") {
@@ -21530,9 +21531,7 @@ class BaseScanner {
     get isSupported() {
         return this.baseConstructor.isSupported;
     }
-    get isClient() {
-        return false;
-    }
+    isClient = false;
     #assertIsSupported() {
         _console$i.assertWithError(this.isSupported, `${this.constructor.name} is not supported`);
     }
@@ -22512,9 +22511,7 @@ class BaseClient {
     constructor() {
         _a$1.OnClient(this);
     }
-    get isClient() {
-        return true;
-    }
+    isClient = true;
     static get clientMtu() {
         return serverMtus[this.type];
     }
@@ -26199,5 +26196,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, scanner$1 as scanner, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
+export { ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, scanner$1 as scanner, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
 //# sourceMappingURL=brilliantwear.node.module.js.map

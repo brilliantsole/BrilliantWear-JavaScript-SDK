@@ -11,6 +11,7 @@ export const ConnectionManagers = [
   WebBluetoothConnectionManager,
   WebSocketConnectionManager,
   ClientConnectionManager,
+
   /** NODE_START */
   NobleConnectionManager,
   UDPConnectionManager,
@@ -18,5 +19,5 @@ export const ConnectionManagers = [
 ] as const;
 
 export type ConnectionManager = InstanceType<
-  (typeof ConnectionManagers)[number]
+  NonNullable<(typeof ConnectionManagers)[number]>
 >;

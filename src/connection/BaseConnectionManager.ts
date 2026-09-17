@@ -22,6 +22,7 @@ import { createMessage } from "../server/ServerUtils.ts";
 const _console = createConsole("BaseConnectionManager", { log: false });
 
 export const ConnectionTypes = [
+  "none",
   "webBluetooth",
   "noble",
   "client",

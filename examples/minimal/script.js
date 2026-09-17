@@ -1,6 +1,6 @@
-import * as BS from "../../build/brilliantwear.module.js";
+import * as BW from "../../build/brilliantwear.module.js";
 
-const device = new BS.Device();
+const device = new BW.Device();
 const connectButton = document.getElementById("connect");
 connectButton.addEventListener("click", () => {
   device.connect();

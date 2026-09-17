@@ -6,4 +6,4 @@ import ClientConnectionManager from "./ClientConnectionManager.ts";
 import WebBluetoothConnectionManager from "./bluetooth/WebBluetoothConnectionManager.ts";
 import WebSocketConnectionManager from "./websocket/WebSocketConnectionManager.ts";
 export declare const ConnectionManagers: readonly [typeof WebBluetoothConnectionManager, typeof WebSocketConnectionManager, typeof ClientConnectionManager, typeof NobleConnectionManager, typeof UDPConnectionManager];
-export type ConnectionManager = InstanceType<(typeof ConnectionManagers)[number]>;
+export type ConnectionManager = InstanceType<NonNullable<(typeof ConnectionManagers)[number]>>;

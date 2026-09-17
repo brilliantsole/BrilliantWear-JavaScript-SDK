@@ -2194,6 +2194,9 @@ html:active-view-transition-type(theme) {
   &[data-manual-width] {
     grid-template-columns: repeat(auto-fit, var(--bw-grid-lane-width));
   }
+  &[data-max-width] {
+    grid-template-columns: repeat(auto-fit, var(--bw-grid-lane-width));
+  }
 
   /* grid-template-columns: repeat(auto-fill, 300px); */
   @supports (display: grid-lanes) {
@@ -2472,6 +2475,9 @@ wa-card {
   padding: 0;
   --spacing: var(--wa-space-xs);
 }
+wa-card::part(body) {
+  padding-bottom: var(--wa-space-2xs);
+}
 
 [data-hidden] {
   display: none;
@@ -2576,18 +2582,9 @@ wa-button::part(button) {
   padding-right: var(--wa-space-s);
 }
 
-.bw-flex-nowrap {
-  flex-wrap: nowrap;
-}
-.bw-flex-nowrap {
-  flex-wrap: nowrap;
-}
-.bw-text-ellipsis {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 .bw-wa-color {
   color: var(--wa-color-on-quiet);
+}
+.bw-row-gap-normal {
+  row-gap: normal;
 }

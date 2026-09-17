@@ -835,7 +835,7 @@ class Device {
   #reconnectIntervalId?: NodeJS.Timeout | number;
 
   get connectionType() {
-    return this.connectionManager?.type;
+    return this.connectionManager?.type ?? "none";
   }
   async disconnect() {
     if (this.connectionStatus == "notConnected") {

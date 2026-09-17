@@ -175,7 +175,7 @@ class DevicesTab extends SignalWatcher(LitElement) {
         <div
           class="bw-grid-lanes"
           style="${styleMap(devicesStyles)}"
-          data-manual-width
+          data-max-width
         >
           ${repeat(
             deviceBluetoothIds,

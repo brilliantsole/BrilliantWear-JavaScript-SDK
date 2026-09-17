@@ -5,10 +5,10 @@ import NullScanner from "./NullScanner.ts";
 
 const _console = createConsole("Scanner", { log: false });
 
-export type ScannerLike = Scanner | Client;
-
 export const Scanners = [NullScanner, NobleScanner] as const;
 export type Scanner = InstanceType<(typeof Scanners)[number]>;
+
+export type ScannerLike = Scanner | Client;
 
 let scanner: Scanner;
 

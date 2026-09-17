@@ -69,9 +69,7 @@ abstract class BaseScanner {
     return this.baseConstructor.isSupported;
   }
 
-  get isClient() {
-    return false;
-  }
+  readonly isClient = false;
 
   #assertIsSupported() {
     _console.assertWithError(
