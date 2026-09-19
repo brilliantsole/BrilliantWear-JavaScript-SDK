@@ -220,7 +220,7 @@ class DevicesTab extends SignalWatcher(LitElement) {
               html`<bw-client-input .client=${client}></bw-client-input>`,
           )}
           ${isAddingClient
-            ? html` <bw-client-input data-pop-on-enter></bw-client-input>`
+            ? html` <bw-client-input></bw-client-input>`
             : nothing}
         </div>
 
