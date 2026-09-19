@@ -596,7 +596,7 @@ class DeviceCard extends LitElement {
         </div>
         <div class="wa-cluster wa-gap-m bw-row-gap-normal">
           ${this.renderClientIpAddress()} ${this.renderBattery()}
-          ${this.renderIpAddress()} ${this.renderRssi()}
+          ${this.renderRssi()} ${this.renderIpAddress()}
           ${this.includeRssiInterval ? this.renderRssiInterval() : nothing}
         </div>
       </div>

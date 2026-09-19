@@ -34405,7 +34405,6 @@ class Device {
                 }
                 break;
             case "notConnected":
-            case "disconnecting":
                 this.#dispatchConnectionEvents(true);
                 break;
             default:

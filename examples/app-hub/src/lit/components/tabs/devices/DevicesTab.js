@@ -4,7 +4,7 @@ import { createBluetoothContextConsumer } from "../../../contexts/bluetoothConte
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/resize-observer/resize-observer.js";
 
 const { lit, BW, litSignals, litRepeat, litStyleMap } = await waitForGlobals();
-const { SignalWatcher, signal } = litSignals;
+const { SignalWatcher, signal, Signal } = litSignals;
 const { repeat } = litRepeat;
 const { styleMap } = litStyleMap;
 
@@ -23,6 +23,7 @@ import {
 } from "./client/AddClientSignals.js";
 import { createDisableViewTransitionsContextConsumer } from "../../../contexts/disableViewTransitionsContext.js";
 import { deviceBluetoothIdsSignal } from "./DevicesSignals.js";
+import { waitForAnimationFrames } from "../../../../utils/rendering.js";
 
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").WebSocketClient} WebSocketClient */
 
@@ -50,6 +51,10 @@ class DevicesTab extends SignalWatcher(LitElement) {
     return this.disableViewTransitionsState.disableViewTransitions;
   }
 
+  get _viewTransition() {
+    return this._addClientViewTransition || this._devicesViewTransition;
+  }
+
   async _toggleAddClient(manual) {
     const newIsAddingClient = !isAddingClientSignal.get();
     const update = () => {
@@ -58,22 +63,60 @@ class DevicesTab extends SignalWatcher(LitElement) {
         addClientConfigSignal.set({ ...defaultAddClientConfig });
       }
     };
-    if (this.disableViewTransitions || !manual) {
+    if (this.disableViewTransitions || !manual || this._viewTransition) {
       update();
     } else {
       const types = [newIsAddingClient ? "add-client" : "remove-client"];
-      // console.log("types", types);
-      await document.startViewTransition({
+      console.log("types", types);
+      this._addClientViewTransition = document.startViewTransition({
         update: async () => {
           update();
         },
         types,
-      }).finished;
+      });
+      await this._addClientViewTransition.finished;
+      this._addClientViewTransition = undefined;
+    }
+  }
+
+  /** @type {string[]} */
+  deviceBluetoothIds = [];
+  async _onDeviceBluetoothIdsUpdate(requestUpdate = true) {
+    console.log("_onDeviceBluetoothIdsUpdate", { requestUpdate });
+    this.deviceBluetoothIds = deviceBluetoothIdsSignal.get();
+    console.log("this.deviceBluetoothIds", this.deviceBluetoothIds);
+
+    if (requestUpdate) {
+      const update = () => {
+        this.requestUpdate();
+      };
+      if (this.disableViewTransitions || this._viewTransition) {
+        update();
+      } else {
+        const types = ["devices-update"];
+        console.log("types", types);
+        this._devicesViewTransition = document.startViewTransition({
+          update: async () => {
+            update();
+          },
+          types,
+        });
+        await this._devicesViewTransition.finished;
+        this._devicesViewTransition = undefined;
+      }
     }
   }
 
   connectedCallback() {
     super.connectedCallback();
+
+    this._watcher = new Signal.subtle.Watcher(async () => {
+      await 0;
+      this._onDeviceBluetoothIdsUpdate();
+      this._watcher.watch();
+    });
+    this._watcher.watch(deviceBluetoothIdsSignal);
+    this._onDeviceBluetoothIdsUpdate(false);
 
     this._abortController = new AbortController();
     /** @type {AddEventListenerOptions} */
@@ -102,23 +145,26 @@ class DevicesTab extends SignalWatcher(LitElement) {
   }
   disconnectedCallback() {
     super.disconnectedCallback();
+    this._watcher?.stop();
     this._abortController.abort();
   }
 
   /** @type {WebSocketClient[]} */
   clients = [];
-  _updateClients(requestUpdate = false) {
+  async _updateClients(requestUpdate = false) {
     this.clients = BW.ClientManager.clients.filter(
       (client) => client.type == "webSocket" && client.hasConnectedOnce,
     );
-    if (requestUpdate) {
+    console.log("_updateClients", this.clients);
+    await waitForAnimationFrames(1);
+    if (requestUpdate && !this._viewTransition) {
       this.requestUpdate();
     }
   }
 
   render() {
     const isAddingClient = isAddingClientSignal.get();
-    const deviceBluetoothIds = deviceBluetoothIdsSignal.get();
+    const deviceBluetoothIds = this.deviceBluetoothIds;
     console.log({ isAddingClient }, this.clients, deviceBluetoothIds);
 
     const clientsStyles = {
