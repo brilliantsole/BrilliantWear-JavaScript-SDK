@@ -12,7 +12,7 @@ export const deviceBluetoothIdsSignal = signal([]);
 
 BW.DeviceManager.addEventListener("availableDevice", (event) => {
   const { device } = event.message;
-  console.log("availableDevice", device);
+  // console.log("availableDevice", device);
 
   const deviceBluetoothIds = deviceBluetoothIdsSignal.get();
   if (deviceBluetoothIds.includes(device.bluetoothId)) {
@@ -22,7 +22,7 @@ BW.DeviceManager.addEventListener("availableDevice", (event) => {
 });
 BW.DeviceManager.addEventListener("unavailableDevice", (event) => {
   const { device } = event.message;
-  console.log("unavailableDevice", device);
+  // console.log("unavailableDevice", device);
 
   const deviceBluetoothIds = deviceBluetoothIdsSignal.get();
   if (!deviceBluetoothIds.includes(device.bluetoothId)) {
@@ -37,7 +37,7 @@ BW.DeviceManager.addEventListener("unavailableDevice", (event) => {
 
 BW.ScannerManager.addEventListener("scannerDiscoveredDevice", (event) => {
   const { discoveredDevice } = event.message;
-  console.log("scannerDiscoveredDevice", discoveredDevice);
+  // console.log("scannerDiscoveredDevice", discoveredDevice);
 
   const deviceBluetoothIds = deviceBluetoothIdsSignal.get();
   if (deviceBluetoothIds.includes(discoveredDevice.bluetoothId)) {
@@ -52,7 +52,7 @@ BW.ScannerManager.addEventListener(
   "scannerExpiredDiscoveredDevice",
   (event) => {
     const { discoveredDevice } = event.message;
-    console.log("scannerExpiredDiscoveredDevice", discoveredDevice);
+    // console.log("scannerExpiredDiscoveredDevice", discoveredDevice);
 
     const deviceBluetoothIds = deviceBluetoothIdsSignal.get();
     if (!deviceBluetoothIds.includes(discoveredDevice.bluetoothId)) {

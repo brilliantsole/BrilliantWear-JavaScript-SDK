@@ -82,6 +82,13 @@ class DeviceCard extends LitElement {
     return BW.ScannerManager.discoveredDevices[this.bluetoothId];
   }
 
+  get isClient() {
+    return (
+      this._discoveredDevice?.scanner.isClient ||
+      this._device.connectionType == "client"
+    );
+  }
+
   /** @type {Device?} */
   _device;
   /** @param {Device} device */
@@ -153,7 +160,7 @@ class DeviceCard extends LitElement {
     if (this._discoveredDevice == discoveredDevice) {
       return;
     }
-    console.log("_onDiscoveredDevice", discoveredDevice);
+    // console.log("_onDiscoveredDevice", discoveredDevice);
     this._discoveredDevice = discoveredDevice;
 
     if (this._discoveredDeviceAbortController) {
@@ -461,6 +468,21 @@ class DeviceCard extends LitElement {
     }
   }
 
+  onConnectionSelect(event) {
+    const { item } = event.detail;
+    const connectionType = item.value;
+    console.log("onConnectionSelect", item, { connectionType });
+
+    if (this._device) {
+      if (this._device.connectionType == "client") {
+        this._device.connect({ type: "client", subType: connectionType });
+      } else {
+        this._device.connect({ type: connectionType });
+      }
+    } else {
+      this._discoveredDevice.connect(connectionType);
+    }
+  }
   buttonSize = "s";
   renderConnection() {
     const size = this.buttonSize;
@@ -468,21 +490,56 @@ class DeviceCard extends LitElement {
     const disconnectVariant = "danger";
     switch (this._connectionStatus) {
       case "notConnected":
-        // FILL - dropdown
-        if (true) {
-          return html` <wa-button
-            @click=${this.toggleConnection}
-            size=${size}
-            variant=${variant}
-            >Connect</wa-button
-          >`;
+        const connectButton = html`<wa-button
+          @click=${this.toggleConnection}
+          size=${size}
+          variant=${variant}
+          >Connect</wa-button
+        >`;
+        if (this.ipAddress) {
+          return html`
+            <wa-button-group label="Connect" size=${size}>
+              ${connectButton}
+              <wa-dropdown
+                placement="bottom-end"
+                size=${size}
+                @wa-select=${this.onConnectionSelect}
+              >
+                <wa-button slot="trigger" variant=${variant} size=${size}>
+                  <wa-icon
+                    name="chevron-down"
+                    label="Connection options"
+                  ></wa-icon>
+                </wa-button>
+
+                <wa-dropdown-item
+                  value=${this.isClient ? "noble" : "webBluetooth"}
+                >
+                  <wa-icon
+                    slot="icon"
+                    name="bluetooth"
+                    family="brands"
+                  ></wa-icon>
+                  Bluetooth</wa-dropdown-item
+                >
+                <wa-divider></wa-divider>
+
+                <wa-dropdown-item value="webSockets">
+                  <wa-icon slot="icon" name="wifi"></wa-icon>
+
+                  WebSockets</wa-dropdown-item
+                >
+                ${this.isClient
+                  ? html`<wa-dropdown-item value="udp">
+                      <wa-icon slot="icon" name="wifi"></wa-icon>
+                      UDP</wa-dropdown-item
+                    >`
+                  : nothing}
+              </wa-dropdown>
+            </wa-button-group>
+          `;
         } else {
-          return html`<wa-button
-            @click=${this.toggleConnection}
-            size=${size}
-            variant=${variant}
-            >Connect</wa-button
-          >`;
+          return connectButton;
         }
         break;
       case "connecting":

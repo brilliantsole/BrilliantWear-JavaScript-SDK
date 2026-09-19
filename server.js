@@ -16,7 +16,7 @@ process.on("warning", (e) => console.warn(e.stack));
 // BW.setConsoleLevelFlagsForType("BaseScanner", { log: true });
 // BW.setConsoleLevelFlagsForType("NobleScanner", { log: true });
 // BW.setConsoleLevelFlagsForType("NobleConnectionManager", { log: true });
-// BW.setConsoleLevelFlagsForType("DiscoveredDevice", { log: true });
+BW.setConsoleLevelFlagsForType("DiscoveredDevice", { log: true });
 // BW.setConsoleLevelFlagsForType("BaseServer", { log: true });
 
 // BW.setAllConsoleLevelFlags({ log: true });

@@ -95,13 +95,15 @@ class DevicesTab extends LitElement {
     console.log("this.deviceBluetoothIds", this.deviceBluetoothIds);
 
     if (requestUpdate) {
-      const update = async (skipRequestUpdate) => {
-        if (skipRequestUpdate) {
-          return;
+      const update = async (noViewTransition) => {
+        if (noViewTransition) {
+          if (this._viewTransition) {
+            await this._viewTransition.finished;
+            this._onDeviceBluetoothIdsUpdate();
+            return;
+          }
         }
-        console.log("requestUpdate", { skipRequestUpdate });
         this.requestUpdate();
-        await this.updateComplete;
       };
       if (this.disableViewTransitions || this._viewTransition) {
         update(Boolean(this._viewTransition));
@@ -125,7 +127,7 @@ class DevicesTab extends LitElement {
 
     this._watcher = new Signal.subtle.Watcher(async () => {
       await 0;
-      await this._onDeviceBluetoothIdsUpdate();
+      this._onDeviceBluetoothIdsUpdate();
       this._watcher.watch();
     });
     this._watcher.watch(deviceBluetoothIdsSignal);

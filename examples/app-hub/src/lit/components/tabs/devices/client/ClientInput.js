@@ -141,7 +141,7 @@ class ClientInput extends SignalWatcher(LitElement) {
       return;
     }
     await this.updateComplete;
-    console.log("addClientEventListeners", client);
+    // console.log("addClientEventListeners", client);
     const options = {
       ...this.clientAddEventListenerOptions,
       immediate,
