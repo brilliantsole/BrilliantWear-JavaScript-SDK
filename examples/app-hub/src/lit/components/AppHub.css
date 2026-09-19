@@ -2511,15 +2511,22 @@ html[data-loaded]:not([data-changing-pathname]) {
   }
 }
 
-html:active-view-transition-type(add-client, remove-client, devices-update) {
+html:active-view-transition-type(
+  toggle-client,
+  toggle-client-manual,
+  devices-update
+) {
   --animation-duration: var(--appear-transition-duration);
   --animation-timing-function: var(--appear-transition-timing-function);
 
-  :is(bw-client-input, bw-device-card) {
-    view-transition-name: match-element;
-    view-transition-class: card;
+  &:active-view-transition-type(toggle-client-manual) {
+    bw-client-input {
+      view-transition-name: match-element;
+      view-transition-class: card;
+    }
   }
-  bw-client-input[data-adding-client] {
+  bw-device-card {
+    view-transition-name: match-element;
     view-transition-class: card;
   }
 
@@ -2558,7 +2565,11 @@ html:active-view-transition-type(add-client, remove-client, devices-update) {
   }
 }
 
-html:active-view-transition-type(add-client, remove-client, devices-update) {
+html:active-view-transition-type(
+  toggle-client,
+  toggle-client-manual,
+  devices-update
+) {
   .bw-overlay :is([data-main-align], [data-cross-align]) {
     view-transition-name: match-element;
     view-transition-class: bw-overlay;

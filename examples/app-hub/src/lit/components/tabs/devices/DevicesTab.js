@@ -27,7 +27,7 @@ import { waitForAnimationFrames } from "../../../../utils/rendering.js";
 
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").WebSocketClient} WebSocketClient */
 
-class DevicesTab extends SignalWatcher(LitElement) {
+class DevicesTab extends LitElement {
   createRenderRoot() {
     return this;
   }
@@ -62,12 +62,19 @@ class DevicesTab extends SignalWatcher(LitElement) {
       if (!newIsAddingClient) {
         addClientConfigSignal.set({ ...defaultAddClientConfig });
       }
-      await this.updateComplete;
+      if (noViewTransition) {
+        await waitForAnimationFrames(1);
+        if (!this._viewTransition) {
+          this.requestUpdate();
+        }
+      } else {
+        this.requestUpdate();
+      }
     };
     if (this.disableViewTransitions || !manual || this._viewTransition) {
       update(true);
     } else {
-      const types = [newIsAddingClient ? "add-client" : "remove-client"];
+      const types = [manual ? "toggle-client-manual" : "toggle-client"];
       console.log("types", types);
       this._addClientViewTransition = document.startViewTransition({
         update: async () => {
