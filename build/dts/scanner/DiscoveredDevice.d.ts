@@ -74,16 +74,16 @@ declare class DiscoveredDevice {
     get expired(): boolean;
     constructor(scanner: ScannerLike, metadata: DiscoveredDeviceMetadata, device?: Device);
     get isConnected(): boolean;
-    get connectionStatus(): "connecting" | "connected" | "disconnecting" | "notConnected";
+    get connectionStatus(): "notConnected" | "connecting" | "connected" | "disconnecting";
     connect(connectionType?: ConnectionType): Promise<void>;
     _expire(): void;
     update(metadata: DiscoveredDeviceMetadata): DiscoveredDeviceMetadataKeys;
-    get addEventListener(): <T extends "connecting" | "connected" | "disconnecting" | "*" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "connecting" | "connected" | "disconnecting" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi", DiscoveredDeviceEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "connecting" | "connected" | "disconnecting" | "*" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "connecting" | "connected" | "disconnecting" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi", DiscoveredDeviceEventMessages, T>) => void) => void;
-    get waitForEvent(): <T extends "connecting" | "connected" | "disconnecting" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi">(type: T, options?: {
+    get addEventListener(): <T extends "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "*" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update", DiscoveredDeviceEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "*" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update", DiscoveredDeviceEventMessages, T>) => void) => void;
+    get waitForEvent(): <T extends "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update">(type: T, options?: {
         immediate?: boolean;
         signal?: AbortSignal;
-    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "connecting" | "connected" | "disconnecting" | "ipAddress" | "isWifiSecure" | "notConnected" | "device" | "connectionStatus" | "isConnected" | "update" | "expired" | "name" | "deviceType" | "rssi", DiscoveredDeviceEventMessages, T>>;
+    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<DiscoveredDevice, "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "isConnected" | "ipAddress" | "isWifiSecure" | "device" | "name" | "expired" | "rssi" | "deviceType" | "update", DiscoveredDeviceEventMessages, T>>;
     toJSON(): {
         bluetoothId: string;
         name: string | undefined;

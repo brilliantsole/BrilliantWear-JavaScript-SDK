@@ -137,6 +137,13 @@ class DeviceCard extends LitElement {
       },
       options,
     );
+    this._device.addEventListener(
+      "ipAddress",
+      () => {
+        this.ipAddress = this._device.ipAddress;
+      },
+      options,
+    );
 
     this._device.addEventListener(
       "connectionStatus",

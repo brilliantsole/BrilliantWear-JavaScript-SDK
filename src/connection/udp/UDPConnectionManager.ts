@@ -14,7 +14,6 @@ import { parseMessage } from "../../utils/ParseUtils.ts";
 import { Timer } from "../../utils/Timer.ts";
 import BaseConnectionManager, {
   ConnectionManagerConnectOptions,
-  ConnectionType,
 } from "../BaseConnectionManager.ts";
 
 import * as dgram from "dgram";
@@ -246,6 +245,7 @@ class UDPConnectionManager extends BaseConnectionManager {
     if (!canContinue) {
       return false;
     }
+    _console.log("connect", options);
     this.#setupSocket();
     return true;
   }
