@@ -2517,17 +2517,23 @@ html:active-view-transition-type(add-client, remove-client, devices-update) {
 
   :is(bw-client-input, bw-device-card) {
     view-transition-name: match-element;
-    &:not([data-pop-on-enter]) {
-      view-transition-class: existing-element;
-    }
-    &:is(bw-client-input)[data-pop-on-enter] {
-      view-transition-class: appearing-element;
-    }
+    view-transition-class: card;
+  }
+  bw-client-input[data-adding-client] {
+    view-transition-class: card;
   }
 
-  &::view-transition-group(.existing-element) {
+  &::view-transition-new(.card):only-child {
     animation-duration: var(--animation-duration);
     animation-timing-function: var(--animation-timing-function);
+    animation-name: pop-in;
+    animation-timing-function: ease-out;
+  }
+  &::view-transition-old(.card):only-child {
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-timing-function);
+    animation-name: pop-out;
+    animation-timing-function: ease-in;
   }
 }
 
@@ -2559,31 +2565,6 @@ html:active-view-transition-type(add-client, remove-client, devices-update) {
   }
   &::view-transition-group(.bw-overlay) {
     animation: none;
-  }
-}
-
-html:active-view-transition-type(add-client, remove-client, devices-update) {
-  &:active-view-transition-type(add-client) {
-    &::view-transition-new(.appearing-element) {
-      animation-name: pop-in;
-      animation-duration: var(--appear-transition-duration);
-      animation-timing-function: ease-out;
-    }
-    &::view-transition-old(.appearing-element) {
-      display: none;
-      animation: none;
-    }
-  }
-  &:active-view-transition-type(remove-client) {
-    &::view-transition-old(.appearing-element) {
-      animation-name: pop-out;
-      animation-duration: var(--appear-transition-duration);
-      animation-timing-function: ease-in;
-    }
-    &::view-transition-new(.appearing-element) {
-      display: none;
-      animation: none;
-    }
   }
 }
 

@@ -57,14 +57,15 @@ class DevicesTab extends SignalWatcher(LitElement) {
 
   async _toggleAddClient(manual) {
     const newIsAddingClient = !isAddingClientSignal.get();
-    const update = () => {
+    const update = async (noViewTransition) => {
       isAddingClientSignal.set(newIsAddingClient);
       if (!newIsAddingClient) {
         addClientConfigSignal.set({ ...defaultAddClientConfig });
       }
+      await this.updateComplete;
     };
     if (this.disableViewTransitions || !manual || this._viewTransition) {
-      update();
+      update(true);
     } else {
       const types = [newIsAddingClient ? "add-client" : "remove-client"];
       console.log("types", types);
@@ -87,11 +88,16 @@ class DevicesTab extends SignalWatcher(LitElement) {
     console.log("this.deviceBluetoothIds", this.deviceBluetoothIds);
 
     if (requestUpdate) {
-      const update = () => {
+      const update = async (skipRequestUpdate) => {
+        if (skipRequestUpdate) {
+          return;
+        }
+        console.log("requestUpdate", { skipRequestUpdate });
         this.requestUpdate();
+        await this.updateComplete;
       };
       if (this.disableViewTransitions || this._viewTransition) {
-        update();
+        update(Boolean(this._viewTransition));
       } else {
         const types = ["devices-update"];
         console.log("types", types);
@@ -112,7 +118,7 @@ class DevicesTab extends SignalWatcher(LitElement) {
 
     this._watcher = new Signal.subtle.Watcher(async () => {
       await 0;
-      this._onDeviceBluetoothIdsUpdate();
+      await this._onDeviceBluetoothIdsUpdate();
       this._watcher.watch();
     });
     this._watcher.watch(deviceBluetoothIdsSignal);
@@ -156,7 +162,7 @@ class DevicesTab extends SignalWatcher(LitElement) {
       (client) => client.type == "webSocket" && client.hasConnectedOnce,
     );
     console.log("_updateClients", this.clients);
-    await waitForAnimationFrames(1);
+    await waitForAnimationFrames(2);
     if (requestUpdate && !this._viewTransition) {
       this.requestUpdate();
     }
