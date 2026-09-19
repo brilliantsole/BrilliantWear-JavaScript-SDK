@@ -4,12 +4,12 @@ import EventDispatcher, {
 import { createConsole } from "../utils/Console.ts";
 import { Timer } from "../utils/Timer.ts";
 import { ConnectionType } from "../connection/BaseConnectionManager.ts";
-import Device from "../Device.ts";
 import DiscoveredDevice, {
   DiscoveredDeviceMetadata,
   DiscoveredDeviceMetadataKeys,
   DiscoveredDevicesMap,
 } from "./DiscoveredDevice.ts";
+import { default as DeviceManager } from "../DeviceManager.ts";
 
 const _console = createConsole("BaseScanner", { log: false });
 
@@ -68,6 +68,8 @@ abstract class BaseScanner {
   get isSupported() {
     return this.baseConstructor.isSupported;
   }
+
+  abstract readonly connectionType: ConnectionType;
 
   readonly isClient = false;
 
@@ -253,7 +255,10 @@ abstract class BaseScanner {
         // @ts-expect-error
         this,
         discoveredDeviceMetadata,
-        this.devices[discoveredDeviceMetadata.bluetoothId],
+        DeviceManager.availableDevices.find(
+          (device) =>
+            device.bluetoothId == discoveredDeviceMetadata.bluetoothId,
+        ),
       );
       this.#discoveredDevices[discoveredDevice.bluetoothId] = discoveredDevice;
     }
@@ -311,9 +316,6 @@ abstract class BaseScanner {
   async disconnectFromDevice(bluetoothId: string) {
     this.#assertIsAvailable();
   }
-
-  // DEVICES
-  abstract devices: { [bluetoothId: string]: Device };
 
   // RESET
   get canReset() {

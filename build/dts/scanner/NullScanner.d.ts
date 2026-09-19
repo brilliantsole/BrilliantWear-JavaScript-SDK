@@ -3,6 +3,7 @@ import Device from "../Device.ts";
 declare class NullScanner extends BaseScanner {
     #private;
     static get isSupported(): boolean;
+    readonly connectionType = "none";
     get isScanning(): boolean;
     get isScanningAvailable(): boolean;
     get canReset(): boolean;

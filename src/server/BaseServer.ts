@@ -1393,7 +1393,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           const device = DeviceManager.availableDevices.find(
             (device) => device.bluetoothId == deviceId,
           );
-          if (device) {
+
+          if (device && connectionType != scanner.connectionType) {
             // @ts-expect-error
             device.connect({ type: connectionType, reconnect: true });
           } else {
@@ -1413,7 +1414,6 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           let device = DeviceManager.availableDevices.find(
             (device) => device.bluetoothId == deviceId,
           );
-          device = device ?? scanner.devices[deviceId];
           if (!device) {
             _console.error(`no device found with id ${deviceId}`);
             break;

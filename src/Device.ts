@@ -577,11 +577,16 @@ class Device {
       return;
     }
 
-    if (options?.reconnect && this.canReconnect) {
+    _console.log("connect options", options);
+
+    if (
+      options?.reconnect &&
+      this.canReconnect &&
+      (!options?.type || options.type == this.connectionType)
+    ) {
       return this.reconnect();
     }
 
-    _console.log("connect options", options);
     if (options) {
       switch (options.type) {
         case "webBluetooth":
@@ -647,7 +652,7 @@ class Device {
         this.connectionManager.subType = options.subType;
       }
     }
-    _console.log("connectionManager type", this.connectionManager.type);
+    _console.log(`connectionManager type "${this.connectionManager.type}"`);
     const abortController = new AbortController();
     const waitForIsConnected = this.waitForEvent("isConnected", {
       signal: abortController.signal,

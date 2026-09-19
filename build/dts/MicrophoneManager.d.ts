@@ -57,12 +57,12 @@ declare class MicrophoneManager {
     constructor();
     sendMessages: SendMicrophoneMessagesCallback;
     eventDispatcher: MicrophoneEventDispatcher;
-    get waitForEvent(): <T extends "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "startRecordingMicrophone" | "stopRecordingMicrophone" | "microphoneRecording">(type: T, options?: {
+    get waitForEvent(): <T extends "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "microphoneRecording" | "startRecordingMicrophone" | "stopRecordingMicrophone">(type: T, options?: {
         immediate?: boolean;
         signal?: AbortSignal;
-    }) => Promise<import("./utils/EventDispatcher.ts").ListenerEvent<Device, "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "startRecordingMicrophone" | "stopRecordingMicrophone" | "microphoneRecording", MicrophoneEventMessages, T>>;
+    }) => Promise<import("./utils/EventDispatcher.ts").ListenerEvent<Device, "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "microphoneRecording" | "startRecordingMicrophone" | "stopRecordingMicrophone", MicrophoneEventMessages, T>>;
     requestRequiredInformation(): void;
-    get microphoneStatus(): "vad" | "inferencing" | "idle" | "streaming";
+    get microphoneStatus(): "idle" | "streaming" | "vad" | "inferencing";
     start(): Promise<void>;
     stop(): Promise<void>;
     vad(): Promise<void>;

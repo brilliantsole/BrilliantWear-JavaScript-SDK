@@ -34073,10 +34073,12 @@ class Device {
             _console$m.log("already connecting");
             return;
         }
-        if (options?.reconnect && this.canReconnect) {
+        _console$m.log("connect options", options);
+        if (options?.reconnect &&
+            this.canReconnect &&
+            (!options?.type || options.type == this.connectionType)) {
             return this.reconnect();
         }
-        _console$m.log("connect options", options);
         if (options) {
             switch (options.type) {
                 case "webBluetooth":
@@ -34130,7 +34132,7 @@ class Device {
                 this.connectionManager.subType = options.subType;
             }
         }
-        _console$m.log("connectionManager type", this.connectionManager.type);
+        _console$m.log(`connectionManager type "${this.connectionManager.type}"`);
         const abortController = new AbortController();
         const waitForIsConnected = this.waitForEvent("isConnected", {
             signal: abortController.signal,
@@ -35754,6 +35756,14 @@ let DeviceManager$1 = (() => {
         get availableDevices() {
             return this.#availableDevices;
         }
+        getAvailableDeviceByBluetoothId(bluetoothId, connectionType) {
+            return this.availableDevices.find((device) => {
+                if (connectionType && device.connectionType != connectionType) {
+                    return false;
+                }
+                return device.bluetoothId == bluetoothId;
+            });
+        }
         get canGetDevices() {
             return isInBrowser && navigator.bluetooth?.getDevices;
         }
@@ -36413,7 +36423,7 @@ class BaseScanner {
         }
         else {
             discoveredDevice = new DiscoveredDevice(
-            this, discoveredDeviceMetadata, this.devices[discoveredDeviceMetadata.bluetoothId]);
+            this, discoveredDeviceMetadata, DeviceManager.availableDevices.find((device) => device.bluetoothId == discoveredDeviceMetadata.bluetoothId));
             this.#discoveredDevices[discoveredDevice.bluetoothId] = discoveredDevice;
         }
         this.#discoveredDeviceTimestamps[discoveredDevice.bluetoothId] = Date.now();
@@ -36478,6 +36488,7 @@ class NullScanner extends BaseScanner {
     static get isSupported() {
         return true;
     }
+    connectionType = "none";
     get isScanning() {
         return false;
     }
@@ -36641,7 +36652,6 @@ class ClientConnectionManager extends BaseConnectionManager {
         _console$f.assertTypeWithError(newIsConnected, "boolean");
         if (this.#isConnected == newIsConnected) {
             _console$f.log("redundant newIsConnected assignment", newIsConnected);
-            return;
         }
         this.#isConnected = newIsConnected;
         _console$f.log({ isConnected: this.isConnected });
@@ -38616,7 +38626,7 @@ class BaseServer {
                         _console$b.log(`connecting to device with id ${deviceId}...`);
                     }
                     const device = DeviceManager.availableDevices.find((device) => device.bluetoothId == deviceId);
-                    if (device) {
+                    if (device && connectionType != scanner.connectionType) {
                         device.connect({ type: connectionType, reconnect: true });
                     }
                     else {
@@ -38631,7 +38641,6 @@ class BaseServer {
                         break;
                     }
                     let device = DeviceManager.availableDevices.find((device) => device.bluetoothId == deviceId);
-                    device = device ?? scanner.devices[deviceId];
                     if (!device) {
                         _console$b.error(`no device found with id ${deviceId}`);
                         break;

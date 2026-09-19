@@ -9,6 +9,8 @@ class NullScanner extends BaseScanner {
     return true;
   }
 
+  readonly connectionType = "none";
+
   // SCANNING
   get isScanning() {
     return false;

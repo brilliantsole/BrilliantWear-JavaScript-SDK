@@ -515,25 +515,21 @@ class DeviceCard extends LitElement {
                 <wa-dropdown-item
                   value=${this.isClient ? "noble" : "webBluetooth"}
                 >
-                  <wa-icon
-                    slot="icon"
-                    name="bluetooth"
-                    family="brands"
-                  ></wa-icon>
-                  Bluetooth</wa-dropdown-item
-                >
-                <wa-divider></wa-divider>
+                  <wa-icon name="bluetooth" family="brands"></wa-icon>
+                  Bluetooth
+                </wa-dropdown-item>
 
-                <wa-dropdown-item value="webSockets">
-                  <wa-icon slot="icon" name="wifi"></wa-icon>
-
-                  WebSockets</wa-dropdown-item
-                >
+                ${!this.isClient
+                  ? html`<wa-dropdown-item value="webSocket">
+                      <wa-icon name="wifi"></wa-icon>
+                      WebSocket
+                    </wa-dropdown-item>`
+                  : nothing}
                 ${this.isClient
                   ? html`<wa-dropdown-item value="udp">
-                      <wa-icon slot="icon" name="wifi"></wa-icon>
-                      UDP</wa-dropdown-item
-                    >`
+                      <wa-icon name="wifi"></wa-icon>
+                      UDP
+                    </wa-dropdown-item>`
                   : nothing}
               </wa-dropdown>
             </wa-button-group>

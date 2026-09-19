@@ -1,4 +1,7 @@
-import { ConnectionStatus } from "./connection/BaseConnectionManager.ts";
+import {
+  ConnectionStatus,
+  ConnectionType,
+} from "./connection/BaseConnectionManager.ts";
 import WebBluetoothConnectionManager from "./connection/bluetooth/WebBluetoothConnectionManager.ts";
 import { DeviceType } from "./InformationManager.ts";
 import { createConsole } from "./utils/Console.ts";
@@ -256,6 +259,17 @@ class DeviceManager {
   #availableDevices: Device[] = [];
   get availableDevices() {
     return this.#availableDevices;
+  }
+  getAvailableDeviceByBluetoothId(
+    bluetoothId: string,
+    connectionType?: ConnectionType,
+  ) {
+    return this.availableDevices.find((device) => {
+      if (connectionType && device.connectionType != connectionType) {
+        return false;
+      }
+      return device.bluetoothId == bluetoothId;
+    });
   }
 
   get canGetDevices() {

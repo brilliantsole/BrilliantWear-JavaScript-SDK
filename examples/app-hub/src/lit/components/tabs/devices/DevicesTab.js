@@ -160,7 +160,7 @@ class DevicesTab extends LitElement {
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._watcher?.stop();
+    this._watcher?.unwatch();
     this._abortController.abort();
   }
 

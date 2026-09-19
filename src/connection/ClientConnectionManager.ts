@@ -67,7 +67,7 @@ class ClientConnectionManager extends BaseConnectionManager {
     _console.assertTypeWithError(newIsConnected, "boolean");
     if (this.#isConnected == newIsConnected) {
       _console.log("redundant newIsConnected assignment", newIsConnected);
-      return;
+      // return;
     }
     this.#isConnected = newIsConnected;
 
