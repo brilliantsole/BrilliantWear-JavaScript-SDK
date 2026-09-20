@@ -1,4 +1,5 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
+import { createLayersContextConsumer } from "../../../contexts/layersContext.js";
 import { tabIcons, tabVariants } from "../../tabs/tabs.js";
 const { lit } = await waitForGlobals();
 
@@ -11,6 +12,14 @@ class NavButtonLayers extends LitElement {
     return this;
   }
 
+  static properties = {
+    numberOfLayers: { type: Number },
+  };
+
+  layersConsumer = createLayersContextConsumer(this, false, (state) => {
+    this.numberOfLayers = state.layers.length;
+  });
+
   render() {
     const { name } = tabIcons["layers"];
 
@@ -18,8 +27,10 @@ class NavButtonLayers extends LitElement {
       href="/layers"
       icon-name=${name}
       variant=${tabVariants["layers"]}
+      ?use-slot=${this.numberOfLayers > 0}
     >
       Layers
+      <div slot="badge">${this.numberOfLayers}</div>
     </bw-header-button>`;
   }
 }

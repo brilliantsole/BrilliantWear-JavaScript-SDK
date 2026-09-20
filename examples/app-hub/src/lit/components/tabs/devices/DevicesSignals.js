@@ -5,8 +5,6 @@ const { signal } = litSignals;
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").Device} Device */
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").DiscoveredDevice} DiscoveredDevice */
 
-/** @typedef {Device | DiscoveredDevice} DeviceOrDiscoveredDevice */
-
 /** @type {import("@lit-labs/signals").Signal.State<string[]>} */
 export const availableDeviceBluetoothIdsSignal = signal([]);
 

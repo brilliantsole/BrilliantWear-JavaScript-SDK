@@ -61,6 +61,7 @@ import { createToggleHeaderHiddenActionButtonContextProvider } from "../contexts
 import { createDirectionContextProvider } from "../contexts/directionContext.js";
 import { createBluetoothContextProvider } from "../contexts/bluetoothContext.js";
 import { waitForAnimationFrames } from "../../utils/rendering.js";
+import { createLayersContextProvider } from "../contexts/layersContext.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -1494,7 +1495,7 @@ class AppHub extends LitElement {
     }
 
     this._tabBreadcrumbHeight = height;
-    console.log("_tabBreadcrumbHeight", this._tabBreadcrumbHeight);
+    // console.log("_tabBreadcrumbHeight", this._tabBreadcrumbHeight);
 
     document.documentElement.style.setProperty(
       "--tab-breadcrumb-height",
@@ -1673,6 +1674,8 @@ class AppHub extends LitElement {
     );
   }
 
+  _layersProvider = createLayersContextProvider(this);
+
   render() {
     return html`
       <header ${ref(this.refs.header)} id="header" data-axis="cross">
@@ -1711,7 +1714,7 @@ class AppHub extends LitElement {
               ></bw-main-corner-button-toggle-theme>
 
               <bw-main-corner-button-toggle-header
-                data-portrait-only-REMOVE
+                data-portrait-only
                 data-slide-on-enter
               ></bw-main-corner-button-toggle-header>
             </div>
