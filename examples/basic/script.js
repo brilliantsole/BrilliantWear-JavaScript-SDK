@@ -193,6 +193,7 @@ const connectViaIpAddressButton = document.getElementById(
 connectViaIpAddressButton.addEventListener("click", () => {
   connectViaIpAddressButton.disabled = true;
   console.log(`connecting via ipAddress "${connectIpAddressInput.value}"`);
+  currentDevice = currentDevice ?? new BW.Device();
   currentDevice.connect({
     type: "webSocket",
     ipAddress: connectIpAddressInput.value,

@@ -3,7 +3,7 @@ const { litSignals } = await waitForGlobals();
 const { signal } = litSignals;
 
 /** @type {import("@lit-labs/signals").Signal.State<Boolean>} */
-export const isAddingClientSignal = signal(true);
+export const isAddingClientSignal = signal(false);
 
 /**
  * @typedef {Object} ClientConfig

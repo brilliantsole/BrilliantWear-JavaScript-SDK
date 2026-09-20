@@ -484,7 +484,10 @@ class DeviceCard extends LitElement {
       if (this._device.connectionType == "client") {
         this._device.connect({ type: "client", subType: connectionType });
       } else {
-        this._device.connect({ type: connectionType });
+        this._device.connect({
+          type: connectionType,
+          ipAddress: this.ipAddress,
+        });
       }
     } else {
       this._discoveredDevice.connect(connectionType);
@@ -655,8 +658,8 @@ class DeviceCard extends LitElement {
           ${this.renderConnection()} ${this.renderSelect()}
         </div>
         <div class="wa-cluster wa-gap-m bw-row-gap-normal">
-          ${this.renderClientIpAddress()} ${this.renderBattery()}
-          ${this.renderRssi()} ${this.renderIpAddress()}
+          ${this.renderClientIpAddress()} ${this.renderIpAddress()}
+          ${this.renderBattery()} ${this.renderRssi()}
           ${this.includeRssiInterval ? this.renderRssiInterval() : nothing}
         </div>
       </div>

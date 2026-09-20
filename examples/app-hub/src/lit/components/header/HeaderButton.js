@@ -53,7 +53,7 @@ class HeaderButton extends LitElement {
     }
 
     wa-badge {
-      translate: -0em 0em;
+      translate: -0.5em 0em;
     }
   `;
 

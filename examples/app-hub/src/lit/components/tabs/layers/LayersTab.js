@@ -10,11 +10,7 @@ class LayersTab extends LitElement {
   }
 
   render() {
-    return html`
-      <div>
-        <h3>Hello World</h3>
-      </div>
-    `;
+    return html``;
   }
 }
 

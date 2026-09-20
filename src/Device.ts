@@ -593,6 +593,19 @@ class Device {
           if (this.connectionManager?.type != "webBluetooth") {
             this.connectionManager = new WebBluetoothConnectionManager();
           }
+          {
+            const bluetoothDevices = await navigator.bluetooth.getDevices();
+            const bluetoothDevice = bluetoothDevices.find(
+              (bluetoothDevice) =>
+                bluetoothDevice.id == this.bluetoothId ||
+                // @ts-expect-error
+                bluetoothDevice.device == this,
+            );
+            if (bluetoothDevice) {
+              console.log("assigning bluetoothDevice", bluetoothDevice);
+              this.connectionManager.device = bluetoothDevice;
+            }
+          }
           break;
         case "webSocket":
           {
@@ -981,6 +994,10 @@ class Device {
     switch (this.connectionStatus) {
       case "connected":
         if (this.#isConnected) {
+          if (this.#connectionManager?.type == "webBluetooth") {
+            // @ts-expect-error
+            this.#connectionManager.device.device = this;
+          }
           this.#dispatchConnectionEvents(true);
         }
         break;

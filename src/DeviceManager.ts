@@ -381,6 +381,10 @@ class DeviceManager {
       if (!bluetoothDevice.gatt) {
         return;
       }
+      // @ts-expect-error
+      if (bluetoothDevice.device) {
+        return;
+      }
 
       let deviceInformation = configuration.devices.find(
         (deviceInformation) =>
