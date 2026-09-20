@@ -992,34 +992,34 @@ html:active-view-transition-type(next-tab) {
   @media (orientation: landscape) {
     /* vertical header */
     html:active-view-transition-type(previous-tab) {
-      --previous-tab-main-old-animation-name: slide-out-to-bottom;
-      --previous-tab-main-new-animation-name: slide-in-from-top;
+      --previous-tab-main-old-animation-name: slide-out-to-bottom-main;
+      --previous-tab-main-new-animation-name: slide-in-from-top-main;
     }
     html:active-view-transition-type(next-tab) {
-      --next-tab-main-old-animation-name: slide-out-to-top;
-      --next-tab-main-new-animation-name: slide-in-from-bottom;
+      --next-tab-main-old-animation-name: slide-out-to-top-main;
+      --next-tab-main-new-animation-name: slide-in-from-bottom-main;
     }
   }
 
   @media (orientation: portrait) {
     /* horizontal header on bottom */
     html:active-view-transition-type(previous-tab) {
-      --previous-tab-main-old-animation-name: slide-out-to-left;
-      --previous-tab-main-new-animation-name: slide-in-from-right;
+      --previous-tab-main-old-animation-name: slide-out-to-left-main;
+      --previous-tab-main-new-animation-name: slide-in-from-right-main;
     }
     html:active-view-transition-type(next-tab) {
-      --next-tab-main-old-animation-name: slide-out-to-right;
-      --next-tab-main-new-animation-name: slide-in-from-left;
+      --next-tab-main-old-animation-name: slide-out-to-right-main;
+      --next-tab-main-new-animation-name: slide-in-from-left-main;
     }
 
     /* reversed horizontal header on bottom */
     html[data-left-handed]:active-view-transition-type(previous-tab) {
-      --previous-tab-main-old-animation-name: slide-out-to-right;
-      --previous-tab-main-new-animation-name: slide-in-from-left;
+      --previous-tab-main-old-animation-name: slide-out-to-right-main;
+      --previous-tab-main-new-animation-name: slide-in-from-left-main;
     }
     html[data-left-handed]:active-view-transition-type(next-tab) {
-      --next-tab-main-old-animation-name: slide-out-to-left;
-      --next-tab-main-new-animation-name: slide-in-from-right;
+      --next-tab-main-old-animation-name: slide-out-to-left-main;
+      --next-tab-main-new-animation-name: slide-in-from-right-main;
     }
   }
 }
@@ -1029,24 +1029,24 @@ html:active-view-transition-type(next-tab) {
   @media (orientation: landscape) {
     /* vertical header on left */
     html:active-view-transition-type(previous-tab) {
-      --previous-tab-main-old-animation-name: slide-out-to-bottom;
-      --previous-tab-main-new-animation-name: slide-in-from-top;
+      --previous-tab-main-old-animation-name: slide-out-to-bottom-main;
+      --previous-tab-main-new-animation-name: slide-in-from-top-main;
     }
     html:active-view-transition-type(next-tab) {
-      --next-tab-main-old-animation-name: slide-out-to-top;
-      --next-tab-main-new-animation-name: slide-in-from-bottom;
+      --next-tab-main-old-animation-name: slide-out-to-top-main;
+      --next-tab-main-new-animation-name: slide-in-from-bottom-main;
     }
   }
 
   @media (orientation: portrait) {
     /* horizontal header on top */
     html:active-view-transition-type(previous-tab) {
-      --previous-tab-main-old-animation-name: slide-out-to-right;
-      --previous-tab-main-new-animation-name: slide-in-from-left;
+      --previous-tab-main-old-animation-name: slide-out-to-right-main;
+      --previous-tab-main-new-animation-name: slide-in-from-left-main;
     }
     html:active-view-transition-type(next-tab) {
-      --next-tab-main-old-animation-name: slide-out-to-left;
-      --next-tab-main-new-animation-name: slide-in-from-right;
+      --next-tab-main-old-animation-name: slide-out-to-left-main;
+      --next-tab-main-new-animation-name: slide-in-from-right-main;
     }
   }
 }
@@ -1056,7 +1056,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-100cqh);
+    transform: translateX(-100%);
   }
 }
 @keyframes slide-out-to-right {
@@ -1064,7 +1064,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateX(0);
   }
   to {
-    transform: translateX(100cqh);
+    transform: translateX(100%);
   }
 }
 @keyframes slide-out-to-top {
@@ -1072,10 +1072,76 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
   to {
-    transform: translateY(-100cqh);
+    transform: translateY(-100%);
   }
 }
 @keyframes slide-out-to-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-to-left-main {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100cqw);
+  }
+}
+@keyframes slide-out-to-right-main {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100cqw);
+  }
+}
+@keyframes slide-out-to-top-main {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100cqh);
+  }
+}
+@keyframes slide-out-to-bottom-main {
   from {
     transform: translateY(0);
   }
@@ -1084,23 +1150,23 @@ html:active-view-transition-type(next-tab) {
   }
 }
 
-@keyframes slide-in-from-right {
+@keyframes slide-in-from-right-main {
   from {
-    transform: translateX(100cqh);
+    transform: translateX(100cqw);
   }
   to {
     transform: translateX(0);
   }
 }
-@keyframes slide-in-from-left {
+@keyframes slide-in-from-left-main {
   from {
-    transform: translateX(-100cqh);
+    transform: translateX(-100cqw);
   }
   to {
     transform: translateX(0);
   }
 }
-@keyframes slide-in-from-top {
+@keyframes slide-in-from-top-main {
   from {
     transform: translateY(-100cqh);
   }
@@ -1108,7 +1174,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
 }
-@keyframes slide-in-from-bottom {
+@keyframes slide-in-from-bottom-main {
   from {
     transform: translateY(100cqh);
   }
@@ -2631,6 +2697,9 @@ bw-layers {
 
   width: 100%;
   height: calc(100% - var(--tab-breadcrumb-height-full));
+  /* height: calc(
+    100% - var(--tab-breadcrumb-height-full) - var(--tab-padding-bottom-extra)
+  ); */
 
   top: var(--tab-breadcrumb-height-full);
 
