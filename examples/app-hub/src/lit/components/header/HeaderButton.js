@@ -22,6 +22,7 @@ class HeaderButton extends LitElement {
     isActive: { type: Boolean },
     click: { attribute: false },
     saturation: { type: Number },
+    useSlot: { type: Boolean, attribute: "use-slot" },
   };
 
   static styles = css`
@@ -104,17 +105,16 @@ class HeaderButton extends LitElement {
         <wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon>
         <span class="wa-font-size-xs"><slot></slot></span>
       </div>
+      ${this.useSlot
+        ? html` <wa-badge
+            .variant=${this.variant}
+            appearance="accent"
+            style="font-size: var(--wa-font-size-3xs);"
+            pill
+            ><slot name="badge"></slot
+          ></wa-badge>`
+        : nothing}
     </wa-button>`;
   }
 }
 customElements.define("bw-header-button", HeaderButton);
-
-/**
- <wa-badge
-        .variant=${this.variant}
-        appearance="accent"
-        style="font-size: var(--wa-font-size-3xs);"
-        pill
-        ><wa-icon family=${this.iconFamily} name=${this.iconName}></wa-icon
-      ></wa-badge>
- */

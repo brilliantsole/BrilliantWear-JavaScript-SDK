@@ -26,7 +26,7 @@ process.on("warning", (e) => console.warn(e.stack));
 // BW.setConsoleLevelFlagsForType("FileTransferManager", { log: true });
 // BW.setConsoleLevelFlagsForType("BaseServer", { log: true });
 // BW.setConsoleLevelFlagsForType("Device", { log: true });
-BW.setConsoleLevelFlagsForType("UDPConnectionManager", { log: true });
+// BW.setConsoleLevelFlagsForType("UDPConnectionManager", { log: true });
 // BW.setConsoleLevelFlagsForType("BaseConnectionManager", { log: true });
 
 // HTTPS SERVER

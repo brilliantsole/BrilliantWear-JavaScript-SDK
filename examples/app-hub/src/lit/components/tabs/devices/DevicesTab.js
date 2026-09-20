@@ -22,7 +22,7 @@ import {
   defaultAddClientConfig,
 } from "./client/AddClientSignals.js";
 import { createDisableViewTransitionsContextConsumer } from "../../../contexts/disableViewTransitionsContext.js";
-import { deviceBluetoothIdsSignal } from "./DevicesSignals.js";
+import { availableDeviceBluetoothIdsSignal } from "./DevicesSignals.js";
 import { waitForAnimationFrames } from "../../../../utils/rendering.js";
 
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").WebSocketClient} WebSocketClient */
@@ -88,11 +88,14 @@ class DevicesTab extends LitElement {
   }
 
   /** @type {string[]} */
-  deviceBluetoothIds = [];
+  availableDeviceBluetoothIds = [];
   async _onDeviceBluetoothIdsUpdate(requestUpdate = true) {
     console.log("_onDeviceBluetoothIdsUpdate", { requestUpdate });
-    this.deviceBluetoothIds = deviceBluetoothIdsSignal.get();
-    console.log("this.deviceBluetoothIds", this.deviceBluetoothIds);
+    this.availableDeviceBluetoothIds = availableDeviceBluetoothIdsSignal.get();
+    console.log(
+      "this.availableDeviceBluetoothIds",
+      this.availableDeviceBluetoothIds,
+    );
 
     if (requestUpdate) {
       const update = async (noViewTransition) => {
@@ -130,7 +133,7 @@ class DevicesTab extends LitElement {
       this._onDeviceBluetoothIdsUpdate();
       this._watcher.watch();
     });
-    this._watcher.watch(deviceBluetoothIdsSignal);
+    this._watcher.watch(availableDeviceBluetoothIdsSignal);
     this._onDeviceBluetoothIdsUpdate(false);
 
     this._abortController = new AbortController();
@@ -179,8 +182,8 @@ class DevicesTab extends LitElement {
 
   render() {
     const isAddingClient = isAddingClientSignal.get();
-    const deviceBluetoothIds = this.deviceBluetoothIds;
-    console.log({ isAddingClient }, this.clients, deviceBluetoothIds);
+    const availableDeviceBluetoothIds = this.availableDeviceBluetoothIds;
+    console.log({ isAddingClient }, this.clients, availableDeviceBluetoothIds);
 
     const clientsStyles = {
       "--bw-grid-lane-width": "17em",
@@ -239,7 +242,7 @@ class DevicesTab extends LitElement {
           data-max-width
         >
           ${repeat(
-            deviceBluetoothIds,
+            availableDeviceBluetoothIds,
             (bluetoothId) => bluetoothId,
             (bluetoothId) =>
               html`<bw-device-card
