@@ -156,8 +156,10 @@
   <style>
     html,
     body {
-      overscroll-behavior: none;
       overflow-x: hidden;
+      @supports (-webkit-touch-callout: none) {
+        overscroll-behavior: none;
+      }
     }
   </style>
   <body>
