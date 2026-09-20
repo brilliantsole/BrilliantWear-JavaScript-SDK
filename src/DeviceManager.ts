@@ -272,6 +272,7 @@ class DeviceManager {
     });
   }
 
+  bluetoothDeviceMap: Record<string, Device> = {};
   get canGetDevices() {
     return isInBrowser && navigator.bluetooth?.getDevices;
   }
@@ -381,8 +382,7 @@ class DeviceManager {
       if (!bluetoothDevice.gatt) {
         return;
       }
-      // @ts-expect-error
-      if (bluetoothDevice.device) {
+      if (this.bluetoothDeviceMap[bluetoothDevice.id]) {
         return;
       }
 
@@ -567,6 +567,9 @@ class DeviceManager {
   #pushAvailableDevice(device: Device, dispatchAvailableDevices = true) {
     if (this.#availableDevices.includes(device)) {
       return;
+    }
+    if (device.bluetoothId) {
+      this.bluetoothDeviceMap[device.bluetoothId] = device;
     }
     _console.log("#pushAvailableDevice", device);
     this.#availableDevices.push(device);

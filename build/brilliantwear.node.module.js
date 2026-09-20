@@ -19352,7 +19352,7 @@ class Device {
                     {
                         const bluetoothDevices = await navigator.bluetooth.getDevices();
                         const bluetoothDevice = bluetoothDevices.find((bluetoothDevice) => bluetoothDevice.id == this.bluetoothId ||
-                            bluetoothDevice.device == this);
+                            DeviceManager.bluetoothDeviceMap[bluetoothDevice.id] == this);
                         if (bluetoothDevice) {
                             console.log("assigning bluetoothDevice", bluetoothDevice);
                             this.connectionManager.device = bluetoothDevice;
@@ -21040,6 +21040,7 @@ let DeviceManager$1 = (() => {
                 return device.bluetoothId == bluetoothId;
             });
         }
+        bluetoothDeviceMap = {};
         get canGetDevices() {
             return isInBrowser && navigator.bluetooth?.getDevices;
         }
@@ -21118,7 +21119,7 @@ let DeviceManager$1 = (() => {
                 if (!bluetoothDevice.gatt) {
                     return;
                 }
-                if (bluetoothDevice.device) {
+                if (this.bluetoothDeviceMap[bluetoothDevice.id]) {
                     return;
                 }
                 let deviceInformation = configuration.devices.find((deviceInformation) => bluetoothDevice.id == deviceInformation.bluetoothId);
@@ -21267,6 +21268,9 @@ let DeviceManager$1 = (() => {
         #pushAvailableDevice(device, dispatchAvailableDevices = true) {
             if (this.#availableDevices.includes(device)) {
                 return;
+            }
+            if (device.bluetoothId) {
+                this.bluetoothDeviceMap[device.bluetoothId] = device;
             }
             _console$k.log("#pushAvailableDevice", device);
             this.#availableDevices.push(device);

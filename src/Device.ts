@@ -598,8 +598,7 @@ class Device {
             const bluetoothDevice = bluetoothDevices.find(
               (bluetoothDevice) =>
                 bluetoothDevice.id == this.bluetoothId ||
-                // @ts-expect-error
-                bluetoothDevice.device == this,
+                DeviceManager.bluetoothDeviceMap[bluetoothDevice.id] == this,
             );
             if (bluetoothDevice) {
               console.log("assigning bluetoothDevice", bluetoothDevice);
