@@ -224,6 +224,7 @@ class DevicesTab extends LitElement {
           class="bw-grid-lanes"
           style="${styleMap(clientsStyles)}"
           data-manual-width
+          ?data-hidden=${!isAddingClient && this.clients.length == 0}
         >
           ${repeat(
             this.clients.filter((client) => client.type == "webSocket"),
@@ -240,6 +241,7 @@ class DevicesTab extends LitElement {
           class="bw-grid-lanes"
           style="${styleMap(devicesStyles)}"
           data-max-width
+          ?data-hidden=${availableDeviceBluetoothIds.length == 0}
         >
           ${repeat(
             availableDeviceBluetoothIds,

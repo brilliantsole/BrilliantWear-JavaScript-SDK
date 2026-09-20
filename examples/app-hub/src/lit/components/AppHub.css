@@ -291,17 +291,27 @@ main {
   display: grid;
 }
 
+:root {
+  --tab-breadcrumb-height: 0px;
+  --tab-breadcrumb-height-full: calc(
+    var(--tab-breadcrumb-height) + var(--tab-breadcrumb-padding-top)
+  );
+}
+
 #mainOverlay {
   z-index: 1;
   display: grid;
   position: absolute;
   pointer-events: none;
 
+  top: var(--tab-breadcrumb-height-full);
+
   width: calc(
     100% - calc(var(--main-padding-right) + var(--main-padding-left))
   );
   height: calc(
-    100% - calc(var(--main-padding-top) + var(--main-padding-bottom))
+    100% - calc(var(--main-padding-top) + var(--main-padding-bottom)) -
+      var(--tab-breadcrumb-height-full)
   );
 
   margin-left: var(--main-padding-left);
@@ -929,11 +939,17 @@ html:active-view-transition-type(previous-tab, next-tab) {
 html:active-view-transition-type(previous-tab, next-tab) {
   main {
     view-transition-name: main;
+    view-transition-class: main;
   }
-  &::view-transition-group(main) {
+  &::view-transition-group(.main) {
     z-index: 0;
     animation-duration: var(--animation-duration);
     animation-timing-function: var(--animation-timing-function);
+  }
+
+  bw-layers {
+    view-transition-name: layers;
+    view-transition-class: main;
   }
 
   #mainOverlay > * {
@@ -949,10 +965,10 @@ html:active-view-transition-type(previous-tab) {
   --previous-tab-main-old-animation-name: none;
   --previous-tab-main-new-animation-name: none;
 
-  &::view-transition-old(main) {
+  &::view-transition-old(.main) {
     animation-name: var(--previous-tab-main-old-animation-name);
   }
-  &::view-transition-new(main) {
+  &::view-transition-new(.main) {
     animation-name: var(--previous-tab-main-new-animation-name);
   }
 }
@@ -961,10 +977,10 @@ html:active-view-transition-type(next-tab) {
   --next-tab-main-old-animation-name: none;
   --next-tab-main-new-animation-name: none;
 
-  &::view-transition-old(main) {
+  &::view-transition-old(.main) {
     animation-name: var(--next-tab-main-old-animation-name);
   }
-  &::view-transition-new(main) {
+  &::view-transition-new(.main) {
     animation-name: var(--next-tab-main-new-animation-name);
   }
 }
@@ -1054,7 +1070,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
   to {
-    transform: translateY(-100%);
+    transform: translateY(-100cqh);
   }
 }
 @keyframes slide-out-to-bottom {
@@ -1062,7 +1078,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
   to {
-    transform: translateY(100%);
+    transform: translateY(100cqh);
   }
 }
 
@@ -1174,19 +1190,24 @@ html:active-view-transition-type(right-handed, left-handed) {
 
       main {
         view-transition-name: main;
+        view-transition-class: main;
       }
-      &::view-transition-group(main) {
+      bw-layers {
+        view-transition-name: layers;
+        view-transition-class: main;
+      }
+      &::view-transition-group(.main) {
         z-index: 0;
         animation: none;
       }
       &:not([data-anchor-header]) {
-        &::view-transition-old(main),
-        &::view-transition-new(main) {
+        &::view-transition-old(.main),
+        &::view-transition-new(.main) {
           animation-duration: var(--animation-duration);
           animation-timing-function: var(--animation-timing-function);
         }
       }
-      &::view-transition-old(main) {
+      &::view-transition-old(.main) {
         animation: none;
         display: none;
       }
@@ -1205,10 +1226,10 @@ html:active-view-transition-type(left-handed) {
 
   --left-handed-main-old-animation-name: none;
   --left-handed-main-new-animation-name: none;
-  &::view-transition-old(main) {
+  &::view-transition-old(.main) {
     animation-name: var(--left-handed-main-old-animation-name);
   }
-  &::view-transition-new(main),
+  &::view-transition-new(.main),
   &::view-transition-new(bw-tab-breadcrumb) {
     animation-name: var(--left-handed-main-new-animation-name);
   }
@@ -1226,10 +1247,10 @@ html:active-view-transition-type(right-handed) {
 
   --right-handed-main-old-animation-name: none;
   --right-handed-main-new-animation-name: none;
-  &::view-transition-old(main) {
+  &::view-transition-old(.main) {
     animation-name: var(--right-handed-main-old-animation-name);
   }
-  &::view-transition-new(main),
+  &::view-transition-new(.main),
   &::view-transition-new(bw-tab-breadcrumb) {
     animation-name: var(--right-handed-main-new-animation-name);
   }
@@ -1726,17 +1747,23 @@ html:active-view-transition-type(header-visible, header-hidden) {
   &:active-view-transition-type(header-right) {
     main {
       view-transition-name: main;
+      view-transition-class: main;
     }
-    &::view-transition-group(main) {
+    bw-layers {
+      view-transition-name: layers;
+      view-transition-class: main;
+    }
+
+    &::view-transition-group(.main) {
       z-index: 0;
       animation: none;
     }
-    &::view-transition-old(main),
-    &::view-transition-new(main) {
+    &::view-transition-old(.main),
+    &::view-transition-new(.main) {
       animation-duration: var(--animation-duration);
       animation-timing-function: var(--animation-timing-function);
     }
-    &::view-transition-old(main) {
+    &::view-transition-old(.main) {
       animation: none;
       display: none;
     }
@@ -1842,12 +1869,12 @@ html[data-header-hidden] {
 }
 html:active-view-transition-type(header-hidden, header-visible) {
   &:active-view-transition-type(header-left) {
-    &::view-transition-new(main),
+    &::view-transition-new(.main),
     &::view-transition-new(bw-tab-breadcrumb) {
       animation-name: slide-main-landscape-header-visibility;
     }
 
-    &::view-transition-new(main),
+    &::view-transition-new(.main),
     &::view-transition-new(bw-tab-breadcrumb) {
       --main-padding-side-offset: calc(
         var(--main-padding-left-safe) * var(--negative-if-header-hidden)
@@ -1855,7 +1882,7 @@ html:active-view-transition-type(header-hidden, header-visible) {
     }
   }
   &:active-view-transition-type(header-right) {
-    &::view-transition-new(main),
+    &::view-transition-new(.main),
     &::view-transition-new(bw-tab-breadcrumb) {
       animation-name: none;
     }
@@ -2246,8 +2273,11 @@ html:active-view-transition-type(theme) {
   }
 }
 
+:root {
+  --tab-breadcrumb-padding-top: var(--wa-space-2xs);
+}
 bw-tab-breadcrumb {
-  padding-top: var(--wa-space-2xs);
+  padding-top: var(--tab-breadcrumb-padding-top);
   background-color: var(--background-color);
 }
 
@@ -2589,4 +2619,32 @@ wa-button::part(button) {
 }
 .bw-row-gap-normal {
   row-gap: normal;
+}
+
+bw-layers {
+  z-index: 1;
+  display: grid;
+  position: absolute;
+  pointer-events: none;
+
+  width: 100%;
+  height: calc(100% - var(--tab-breadcrumb-height-full));
+
+  top: var(--tab-breadcrumb-height-full);
+
+  padding-left: var(--main-padding-left);
+  padding-right: var(--main-padding-right);
+  padding-top: var(--main-padding-top);
+  padding-bottom: var(--main-padding-bottom);
+}
+bw-layers > * {
+  pointer-events: auto;
+}
+
+html:not([data-active-tab="layers"]) bw-layers {
+  display: none;
+}
+
+[data-position-relative] {
+  position: relative;
 }

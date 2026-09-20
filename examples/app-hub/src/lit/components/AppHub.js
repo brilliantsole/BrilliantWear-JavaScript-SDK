@@ -25,6 +25,7 @@ const tabRenders = {
 
 import "./header/header.js";
 import "./main/main.js";
+import "./tabs/layers/Layers.js";
 
 import { createIsLeftHandedContextProvider } from "../contexts/isLeftHandedContext.js";
 import { createBatteryManagerContextProvider } from "../contexts/batteryManagerContext.js";
@@ -210,6 +211,8 @@ class AppHub extends LitElement {
     tabContent: createRef(),
     tabContentResizeObserver: createRef(),
     header: createRef(),
+    layers: createRef(),
+    tabBreadcrumbResizeObserver: createRef(),
   };
 
   _navigationStateProvider = createNavigationStateContextProvider(this);
@@ -1479,6 +1482,26 @@ class AppHub extends LitElement {
     true,
   );
 
+  _onTabBreadcrumbResize(event) {
+    const entry = event.detail.entries[0];
+    /** @type {DOMRectReadOnly} */
+    const rect = entry.contentRect;
+    // console.log("_onTabBreadcrumbResize", rect, entry);
+    const { height } = rect;
+
+    if (height == this._tabBreadcrumbHeight) {
+      return;
+    }
+
+    this._tabBreadcrumbHeight = height;
+    console.log("_tabBreadcrumbHeight", this._tabBreadcrumbHeight);
+
+    document.documentElement.style.setProperty(
+      "--tab-breadcrumb-height",
+      `${this._tabBreadcrumbHeight}px`,
+    );
+  }
+
   _onClick(event) {
     // for some reason you need this to focus out of an input element on iOS
   }
@@ -1666,6 +1689,8 @@ class AppHub extends LitElement {
       </header>
 
       <div id="main">
+        <bw-layers ${ref(this.refs.layers)}></bw-layers>
+
         <div id="mainOverlay" @wa-resize=${this._onMainOverlayResize}>
           <wa-resize-observer
             ${ref(this._mainOverlayRefs["start-start"])}
@@ -1686,7 +1711,7 @@ class AppHub extends LitElement {
               ></bw-main-corner-button-toggle-theme>
 
               <bw-main-corner-button-toggle-header
-                data-portrait-only
+                data-portrait-only-REMOVE
                 data-slide-on-enter
               ></bw-main-corner-button-toggle-header>
             </div>
@@ -1795,7 +1820,12 @@ class AppHub extends LitElement {
         </div>
 
         <main>
-          <bw-tab-breadcrumb></bw-tab-breadcrumb>
+          <wa-resize-observer
+            @wa-resize=${this._onTabBreadcrumbResize}
+            ${ref(this.refs.tabBreadcrumbResizeObserver)}
+          >
+            <bw-tab-breadcrumb></bw-tab-breadcrumb>
+          </wa-resize-observer>
           <div id="tab">
             <div id="tabBefore"></div>
             <wa-resize-observer

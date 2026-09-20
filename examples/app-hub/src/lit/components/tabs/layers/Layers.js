@@ -4,14 +4,14 @@ const { lit } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 
-class AppsTab extends LitElement {
+class Layers extends LitElement {
   createRenderRoot() {
     return this;
   }
 
   render() {
-    return html`<p>coming soon</p>`;
+    return html``;
   }
 }
 
-customElements.define("bw-apps-tab", AppsTab);
+customElements.define("bw-layers", Layers);
