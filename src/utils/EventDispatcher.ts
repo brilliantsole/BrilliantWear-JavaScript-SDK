@@ -124,6 +124,7 @@ export const DefaultEventDispatcherOptions: EventDispatcherOptions = {
 export type EventDispatcherListenerObject = {
   listener: Function;
   shouldRemove?: boolean;
+  signalAbortController?: AbortController;
 } & EventDispatcherOptions;
 
 class EventDispatcher<
@@ -212,7 +213,9 @@ class EventDispatcher<
       _console.log("already added listener");
       return;
     }
+    let signalAbortController: AbortController | undefined;
     if (options.signal) {
+      signalAbortController = new AbortController();
       _console.log(`listening to "abort" signal`);
       options.signal.addEventListener(
         "abort",
@@ -222,7 +225,7 @@ class EventDispatcher<
           );
           this.removeEventListener(type, listener);
         },
-        { once: true },
+        { once: true, signal: signalAbortController.signal },
       );
     }
     const listenerObject: EventDispatcherListenerObject = {
@@ -230,6 +233,7 @@ class EventDispatcher<
       once: options.once,
       immediate: options.immediate,
       signal: options.signal,
+      signalAbortController,
     };
     _console.log(`adding "${type}" listener`, listenerObject);
     this.#listeners[type]!.push(listenerObject);
@@ -272,6 +276,7 @@ class EventDispatcher<
       if (isListenerToRemove) {
         _console.log(`flagging "${type}" listener for removal`, listener);
         listenerObj.shouldRemove = true;
+        listenerObj?.signalAbortController?.abort();
         foundListener = true;
       }
     });

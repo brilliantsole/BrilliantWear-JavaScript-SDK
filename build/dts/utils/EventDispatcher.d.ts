@@ -57,6 +57,7 @@ export declare const DefaultEventDispatcherOptions: EventDispatcherOptions;
 export type EventDispatcherListenerObject = {
     listener: Function;
     shouldRemove?: boolean;
+    signalAbortController?: AbortController;
 } & EventDispatcherOptions;
 declare class EventDispatcher<Target extends any, EventType extends string, EventMessages extends Partial<Record<EventType, any>>> {
     #private;

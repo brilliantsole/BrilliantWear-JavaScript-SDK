@@ -252,6 +252,12 @@ class WindowManagerServer {
     };
     this.#clients.push(client);
     this.#dispatchEvent("clientConnected", { client });
+    iframe.dispatchEvent(
+      new CustomEvent("bw-client-connected", {
+        detail: { client },
+        bubbles: true,
+      }),
+    );
     return client;
   }
   #destroyClient(client: WindowManagerServerClient) {
@@ -267,6 +273,12 @@ class WindowManagerServer {
 
     this.#clients.splice(this.#clients.indexOf(client), 1);
     this.#dispatchEvent("clientNotConnected", { client });
+    client.iframe.dispatchEvent(
+      new CustomEvent("bw-client-not-connected", {
+        detail: { client },
+        bubbles: true,
+      }),
+    );
     return client;
   }
 

@@ -1,12 +1,26 @@
 import * as BW from "../../build/brilliantwear.module.js";
 
 const device = new BW.Device();
-const connectButton = document.getElementById("connect");
-connectButton.addEventListener("click", () => {
-  device.connect();
+const toggleConnectionButton = document.getElementById("toggleConnection");
+toggleConnectionButton.addEventListener("click", () => {
+  device.toggleConnection();
+});
+device.addEventListener("connectionStatus", () => {
+  let innerText = device.connectionStatus;
+  switch (device.connectionStatus) {
+    case "notConnected":
+      innerText = "connect";
+      break;
+    case "connected":
+      innerText = "disconnect";
+      break;
+  }
+  toggleConnectionButton.innerText = innerText;
 });
 device.addEventListener("isConnected", () => {
-  connectButton.innerText = device.isConnected ? "disconnect" : "connect";
+  toggleConnectionButton.innerText = device.isConnected
+    ? "disconnect"
+    : "connect";
 });
 device.addEventListener("connected", () => {
   device.setSensorConfiguration({ gameRotation: 20 });

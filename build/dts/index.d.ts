@@ -19,8 +19,8 @@ export { PubSubManager };
 import { default as ScannerManager } from "./scanner/ScannerManager.ts";
 export { ScannerManager };
 /** BROWSER_START */
-import { default as WindowManagerServer } from "./window/WindowManagerServer.ts";
-export { WindowManagerServer };
+import { default as WindowManagerServer, WindowManagerServerClient } from "./window/WindowManagerServer.ts";
+export { WindowManagerServer, WindowManagerServerClient };
 import { default as WindowManagerClient } from "./window/WindowManagerClient.ts";
 export { WindowManagerClient };
 import { default as WindowServer } from "./server/window/WindowServer.ts";
@@ -38,6 +38,8 @@ import { SensorType, SensorTypes, ContinuousSensorType, ContinuousSensorTypes } 
 export { SensorType, SensorTypes, ContinuousSensorType, ContinuousSensorTypes };
 import { MaxSensorRate, SensorRateStep, SensorConfiguration } from "./sensor/SensorConfigurationManager.ts";
 export { MaxSensorRate, SensorRateStep, SensorConfiguration };
+import { default as GuardManager, GuardManagerObject, GuardManagerOptions, DefaultGuardManagerOptions, Guard } from "./utils/GuardManager.ts";
+export { GuardManager, GuardManagerObject, GuardManagerOptions, DefaultGuardManagerOptions, Guard, };
 import { DefaultNumberOfPressureSensors, PressureData, PressureSensorPosition, PressureSensorValue } from "./sensor/PressureSensorDataManager.ts";
 export { DefaultNumberOfPressureSensors, PressureData, PressureSensorPosition, PressureSensorValue, };
 import { CenterOfPressure } from "./utils/CenterOfPressureHelper.ts";

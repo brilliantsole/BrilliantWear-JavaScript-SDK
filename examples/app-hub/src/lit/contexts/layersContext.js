@@ -7,7 +7,8 @@ const {
   createContextProvider: createLayersContextProvider,
   createContextConsumer: createLayersContextConsumer,
 } = await createContext("layers", {
-  defaultState: { layers: [{ src: "apps/test" }] },
+  defaultState: { layers: [{ src: "apps/basic" }] },
+  storageType: "localStorage",
 });
 
 export { createLayersContextProvider, createLayersContextConsumer };

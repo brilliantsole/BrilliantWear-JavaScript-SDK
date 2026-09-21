@@ -59,22 +59,25 @@ export async function waitForWindowValue(value) {
   });
 }
 
-export async function waitForGlobals() {
+export async function waitForGlobals(justBW) {
   if (!globalThis.URLPattern) {
     await import("https://cdn.jsdelivr.net/npm/urlpattern-polyfill@10.1.0/+esm");
   }
 
-  const values = await Promise.all([
-    waitForWindowValue("lit"),
-    waitForWindowValue("litRouter"),
-    waitForWindowValue("litContext"),
-    waitForWindowValue("litKeyed"),
-    waitForWindowValue("litRef"),
-    waitForWindowValue("litRepeat"),
-    waitForWindowValue("litSignals"),
-    waitForWindowValue("litClassMap"),
-    waitForWindowValue("BW"),
-  ]);
+  const promises = [waitForWindowValue("BW")];
+  if (!justBW) {
+    promises.push(
+      waitForWindowValue("lit"),
+      waitForWindowValue("litRouter"),
+      waitForWindowValue("litContext"),
+      waitForWindowValue("litKeyed"),
+      waitForWindowValue("litRef"),
+      waitForWindowValue("litRepeat"),
+      waitForWindowValue("litSignals"),
+      waitForWindowValue("litClassMap"),
+    );
+  }
+  const values = await Promise.all(promises);
   // console.log("values", values);
 
   /** @type {import("lit")} */

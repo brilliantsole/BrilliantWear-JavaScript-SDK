@@ -1,0 +1,48 @@
+<html class="wa-cloak">
+  <head>
+    <title>Layers | BrilliantWear JavaScript SDK</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script type="module">
+      // import * as BW from "./src/brilliantwear/brilliantwear.module.min.js";
+      import * as BW from "../../../../build/brilliantwear.module.js";
+      // with {
+      //   integrity: "sha256-MhagQu/CuXLB/Mo0G08XBTgcGCsSjKwSPWV9Pxv7NSk=",
+      //   crossOriginStorage: "*",
+      // };
+      console.log("BW loaded", BW);
+      window.BW = BW;
+      window.dispatchEvent(new CustomEvent("BW-loaded", { detail: BW }));
+    </script>
+
+    <script type="module" src="./script.js"></script>
+  </head>
+  <style>
+    html,
+    body {
+      overflow-x: hidden;
+      @supports (-webkit-touch-callout: none) {
+        overscroll-behavior: none;
+      }
+    }
+
+    [data-client-connected] [data-hide-on-client-connection] {
+      display: none;
+    }
+    html:not([data-bluetooth-available]) [data-hide-on-bluetooth-unavailable] {
+      display: none;
+    }
+  </style>
+  <body>
+    <h1>Minimal Example</h1>
+    <button id="toggleConnection" data-hide-on-bluetooth-unavailable>
+      connect
+    </button>
+    <button disabled id="toggleQuaternion">enable quaternion</button>
+    <label>quaternion: <span id="quaternion"></span></label>
+  </body>
+</html>

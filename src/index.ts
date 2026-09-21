@@ -71,8 +71,11 @@ export { ScannerManager };
 
 /** BROWSER_START */
 
-import { default as WindowManagerServer } from "./window/WindowManagerServer.ts";
-export { WindowManagerServer };
+import {
+  default as WindowManagerServer,
+  WindowManagerServerClient,
+} from "./window/WindowManagerServer.ts";
+export { WindowManagerServer, WindowManagerServerClient };
 
 import { default as WindowManagerClient } from "./window/WindowManagerClient.ts";
 export { WindowManagerClient };
@@ -125,6 +128,21 @@ import {
   SensorConfiguration,
 } from "./sensor/SensorConfigurationManager.ts";
 export { MaxSensorRate, SensorRateStep, SensorConfiguration };
+
+import {
+  default as GuardManager,
+  GuardManagerObject,
+  GuardManagerOptions,
+  DefaultGuardManagerOptions,
+  Guard,
+} from "./utils/GuardManager.ts";
+export {
+  GuardManager,
+  GuardManagerObject,
+  GuardManagerOptions,
+  DefaultGuardManagerOptions,
+  Guard,
+};
 
 import {
   DefaultNumberOfPressureSensors,

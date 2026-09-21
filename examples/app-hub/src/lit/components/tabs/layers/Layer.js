@@ -1,6 +1,6 @@
 import { waitForGlobals } from "../../../../utils/cross-origin-storage-utils.js";
 
-const { lit, litRef } = await waitForGlobals();
+const { lit, litRef, BW } = await waitForGlobals();
 
 const { LitElement, html } = lit;
 const { createRef, ref } = litRef;
@@ -10,6 +10,9 @@ import "https://ka-f.webawesome.com/webawesome@3.12.0/components/button/button.j
 import "https://ka-f.webawesome.com/webawesome@3.12.0/components/input/input.js";
 
 import { createActiveTabContextConsumer } from "../../../contexts/activeTabContext.js";
+import { createLayersContextConsumer } from "../../../contexts/layersContext.js";
+
+/** @typedef {import("../../../../../../../build/brilliantwear.module.js").WindowManagerServerClient} WindowManagerServerClient */
 
 class Layer extends LitElement {
   createRenderRoot() {
@@ -20,6 +23,13 @@ class Layer extends LitElement {
     layer: { attribute: false },
     withoutInteraction: { type: Boolean },
     didSetupIframe: { type: Boolean },
+    didIframeLoad: { type: Boolean, reflect: true, attribute: "iframe-loaded" },
+    isClientConnected: {
+      type: Boolean,
+      reflect: true,
+      attribute: "client-connected",
+    },
+    isDataEnabled: { type: Boolean },
   };
 
   /** @type {import("../../../contexts/layersContext.js").LayerContextState} */
@@ -35,11 +45,22 @@ class Layer extends LitElement {
     },
   );
 
-  onLoad() {
+  layersConsumer = createLayersContextConsumer(this);
+  /** @type {import("../../../contexts/layersContext.js").LayersContextState} */
+  get layersState() {
+    return this.layersConsumer.value.state;
+  }
+  updateLayers() {
+    this.layersConsumer.value.update(this.layersState, true);
+  }
+
+  onLoad(event) {
+    // console.log("onLoad", event);
     const zoomableFrame = this.querySelector("wa-zoomable-frame");
     const iframe = zoomableFrame.shadowRoot.querySelector("iframe");
     // console.log("zoomableFrame", zoomableFrame);
     // console.log("iframe", iframe);
+    this.didIframeLoad = true;
     if (this._layer.iframe != iframe) {
       console.log("assigning iframe");
       this._layer.iframe = iframe;
@@ -47,6 +68,9 @@ class Layer extends LitElement {
     } else {
       this.didSetupIframe = true;
     }
+  }
+  onError(event) {
+    // console.log("onError", event);
   }
 
   get iframe() {
@@ -73,6 +97,7 @@ class Layer extends LitElement {
         console.log({ src });
         this._layer.src = src;
         this.refresh();
+        this.updateLayers();
         break;
     }
   }
@@ -87,13 +112,87 @@ class Layer extends LitElement {
     console.log("refresh");
     if (this.iframe) {
       this.didSetupIframe = false;
+      this.didIframeLoad = false;
       this.iframe.src = this._layer.src;
     }
   }
 
+  onClientConnected(event) {
+    const client = event.detail.client;
+    console.log("onClientConnected", event, client);
+    this.client = client;
+    this.isClientConnected = true;
+  }
+  onClientNotConnected(event) {
+    const client = event.detail.client;
+    console.log("onClientNotConnected", event, client);
+    this.client = undefined;
+    this.isClientConnected = false;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.isDataEnabled = true;
+
+    this.abortController = new AbortController();
+    const signal = this.abortController.signal;
+    const options = { signal };
+
+    BW.ServerManager.clientToDeviceGuardManager.add(({ client, message }) => {
+      if (client != this.client) {
+        return true;
+      }
+      // console.log("clientToDeviceGuardManager", client, message);
+      switch (message?.type) {
+        case "setSensorConfiguration":
+        case "microphoneCommand":
+        case "cameraCommand":
+          return this.isDataEnabled;
+        default:
+          return true;
+      }
+    }, options);
+    BW.ServerManager.deviceToClientGuardManager.add(({ client, message }) => {
+      if (client != this.client) {
+        return true;
+      }
+      // console.log("deviceToClientGuardManager", client, message);
+      switch (message?.type) {
+        case "sensorData":
+          return this.isDataEnabled;
+        default:
+          return true;
+      }
+    }, options);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.abortController.abort();
+  }
+
+  /** @type {WindowManagerServerClient?} */
+  client;
+
+  toggleDataEnabled(event) {
+    // console.log("toggleDataEnabled", event);
+    this.isDataEnabled = !this.isDataEnabled;
+  }
+
   render() {
     // console.log("withoutInteraction", this.withoutInteraction);
-    return html`<div class="wa-stack wa-gap-0">
+    console.log({
+      isClientConnected: this.isClientConnected,
+      didIframeLoad: this.didIframeLoad,
+      didSetupIframe: this.didSetupIframe,
+      withoutInteraction: this.withoutInteraction,
+      isDataEnabled: this.isDataEnabled,
+    });
+    return html`<div
+      class="wa-stack wa-gap-2xs bw-wa-stack-touch-reverse"
+      @bw-client-connected=${this.onClientConnected}
+      @bw-client-not-connected=${this.onClientNotConnected}
+    >
       <div class="wa-cluster wa-gap-2xs wa-flex-nowrap">
         <wa-button
           @click=${this.refresh}
@@ -115,16 +214,25 @@ class Layer extends LitElement {
           @input=${this.onInput}
           @keydown=${this.onKeyDown}
           ${ref(this.inputRef)}
-          style="flex: 1"
+          style="flex: 1;"
         >
         </wa-input>
-        <wa-button variant="neutral" size=${this.size} appearance="accent"
-          ><wa-icon name="gear" label="settings"></wa-icon
+        <wa-button
+          ?disabled=${!this.isClientConnected}
+          @click=${this.toggleDataEnabled}
+          variant="neutral"
+          size=${this.size}
+          appearance="accent"
+          ><wa-icon
+            name=${this.isDataEnabled ? "eye" : "eye-slash"}
+            label="settings"
+          ></wa-icon
         ></wa-button>
       </div>
       <wa-zoomable-frame
         ?data-hidden=${!this.didSetupIframe}
         @load=${this.onLoad}
+        @error=${this.onError}
         sandbox="allow-scripts allow-same-origin"
         without-controls
         with-theme-sync
