@@ -34085,7 +34085,7 @@ class Device {
                     if (this.connectionManager?.type != "webBluetooth") {
                         this.connectionManager = new WebBluetoothConnectionManager();
                     }
-                    {
+                    if (navigator.bluetooth.getDevices) {
                         const bluetoothDevices = await navigator.bluetooth.getDevices();
                         const bluetoothDevice = bluetoothDevices.find((bluetoothDevice) => bluetoothDevice.id == this.bluetoothId ||
                             DeviceManager$1.bluetoothDeviceMap[bluetoothDevice.id] == this);
