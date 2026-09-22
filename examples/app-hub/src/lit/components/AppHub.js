@@ -419,8 +419,10 @@ class AppHub extends LitElement {
     if (this.#activeTab == newActiveTab) {
       return;
     }
+    const oldActiveTab = this.#activeTab;
     this.#activeTab = newActiveTab;
     // console.log({ activeTab: this.#activeTab });
+    document.documentElement.dataset.oldActiveTab = oldActiveTab;
     document.documentElement.dataset.activeTab = this.activeTab;
     this._updateMetaColor();
 

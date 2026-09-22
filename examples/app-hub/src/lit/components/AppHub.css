@@ -847,35 +847,49 @@ html[data-header-hidden] {
 
 /* BACKGROUND COLORS */
 
-html,
-main {
-  background-color: var(--background-color);
-}
-
 html {
+  background-color: var(--background-color);
+
   --background-color: var(--wa-color-neutral-fill-quiet);
-}
 
-html[data-active-tab="settings"] {
-  --background-color: var(--wa-color-neutral-fill-quiet);
-}
-
-html[data-active-tab="layers"] {
-  --background-color: hsl(
-    from var(--wa-color-success-fill-quiet) h calc(s * 0.2) l
-  );
-}
-
-html[data-active-tab="apps"] {
-  --background-color: hsl(
-    from var(--wa-color-warning-fill-quiet) h calc(s * 0.1) l
-  );
-}
-
-html[data-active-tab="devices"] {
-  --background-color: hsl(
+  --background-color-settings: var(--wa-color-neutral-fill-quiet);
+  --background-color-devices: hsl(
     from var(--wa-color-brand-fill-quiet) h calc(s * 0.4) l
   );
+  --background-color-apps: hsl(
+    from var(--wa-color-warning-fill-quiet) h calc(s * 0.1) l
+  );
+  --background-color-layers: hsl(
+    from var(--wa-color-success-fill-quiet) h calc(s * 0.2) l
+  );
+
+  &[data-active-tab="settings"] {
+    --background-color: var(--background-color-settings);
+  }
+  &[data-old-active-tab="settings"] {
+    --old-background-color: var(--background-color-settings);
+  }
+
+  &[data-active-tab="devices"] {
+    --background-color: var(--background-color-devices);
+  }
+  &[data-old-active-tab="devices"] {
+    --old-background-color: var(--background-color-devices);
+  }
+
+  &[data-active-tab="apps"] {
+    --background-color: var(--background-color-apps);
+  }
+  &[data-old-active-tab="apps"] {
+    --old-background-color: var(--background-color-apps);
+  }
+
+  &[data-active-tab="layers"] {
+    --background-color: var(--background-color-layers);
+  }
+  &[data-old-active-tab="layers"] {
+    --old-background-color: var(--background-color-layers);
+  }
 }
 
 :root {
@@ -947,7 +961,7 @@ html:active-view-transition {
 /* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
 
 html:active-view-transition-type(previous-tab, next-tab) {
-  --animation-duration: 3000ms;
+  --animation-duration: 300ms;
   --animation-timing-function: ease;
 }
 
@@ -965,6 +979,10 @@ html:active-view-transition-type(previous-tab, next-tab) {
     z-index: 0;
     animation-duration: var(--animation-duration);
     animation-timing-function: var(--animation-timing-function);
+  }
+
+  &::view-transition-old(main) {
+    background-color: var(--old-background-color);
   }
 
   #mainOverlay :is([data-main-align], [data-cross-align]) {
@@ -2370,7 +2388,6 @@ html:active-view-transition-type(theme) {
 }
 bw-tab-breadcrumb {
   padding-top: var(--tab-breadcrumb-padding-top);
-  background-color: var(--background-color);
 }
 
 :root {
