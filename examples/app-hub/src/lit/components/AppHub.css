@@ -534,6 +534,27 @@ html[data-header-hidden] {
   }
 }
 
+@media (orientation: landscape) {
+  :dir(ltr) {
+    --header-direction: ltr;
+    --header-opposite-direction: rtl;
+
+    --zero-if-header-on-left: 0;
+    --zero-if-header-on-right: 1;
+    --negative-if-header-on-left: -1;
+    --negative-if-header-on-right: 1;
+  }
+  :dir(rtl) {
+    --header-direction: rtl;
+    --header-opposite-direction: ltr;
+
+    --zero-if-header-on-left: 1;
+    --zero-if-header-on-right: 0;
+    --negative-if-header-on-left: 1;
+    --negative-if-header-on-right: -1;
+  }
+}
+
 /* touch screens */
 @media (pointer: coarse) {
   @media (orientation: landscape) {
@@ -543,6 +564,17 @@ html[data-header-hidden] {
       --main-opposite-axis-flex-direction: var(--flex-direction-ltr);
       --cross-axis-flex-direction: column;
       --cross-opposite-axis-flex-direction: column-reverse;
+
+      :dir(ltr),
+      :dir(rtl) {
+        --header-direction: rtl;
+        --header-opposite-direction: ltr;
+
+        --zero-if-header-on-left: 1;
+        --zero-if-header-on-right: 0;
+        --negative-if-header-on-left: 1;
+        --negative-if-header-on-right: -1;
+      }
     }
 
     [data-main-align="center"] {
@@ -576,6 +608,17 @@ html[data-header-hidden] {
       /* vertical header on left */
       --main-axis-flex-direction: var(--flex-direction-lrt);
       --main-opposite-axis-flex-direction: var(--flex-direction-rtl);
+
+      :dir(ltr),
+      :dir(rtl) {
+        --header-direction: ltr;
+        --header-opposite-direction: rtl;
+
+        --zero-if-header-on-left: 0;
+        --zero-if-header-on-right: 1;
+        --negative-if-header-on-left: -1;
+        --negative-if-header-on-right: 1;
+      }
 
       [data-main-align="start"] {
         justify-self: var(--justify-end);
@@ -772,7 +815,7 @@ html[data-header-hidden] {
 /* non-touch screens */
 @media (pointer: fine) {
   @media (orientation: landscape) {
-    /* vertical header on left */
+    /* vertical header on dir */
     :root {
       --main-axis-flex-direction: row;
       --main-opposite-axis-flex-direction: row-reverse;
@@ -1078,7 +1121,7 @@ html:active-view-transition-type(next-tab) {
 /* non-touch screens */
 @media (pointer: fine) {
   @media (orientation: landscape) {
-    /* vertical header on left */
+    /* vertical header */
     html:active-view-transition-type(previous-tab) {
       --previous-tab-main-old-animation-name: slide-out-to-bottom-main;
       --previous-tab-main-new-animation-name: slide-in-from-top-main;

@@ -52,8 +52,20 @@ class HeaderButton extends LitElement {
       filter: saturate(var(--button-saturation));
     }
 
+    @media (orientation: landscape) {
+      :host {
+        direction: var(--header-direction);
+      }
+    }
+
     wa-badge {
-      translate: -0.5em 0em;
+      @media (orientation: portrait) {
+        translate: calc(0.5em * var(--negative-if-ltr)) 0em;
+      }
+      @media (orientation: landscape) {
+        translate: 0 0;
+        inset-inline-end: 0.5em;
+      }
     }
   `;
 
