@@ -136,3 +136,5 @@ import { default as RangeHelper, Range } from "./utils/RangeHelper.ts";
 export { RangeHelper, Range };
 import { default as RangeHelper2 } from "./utils/RangeHelper2.ts";
 export { RangeHelper2 };
+declare const lol: () => Promise<import("@capgo/capacitor-bluetooth-low-energy").IsAvailableResult>;
+export { lol };

@@ -284,8 +284,10 @@ main {
 }
 
 @media (pointer: coarse) and (orientation: portrait) {
-  :fullscreen main {
-    padding-top: var(--main-padding-top);
+  main {
+    padding-top: calc(
+      var(--main-padding-top) * sign(abs(var(--main-padding-top-extra)))
+    );
   }
 }
 
@@ -347,11 +349,15 @@ main {
   pointer-events: auto;
 }
 
+:root {
+  --header-color: var(--wa-color-surface-default);
+}
+
 #header {
+  background-color: var(--header-color);
   z-index: 2;
 
   flex: 0 0 auto;
-  background-color: var(--wa-color-surface-default);
   justify-content: space-between;
 
   padding-left: var(--header-padding-left);
@@ -488,11 +494,11 @@ html[data-header-hidden] {
     @supports (-webkit-touch-callout: none) {
       :root {
         --header-padding-bottom-extra: max(
-          calc(env(safe-area-inset-bottom) - var(--wa-space-l)),
+          calc(env(safe-area-inset-bottom) - var(--wa-space-xs)),
           0px
         );
       }
-      [data-header-hidden]:fullscreen {
+      [data-header-hidden] {
         --main-padding-bottom-extra: max(
           calc(env(safe-area-inset-bottom) - var(--wa-space-m)),
           var(--wa-space-xs)
@@ -947,6 +953,7 @@ html:active-view-transition-type(previous-tab, next-tab) {
     view-transition-name: main;
     view-transition-class: main;
   }
+
   bw-layers {
     view-transition-name: layers;
     view-transition-class: main;
@@ -966,6 +973,14 @@ html:active-view-transition-type(previous-tab, next-tab) {
   &::view-transition-old(.overlay),
   &::view-transition-new(.overlay) {
     animation: none;
+  }
+
+  header {
+    /* view-transition-name: header; */
+  }
+  &::view-transition-group(header) {
+    animation: none;
+    pointer-events: none;
   }
 }
 
@@ -2352,7 +2367,7 @@ html:active-view-transition-type(theme) {
 }
 bw-tab-breadcrumb {
   padding-top: var(--tab-breadcrumb-padding-top);
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
 }
 
 :root {
@@ -2521,7 +2536,7 @@ html:not([data-scroll-assist]) :is(#tabBefore, #tabAfter) {
       }
       --padding: calc(
         var(--wa-space-xs) + var(--main-overlay-start-height) +
-          (var(--wa-space-xs) * sign(abs(var(--main-overlay-start-height))))
+          (var(--wa-space-m) * sign(abs(var(--main-overlay-start-height))))
       );
       padding-bottom: var(--padding);
     }

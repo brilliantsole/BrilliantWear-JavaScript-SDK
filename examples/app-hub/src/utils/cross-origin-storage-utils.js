@@ -102,7 +102,7 @@ export async function waitForGlobals(justBW) {
   /** @type {import("../../../../build/brilliantwear.module.min.js")} */
   const BW = window.BW;
 
-  // console.log({ lit, litRouter,litContext, BW });
+  // console.log({ lit, litRouter, litContext, BW });
   return {
     lit,
     litRouter,

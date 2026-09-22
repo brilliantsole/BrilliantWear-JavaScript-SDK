@@ -624,3 +624,9 @@ export { RangeHelper, Range };
 
 import { default as RangeHelper2 } from "./utils/RangeHelper2.ts";
 export { RangeHelper2 };
+
+import { BluetoothLowEnergy } from "@capgo/capacitor-bluetooth-low-energy";
+const lol = () => {
+  return BluetoothLowEnergy.isAvailable();
+};
+export { lol };

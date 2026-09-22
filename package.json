@@ -87,6 +87,8 @@
     "ws": "^8.16.0"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.2",
+    "@capgo/capacitor-bluetooth-low-energy": "^8.2.1",
     "@lit-labs/router": "^0.1.4",
     "@stoprocent/noble": "^2.4.0",
     "@tensorflow/tfjs": "^4.22.0",

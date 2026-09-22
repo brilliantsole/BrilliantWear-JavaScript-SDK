@@ -62,7 +62,7 @@ class Layer extends LitElement {
     // console.log("iframe", iframe);
     this.didIframeLoad = true;
     if (this._layer.iframe != iframe) {
-      console.log("assigning iframe");
+      // console.log("assigning iframe");
       this._layer.iframe = iframe;
       this.setupIframe();
     } else {
@@ -81,7 +81,7 @@ class Layer extends LitElement {
     if (!iframe) {
       return;
     }
-    console.log("setupIframe", iframe);
+    // console.log("setupIframe", iframe);
     iframe.setAttribute("allow", "bluetooth 'none'");
     iframe.src = iframe.src;
   }
@@ -94,7 +94,7 @@ class Layer extends LitElement {
       case "Enter":
         event.preventDefault();
         const src = this.inputRef.value.value;
-        console.log({ src });
+        // console.log({ src });
         this._layer.src = src;
         this.refresh();
         this.updateLayers();
@@ -109,7 +109,7 @@ class Layer extends LitElement {
   inputRef = createRef();
 
   refresh() {
-    console.log("refresh");
+    // console.log("refresh");
     if (this.iframe) {
       this.didSetupIframe = false;
       this.didIframeLoad = false;
@@ -119,13 +119,13 @@ class Layer extends LitElement {
 
   onClientConnected(event) {
     const client = event.detail.client;
-    console.log("onClientConnected", event, client);
+    // console.log("onClientConnected", event, client);
     this.client = client;
     this.isClientConnected = true;
   }
   onClientNotConnected(event) {
     const client = event.detail.client;
-    console.log("onClientNotConnected", event, client);
+    // console.log("onClientNotConnected", event, client);
     this.client = undefined;
     this.isClientConnected = false;
   }
@@ -180,14 +180,13 @@ class Layer extends LitElement {
   }
 
   render() {
-    // console.log("withoutInteraction", this.withoutInteraction);
-    console.log({
-      isClientConnected: this.isClientConnected,
-      didIframeLoad: this.didIframeLoad,
-      didSetupIframe: this.didSetupIframe,
-      withoutInteraction: this.withoutInteraction,
-      isDataEnabled: this.isDataEnabled,
-    });
+    // console.log({
+    //   isClientConnected: this.isClientConnected,
+    //   didIframeLoad: this.didIframeLoad,
+    //   didSetupIframe: this.didSetupIframe,
+    //   withoutInteraction: this.withoutInteraction,
+    //   isDataEnabled: this.isDataEnabled,
+    // });
     return html`<div
       class="wa-stack wa-gap-2xs bw-wa-stack-touch-reverse"
       @bw-client-connected=${this.onClientConnected}
