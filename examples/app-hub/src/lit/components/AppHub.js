@@ -62,6 +62,7 @@ import { createDirectionContextProvider } from "../contexts/directionContext.js"
 import { createBluetoothContextProvider } from "../contexts/bluetoothContext.js";
 import { waitForAnimationFrames } from "../../utils/rendering.js";
 import { createLayersContextProvider } from "../contexts/layersContext.js";
+import { cssColorToHex } from "../../utils/color-utils.js";
 
 class AppHub extends LitElement {
   createRenderRoot() {
@@ -296,12 +297,15 @@ class AppHub extends LitElement {
     console.log("AppHub", this);
   }
 
-  _updateMetaColor() {
+  async _updateMetaColor() {
     // console.log("_updateMetaColor");
-    const metaContentColor = getComputedStyle(document.documentElement)
+    let metaContentColor = getComputedStyle(document.body)
       .getPropertyValue("background-color")
       .trim();
-    // console.log({ metaContentColor });
+    if (isIOS) {
+      metaContentColor = cssColorToHex(metaContentColor);
+    }
+    console.log({ metaContentColor });
     this._themeColorMeta.removeAttribute("content");
     if (this._metaTimeout != undefined) {
       window.clearTimeout(this._metaTimeout);
@@ -311,6 +315,14 @@ class AppHub extends LitElement {
     this._metaTimeout = setTimeout(() => {
       this._themeColorMeta.setAttribute("content", metaContentColor);
     }, 100);
+
+    // ios 26 safari landscape toolbar doesn't change color if system theme != webpage theme...ugh
+    if (isIOS) {
+      // if (document.activeViewTransition) {
+      //   await document.activeViewTransition.finished;
+      // }
+      // document.body.style.backgroundColor = metaContentColor;
+    }
   }
 
   connectedCallback() {
