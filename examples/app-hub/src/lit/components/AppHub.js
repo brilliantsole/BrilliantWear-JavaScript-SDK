@@ -305,7 +305,7 @@ class AppHub extends LitElement {
     if (isIOS) {
       metaContentColor = cssColorToHex(metaContentColor);
     }
-    console.log({ metaContentColor });
+    // console.log({ metaContentColor });
     this._themeColorMeta.removeAttribute("content");
     if (this._metaTimeout != undefined) {
       window.clearTimeout(this._metaTimeout);
