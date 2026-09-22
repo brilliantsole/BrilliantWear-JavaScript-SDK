@@ -159,6 +159,9 @@ bw-app-hub {
   width: 100%;
   height: 100dvh;
   position: fixed;
+
+  container-type: size;
+  container-name: hub;
 }
 
 :root {
@@ -259,9 +262,6 @@ main {
   /* padding-top: var(--main-padding-top); */
   /* padding-bottom: var(--main-padding-bottom); */
 
-  container-type: size;
-  container-name: main;
-
   display: flex;
   flex-direction: column;
 }
@@ -297,6 +297,9 @@ main {
   flex: 1;
   position: relative;
   display: grid;
+
+  container-type: size;
+  container-name: main;
 }
 
 :root {
@@ -944,7 +947,7 @@ html:active-view-transition {
 /* PREVIOUS/NEXT TAB VIEW TRANSITIONS */
 
 html:active-view-transition-type(previous-tab, next-tab) {
-  --animation-duration: 300ms;
+  --animation-duration: 3000ms;
   --animation-timing-function: ease;
 }
 
@@ -1159,7 +1162,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
   to {
-    transform: translateY(-100cqh);
+    transform: translateY(-100dvh);
   }
 }
 @keyframes slide-out-to-bottom-main {
@@ -1167,7 +1170,7 @@ html:active-view-transition-type(next-tab) {
     transform: translateY(0);
   }
   to {
-    transform: translateY(100cqh);
+    transform: translateY(100dvh);
   }
 }
 
@@ -1189,7 +1192,7 @@ html:active-view-transition-type(next-tab) {
 }
 @keyframes slide-in-from-top-main {
   from {
-    transform: translateY(-100cqh);
+    transform: translateY(-100dvh);
   }
   to {
     transform: translateY(0);
@@ -1197,7 +1200,7 @@ html:active-view-transition-type(next-tab) {
 }
 @keyframes slide-in-from-bottom-main {
   from {
-    transform: translateY(100cqh);
+    transform: translateY(100dvh);
   }
   to {
     transform: translateY(0);
@@ -2367,7 +2370,7 @@ html:active-view-transition-type(theme) {
 }
 bw-tab-breadcrumb {
   padding-top: var(--tab-breadcrumb-padding-top);
-  /* background-color: var(--background-color); */
+  background-color: var(--background-color);
 }
 
 :root {
