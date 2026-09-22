@@ -297,7 +297,7 @@ class AppHub extends LitElement {
   }
 
   _updateMetaColor() {
-    console.log("_updateMetaColor");
+    // console.log("_updateMetaColor");
     const metaContentColor = getComputedStyle(document.documentElement)
       .getPropertyValue("background-color")
       .trim();

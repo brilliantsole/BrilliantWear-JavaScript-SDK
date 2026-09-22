@@ -44,11 +44,11 @@ class _ContextProvider extends ContextProvider {
   /** @type {ContextProviderHostDisconnectionCallback?} */
   _hostDisconnectionCallback;
 
-  hostConnected() {
+  async hostConnected() {
     super.hostConnected();
     // console.log("hostConnected");
     this._connectionAbortController = new AbortController();
-    this._hostDisconnectionCallback = this._hostConnectionCallback?.(
+    this._hostDisconnectionCallback = await this._hostConnectionCallback?.(
       this,
       this._connectionAbortController,
     );
