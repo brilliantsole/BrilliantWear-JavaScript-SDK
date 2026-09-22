@@ -2384,6 +2384,11 @@ html:active-view-transition-type(theme) {
 
   @supports (hanging-punctuation: first) and (-webkit-appearance: none) {
     grid-template-columns: repeat(auto-fit, var(--bw-grid-lane-width));
+    direction: var(--header-direction);
+    justify-content: start !important;
+    & > * {
+      direction: initial;
+    }
   }
   @supports not ((hanging-punctuation: first) and (-webkit-appearance: none)) {
     grid-template-columns: repeat(auto-fit, min-content);
@@ -2495,7 +2500,8 @@ bw-tab-breadcrumb {
   container-name: tab;
 
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
+  flex: auto;
 }
 #tabContent {
   padding-top: var(--tab-padding-top);
