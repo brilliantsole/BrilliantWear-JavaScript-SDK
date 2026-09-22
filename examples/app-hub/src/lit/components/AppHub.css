@@ -900,6 +900,15 @@ body::after {
   height: 5px;
   z-index: 8675309;
 }
+body::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 5px;
+  z-index: 8675309;
+}
 
 html {
   --background-color: var(--wa-color-neutral-fill-quiet);
