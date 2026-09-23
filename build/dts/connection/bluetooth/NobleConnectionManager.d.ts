@@ -1,5 +1,4 @@
 import BluetoothConnectionManager from "./BluetoothConnectionManager.ts";
-/** NODE_START */
 import * as noble from "@stoprocent/noble";
 import { BluetoothCharacteristicName, BluetoothServiceName } from "./bluetoothUUIDs.ts";
 import NobleScanner from "../../scanner/NobleScanner.ts";

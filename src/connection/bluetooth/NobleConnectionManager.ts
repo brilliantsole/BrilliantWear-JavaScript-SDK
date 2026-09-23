@@ -19,18 +19,15 @@ const _console = createConsole("NobleConnectionManager", { log: false });
 
 let filterUUIDs = true;
 
-/** NODE_START */
 import * as noble from "@stoprocent/noble";
 import os from "os";
 const isLinux = os.platform() == "linux";
 filterUUIDs = !isLinux;
-/** NODE_END */
 
-/** NODE_START */
 noble.withBindings("default", {
   extended: true,
   userChannel: true,
-}); /** NODE_END */
+});
 
 import {
   BluetoothCharacteristicName,

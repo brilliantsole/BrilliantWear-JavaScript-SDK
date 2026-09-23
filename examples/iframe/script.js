@@ -1,28 +1,28 @@
-import * as BS from "../../build/brilliantwear.module.js";
-window.BS = BS;
+import * as BW from "../../build/brilliantwear.module.js";
+window.BW = BW;
 
-// BS.setConsoleLevelFlagsForType("DisplayManager", { log: false });
-// BS.setConsoleLevelFlagsForType("DeviceManager", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
-// BS.setConsoleLevelFlagsForType("WebBluetoothConnectionManager", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
-// BS.setConsoleLevelFlagsForType("BaseServer", { log: true });
-// BS.setConsoleLevelFlagsForType("WindowManagerServer", { log: true });
-// BS.setConsoleLevelFlagsForType("Device", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayManagerInterface", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayContextCommand", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayBitmapUtils", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplaySpriteSheetUtils", { log: true });
-// BS.setConsoleLevelFlagsForType("DisplayBitmapUtils", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayManager", { log: false });
+// BW.setConsoleLevelFlagsForType("DeviceManager", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayCanvasHelper", { log: true });
+// BW.setConsoleLevelFlagsForType("WebBluetoothConnectionManager", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayContextCommand", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayContextStateHelper", { log: true });
+// BW.setConsoleLevelFlagsForType("BaseServer", { log: true });
+// BW.setConsoleLevelFlagsForType("WindowManagerServer", { log: true });
+// BW.setConsoleLevelFlagsForType("Device", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayManagerInterface", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayContextCommand", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayBitmapUtils", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplaySpriteSheetUtils", { log: true });
+// BW.setConsoleLevelFlagsForType("DisplayBitmapUtils", { log: true });
 
-// WEBSOCKET CLIENT
-const client = new BS.WebSocketClient();
+// WEBWOCKET CLIENT
+const client = new BW.WebSocketClient();
 console.log({ client });
 
 window.client = client;
 
-// WEBSOCKET URL SEARCH PARAMS
+// WEBWOCKET URL SEARCH PARAMS
 
 const url = new URL(location);
 function setUrlParam(key, value) {
@@ -53,14 +53,14 @@ client.addEventListener("isConnected", () => {
   }
 });
 
-// WEBSOCKET SERVER URL
+// WEBWOCKET SERVER URL
 
 /** @type {HTMLInputElement} */
 const webSocketUrlInput = document.getElementById("webSocketUrl");
 webSocketUrlInput.value = url.searchParams.get("webSocketUrl") || "";
 webSocketUrlInput.dispatchEvent(new Event("input"));
 
-// WEBSOCKET CONNECTION
+// WEBWOCKET CONNECTION
 
 /** @type {HTMLButtonElement} */
 const toggleConnectionButton = document.getElementById("toggleConnection");
@@ -97,7 +97,7 @@ client.addEventListener("connectionStatus", () => {
 
 const addDeviceButton = document.getElementById("addDevice");
 addDeviceButton.addEventListener("click", () => {
-  BS.Device.Connect();
+  BW.Device.Connect();
 });
 
 // AVAILABLE DEVICES
@@ -109,7 +109,7 @@ const availableDevicesContainer = document.getElementById(
 const availableDeviceContainerTemplate = document.getElementById(
   "availableDeviceContainerTemplate",
 );
-BS.DeviceManager.addEventListener("availableDevice", (event) => {
+BW.DeviceManager.addEventListener("availableDevice", (event) => {
   const { device } = event.message;
   console.log("availableDevice", device);
 
@@ -166,7 +166,7 @@ BS.DeviceManager.addEventListener("availableDevice", (event) => {
 });
 
 const autoConnectToAvailableDevices = false;
-BS.DeviceManager.addEventListener("availableDevice", (event) => {
+BW.DeviceManager.addEventListener("availableDevice", (event) => {
   const { availableDevice } = event.message;
   console.log("availableDevice", availableDevice);
   if (availableDevice.canReconnect && autoConnectToAvailableDevices) {
@@ -177,7 +177,7 @@ BS.DeviceManager.addEventListener("availableDevice", (event) => {
 // GET DEVICES
 const connectOnLoad = false;
 if (connectOnLoad) {
-  const devices = await BS.DeviceManager.getDevices();
+  const devices = await BW.DeviceManager.getDevices();
   console.log("getDevices", devices);
   devices.forEach((device) => device.reconnect());
 }
@@ -187,7 +187,7 @@ if (connectOnLoad) {
 const displayCanvas = document.getElementById("display");
 
 // DISPLAY CANVAS HELPER
-const displayCanvasHelper = new BS.DisplayCanvasHelper();
+const displayCanvasHelper = new BW.DisplayCanvasHelper();
 const clearDisplayCanvasHelper = async () => {
   await displayCanvasHelper.clearContext();
   await displayCanvasHelper.clear();
@@ -196,7 +196,7 @@ const clearDisplayCanvasHelper = async () => {
 displayCanvasHelper.canvas = displayCanvas;
 window.displayCanvasHelper = displayCanvasHelper;
 
-BS.DeviceManager.addEventListener("deviceConnected", async (event) => {
+BW.DeviceManager.addEventListener("deviceConnected", async (event) => {
   const { device } = event.message;
   if (device.isGlasses && device.isDisplayAvailable) {
     displayCanvasHelper.device = device;
@@ -207,7 +207,7 @@ BS.DeviceManager.addEventListener("deviceConnected", async (event) => {
 /** @type {HTMLTemplateElement} */
 const displayColorTemplate = document.getElementById("displayColorTemplate");
 const displayColorsContainer = document.getElementById("displayColors");
-const setDisplayColor = BS.ThrottleUtils.throttle(
+const setDisplayColor = BW.ThrottleUtils.throttle(
   (colorIndex, colorString) => {
     console.log({ colorIndex, colorString });
     displayCanvasHelper.setColor(colorIndex, colorString, true);
@@ -385,7 +385,7 @@ addIframeButton.addEventListener("click", () => {
   createIframeContainer();
 });
 
-BS.ServerManager.clientSensorConfigurationToDeviceGuardManager.add(
+BW.ServerManager.clientSensorConfigurationToDeviceGuardManager.add(
   ({ client, message, sensorType, sensorRate }) => {
     // console.log("allow sensorConfiguration?", { sensorType, sensorRate });
     return client.iframe.dataset.allowSensorData == "true";
@@ -393,7 +393,7 @@ BS.ServerManager.clientSensorConfigurationToDeviceGuardManager.add(
   },
 );
 
-BS.ServerManager.deviceSensorDataToClientGuardManager.add(
+BW.ServerManager.deviceSensorDataToClientGuardManager.add(
   ({ client, message, sensorType, sensorData }) => {
     // console.log("allow sensorData?", { sensorType, sensorData });
     return client.iframe.dataset.allowSensorData == "true";
@@ -401,21 +401,21 @@ BS.ServerManager.deviceSensorDataToClientGuardManager.add(
   },
 );
 
-BS.ServerManager.clientDisplayContextCommandToDeviceGuardManager.add(
+BW.ServerManager.clientDisplayContextCommandToDeviceGuardManager.add(
   ({ client, message, displayContextCommand }) => {
     // console.log("allow displayContextCommand?", displayContextCommand);
     return true;
   },
 );
 
-BS.ServerManager.clientVibrationConfigurationToDeviceGuardManager.add(
+BW.ServerManager.clientVibrationConfigurationToDeviceGuardManager.add(
   ({ client, message, vibrationConfiguration }) => {
     console.log("allow vibrationConfiguration?", vibrationConfiguration);
     return true;
   },
 );
 
-BS.ServerManager.deviceFileToClientGuardManager.add(
+BW.ServerManager.deviceFileToClientGuardManager.add(
   ({ client, message, fileConfiguration }) => {
     console.log("allow fileConfiguration?", fileConfiguration);
     return true;
@@ -423,7 +423,7 @@ BS.ServerManager.deviceFileToClientGuardManager.add(
 );
 
 const generateSpriteSheet = (name, length) => {
-  /** @type {BS.DisplaySpriteSheet} */
+  /** @type {BW.DisplaySpriteSheet} */
   const spriteSheet = {
     name,
     sprites: [],
@@ -446,17 +446,17 @@ const generateSpriteSheet = (name, length) => {
 
 let image = new Image();
 document.body.appendChild(image);
-BS.DeviceManager.addEventListener("deviceCameraImage", (event) => {
+BW.DeviceManager.addEventListener("deviceCameraImage", (event) => {
   image.src = event.message.url;
 });
 
-// PUBSUB
+// PUBWUB
 
 const abortController = new AbortController();
-BS.PubSubManager.subscribe(
+BW.PubSubManager.subscribe(
   "hello",
   (event) => {
-    console.log("PUBSUB", event);
+    console.log("PUBWUB", event);
     // abortController.abort();
   },
   { signal: abortController.signal },
@@ -464,7 +464,7 @@ BS.PubSubManager.subscribe(
 window.abortController = abortController;
 
 window.allowPeerSubscription = true;
-BS.PubSubManager.peerSubscriptionGuardManager.add(
+BW.PubSubManager.peerSubscriptionGuardManager.add(
   ({ peer, type, data, sendingPeer }) => {
     console.log("allow peerSubscription?", peer, type, data, sendingPeer);
     return window.allowPeerSubscription;

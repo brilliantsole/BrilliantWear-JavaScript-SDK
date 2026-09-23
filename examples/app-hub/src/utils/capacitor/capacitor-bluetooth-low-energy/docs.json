@@ -1,0 +1,3629 @@
+{
+  "api": {
+    "name": "BluetoothLowEnergyPlugin",
+    "slug": "bluetoothlowenergyplugin",
+    "docs": "Capacitor Bluetooth Low Energy Plugin for BLE communication.",
+    "tags": [
+      {
+        "text": "1.0.0",
+        "name": "since"
+      }
+    ],
+    "methods": [
+      {
+        "name": "initialize",
+        "signature": "(options?: InitializeOptions | undefined) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Initialization options",
+            "type": "InitializeOptions | undefined"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Initialization options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when initialization is complete"
+          },
+          {
+            "name": "throws",
+            "text": "Error if initialization fails"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.initialize({ mode: 'central' });\n```"
+          }
+        ],
+        "docs": "Initialize the BLE plugin.\nMust be called before any other method.",
+        "complexTypes": [
+          "InitializeOptions"
+        ],
+        "slug": "initialize"
+      },
+      {
+        "name": "shimWebBluetooth",
+        "signature": "() => void",
+        "parameters": [],
+        "returns": "void",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nBluetoothLowEnergy.shimWebBluetooth();\n```"
+          }
+        ],
+        "docs": "Install the Capacitor Web Bluetooth shim on `navigator.bluetooth`.\nCall this manually before using the Web Bluetooth API from a Capacitor native app.",
+        "complexTypes": [],
+        "slug": "shimwebbluetooth"
+      },
+      {
+        "name": "isAvailable",
+        "signature": "() => Promise<IsAvailableResult>",
+        "parameters": [],
+        "returns": "Promise<IsAvailableResult>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with availability status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { available } = await BluetoothLowEnergy.isAvailable();\n```"
+          }
+        ],
+        "docs": "Check if Bluetooth is available on the device.",
+        "complexTypes": [
+          "IsAvailableResult"
+        ],
+        "slug": "isavailable"
+      },
+      {
+        "name": "isEnabled",
+        "signature": "() => Promise<IsEnabledResult>",
+        "parameters": [],
+        "returns": "Promise<IsEnabledResult>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with enabled status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { enabled } = await BluetoothLowEnergy.isEnabled();\n```"
+          }
+        ],
+        "docs": "Check if Bluetooth is enabled on the device.",
+        "complexTypes": [
+          "IsEnabledResult"
+        ],
+        "slug": "isenabled"
+      },
+      {
+        "name": "isLocationEnabled",
+        "signature": "() => Promise<IsLocationEnabledResult>",
+        "parameters": [],
+        "returns": "Promise<IsLocationEnabledResult>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with location enabled status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { enabled } = await BluetoothLowEnergy.isLocationEnabled();\n```"
+          }
+        ],
+        "docs": "Check if location services are enabled (Android only).",
+        "complexTypes": [
+          "IsLocationEnabledResult"
+        ],
+        "slug": "islocationenabled"
+      },
+      {
+        "name": "openAppSettings",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when settings are opened"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.openAppSettings();\n```"
+          }
+        ],
+        "docs": "Open the app settings page.",
+        "complexTypes": [],
+        "slug": "openappsettings"
+      },
+      {
+        "name": "openBluetoothSettings",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when settings are opened"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.openBluetoothSettings();\n```"
+          }
+        ],
+        "docs": "Open the Bluetooth settings page (Android only).",
+        "complexTypes": [],
+        "slug": "openbluetoothsettings"
+      },
+      {
+        "name": "openLocationSettings",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when settings are opened"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.openLocationSettings();\n```"
+          }
+        ],
+        "docs": "Open the location settings page (Android only).",
+        "complexTypes": [],
+        "slug": "openlocationsettings"
+      },
+      {
+        "name": "checkPermissions",
+        "signature": "() => Promise<PermissionStatus>",
+        "parameters": [],
+        "returns": "Promise<PermissionStatus>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with permission status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { bluetooth, location } = await BluetoothLowEnergy.checkPermissions();\n```"
+          }
+        ],
+        "docs": "Check the current permission status.",
+        "complexTypes": [
+          "PermissionStatus"
+        ],
+        "slug": "checkpermissions"
+      },
+      {
+        "name": "requestPermissions",
+        "signature": "() => Promise<PermissionStatus>",
+        "parameters": [],
+        "returns": "Promise<PermissionStatus>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with permission status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { bluetooth, location } = await BluetoothLowEnergy.requestPermissions();\n```"
+          }
+        ],
+        "docs": "Request Bluetooth permissions.",
+        "complexTypes": [
+          "PermissionStatus"
+        ],
+        "slug": "requestpermissions"
+      },
+      {
+        "name": "startScan",
+        "signature": "(options?: StartScanOptions | undefined) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Scan options",
+            "type": "StartScanOptions | undefined"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Scan options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when scanning starts"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.startScan({\n  services: ['180D'], // Heart Rate Service\n  timeout: 10000\n});\n```"
+          }
+        ],
+        "docs": "Start scanning for BLE devices.",
+        "complexTypes": [
+          "StartScanOptions"
+        ],
+        "slug": "startscan"
+      },
+      {
+        "name": "stopScan",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when scanning stops"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.stopScan();\n```"
+          }
+        ],
+        "docs": "Stop scanning for BLE devices.",
+        "complexTypes": [],
+        "slug": "stopscan"
+      },
+      {
+        "name": "connect",
+        "signature": "(options: ConnectOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Connection options",
+            "type": "ConnectOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Connection options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when connected"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.connect({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Connect to a BLE device.",
+        "complexTypes": [
+          "ConnectOptions"
+        ],
+        "slug": "connect"
+      },
+      {
+        "name": "disconnect",
+        "signature": "(options: DisconnectOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Disconnect options",
+            "type": "DisconnectOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Disconnect options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when disconnected"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.disconnect({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Disconnect from a BLE device.",
+        "complexTypes": [
+          "DisconnectOptions"
+        ],
+        "slug": "disconnect"
+      },
+      {
+        "name": "createBond",
+        "signature": "(options: CreateBondOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Bond options",
+            "type": "CreateBondOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Bond options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when bond is created"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.createBond({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Create a bond with a BLE device (Android only).",
+        "complexTypes": [
+          "CreateBondOptions"
+        ],
+        "slug": "createbond"
+      },
+      {
+        "name": "isBonded",
+        "signature": "(options: IsBondedOptions) => Promise<IsBondedResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Bond check options",
+            "type": "IsBondedOptions"
+          }
+        ],
+        "returns": "Promise<IsBondedResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Bond check options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with bonded status"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { bonded } = await BluetoothLowEnergy.isBonded({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Check if a device is bonded (Android only).",
+        "complexTypes": [
+          "IsBondedResult",
+          "IsBondedOptions"
+        ],
+        "slug": "isbonded"
+      },
+      {
+        "name": "discoverServices",
+        "signature": "(options: DiscoverServicesOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Discover options",
+            "type": "DiscoverServicesOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Discover options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when discovery is complete"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.discoverServices({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Discover services on a connected device.",
+        "complexTypes": [
+          "DiscoverServicesOptions"
+        ],
+        "slug": "discoverservices"
+      },
+      {
+        "name": "getServices",
+        "signature": "(options: GetServicesOptions) => Promise<GetServicesResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Get services options",
+            "type": "GetServicesOptions"
+          }
+        ],
+        "returns": "Promise<GetServicesResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Get services options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with services list"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { services } = await BluetoothLowEnergy.getServices({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Get discovered services for a device.",
+        "complexTypes": [
+          "GetServicesResult",
+          "GetServicesOptions"
+        ],
+        "slug": "getservices"
+      },
+      {
+        "name": "getConnectedDevices",
+        "signature": "() => Promise<GetConnectedDevicesResult>",
+        "parameters": [],
+        "returns": "Promise<GetConnectedDevicesResult>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with connected devices"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { devices } = await BluetoothLowEnergy.getConnectedDevices();\n```"
+          }
+        ],
+        "docs": "Get a list of connected devices.",
+        "complexTypes": [
+          "GetConnectedDevicesResult"
+        ],
+        "slug": "getconnecteddevices"
+      },
+      {
+        "name": "readCharacteristic",
+        "signature": "(options: ReadCharacteristicOptions) => Promise<ReadCharacteristicResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Read options",
+            "type": "ReadCharacteristicOptions"
+          }
+        ],
+        "returns": "Promise<ReadCharacteristicResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Read options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with the characteristic value"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { value } = await BluetoothLowEnergy.readCharacteristic({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A37'\n});\n```"
+          }
+        ],
+        "docs": "Read a characteristic value.",
+        "complexTypes": [
+          "ReadCharacteristicResult",
+          "ReadCharacteristicOptions"
+        ],
+        "slug": "readcharacteristic"
+      },
+      {
+        "name": "writeCharacteristic",
+        "signature": "(options: WriteCharacteristicOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Write options",
+            "type": "WriteCharacteristicOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Write options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when write is complete"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.writeCharacteristic({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A39',\n  value: [0x01]\n});\n```"
+          }
+        ],
+        "docs": "Write a value to a characteristic.",
+        "complexTypes": [
+          "WriteCharacteristicOptions"
+        ],
+        "slug": "writecharacteristic"
+      },
+      {
+        "name": "startCharacteristicNotifications",
+        "signature": "(options: StartCharacteristicNotificationsOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Notification options",
+            "type": "StartCharacteristicNotificationsOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Notification options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when notifications start"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.startCharacteristicNotifications({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A37'\n});\n```"
+          }
+        ],
+        "docs": "Start notifications for a characteristic.",
+        "complexTypes": [
+          "StartCharacteristicNotificationsOptions"
+        ],
+        "slug": "startcharacteristicnotifications"
+      },
+      {
+        "name": "stopCharacteristicNotifications",
+        "signature": "(options: StopCharacteristicNotificationsOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Stop notification options",
+            "type": "StopCharacteristicNotificationsOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Stop notification options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when notifications stop"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.stopCharacteristicNotifications({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A37'\n});\n```"
+          }
+        ],
+        "docs": "Stop notifications for a characteristic.",
+        "complexTypes": [
+          "StopCharacteristicNotificationsOptions"
+        ],
+        "slug": "stopcharacteristicnotifications"
+      },
+      {
+        "name": "readDescriptor",
+        "signature": "(options: ReadDescriptorOptions) => Promise<ReadDescriptorResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Read descriptor options",
+            "type": "ReadDescriptorOptions"
+          }
+        ],
+        "returns": "Promise<ReadDescriptorResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Read descriptor options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with the descriptor value"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { value } = await BluetoothLowEnergy.readDescriptor({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A37',\n  descriptor: '2902'\n});\n```"
+          }
+        ],
+        "docs": "Read a descriptor value.",
+        "complexTypes": [
+          "ReadDescriptorResult",
+          "ReadDescriptorOptions"
+        ],
+        "slug": "readdescriptor"
+      },
+      {
+        "name": "writeDescriptor",
+        "signature": "(options: WriteDescriptorOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Write descriptor options",
+            "type": "WriteDescriptorOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Write descriptor options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when write is complete"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.writeDescriptor({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  service: '180D',\n  characteristic: '2A37',\n  descriptor: '2902',\n  value: [0x01, 0x00]\n});\n```"
+          }
+        ],
+        "docs": "Write a value to a descriptor.",
+        "complexTypes": [
+          "WriteDescriptorOptions"
+        ],
+        "slug": "writedescriptor"
+      },
+      {
+        "name": "readRssi",
+        "signature": "(options: ReadRssiOptions) => Promise<ReadRssiResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Read RSSI options",
+            "type": "ReadRssiOptions"
+          }
+        ],
+        "returns": "Promise<ReadRssiResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Read RSSI options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with the RSSI value"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { rssi } = await BluetoothLowEnergy.readRssi({ deviceId: 'AA:BB:CC:DD:EE:FF' });\n```"
+          }
+        ],
+        "docs": "Read the RSSI (signal strength) of a connected device.",
+        "complexTypes": [
+          "ReadRssiResult",
+          "ReadRssiOptions"
+        ],
+        "slug": "readrssi"
+      },
+      {
+        "name": "requestMtu",
+        "signature": "(options: RequestMtuOptions) => Promise<RequestMtuResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Request MTU options",
+            "type": "RequestMtuOptions"
+          }
+        ],
+        "returns": "Promise<RequestMtuResult>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Request MTU options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with the new MTU value"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { mtu } = await BluetoothLowEnergy.requestMtu({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  mtu: 512\n});\n```"
+          }
+        ],
+        "docs": "Request MTU size change (Android only).",
+        "complexTypes": [
+          "RequestMtuResult",
+          "RequestMtuOptions"
+        ],
+        "slug": "requestmtu"
+      },
+      {
+        "name": "requestConnectionPriority",
+        "signature": "(options: RequestConnectionPriorityOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Request priority options",
+            "type": "RequestConnectionPriorityOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Request priority options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when priority is set"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.requestConnectionPriority({\n  deviceId: 'AA:BB:CC:DD:EE:FF',\n  priority: 'high'\n});\n```"
+          }
+        ],
+        "docs": "Request connection priority (Android only).",
+        "complexTypes": [
+          "RequestConnectionPriorityOptions"
+        ],
+        "slug": "requestconnectionpriority"
+      },
+      {
+        "name": "startAdvertising",
+        "signature": "(options: StartAdvertisingOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Advertising options",
+            "type": "StartAdvertisingOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Advertising options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when advertising starts"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.startAdvertising({\n  name: 'MyDevice',\n  services: ['180D']\n});\n```"
+          }
+        ],
+        "docs": "Start advertising as a peripheral (BLE server).",
+        "complexTypes": [
+          "StartAdvertisingOptions"
+        ],
+        "slug": "startadvertising"
+      },
+      {
+        "name": "stopAdvertising",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when advertising stops"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.stopAdvertising();\n```"
+          }
+        ],
+        "docs": "Stop advertising.",
+        "complexTypes": [],
+        "slug": "stopadvertising"
+      },
+      {
+        "name": "addGattService",
+        "signature": "(options: AddGattServiceOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- GATT service definition",
+            "type": "AddGattServiceOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - GATT service definition"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when the service is added"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.addGattService({\n  service: '180D',\n  characteristics: [{\n    uuid: '2A37',\n    properties: { read: true, notify: true, write: false, writeWithoutResponse: false, broadcast: false, indicate: false, authenticatedSignedWrites: false, extendedProperties: false },\n    value: [0x00]\n  }]\n});\n```"
+          }
+        ],
+        "docs": "Add a GATT service with characteristics to the local GATT server.\nMust be called in peripheral mode before starting advertising.",
+        "complexTypes": [
+          "AddGattServiceOptions"
+        ],
+        "slug": "addgattservice"
+      },
+      {
+        "name": "removeGattService",
+        "signature": "(options: RemoveGattServiceOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Service removal options",
+            "type": "RemoveGattServiceOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Service removal options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when the service is removed"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Remove a GATT service from the local GATT server.",
+        "complexTypes": [
+          "RemoveGattServiceOptions"
+        ],
+        "slug": "removegattservice"
+      },
+      {
+        "name": "setGattCharacteristicValue",
+        "signature": "(options: SetGattCharacteristicValueOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Characteristic value options",
+            "type": "SetGattCharacteristicValueOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Characteristic value options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when the value is set"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Set the value of a local GATT characteristic.",
+        "complexTypes": [
+          "SetGattCharacteristicValueOptions"
+        ],
+        "slug": "setgattcharacteristicvalue"
+      },
+      {
+        "name": "notifyGattCharacteristicChanged",
+        "signature": "(options: NotifyGattCharacteristicChangedOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Notification options",
+            "type": "NotifyGattCharacteristicChangedOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Notification options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when the notification is sent"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Notify connected centrals that a local GATT characteristic value changed.",
+        "complexTypes": [
+          "NotifyGattCharacteristicChangedOptions"
+        ],
+        "slug": "notifygattcharacteristicchanged"
+      },
+      {
+        "name": "startForegroundService",
+        "signature": "(options: StartForegroundServiceOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "- Foreground service options",
+            "type": "StartForegroundServiceOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Foreground service options"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves when service starts"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.startForegroundService({\n  title: 'BLE Connection',\n  body: 'Maintaining connection...'\n});\n```"
+          }
+        ],
+        "docs": "Start a foreground service to maintain BLE connections in background (Android only).",
+        "complexTypes": [
+          "StartForegroundServiceOptions"
+        ],
+        "slug": "startforegroundservice"
+      },
+      {
+        "name": "stopForegroundService",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when service stops"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nawait BluetoothLowEnergy.stopForegroundService();\n```"
+          }
+        ],
+        "docs": "Stop the foreground service (Android only).",
+        "complexTypes": [],
+        "slug": "stopforegroundservice"
+      },
+      {
+        "name": "getPluginVersion",
+        "signature": "() => Promise<GetPluginVersionResult>",
+        "parameters": [],
+        "returns": "Promise<GetPluginVersionResult>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves with the plugin version"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          },
+          {
+            "name": "example",
+            "text": "```typescript\nconst { version } = await BluetoothLowEnergy.getPluginVersion();\n```"
+          }
+        ],
+        "docs": "Get the native Capacitor plugin version.",
+        "complexTypes": [
+          "GetPluginVersionResult"
+        ],
+        "slug": "getpluginversion"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'deviceScanned', listenerFunc: (event: DeviceScannedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'deviceScanned'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: DeviceScannedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Add a listener for device scanned events.",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "DeviceScannedEvent"
+        ],
+        "slug": "addlistenerdevicescanned-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'deviceConnected', listenerFunc: (event: DeviceConnectedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'deviceConnected'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: DeviceConnectedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Add a listener for device connected events.",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "DeviceConnectedEvent"
+        ],
+        "slug": "addlistenerdeviceconnected-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'deviceDisconnected', listenerFunc: (event: DeviceDisconnectedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'deviceDisconnected'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: DeviceDisconnectedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Add a listener for device disconnected events.",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "DeviceDisconnectedEvent"
+        ],
+        "slug": "addlistenerdevicedisconnected-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'characteristicChanged', listenerFunc: (event: CharacteristicChangedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'characteristicChanged'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: CharacteristicChangedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Add a listener for characteristic changed events.",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "CharacteristicChangedEvent"
+        ],
+        "slug": "addlistenercharacteristicchanged-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'centralConnected', listenerFunc: (event: CentralConnectedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'centralConnected'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: CentralConnectedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Add a listener for central connected events (peripheral mode).",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "CentralConnectedEvent"
+        ],
+        "slug": "addlistenercentralconnected-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'centralDisconnected', listenerFunc: (event: CentralDisconnectedEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'centralDisconnected'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: CentralDisconnectedEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Add a listener for central disconnected events (peripheral mode).",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "CentralDisconnectedEvent"
+        ],
+        "slug": "addlistenercentraldisconnected-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'gattCharacteristicReadRequest', listenerFunc: (event: GattCharacteristicReadRequestEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'gattCharacteristicReadRequest'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: GattCharacteristicReadRequestEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Add a listener for GATT characteristic read requests (peripheral mode).",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "GattCharacteristicReadRequestEvent"
+        ],
+        "slug": "addlistenergattcharacteristicreadrequest-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'gattCharacteristicWriteRequest', listenerFunc: (event: GattCharacteristicWriteRequestEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "- The event name",
+            "type": "'gattCharacteristicWriteRequest'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "- The listener function",
+            "type": "(event: GattCharacteristicWriteRequestEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "eventName - The event name"
+          },
+          {
+            "name": "param",
+            "text": "listenerFunc - The listener function"
+          },
+          {
+            "name": "returns",
+            "text": "Promise that resolves with a handle to remove the listener"
+          },
+          {
+            "name": "since",
+            "text": "8.2.0"
+          }
+        ],
+        "docs": "Add a listener for GATT characteristic write requests (peripheral mode).",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "GattCharacteristicWriteRequestEvent"
+        ],
+        "slug": "addlistenergattcharacteristicwriterequest-"
+      },
+      {
+        "name": "removeAllListeners",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "returns",
+            "text": "Promise that resolves when all listeners are removed"
+          },
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Remove all listeners for this plugin.",
+        "complexTypes": [],
+        "slug": "removealllisteners"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "InitializeOptions",
+      "slug": "initializeoptions",
+      "docs": "Initialization options for the plugin.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "mode",
+          "tags": [
+            {
+              "text": "'central'",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The mode to initialize the plugin in.\n- 'central': Act as a BLE central (client)\n- 'peripheral': Act as a BLE peripheral (server)",
+          "complexTypes": [],
+          "type": "'central' | 'peripheral' | undefined"
+        },
+        {
+          "name": "showPowerAlert",
+          "tags": [
+            {
+              "text": "true",
+              "name": "default"
+            },
+            {
+              "text": "8.0.7",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether iOS should show the system Bluetooth power alert when Bluetooth is off (iOS only).",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        }
+      ]
+    },
+    {
+      "name": "IsAvailableResult",
+      "slug": "isavailableresult",
+      "docs": "Result of the isAvailable method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "available",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether Bluetooth is available on the device.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "IsEnabledResult",
+      "slug": "isenabledresult",
+      "docs": "Result of the isEnabled method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "enabled",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether Bluetooth is enabled on the device.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "IsLocationEnabledResult",
+      "slug": "islocationenabledresult",
+      "docs": "Result of the isLocationEnabled method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "enabled",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether location services are enabled on the device.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "PermissionStatus",
+      "slug": "permissionstatus",
+      "docs": "Permission status for Bluetooth and location.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "bluetooth",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Bluetooth permission status.",
+          "complexTypes": [
+            "PermissionState"
+          ],
+          "type": "PermissionState"
+        },
+        {
+          "name": "location",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Location permission status (Android only).",
+          "complexTypes": [
+            "PermissionState"
+          ],
+          "type": "PermissionState"
+        }
+      ]
+    },
+    {
+      "name": "StartScanOptions",
+      "slug": "startscanoptions",
+      "docs": "Options for starting a scan.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "services",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "List of service UUIDs to filter by.\nOnly devices advertising these services will be returned.",
+          "complexTypes": [],
+          "type": "string[] | undefined"
+        },
+        {
+          "name": "timeout",
+          "tags": [
+            {
+              "text": "0",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Scan timeout in milliseconds.\nSet to 0 for no timeout.",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "allowDuplicates",
+          "tags": [
+            {
+              "text": "false",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether to allow duplicate scan results.",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        }
+      ]
+    },
+    {
+      "name": "ConnectOptions",
+      "slug": "connectoptions",
+      "docs": "Options for connecting to a device.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID (MAC address on Android, UUID on iOS).",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "autoConnect",
+          "tags": [
+            {
+              "text": "false",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether to automatically connect when the device becomes available.",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        }
+      ]
+    },
+    {
+      "name": "DisconnectOptions",
+      "slug": "disconnectoptions",
+      "docs": "Options for disconnecting from a device.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID to disconnect from.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "CreateBondOptions",
+      "slug": "createbondoptions",
+      "docs": "Options for creating a bond.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID to bond with.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "IsBondedResult",
+      "slug": "isbondedresult",
+      "docs": "Result of the isBonded method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "bonded",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the device is bonded.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "IsBondedOptions",
+      "slug": "isbondedoptions",
+      "docs": "Options for checking bond status.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID to check.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "DiscoverServicesOptions",
+      "slug": "discoverservicesoptions",
+      "docs": "Options for discovering services.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID to discover services on.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "GetServicesResult",
+      "slug": "getservicesresult",
+      "docs": "Result of the getServices method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "services",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "List of discovered services.",
+          "complexTypes": [
+            "BleService"
+          ],
+          "type": "BleService[]"
+        }
+      ]
+    },
+    {
+      "name": "BleService",
+      "slug": "bleservice",
+      "docs": "A BLE service.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "uuid",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristics",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "List of characteristics in this service.",
+          "complexTypes": [
+            "BleCharacteristic"
+          ],
+          "type": "BleCharacteristic[]"
+        }
+      ]
+    },
+    {
+      "name": "BleCharacteristic",
+      "slug": "blecharacteristic",
+      "docs": "A BLE characteristic.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "uuid",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "properties",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Properties of this characteristic.",
+          "complexTypes": [
+            "CharacteristicProperties"
+          ],
+          "type": "CharacteristicProperties"
+        },
+        {
+          "name": "descriptors",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "List of descriptors in this characteristic.",
+          "complexTypes": [
+            "BleDescriptor"
+          ],
+          "type": "BleDescriptor[]"
+        }
+      ]
+    },
+    {
+      "name": "CharacteristicProperties",
+      "slug": "characteristicproperties",
+      "docs": "Properties of a BLE characteristic.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "broadcast",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports broadcast.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "read",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports read.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "writeWithoutResponse",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports write without response.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "write",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports write.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "notify",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports notify.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "indicate",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports indicate.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "authenticatedSignedWrites",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic supports authenticated signed writes.",
+          "complexTypes": [],
+          "type": "boolean"
+        },
+        {
+          "name": "extendedProperties",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether the characteristic has extended properties.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "BleDescriptor",
+      "slug": "bledescriptor",
+      "docs": "A BLE descriptor.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "uuid",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The descriptor UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "GetServicesOptions",
+      "slug": "getservicesoptions",
+      "docs": "Options for getting services.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID to get services for.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "GetConnectedDevicesResult",
+      "slug": "getconnecteddevicesresult",
+      "docs": "Result of the getConnectedDevices method.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "devices",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "List of connected devices.",
+          "complexTypes": [
+            "BleDevice"
+          ],
+          "type": "BleDevice[]"
+        }
+      ]
+    },
+    {
+      "name": "BleDevice",
+      "slug": "bledevice",
+      "docs": "A BLE device.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID (MAC address on Android, UUID on iOS).",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device name (may be null if not available).",
+          "complexTypes": [],
+          "type": "string | null"
+        },
+        {
+          "name": "rssi",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The RSSI (signal strength) at time of discovery.",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "manufacturerData",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Manufacturer data from advertisement (as hex string).",
+          "complexTypes": [],
+          "type": "string | undefined"
+        },
+        {
+          "name": "serviceUuids",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Service UUIDs advertised by the device.",
+          "complexTypes": [],
+          "type": "string[] | undefined"
+        }
+      ]
+    },
+    {
+      "name": "ReadCharacteristicResult",
+      "slug": "readcharacteristicresult",
+      "docs": "Result of reading a characteristic.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "ReadCharacteristicOptions",
+      "slug": "readcharacteristicoptions",
+      "docs": "Options for reading a characteristic.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "WriteCharacteristicOptions",
+      "slug": "writecharacteristicoptions",
+      "docs": "Options for writing to a characteristic.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The value to write as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        },
+        {
+          "name": "type",
+          "tags": [
+            {
+              "text": "'withResponse'",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Write type.",
+          "complexTypes": [],
+          "type": "'withResponse' | 'withoutResponse' | undefined"
+        }
+      ]
+    },
+    {
+      "name": "StartCharacteristicNotificationsOptions",
+      "slug": "startcharacteristicnotificationsoptions",
+      "docs": "Options for starting characteristic notifications.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "StopCharacteristicNotificationsOptions",
+      "slug": "stopcharacteristicnotificationsoptions",
+      "docs": "Options for stopping characteristic notifications.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "ReadDescriptorResult",
+      "slug": "readdescriptorresult",
+      "docs": "Result of reading a descriptor.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The descriptor value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "ReadDescriptorOptions",
+      "slug": "readdescriptoroptions",
+      "docs": "Options for reading a descriptor.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "descriptor",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The descriptor UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "WriteDescriptorOptions",
+      "slug": "writedescriptoroptions",
+      "docs": "Options for writing to a descriptor.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "descriptor",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The descriptor UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The value to write as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "ReadRssiResult",
+      "slug": "readrssiresult",
+      "docs": "Result of reading RSSI.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "rssi",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The RSSI value in dBm.",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "ReadRssiOptions",
+      "slug": "readrssioptions",
+      "docs": "Options for reading RSSI.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "RequestMtuResult",
+      "slug": "requestmturesult",
+      "docs": "Result of requesting MTU.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "mtu",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The negotiated MTU size.",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "RequestMtuOptions",
+      "slug": "requestmtuoptions",
+      "docs": "Options for requesting MTU.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "mtu",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The requested MTU size.",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "RequestConnectionPriorityOptions",
+      "slug": "requestconnectionpriorityoptions",
+      "docs": "Options for requesting connection priority.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "priority",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The requested connection priority.",
+          "complexTypes": [],
+          "type": "'low' | 'balanced' | 'high'"
+        }
+      ]
+    },
+    {
+      "name": "StartAdvertisingOptions",
+      "slug": "startadvertisingoptions",
+      "docs": "Options for starting advertising.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "name",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device name to advertise.\n\nOn Android, advertising the local name is implemented by temporarily setting the Bluetooth adapter name\nwhile advertising, then restoring the previous adapter name when advertising is stopped.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        },
+        {
+          "name": "services",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Service UUIDs to advertise.",
+          "complexTypes": [],
+          "type": "string[] | undefined"
+        },
+        {
+          "name": "includeName",
+          "tags": [
+            {
+              "text": "true",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether to include the device name in the advertisement.",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        },
+        {
+          "name": "includeTxPowerLevel",
+          "tags": [
+            {
+              "text": "false",
+              "name": "default"
+            },
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Whether to include TX power level in the advertisement.",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        }
+      ]
+    },
+    {
+      "name": "AddGattServiceOptions",
+      "slug": "addgattserviceoptions",
+      "docs": "Options for adding a GATT service.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristics",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Characteristics to expose in this service.",
+          "complexTypes": [
+            "GattCharacteristicDefinition"
+          ],
+          "type": "GattCharacteristicDefinition[]"
+        }
+      ]
+    },
+    {
+      "name": "GattCharacteristicDefinition",
+      "slug": "gattcharacteristicdefinition",
+      "docs": "A GATT characteristic definition for the local GATT server.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "uuid",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "properties",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Properties of this characteristic.",
+          "complexTypes": [
+            "CharacteristicProperties"
+          ],
+          "type": "CharacteristicProperties"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Initial value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[] | undefined"
+        },
+        {
+          "name": "descriptors",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Optional descriptors for this characteristic.",
+          "complexTypes": [
+            "GattDescriptorDefinition"
+          ],
+          "type": "GattDescriptorDefinition[] | undefined"
+        }
+      ]
+    },
+    {
+      "name": "GattDescriptorDefinition",
+      "slug": "gattdescriptordefinition",
+      "docs": "A GATT descriptor definition for the local GATT server.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "uuid",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The descriptor UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Initial value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[] | undefined"
+        }
+      ]
+    },
+    {
+      "name": "RemoveGattServiceOptions",
+      "slug": "removegattserviceoptions",
+      "docs": "Options for removing a GATT service.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "SetGattCharacteristicValueOptions",
+      "slug": "setgattcharacteristicvalueoptions",
+      "docs": "Options for setting a local GATT characteristic value.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "NotifyGattCharacteristicChangedOptions",
+      "slug": "notifygattcharacteristicchangedoptions",
+      "docs": "Options for notifying connected centrals of a characteristic change.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        },
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "Optional central device ID. When omitted, all subscribed centrals are notified.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "StartForegroundServiceOptions",
+      "slug": "startforegroundserviceoptions",
+      "docs": "Options for starting the foreground service.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "title",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The notification title.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "body",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The notification body.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "smallIcon",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The notification small icon resource name.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "GetPluginVersionResult",
+      "slug": "getpluginversionresult",
+      "docs": "Result of getPluginVersion.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "version",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The plugin version.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "PluginListenerHandle",
+      "slug": "pluginlistenerhandle",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "remove",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "() => Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "DeviceScannedEvent",
+      "slug": "devicescannedevent",
+      "docs": "Event emitted when a device is scanned.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "device",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The scanned device.",
+          "complexTypes": [
+            "BleDevice"
+          ],
+          "type": "BleDevice"
+        }
+      ]
+    },
+    {
+      "name": "DeviceConnectedEvent",
+      "slug": "deviceconnectedevent",
+      "docs": "Event emitted when a device is connected.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "DeviceDisconnectedEvent",
+      "slug": "devicedisconnectedevent",
+      "docs": "Event emitted when a device is disconnected.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "CharacteristicChangedEvent",
+      "slug": "characteristicchangedevent",
+      "docs": "Event emitted when a characteristic value changes.",
+      "tags": [
+        {
+          "text": "1.0.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "1.0.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The new value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    },
+    {
+      "name": "CentralConnectedEvent",
+      "slug": "centralconnectedevent",
+      "docs": "Event emitted when a central connects to the local GATT server.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The central device ID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "CentralDisconnectedEvent",
+      "slug": "centraldisconnectedevent",
+      "docs": "Event emitted when a central disconnects from the local GATT server.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The central device ID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "GattCharacteristicReadRequestEvent",
+      "slug": "gattcharacteristicreadrequestevent",
+      "docs": "Event emitted when a central reads a local GATT characteristic.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The central device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "GattCharacteristicWriteRequestEvent",
+      "slug": "gattcharacteristicwriterequestevent",
+      "docs": "Event emitted when a central writes to a local GATT characteristic.",
+      "tags": [
+        {
+          "text": "8.2.0",
+          "name": "since"
+        }
+      ],
+      "methods": [],
+      "properties": [
+        {
+          "name": "deviceId",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The central device ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The service UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "characteristic",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The characteristic UUID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "value",
+          "tags": [
+            {
+              "text": "8.2.0",
+              "name": "since"
+            }
+          ],
+          "docs": "The written value as an array of bytes.",
+          "complexTypes": [],
+          "type": "number[]"
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typeAliases": [
+    {
+      "name": "PermissionState",
+      "slug": "permissionstate",
+      "docs": "",
+      "types": [
+        {
+          "text": "'prompt'",
+          "complexTypes": []
+        },
+        {
+          "text": "'prompt-with-rationale'",
+          "complexTypes": []
+        },
+        {
+          "text": "'granted'",
+          "complexTypes": []
+        },
+        {
+          "text": "'denied'",
+          "complexTypes": []
+        }
+      ]
+    }
+  ],
+  "pluginConfigs": []
+}

@@ -17,7 +17,6 @@ let filterManually = true;
 const filterServiceUuid = (serviceUUIDs[0] as string).replaceAll("-", "");
 
 let isLinux = false;
-/** NODE_START */
 import noble from "@stoprocent/noble";
 isSupported = true;
 import os from "os";
@@ -25,7 +24,6 @@ const platform = os.platform();
 isLinux = platform == "linux";
 filterManually = isLinux;
 _console.log({ platform, filterManually, filterServiceUuid });
-/** NODE_END */
 
 import { DeviceTypes } from "../InformationManager.ts";
 import DeviceManager from "../DeviceManager.ts";

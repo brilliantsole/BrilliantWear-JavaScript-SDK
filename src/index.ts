@@ -69,6 +69,9 @@ export { PubSubManager };
 import { default as ScannerManager } from "./scanner/ScannerManager.ts";
 export { ScannerManager };
 
+import { default as BaseScanner } from "./scanner/BaseScanner.ts";
+export { BaseScanner };
+
 /** BROWSER_START */
 
 import {
@@ -585,9 +588,6 @@ export { WebSocketServer };
 export { UDPServer };
 /** NODE_END */
 
-import { default as scanner } from "./scanner/Scanner.ts";
-export { scanner };
-
 import {
   Server,
   Servers,
@@ -624,9 +624,3 @@ export { RangeHelper, Range };
 
 import { default as RangeHelper2 } from "./utils/RangeHelper2.ts";
 export { RangeHelper2 };
-
-import { BluetoothLowEnergy } from "@capgo/capacitor-bluetooth-low-energy";
-const lol = () => {
-  return BluetoothLowEnergy.isAvailable();
-};
-export { lol };

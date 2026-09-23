@@ -18,6 +18,8 @@ import { default as PubSubManager } from "./pubSub/PubSubManager.ts";
 export { PubSubManager };
 import { default as ScannerManager } from "./scanner/ScannerManager.ts";
 export { ScannerManager };
+import { default as BaseScanner } from "./scanner/BaseScanner.ts";
+export { BaseScanner };
 /** BROWSER_START */
 import { default as WindowManagerServer, WindowManagerServerClient } from "./window/WindowManagerServer.ts";
 export { WindowManagerServer, WindowManagerServerClient };
@@ -122,8 +124,6 @@ import { default as UDPServer } from "./server/udp/UDPServer.ts";
 export { WebSocketServer };
 export { UDPServer };
 /** NODE_END */
-import { default as scanner } from "./scanner/Scanner.ts";
-export { scanner };
 import { Server, Servers, ServerClient, ServerEvent, ServerEventDispatcher, ServerEventDispatcherTypes, ServerEventListenerMap, ServerEventMap, BoundServerEventListeners } from "./server/Server.ts";
 export { Server, Servers, ServerClient, ServerEvent, ServerEventDispatcher, ServerEventDispatcherTypes, ServerEventListenerMap, ServerEventMap, BoundServerEventListeners, };
 import { Client, Clients } from "./server/Client.ts";
@@ -136,5 +136,3 @@ import { default as RangeHelper, Range } from "./utils/RangeHelper.ts";
 export { RangeHelper, Range };
 import { default as RangeHelper2 } from "./utils/RangeHelper2.ts";
 export { RangeHelper2 };
-declare const lol: () => Promise<import("@capgo/capacitor-bluetooth-low-energy").IsAvailableResult>;
-export { lol };

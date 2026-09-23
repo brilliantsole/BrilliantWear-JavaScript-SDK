@@ -58,6 +58,9 @@ export type BoundScannerEventListeners =
   ScannerEventDispatcherTypes["BoundEventListeners"];
 
 abstract class BaseScanner {
+  // SCANNER MANAGER
+  private static OnScanner: (scanner: BaseScanner) => void;
+
   // IS SUPPORTED
   protected get baseConstructor() {
     return this.constructor as typeof BaseScanner;
@@ -90,6 +93,8 @@ abstract class BaseScanner {
   constructor() {
     this.#assertIsSubclass();
     this.#assertIsSupported();
+
+    BaseScanner.OnScanner?.(this);
   }
 
   // EVENT DISPATCHER
@@ -252,7 +257,6 @@ abstract class BaseScanner {
       }
     } else {
       discoveredDevice = new DiscoveredDevice(
-        // @ts-expect-error
         this,
         discoveredDeviceMetadata,
         DeviceManager.availableDevices.find(

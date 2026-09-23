@@ -160,6 +160,16 @@
 
     <script src="./src/utils/wa-zoomable-frame-utils.js" type="module"></script>
 
+    <script type="importmap">
+      {
+        "imports": {
+          "@capacitor/core": "./src/utils/capacitor/core/index.js",
+          "@capgo/capacitor-bluetooth-low-energy": "./src/utils/capacitor/capacitor-bluetooth-low-energy/esm/index.js",
+          "@capacitor-community/bluetooth-le": "./src/utils/capacitor/bluetooth-le/esm/index.js"
+        }
+      }
+    </script>
+
     <script type="module" src="./src/lit/components/AppHub.js"></script>
     <link rel="stylesheet" href="./src/lit/components/AppHub.css" />
   </head>

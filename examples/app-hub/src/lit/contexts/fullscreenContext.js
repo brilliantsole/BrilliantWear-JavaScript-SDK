@@ -4,7 +4,8 @@ import { createContext } from "./createContext.js";
 
 /** @returns {FullscreenContextState} */
 const getFullscreenState = () => {
-  const { fullscreenEnabled, fullscreenElement } = document;
+  let { fullscreenEnabled, fullscreenElement } = document;
+  fullscreenEnabled = fullscreenEnabled && !window.webkit;
   return { fullscreenEnabled, fullscreenElement };
 };
 

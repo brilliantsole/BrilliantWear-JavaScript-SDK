@@ -124,10 +124,10 @@ class DeviceManager {
 
   constructor() {
     // @ts-expect-error
-    Device.OnDevice = this.onDevice.bind(this);
+    Device.OnDevice = this._onDevice.bind(this);
     // @ts-expect-error
     Device.OnDeviceConnectionStatusUpdated =
-      this.onDeviceConnectionStatusUpdated.bind(this);
+      this._onDeviceConnectionStatusUpdated.bind(this);
 
     if (this.canUseLocalStorage) {
       this.useLocalStorage = true;
@@ -141,8 +141,7 @@ class DeviceManager {
     connected: this.#onDeviceConnected.bind(this),
     [wildcardEventType]: this.#onDeviceEvent.bind(this),
   };
-  /** @private */
-  onDevice(device: Device) {
+  private _onDevice(device: Device) {
     addEventListeners(device, this.#boundDeviceEventListeners);
   }
 
@@ -153,8 +152,7 @@ class DeviceManager {
   }
 
   // CONNECTION STATUS
-  /** @private */
-  onDeviceConnectionStatusUpdated(
+  _onDeviceConnectionStatusUpdated(
     device: Device,
     connectionStatus: ConnectionStatus,
   ) {

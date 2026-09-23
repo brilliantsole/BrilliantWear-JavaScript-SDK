@@ -2,7 +2,7 @@ import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.
 
 const { lit, litRef } = await waitForGlobals();
 
-const { LitElement, html } = lit;
+const { LitElement, html, nothing } = lit;
 const { ref, createRef } = litRef;
 
 import "../../../utils/Toggle.js";
@@ -16,6 +16,7 @@ import { createFlipActionButtonContextConsumer } from "../../../../contexts/flip
 import { createToggleHeaderHiddenActionButtonContextConsumer } from "../../../../contexts/toggleHeaderHiddenActionButtonContext.js";
 import { createToggleFullscreenActionButtonContextConsumer } from "../../../../contexts/toggleFullscreenActionButtonContext.js";
 import { createToggleThemeActionButtonContextConsumer } from "../../../../contexts/toggleThemeActionButtonContext.js";
+import { createFullscreenContextConsumer } from "../../../../contexts/fullscreenContext.js";
 
 class SettingsActionButtonsTreeElement extends LitElement {
   createRenderRoot() {
@@ -41,6 +42,12 @@ class SettingsActionButtonsTreeElement extends LitElement {
   }
   get isFlipActionButtonVisible() {
     return this.flipActionButtonState.visible;
+  }
+
+  fullscreenConsumer = createFullscreenContextConsumer(this);
+  /** @type {import("../../../../contexts/fullscreenContext.js").FullscreenContextState} */
+  get fullscreenState() {
+    return this.fullscreenConsumer.value.state;
   }
 
   toggleFullscreenActionButtonConsumer =
@@ -165,7 +172,9 @@ class SettingsActionButtonsTreeElement extends LitElement {
           <div class="wa-stack wa-gap-xs">
             <bw-settings-flip-action-button-toggle></bw-settings-flip-action-button-toggle>
             <bw-settings-toggle-header-hidden-action-button-toggle></bw-settings-toggle-header-hidden-action-button-toggle>
-            <bw-settings-toggle-fullscreen-action-button-toggle></bw-settings-toggle-fullscreen-action-button-toggle>
+            ${this.fullscreenState.fullscreenEnabled
+              ? html` <bw-settings-toggle-fullscreen-action-button-toggle></bw-settings-toggle-fullscreen-action-button-toggle>`
+              : nothing}
             <bw-settings-toggle-theme-action-button-toggle></bw-settings-toggle-theme-action-button-toggle>
           </div>
         </div>

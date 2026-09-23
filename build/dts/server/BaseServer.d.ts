@@ -1,6 +1,7 @@
 import { EventDispatcherTypes } from "../utils/EventDispatcher.ts";
 import { DeviceMessage } from "./ServerUtils.ts";
 import Device from "../Device.ts";
+import BaseScanner from "../scanner/BaseScanner.ts";
 export declare const ServerTypes: readonly ["window", "webSocket", "udp"];
 export type ServerType = (typeof ServerTypes)[number];
 export declare const serverMtus: Record<ServerType, number>;
@@ -42,6 +43,8 @@ export interface BaseServerClientMetaData {
 }
 declare abstract class BaseServer<ServerClient extends BaseServerClient> {
     #private;
+    get scanner(): BaseScanner;
+    set scanner(newScanner: BaseScanner);
     static type: ServerType;
     abstract readonly type: ServerType;
     protected get baseConstructor(): typeof BaseServer;

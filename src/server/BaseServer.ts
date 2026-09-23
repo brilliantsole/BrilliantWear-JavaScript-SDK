@@ -23,7 +23,6 @@ import {
   addEventListeners,
   removeEventListeners,
 } from "../utils/EventUtils.ts";
-import scanner from "../scanner/Scanner.ts";
 import {
   enumToDataView,
   parseMessage,
@@ -40,7 +39,7 @@ import {
   TxRxMessageType,
   TxRxMessageTypes,
 } from "../connection/BaseConnectionManager.ts";
-import {
+import BaseScanner, {
   BoundScannerEventListeners,
   ScannerEventMap,
 } from "../scanner/BaseScanner.ts";
@@ -181,6 +180,23 @@ export interface BaseServerClientMetaData {
 }
 
 abstract class BaseServer<ServerClient extends BaseServerClient> {
+  #scanner!: BaseScanner;
+  get scanner() {
+    return this.#scanner;
+  }
+  set scanner(newScanner) {
+    if (this.#scanner == newScanner) {
+      return;
+    }
+    if (this.#scanner) {
+      _console.log("removing scanner", this.#scanner);
+      removeEventListeners(this.#scanner, this.#boundScannerListeners);
+    }
+    _console.log("assigning scanner", newScanner);
+    addEventListeners(newScanner, this.#boundScannerListeners);
+    this.#scanner = newScanner;
+  }
+
   static type: ServerType;
   abstract readonly type: ServerType;
 
@@ -216,9 +232,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   private static OnServer: (server: BaseServer<BaseServerClient>) => void;
 
   constructor() {
-    _console.assertWithError(scanner, "no scanner defined");
+    this.scanner = NullScanner;
 
-    addEventListeners(scanner, this.#boundScannerListeners);
+    addEventListeners(ScannerManager, this.#boundScannerManagerListeners);
     addEventListeners(DeviceManager, this.#boundDeviceManagerListeners);
     addEventListeners(
       DisplayCanvasHelperManager,
@@ -388,7 +404,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   get #isScanningAvailableMessage() {
     return createServerMessage({
       type: "isScanningAvailable",
-      data: scanner.isScanningAvailable,
+      data: this.scanner.isScanningAvailable,
     });
   }
 
@@ -401,7 +417,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   get #isScanningMessage() {
     return createServerMessage({
       type: "isScanning",
-      data: scanner.isScanning,
+      data: this.scanner.isScanning,
     });
   }
 
@@ -450,7 +466,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   }
 
   get #discoveredDevicesMessage() {
-    const serverMessages: ServerMessage[] = scanner.discoveredDevicesArray
+    const serverMessages: ServerMessage[] = this.scanner.discoveredDevicesArray
       .filter((discoveredDevice) => {
         const existingConnectedDevice = DeviceManager.connectedDevices.find(
           (device) => device.bluetoothId == discoveredDevice.bluetoothId,
@@ -1063,6 +1079,18 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     this.#onDoneTransferringFile(device, undefined);
   }
 
+  // STATIC SCANNER LISTENERS
+  #boundScannerManagerListeners: BoundScannerManagerEventListeners = {
+    scanner: this.#onScanner.bind(this),
+  };
+  #onScanner(scannerEvent: ScannerManagerEventMap["scanner"]) {
+    const { scanner } = scannerEvent.message;
+    _console.log("#onScanner", scanner);
+    if (!scanner.isClient) {
+      this.scanner = scanner;
+    }
+  }
+
   // STATIC DEVICE LISTENERS
   #boundDeviceManagerListeners: BoundDeviceManagerEventListeners = {
     deviceConnected: this.#onDeviceConnected.bind(this),
@@ -1324,6 +1352,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   ) {
     _console.log(
       `onClientMessage "${messageType}" (${dataView.byteLength} bytes)`,
+      this,
     );
 
     const {
@@ -1347,7 +1376,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
             .get(client)!
             .add("isScanningAvailable");
 
-          if (scanner.isScanningAvailable) {
+          if (this.scanner.isScanningAvailable) {
             if (this.#allowServerToClient(client, "isScanning")) {
               responseMessages.push(this.#isScanningMessage);
               this.#requiredMessageTypesSentToClients
@@ -1366,10 +1395,10 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         }
         break;
       case "startScan":
-        scanner.startScan();
+        this.scanner.startScan();
         break;
       case "stopScan":
-        scanner.stopScan();
+        this.scanner.stopScan();
         break;
       case "discoveredDevices":
         if (this.#allowServerToClient(client, "discoveredDevices")) {
@@ -1394,11 +1423,11 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
             (device) => device.bluetoothId == deviceId,
           );
 
-          if (device && connectionType != scanner.connectionType) {
+          if (device && connectionType != this.scanner.connectionType) {
             // @ts-expect-error
             device.connect({ type: connectionType, reconnect: true });
           } else {
-            scanner.connectToDevice(
+            this.scanner.connectToDevice(
               deviceId,
               connectionType as ClientConnectionType,
             );
@@ -2753,4 +2782,9 @@ export default BaseServer;
 
 import { default as ServerManager } from "./ServerManager.ts";
 import BaseClient from "./BaseClient.ts";
-import { DiscoveredDevice } from "../index.ts";
+import { DiscoveredDevice, ScannerManager } from "../index.ts";
+import {
+  BoundScannerManagerEventListeners,
+  ScannerManagerEventMap,
+} from "../scanner/ScannerManager.ts";
+import NullScanner from "../scanner/NullScanner.ts";

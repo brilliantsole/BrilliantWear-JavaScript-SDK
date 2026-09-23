@@ -1,8 +1,3 @@
 import { Client } from "../server/Client.ts";
-import NobleScanner from "./NobleScanner.ts";
-import NullScanner from "./NullScanner.ts";
-export declare const Scanners: readonly [typeof NullScanner, typeof NobleScanner];
-export type Scanner = InstanceType<(typeof Scanners)[number]>;
-export type ScannerLike = Scanner | Client;
-declare let scanner: Scanner;
-export default scanner;
+import BaseScanner from "./BaseScanner.ts";
+export type ScannerLike = BaseScanner | Client;

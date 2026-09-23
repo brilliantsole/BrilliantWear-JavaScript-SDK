@@ -12,7 +12,7 @@ import {
   KeyOf,
   Singleton,
 } from "../utils/TypeScriptUtils.ts";
-import {
+import BaseScanner, {
   ScannerEventType,
   ScannerEventTypes,
   BoundScannerEventListeners,
@@ -25,7 +25,7 @@ import {
 } from "../server/ClientManager.ts";
 
 import { capitalizeFirstCharacter } from "../utils/stringUtils.ts";
-import { default as scanner, ScannerLike } from "./Scanner.ts";
+import { ScannerLike } from "./Scanner.ts";
 import { DiscoveredDevicesMap } from "./DiscoveredDevice.ts";
 
 const _console = createConsole("ScannerManager", { log: false });
@@ -110,7 +110,10 @@ class ScannerManager {
   static readonly shared: ScannerManager;
 
   constructor() {
-    this.#onScanner(scanner);
+    console.log("assigning OnScanner");
+    // @ts-expect-error
+    BaseScanner.OnScanner = this._onScanner.bind(this);
+
     addEventListeners(ClientManager, this.#boundClientManagerListeners);
   }
 
@@ -129,8 +132,9 @@ class ScannerManager {
     discoveredDevice: this.#onDiscoveredDevice.bind(this),
     expiredDiscoveredDevice: this.#onExpiredDiscoveredDevice.bind(this),
   };
-  #onScanner(scanner: ScannerLike) {
-    _console.log("onScanner", scanner);
+  private _onScanner(scanner: ScannerLike) {
+    // FILL
+    _console.log("_onScanner", scanner);
     addEventListeners(scanner, this.#boundScannerEventListeners);
     if (!this.#scanners.includes(scanner)) {
       _console.log("adding scanner", scanner);
@@ -145,8 +149,11 @@ class ScannerManager {
     const { type: scannerEventType, target: scanner, message } = scannerEvent;
     const { discoveredDevice } = message;
     _console.log("#onDiscoveredDevice", discoveredDevice);
+    const firstTime = !(
+      discoveredDevice.bluetoothId in this.#discoveredDevices
+    );
     this.#discoveredDevices[discoveredDevice.bluetoothId] = discoveredDevice;
-    if (message.firstTime) {
+    if (firstTime) {
       this.#dispatchEvent("discoveredDevices", {
         discoveredDevices: this.#discoveredDevices,
       });
@@ -158,10 +165,13 @@ class ScannerManager {
     const { type: scannerEventType, target: scanner, message } = scannerEvent;
     const { discoveredDevice } = message;
     _console.log("#onExpiredDiscoveredDevice", discoveredDevice);
+    const existed = discoveredDevice.bluetoothId in this.#discoveredDevices;
     delete this.#discoveredDevices[discoveredDevice.bluetoothId];
-    this.#dispatchEvent("discoveredDevices", {
-      discoveredDevices: this.#discoveredDevices,
-    });
+    if (existed) {
+      this.#dispatchEvent("discoveredDevices", {
+        discoveredDevices: this.#discoveredDevices,
+      });
+    }
   }
   #onScannerEvent(scannerEvent: ScannerEventMap[WildcardEventType]) {
     const { type: scannerEventType, target: scanner, message } = scannerEvent;
@@ -201,7 +211,7 @@ class ScannerManager {
     const { message } = event;
     _console.log("#onClient", message);
 
-    this.#onScanner(message.client);
+    this._onScanner(message.client);
   }
 
   // STATIC EVENTLISTENERS
