@@ -110,7 +110,7 @@ class ScannerManager {
   static readonly shared: ScannerManager;
 
   constructor() {
-    console.log("assigning OnScanner");
+    _console.log("assigning OnScanner");
     // @ts-expect-error
     BaseScanner.OnScanner = this._onScanner.bind(this);
 
@@ -133,7 +133,6 @@ class ScannerManager {
     expiredDiscoveredDevice: this.#onExpiredDiscoveredDevice.bind(this),
   };
   private _onScanner(scanner: ScannerLike) {
-    // FILL
     _console.log("_onScanner", scanner);
     addEventListeners(scanner, this.#boundScannerEventListeners);
     if (!this.#scanners.includes(scanner)) {

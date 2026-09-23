@@ -167,10 +167,10 @@ BW.DeviceManager.addEventListener("availableDevice", (event) => {
 
 const autoConnectToAvailableDevices = false;
 BW.DeviceManager.addEventListener("availableDevice", (event) => {
-  const { availableDevice } = event.message;
-  console.log("availableDevice", availableDevice);
-  if (availableDevice.canReconnect && autoConnectToAvailableDevices) {
-    availableDevice.reconnect();
+  const { device } = event.message;
+  console.log("availableDevice", device);
+  if (device.canReconnect && autoConnectToAvailableDevices) {
+    device.reconnect();
   }
 });
 

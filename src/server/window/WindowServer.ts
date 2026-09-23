@@ -88,5 +88,4 @@ class WindowServer extends BaseServer<WindowServerClient> {
   }
 }
 export { WindowServer };
-
 export default WindowServer.shared;

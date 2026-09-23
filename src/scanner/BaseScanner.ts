@@ -94,6 +94,8 @@ abstract class BaseScanner {
     this.#assertIsSubclass();
     this.#assertIsSupported();
 
+    _console.log("BaseScanner", this);
+
     BaseScanner.OnScanner?.(this);
   }
 

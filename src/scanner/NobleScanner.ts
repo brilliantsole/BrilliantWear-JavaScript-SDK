@@ -29,6 +29,7 @@ import { DeviceTypes } from "../InformationManager.ts";
 import DeviceManager from "../DeviceManager.ts";
 import { ClientConnectionType } from "../connection/BaseConnectionManager.ts";
 import { DiscoveredDeviceMetadata } from "../index.ts";
+import { Singleton } from "../utils/TypeScriptUtils.ts";
 
 export const NobleStates = [
   "unknown",
@@ -40,10 +41,13 @@ export const NobleStates = [
 ] as const;
 export type NobleState = (typeof NobleStates)[number];
 
+@Singleton
 class NobleScanner extends BaseScanner {
   static get isSupported() {
     return isSupported;
   }
+
+  static readonly shared: NobleScanner;
 
   readonly connectionType = "noble";
 
@@ -306,4 +310,4 @@ class NobleScanner extends BaseScanner {
   }
 }
 
-export default NobleScanner;
+export default NobleScanner.shared;

@@ -36416,6 +36416,7 @@ class BaseScanner {
     constructor() {
         this.#assertIsSubclass();
         this.#assertIsSupported();
+        _console$h.log("BaseScanner", this);
         _a$2.OnScanner?.(this);
     }
     #eventDispatcher = new EventDispatcher(this, ScannerEventTypes);
@@ -37832,45 +37833,6 @@ let PubSubManager$1 = (() => {
 })();
 var PubSubManager = PubSubManager$1.shared;
 
-createConsole("NullScanner", { log: false });
-let NullScanner$1 = (() => {
-    let _classDecorators = [Singleton];
-    let _classDescriptor;
-    let _classExtraInitializers = [];
-    let _classThis;
-    let _classSuper = BaseScanner;
-    (class extends _classSuper {
-        static { _classThis = this; }
-        static {
-            const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
-            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
-            _classThis = _classDescriptor.value;
-            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-            __runInitializers(_classThis, _classExtraInitializers);
-        }
-        static get isSupported() {
-            return true;
-        }
-        static shared;
-        connectionType = "none";
-        get isScanning() {
-            return false;
-        }
-        get isScanningAvailable() {
-            return false;
-        }
-        get canReset() {
-            return false;
-        }
-        #devices = {};
-        get devices() {
-            return this.#devices;
-        }
-    });
-    return _classThis;
-})();
-var NullScanner = NullScanner$1.shared;
-
 var _a;
 const RequiredDeviceInformationMessageTypes = [
     ...DeviceInformationTypes,
@@ -37936,7 +37898,7 @@ class BaseServer {
     }
     static OnServer;
     constructor() {
-        this.scanner = NullScanner;
+        ScannerManager_default.scanners.forEach((scanner) => this.#onScanner(scanner));
         addEventListeners(ScannerManager_default, this.#boundScannerManagerListeners);
         addEventListeners(DeviceManager, this.#boundDeviceManagerListeners);
         addEventListeners(DisplayCanvasHelperManager, this.#boundDisplayCanvasHelperManagerEventListeners);
@@ -38479,10 +38441,14 @@ class BaseServer {
         this.#onDoneTransferringFile(device, undefined);
     }
     #boundScannerManagerListeners = {
-        scanner: this.#onScanner.bind(this),
+        scanner: this.#onScannerManagerScanner.bind(this),
     };
-    #onScanner(scannerEvent) {
+    #onScannerManagerScanner(scannerEvent) {
         const { scanner } = scannerEvent.message;
+        _console$b.log("#onScannerManagerScanner", scanner);
+        this.#onScanner(scanner);
+    }
+    #onScanner(scanner) {
         _console$b.log("#onScanner", scanner);
         if (!scanner.isClient) {
             this.scanner = scanner;
@@ -39615,7 +39581,7 @@ let ScannerManager = (() => {
         }
         static shared;
         constructor() {
-            console.log("assigning OnScanner");
+            _console$9.log("assigning OnScanner");
             BaseScanner.OnScanner = this._onScanner.bind(this);
             addEventListeners(ClientManager, this.#boundClientManagerListeners);
         }
@@ -39711,6 +39677,45 @@ let ScannerManager = (() => {
     return _classThis;
 })();
 var ScannerManager_default = ScannerManager.shared;
+
+createConsole("NullScanner", { log: false });
+let NullScanner = (() => {
+    let _classDecorators = [Singleton];
+    let _classDescriptor;
+    let _classExtraInitializers = [];
+    let _classThis;
+    let _classSuper = BaseScanner;
+    (class extends _classSuper {
+        static { _classThis = this; }
+        static {
+            const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
+            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
+            _classThis = _classDescriptor.value;
+            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+            __runInitializers(_classThis, _classExtraInitializers);
+        }
+        static get isSupported() {
+            return true;
+        }
+        static shared;
+        connectionType = "none";
+        get isScanning() {
+            return false;
+        }
+        get isScanningAvailable() {
+            return false;
+        }
+        get canReset() {
+            return false;
+        }
+        #devices = {};
+        get devices() {
+            return this.#devices;
+        }
+    });
+    return _classThis;
+})();
+var NullScanner_default = NullScanner.shared;
 
 const _console$8 = createConsole("WindowManagerUtils", { log: false });
 const WindowManagerMessageTypes = [
@@ -41041,5 +41046,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { BaseScanner, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
+export { BaseScanner, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, NullScanner_default as NullScanner, PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
 //# sourceMappingURL=brilliantwear.module.js.map

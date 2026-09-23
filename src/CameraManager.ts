@@ -9,7 +9,6 @@ import {
   BaseExtendedFileConfiguration,
   BaseFileConfiguration,
   emptyHeaderDataView,
-  ExtendedFileConfiguration,
   OnParseFileCallback,
 } from "./FileTransferManager.ts";
 

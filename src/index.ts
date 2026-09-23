@@ -72,6 +72,9 @@ export { ScannerManager };
 import { default as BaseScanner } from "./scanner/BaseScanner.ts";
 export { BaseScanner };
 
+import { ScannerLike, NullScanner } from "./scanner/Scanner.ts";
+export { ScannerLike, NullScanner };
+
 /** BROWSER_START */
 
 import {

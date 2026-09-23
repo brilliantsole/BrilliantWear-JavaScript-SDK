@@ -232,7 +232,7 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   private static OnServer: (server: BaseServer<BaseServerClient>) => void;
 
   constructor() {
-    this.scanner = NullScanner;
+    ScannerManager.scanners.forEach((scanner) => this.#onScanner(scanner));
 
     addEventListeners(ScannerManager, this.#boundScannerManagerListeners);
     addEventListeners(DeviceManager, this.#boundDeviceManagerListeners);
@@ -1081,10 +1081,14 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
 
   // STATIC SCANNER LISTENERS
   #boundScannerManagerListeners: BoundScannerManagerEventListeners = {
-    scanner: this.#onScanner.bind(this),
+    scanner: this.#onScannerManagerScanner.bind(this),
   };
-  #onScanner(scannerEvent: ScannerManagerEventMap["scanner"]) {
+  #onScannerManagerScanner(scannerEvent: ScannerManagerEventMap["scanner"]) {
     const { scanner } = scannerEvent.message;
+    _console.log("#onScannerManagerScanner", scanner);
+    this.#onScanner(scanner);
+  }
+  #onScanner(scanner: ScannerLike) {
     _console.log("#onScanner", scanner);
     if (!scanner.isClient) {
       this.scanner = scanner;
@@ -2788,3 +2792,4 @@ import {
   ScannerManagerEventMap,
 } from "../scanner/ScannerManager.ts";
 import NullScanner from "../scanner/NullScanner.ts";
+import { ScannerLike } from "../scanner/Scanner.ts";
