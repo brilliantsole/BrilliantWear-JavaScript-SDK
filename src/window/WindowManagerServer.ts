@@ -233,12 +233,24 @@ class WindowManagerServer {
   async #waitForiframeToLoad(iframe: HTMLIFrameElement) {
     _console.log("waitForiframeToLoad", iframe);
     await new Promise<void>((resolve) => {
-      if (iframe.contentDocument?.readyState === "complete") {
-        _console.log("iframe complete");
-        resolve();
+      if (iframe.contentDocument) {
+        if (iframe.contentDocument.readyState === "complete") {
+          _console.log("iframe complete");
+          resolve();
+        } else {
+          _console.log("waiting for iframe to load...");
+          iframe.addEventListener(
+            "load",
+            () => {
+              _console.log("iframe loaded");
+              resolve();
+            },
+            { once: true },
+          );
+        }
       } else {
-        _console.log("waiting for iframe to load...");
-        iframe.addEventListener("load", () => resolve(), { once: true });
+        _console.log("iframe has no contentDocument");
+        resolve();
       }
     });
   }

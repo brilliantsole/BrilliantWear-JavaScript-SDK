@@ -22247,7 +22247,7 @@ class BaseClient {
                 break;
             case "pubSub":
                 {
-                    const responseMessage = PubSubManager._parsePeerMessage(
+                    const responseMessage = PubSubManager$1._parsePeerMessage(
                     this, dataView);
                     if (responseMessage) {
                         responseMessages.push({ type: "pubSub", data: responseMessage });
@@ -22632,7 +22632,7 @@ function doesBasePubSubManagerOptionsIncludePeer(options, peer) {
     }
     return true;
 }
-let PubSubManager$1 = (() => {
+let PubSubManager = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -23095,7 +23095,7 @@ let PubSubManager$1 = (() => {
     });
     return _classThis;
 })();
-var PubSubManager = PubSubManager$1.shared;
+var PubSubManager$1 = PubSubManager.shared;
 
 var _a;
 const RequiredDeviceInformationMessageTypes = [
@@ -24032,7 +24032,7 @@ class BaseServer {
                 break;
             case "pubSub":
                 {
-                    const responseMessage = PubSubManager._parsePeerMessage(
+                    const responseMessage = PubSubManager$1._parsePeerMessage(
                     client, dataView);
                     if (responseMessage) {
                         responseMessages.push(createServerMessage({ type: "pubSub", data: responseMessage }));
@@ -24811,7 +24811,7 @@ let ServerManager = (() => {
     return _classThis;
 })();
 var ServerManager_default = ServerManager.shared;
-PubSubManager._init();
+PubSubManager$1._init();
 
 const _console$8 = createConsole("ScannerManager", { log: false });
 function getScannerManagerScannerEventTypes(scannerEventType) {
@@ -26295,5 +26295,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { BaseScanner, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, NullScanner_default as NullScanner, PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
+export { BaseScanner, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
 //# sourceMappingURL=brilliantwear.node.module.js.map
