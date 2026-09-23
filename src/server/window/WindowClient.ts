@@ -1,6 +1,6 @@
 import { createConsole } from "../../utils/Console.ts";
 import { addEventListeners } from "../../utils/EventUtils.ts";
-import BaseClient from "../BaseClient.ts";
+import BaseClient, { ClientEventMap } from "../BaseClient.ts";
 import {
   createServerMessage,
   ServerMessageOrMessageType,
@@ -25,6 +25,20 @@ class WindowClient extends BaseClient {
     super();
     this._connectionStatus = "connecting";
     addEventListeners(WindowManagerClient, this.#boundWindowEventListeners);
+    addEventListeners(this, this.#boundClientEventListeners);
+  }
+
+  #boundClientEventListeners: {
+    [K in keyof ClientEventMap]?: (event: ClientEventMap[K]) => void;
+  } = {
+    isConnected: this.#onIsConnected.bind(this),
+  };
+
+  #onIsConnected(event: ClientEventMap["isConnected"]) {
+    document.documentElement.toggleAttribute(
+      "data-bw-client-connected",
+      this.isConnected,
+    );
   }
 
   // WINDOW

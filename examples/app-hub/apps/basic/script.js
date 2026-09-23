@@ -25,13 +25,6 @@ device.addEventListener("connectionStatus", () => {
   toggleConnectionButton.innerText = innerText;
 });
 
-BW.WindowClient.addEventListener("isConnected", (event) => {
-  document.documentElement.toggleAttribute(
-    "data-client-connected",
-    BW.WindowClient.isConnected,
-  );
-});
-
 const toggleQuaternionButton = document.getElementById("toggleQuaternion");
 toggleQuaternionButton.addEventListener("click", () => {
   BW.DeviceManager.connectedDevices[0].toggleSensor("gameRotation", 20);
