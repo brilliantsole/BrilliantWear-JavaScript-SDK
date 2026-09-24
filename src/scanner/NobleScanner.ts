@@ -310,4 +310,5 @@ class NobleScanner extends BaseScanner {
   }
 }
 
+export { NobleScanner };
 export default NobleScanner.shared;

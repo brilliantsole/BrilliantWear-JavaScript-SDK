@@ -15,5 +15,6 @@ declare class NobleScanner extends BaseScanner {
     connectToDevice(bluetoothId: string, connectionType?: ClientConnectionType): Promise<void>;
     disconnectFromDevice(bluetoothId: string): Promise<void>;
 }
+export { NobleScanner };
 declare const _default: NobleScanner;
 export default _default;

@@ -33,7 +33,7 @@ import {
   BluetoothCharacteristicName,
   BluetoothServiceName,
 } from "./bluetoothUUIDs.ts";
-import NobleScanner from "../../scanner/NobleScanner.ts";
+import { NobleScanner } from "../../scanner/NobleScanner.ts";
 import { ConnectionManagerConnectOptions } from "../BaseConnectionManager.ts";
 
 interface HasConnectionManager {
