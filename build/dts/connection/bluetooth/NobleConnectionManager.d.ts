@@ -20,7 +20,6 @@ declare class NobleConnectionManager extends BluetoothConnectionManager {
     #private;
     get bluetoothId(): string;
     get canUpdateFirmware(): boolean;
-    static get isSupported(): boolean;
     static type: "noble";
     readonly type: "noble";
     get isConnected(): boolean;

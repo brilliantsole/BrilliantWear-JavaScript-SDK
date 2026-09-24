@@ -8,7 +8,6 @@ declare class UDPConnectionManager extends BaseConnectionManager {
     defaultMtu: number;
     constructor(ipAddress: string, bluetoothId?: string, receivePort?: number);
     get isAvailable(): boolean;
-    static get isSupported(): boolean;
     static type: "udp";
     readonly type: "udp";
     get ipAddress(): string;

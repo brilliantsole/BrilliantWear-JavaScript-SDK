@@ -7,10 +7,6 @@ const _console = createConsole("NullScanner", { log: false });
 
 @Singleton
 class NullScanner extends BaseScanner {
-  static get isSupported() {
-    return true;
-  }
-
   static readonly shared: NullScanner;
 
   readonly connectionType = "none";

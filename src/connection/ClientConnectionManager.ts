@@ -29,10 +29,6 @@ const ClientDeviceInformationMessageTypes: ConnectionMessageType[] = [
 ];
 
 class ClientConnectionManager extends BaseConnectionManager {
-  static get isSupported() {
-    return isInBrowser;
-  }
-
   static type = "client" as const;
   readonly type = ClientConnectionManager.type;
 

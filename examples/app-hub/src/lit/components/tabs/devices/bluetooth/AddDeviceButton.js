@@ -19,6 +19,7 @@ import {
 import { createIsLeftHandedContextConsumer } from "../../../../contexts/isLeftHandedContext.js";
 import { waitForAnimationFrames } from "../../../../../utils/rendering.js";
 import { createDirectionContextConsumer } from "../../../../contexts/directionContext.js";
+import { createBluetoothContextConsumer } from "../../../../contexts/bluetoothContext.js";
 
 class AddDeviceButton extends SignalWatcher(LitElement) {
   createRenderRoot() {
@@ -92,6 +93,15 @@ class AddDeviceButton extends SignalWatcher(LitElement) {
     return this._directionConsumer.value.state;
   }
 
+  _bluetoothConsumer = createBluetoothContextConsumer(this, true);
+  /** @type {import("../../../../contexts/bluetoothContext.js").BluetoothContextState} */
+  get bluetoothState() {
+    return this._bluetoothConsumer.value.state;
+  }
+  get isBluetoothEnabled() {
+    return this.bluetoothState.isBluetoothEnabled;
+  }
+
   render() {
     const isAddingDevice = isAddingDeviceSignal.get();
     let slotName = "start";
@@ -116,7 +126,7 @@ class AddDeviceButton extends SignalWatcher(LitElement) {
           variant="brand"
           size="s"
           @click=${this._onClick}
-          ?disabled=${!BW.Device.CanConnect}
+          ?disabled=${!this.isBluetoothEnabled || !BW.Device.CanConnect}
         >
           ${slot} ${isAddingDevice ? "Adding Device" : "Add Device"}
         </wa-button>

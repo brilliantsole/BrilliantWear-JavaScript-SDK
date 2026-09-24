@@ -38,7 +38,7 @@ class DevicesTab extends LitElement {
     return this._bluetoothConsumer.value.state;
   }
   get isBluetoothEnabled() {
-    return this.bluetoothState.isEnabled;
+    return this.bluetoothState.isBluetoothEnabled;
   }
 
   _disableViewTransitionsConsumer =
@@ -195,19 +195,6 @@ class DevicesTab extends LitElement {
     };
 
     return html`
-      <!--
-      <p class="wa-font-size-m" data-bluetooth-not-available-only>
-        Bluetooth is not available
-      </p>
-      <p
-        class="wa-font-size-m"
-        data-bluetooth-available-only
-        data-bluetooth-not-enabled-only
-      >
-        Bluetooth is not enabled
-      </p>
-      -->
-
       <div class="wa-stack wa-gap-xs">
         <div
           data-not-touch-not-portrait-only
@@ -215,7 +202,7 @@ class DevicesTab extends LitElement {
           data-tab-view-transition-container
         >
           <bw-add-device-button
-            data-bluetooth-available-only
+            data-web-bluetooth-available-only
           ></bw-add-device-button>
           <bw-add-client-button></bw-add-client-button>
         </div>
@@ -267,7 +254,7 @@ class DevicesTab extends LitElement {
               <bw-add-client-button use-handedness></bw-add-client-button>
               <bw-add-device-button
                 use-handedness
-                data-bluetooth-available-only
+                data-web-bluetooth-available-only
               ></bw-add-device-button>
             </div>
           </div>

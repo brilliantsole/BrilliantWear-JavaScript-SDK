@@ -67,9 +67,6 @@ class UDPConnectionManager extends BaseConnectionManager {
   get isAvailable() {
     return true;
   }
-  static get isSupported() {
-    return isInNode;
-  }
 
   static type = "udp" as const;
   readonly type = UDPConnectionManager.type;

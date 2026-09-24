@@ -28,6 +28,7 @@ export const ConnectionTypes = [
   "client",
   "webSocket",
   "udp",
+  "other",
 ] as const;
 export type ConnectionType = (typeof ConnectionTypes)[number];
 
@@ -171,11 +172,15 @@ abstract class BaseConnectionManager {
   protected get baseConstructor() {
     return this.constructor as typeof BaseConnectionManager;
   }
-  static get isSupported() {
-    return false;
+  #assertIsSubclass() {
+    _console.assertWithError(
+      this.constructor != BaseConnectionManager,
+      `${this.constructor.name} must be subclassed`,
+    );
   }
-  get isSupported() {
-    return this.baseConstructor.isSupported;
+
+  constructor() {
+    this.#assertIsSubclass();
   }
 
   get canUpdateFirmware() {
@@ -184,15 +189,6 @@ abstract class BaseConnectionManager {
 
   static type: ConnectionType;
   abstract readonly type: ConnectionType;
-
-  /** @throws {Error} if not supported */
-  #assertIsSupported() {
-    _console.assertWithError(this.isSupported, `${this.type} is not supported`);
-  }
-
-  constructor() {
-    this.#assertIsSupported();
-  }
 
   #status: ConnectionStatus = "notConnected";
   get status() {

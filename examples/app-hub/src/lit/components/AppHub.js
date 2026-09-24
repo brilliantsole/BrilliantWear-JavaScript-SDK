@@ -1667,13 +1667,22 @@ class AppHub extends LitElement {
     return this._bluetoothProvider.value.state;
   }
   _onBluetoothUpdate() {
-    const { isBluetoothAvailable, isBluetoothEnabled, isBluetoothScanning } =
-      this._bluetoothState;
+    const {
+      isWebBluetoothAvailable,
+      isBluetoothAvailable,
+      isBluetoothEnabled,
+      isBluetoothScanningAvailable,
+    } = this._bluetoothState;
     // console.log({
+    // isWebBluetoothAvailable,
     //   isBluetoothAvailable,
     //   isBluetoothEnabled,
-    //   isBluetoothScanning,
+    //   isBluetoothScanningAvailable,
     // });
+    document.documentElement.toggleAttribute(
+      "data-web-bluetooth-available",
+      isWebBluetoothAvailable,
+    );
     document.documentElement.toggleAttribute(
       "data-bluetooth-available",
       isBluetoothAvailable,
@@ -1683,8 +1692,8 @@ class AppHub extends LitElement {
       isBluetoothEnabled,
     );
     document.documentElement.toggleAttribute(
-      "data-bluetooth-scanning",
-      isBluetoothScanning,
+      "data-bluetooth-scanning-available",
+      isBluetoothScanningAvailable,
     );
   }
 

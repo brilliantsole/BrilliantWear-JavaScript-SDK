@@ -2,9 +2,10 @@ import { waitForGlobals } from "../../src/utils/cross-origin-storage-utils.js";
 
 const { BW } = await waitForGlobals(true);
 
+const isBluetoothAvailable = await navigator.bluetooth?.getAvailability();
 document.documentElement.toggleAttribute(
   "data-bluetooth-available",
-  BW.Environment.isBluetoothAvailable,
+  isBluetoothAvailable,
 );
 
 const device = new BW.Device();

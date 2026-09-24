@@ -65,23 +65,10 @@ abstract class BaseScanner {
   protected get baseConstructor() {
     return this.constructor as typeof BaseScanner;
   }
-  static get isSupported() {
-    return false;
-  }
-  get isSupported() {
-    return this.baseConstructor.isSupported;
-  }
 
-  abstract readonly connectionType: ConnectionType;
+  readonly connectionType: ConnectionType = "other";
 
   readonly isClient = false;
-
-  #assertIsSupported() {
-    _console.assertWithError(
-      this.isSupported,
-      `${this.constructor.name} is not supported`,
-    );
-  }
 
   // CONSTRUCTOR
   #assertIsSubclass() {
@@ -92,7 +79,6 @@ abstract class BaseScanner {
   }
   constructor() {
     this.#assertIsSubclass();
-    this.#assertIsSupported();
 
     _console.log("BaseScanner", this);
 

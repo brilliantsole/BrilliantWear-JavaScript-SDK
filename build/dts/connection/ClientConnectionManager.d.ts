@@ -6,7 +6,6 @@ export type SendClientMessageCallback = (...messages: ClientDeviceMessage[]) => 
 export type SendClientConnectMessageCallback = (connectionType?: ClientConnectionType) => void;
 declare class ClientConnectionManager extends BaseConnectionManager {
     #private;
-    static get isSupported(): boolean;
     static type: "client";
     readonly type: "client";
     subType?: ClientConnectionType;

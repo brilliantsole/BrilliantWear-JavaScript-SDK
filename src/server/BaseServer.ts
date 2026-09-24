@@ -1105,7 +1105,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   #onScanner(scanner: ScannerLike) {
     _console.log("#onScanner", scanner);
     if (!scanner.isClient) {
-      this.scanner = scanner;
+      if (!this.scanner || this.#scanner.connectionType == "none")
+        this.scanner = scanner;
     }
   }
 

@@ -792,7 +792,7 @@ class Device {
   }
 
   static get CanConnect() {
-    return WebBluetoothConnectionManager.isSupported;
+    return Boolean(navigator.bluetooth?.requestDevice);
   }
   static async Connect(options?: ConnectOptions) {
     _console.assertWithError(

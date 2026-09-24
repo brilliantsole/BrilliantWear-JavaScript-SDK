@@ -26,14 +26,6 @@ const isInNode =
 
 const userAgent = (isInBrowser && navigator.userAgent) || "";
 
-let isBluetoothAvailable = false;
-if (isInBrowser) {
-  isBluetoothAvailable =
-    (await navigator.bluetooth?.getAvailability()) ?? false;
-} else if (isInNode) {
-  isBluetoothAvailable = true;
-}
-
 const isInBluefy = isInBrowser && /Bluefy/i.test(userAgent);
 const isInWebBLE = isInBrowser && /WebBLE/i.test(userAgent);
 
@@ -70,5 +62,4 @@ export {
   isSafari,
   isIOS,
   isMac,
-  isBluetoothAvailable,
 };

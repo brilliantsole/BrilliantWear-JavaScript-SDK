@@ -12,13 +12,11 @@ import NobleConnectionManager, {
 
 const _console = createConsole("NobleScanner", { log: false });
 
-let isSupported = false;
 let filterManually = true;
 const filterServiceUuid = (serviceUUIDs[0] as string).replaceAll("-", "");
 
 let isLinux = false;
 import noble from "@stoprocent/noble";
-isSupported = true;
 import os from "os";
 const platform = os.platform();
 isLinux = platform == "linux";
@@ -43,10 +41,6 @@ export type NobleState = (typeof NobleStates)[number];
 
 @Singleton
 class NobleScanner extends BaseScanner {
-  static get isSupported() {
-    return isSupported;
-  }
-
   static readonly shared: NobleScanner;
 
   readonly connectionType = "noble";

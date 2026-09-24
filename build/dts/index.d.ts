@@ -116,6 +116,10 @@ import { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfigurat
 export { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, Led, };
 import { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses } from "./connection/BaseConnectionManager.ts";
 export { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses, };
+import { default as BluetoothConnectionManager } from "./connection/bluetooth/BluetoothConnectionManager.ts";
+export { BluetoothConnectionManager };
+import * as Bluetooth from "./connection/bluetooth/bluetoothUUIDs.ts";
+export { Bluetooth };
 import { ConnectionManager, ConnectionManagers } from "./connection/ConnectionManager.ts";
 export { ConnectionManager, ConnectionManagers };
 import { default as DiscoveredDevice, DiscoveredDeviceMetadata } from "./scanner/DiscoveredDevice.ts";

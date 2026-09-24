@@ -1,4 +1,4 @@
-export declare const ConnectionTypes: readonly ["none", "webBluetooth", "noble", "client", "webSocket", "udp"];
+export declare const ConnectionTypes: readonly ["none", "webBluetooth", "noble", "client", "webSocket", "udp", "other"];
 export type ConnectionType = (typeof ConnectionTypes)[number];
 export declare const ClientConnectionTypes: readonly ["noble", "webSocket", "udp"];
 export type ClientConnectionType = (typeof ClientConnectionTypes)[number];
@@ -76,14 +76,12 @@ declare abstract class BaseConnectionManager {
     onMessageSent?: MessageSentCallback;
     onMessagesSent?: MessagesSentCallback;
     protected get baseConstructor(): typeof BaseConnectionManager;
-    static get isSupported(): boolean;
-    get isSupported(): boolean;
+    constructor();
     get canUpdateFirmware(): boolean;
     static type: ConnectionType;
     abstract readonly type: ConnectionType;
-    constructor();
-    get status(): "connecting" | "connected" | "disconnecting" | "notConnected";
-    protected set status(newConnectionStatus: "connecting" | "connected" | "disconnecting" | "notConnected");
+    get status(): "notConnected" | "connecting" | "connected" | "disconnecting";
+    protected set status(newConnectionStatus: "notConnected" | "connecting" | "connected" | "disconnecting");
     get isConnected(): boolean;
     get isAvailable(): boolean;
     /** @throws {Error} if connected */

@@ -5,7 +5,6 @@ declare class WebSocketConnectionManager extends BaseConnectionManager {
     defaultMtu: number;
     constructor(ipAddress?: string, isSecure?: boolean, bluetoothId?: string);
     get isAvailable(): boolean;
-    static get isSupported(): boolean;
     static type: "webSocket";
     readonly type: "webSocket";
     get webSocket(): WebSocket | undefined;

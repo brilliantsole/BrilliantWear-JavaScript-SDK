@@ -2,7 +2,6 @@ import BaseScanner from "./BaseScanner.ts";
 import Device from "../Device.ts";
 declare class NullScanner extends BaseScanner {
     #private;
-    static get isSupported(): boolean;
     static readonly shared: NullScanner;
     readonly connectionType = "none";
     get isScanning(): boolean;

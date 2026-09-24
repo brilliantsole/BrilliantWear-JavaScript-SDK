@@ -571,6 +571,12 @@ export {
   ConnectionStatuses,
 };
 
+import { default as BluetoothConnectionManager } from "./connection/bluetooth/BluetoothConnectionManager.ts";
+export { BluetoothConnectionManager };
+
+import * as Bluetooth from "./connection/bluetooth/bluetoothUUIDs.ts";
+export { Bluetooth };
+
 import {
   ConnectionManager,
   ConnectionManagers,

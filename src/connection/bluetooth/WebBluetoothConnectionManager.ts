@@ -70,10 +70,6 @@ class WebBluetoothConnectionManager extends BluetoothConnectionManager {
       gattserverdisconnected: this.#onGattserverdisconnected.bind(this),
     };
 
-  static get isSupported() {
-    return Boolean(bluetooth);
-  }
-
   static type = "webBluetooth" as const;
   readonly type = WebBluetoothConnectionManager.type;
 

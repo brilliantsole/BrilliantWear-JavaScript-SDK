@@ -4,7 +4,6 @@ export declare const NobleStates: readonly ["unknown", "resetting", "unsupported
 export type NobleState = (typeof NobleStates)[number];
 declare class NobleScanner extends BaseScanner {
     #private;
-    static get isSupported(): boolean;
     static readonly shared: NobleScanner;
     readonly connectionType = "noble";
     constructor();
