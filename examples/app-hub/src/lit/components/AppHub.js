@@ -1866,12 +1866,3 @@ class AppHub extends LitElement {
   }
 }
 customElements.define("bw-app-hub", AppHub);
-
-// import {
-//   BluetoothLowEnergy,
-//   installBluetoothLowEnergyShim,
-// } from "@capgo/capacitor-bluetooth-low-energy";
-// console.log("BluetoothLowEnergy", BluetoothLowEnergy);
-
-// import { BleClient } from "@capacitor-community/bluetooth-le";
-// console.log("BleClient", BleClient);

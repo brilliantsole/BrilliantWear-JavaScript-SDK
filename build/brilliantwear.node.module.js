@@ -23136,6 +23136,11 @@ class BaseServer {
         _console$a.log("assigning scanner", newScanner);
         addEventListeners(newScanner, this.#boundScannerListeners);
         this.#scanner = newScanner;
+        this.#broadcastIsScanningAvailable();
+        this.#broadcastScannerIsScanning();
+        Object.entries(this.scanner.discoveredDevices).forEach(([id, discoveredDevice]) => {
+            this.#broadcastDiscoveredDevice(discoveredDevice);
+        });
     }
     static type;
     get baseConstructor() {
@@ -23283,6 +23288,9 @@ class BaseServer {
         expiredDiscoveredDevice: this.#onExpiredDiscoveredDevice.bind(this),
     };
     #onScannerIsAvailable(event) {
+        this.#broadcastIsScanningAvailable();
+    }
+    #broadcastIsScanningAvailable() {
         this.broadcast(this.#isScanningAvailableMessage, this.#filterServerToClients("isScanningAvailable"));
     }
     get #isScanningAvailableMessage() {
@@ -23292,6 +23300,9 @@ class BaseServer {
         });
     }
     #onScannerIsScanning(event) {
+        this.#broadcastScannerIsScanning();
+    }
+    #broadcastScannerIsScanning() {
         this.broadcast(this.#isScanningMessage, this.#filterServerToClients("isScanning"));
     }
     get #isScanningMessage() {

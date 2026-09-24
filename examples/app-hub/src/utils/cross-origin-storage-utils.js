@@ -98,8 +98,8 @@ export async function waitForGlobals(justBW) {
   const litContext = window.litContext;
   /** @type {import("lit/directives/repeat.js")} */
   const litRepeat = window.litRepeat;
-  /** @type {import("../brilliantwear/brilliantwear.module.min.js")} */
-  /** @type {import("../../../../build/brilliantwear.module.min.js")} */
+  /** @type {import("../brilliantwear/brilliantwear.module.js")} */
+  /** @type {import("../../../../build/brilliantwear.module.js")} */
   const BW = window.BW;
 
   // console.log({ lit, litRouter, litContext, BW });

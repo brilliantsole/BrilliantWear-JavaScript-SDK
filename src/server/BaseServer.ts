@@ -195,6 +195,14 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
     _console.log("assigning scanner", newScanner);
     addEventListeners(newScanner, this.#boundScannerListeners);
     this.#scanner = newScanner;
+
+    this.#broadcastIsScanningAvailable();
+    this.#broadcastScannerIsScanning();
+    Object.entries(this.scanner.discoveredDevices).forEach(
+      ([id, discoveredDevice]) => {
+        this.#broadcastDiscoveredDevice(discoveredDevice);
+      },
+    );
   }
 
   static type: ServerType;
@@ -396,6 +404,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   };
 
   #onScannerIsAvailable(event: ScannerEventMap["isScanningAvailable"]) {
+    this.#broadcastIsScanningAvailable();
+  }
+  #broadcastIsScanningAvailable() {
     this.broadcast(
       this.#isScanningAvailableMessage,
       this.#filterServerToClients("isScanningAvailable"),
@@ -409,6 +420,9 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   }
 
   #onScannerIsScanning(event: ScannerEventMap["isScanning"]) {
+    this.#broadcastScannerIsScanning();
+  }
+  #broadcastScannerIsScanning() {
     this.broadcast(
       this.#isScanningMessage,
       this.#filterServerToClients("isScanning"),

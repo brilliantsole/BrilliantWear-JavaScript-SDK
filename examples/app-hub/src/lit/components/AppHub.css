@@ -2412,6 +2412,7 @@ html:active-view-transition-type(theme) {
   }
   @supports not (display: grid-lanes) {
     display: grid;
+    grid-template-columns: repeat(auto-fit, var(--bw-grid-lane-width));
   }
 
   row-gap: var(--wa-space-xs);
