@@ -56,6 +56,11 @@ declare abstract class BaseScanner {
     toggleScan(): boolean;
     get discoveredDevices(): Readonly<DiscoveredDevicesMap>;
     get discoveredDevicesArray(): DiscoveredDevice[];
+    protected _parseManufacturerData(dataView: DataView | string): {
+        deviceType: "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "generic" | undefined;
+        ipAddress: string | undefined;
+        isWifiSecure: boolean | undefined;
+    };
     protected _onDiscoveredDevice(discoveredDeviceMetadata: DiscoveredDeviceMetadata): void;
     static get DiscoveredDeviceExpirationTimeout(): number;
     connectToDevice(bluetoothId: string, connectionType?: ConnectionType): Promise<void>;

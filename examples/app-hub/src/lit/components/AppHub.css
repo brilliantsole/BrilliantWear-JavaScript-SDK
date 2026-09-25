@@ -2705,6 +2705,13 @@ html[data-web-bluetooth-available] [data-web-bluetooth-not-available-only] {
   display: none;
 }
 
+html:not([data-web]) [data-web-only] {
+  display: none;
+}
+html[data-web] [data-web-only] {
+  display: none;
+}
+
 wa-card {
   padding: 0;
   --spacing: var(--wa-space-xs);

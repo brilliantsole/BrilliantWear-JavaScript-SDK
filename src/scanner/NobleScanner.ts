@@ -116,48 +116,16 @@ class NobleScanner extends BaseScanner {
 
     _console.log("advertisement", noblePeripheral.advertisement);
 
-    let deviceType;
-    let ipAddress;
-    let isWifiSecure;
-    const { manufacturerData, serviceData } = noblePeripheral.advertisement;
-    if (manufacturerData) {
-      _console.log("manufacturerData", manufacturerData);
-      if (manufacturerData.byteLength >= 3) {
-        const deviceTypeEnum = manufacturerData.readUint8(2);
-        deviceType = DeviceTypes[deviceTypeEnum];
-        _console;
-      }
-      if (manufacturerData.byteLength >= 3 + 4) {
-        ipAddress = new Uint8Array(
-          manufacturerData.buffer.slice(3, 3 + 4),
-        ).join(".");
-        _console.log({ ipAddress });
-      }
-      if (manufacturerData.byteLength >= 3 + 4 + 1) {
-        isWifiSecure = manufacturerData.readUint8(3 + 4) != 0;
-        _console.log({ isWifiSecure });
-      }
-    }
-    if (serviceData) {
-      _console.log("serviceData", serviceData);
-      const deviceTypeServiceData = serviceData.find((serviceDatum) => {
-        return serviceDatum.uuid == serviceDataUUID;
-      });
-      _console.log("deviceTypeServiceData", deviceTypeServiceData);
-      if (deviceTypeServiceData) {
-        const deviceTypeEnum = deviceTypeServiceData.data.readUint8(0);
-        deviceType = DeviceTypes[deviceTypeEnum];
-      }
-    }
-    if (deviceType == undefined) {
-      _console.log("skipping device - no deviceType");
-      return;
-    }
+    const { manufacturerData } = noblePeripheral.advertisement;
+    _console.log("manufacturerData", manufacturerData);
+    const { deviceType, ipAddress, isWifiSecure } = this._parseManufacturerData(
+      new DataView(manufacturerData.buffer),
+    );
 
     const discoveredDeviceMetadata: DiscoveredDeviceMetadata = {
       name: noblePeripheral.advertisement.localName,
       bluetoothId: noblePeripheral.id,
-      deviceType,
+      deviceType: deviceType!,
       rssi: noblePeripheral.rssi,
       ipAddress,
       isWifiSecure,

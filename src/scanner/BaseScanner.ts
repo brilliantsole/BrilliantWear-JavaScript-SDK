@@ -10,8 +10,9 @@ import DiscoveredDevice, {
   DiscoveredDevicesMap,
 } from "./DiscoveredDevice.ts";
 import { default as DeviceManager } from "../DeviceManager.ts";
+import { DeviceType, DeviceTypes } from "../InformationManager.ts";
 
-const _console = createConsole("BaseScanner", { log: false });
+const _console = createConsole("BaseScanner", { log: true });
 
 export const ScannerEventTypes = [
   "isScanningAvailable",
@@ -235,10 +236,44 @@ abstract class BaseScanner {
     );
   }
 
+  protected _parseManufacturerData(dataView: DataView | string) {
+    if (typeof dataView == "string") {
+      const array = dataView
+        .match(/.{1,2}/g)!
+        .map((byte) => parseInt(byte, 16));
+      dataView = new DataView(Uint8Array.from(array).buffer);
+    }
+
+    let deviceType: DeviceType | undefined;
+    let ipAddress: string | undefined;
+    let isWifiSecure: boolean | undefined;
+
+    _console.log("_parseAdvertisement", dataView);
+    if (dataView.byteLength >= 3) {
+      const deviceTypeEnum = dataView.getUint8(2);
+      deviceType = DeviceTypes[deviceTypeEnum];
+      _console;
+    }
+    if (dataView.byteLength >= 3 + 4) {
+      ipAddress = new Uint8Array(dataView.buffer.slice(3, 3 + 4)).join(".");
+      _console.log({ ipAddress });
+    }
+    if (dataView.byteLength >= 3 + 4 + 1) {
+      isWifiSecure = dataView.getUint8(3 + 4) != 0;
+      _console.log({ isWifiSecure });
+    }
+
+    return { deviceType, ipAddress, isWifiSecure };
+  }
   protected _onDiscoveredDevice(
     discoveredDeviceMetadata: DiscoveredDeviceMetadata,
   ) {
     _console.log("_onDiscoveredDevice", discoveredDeviceMetadata);
+
+    if (discoveredDeviceMetadata.deviceType == undefined) {
+      _console.log("skipping device - no deviceType");
+      return;
+    }
 
     let discoveredDevice =
       this.#discoveredDevices[discoveredDeviceMetadata.bluetoothId];

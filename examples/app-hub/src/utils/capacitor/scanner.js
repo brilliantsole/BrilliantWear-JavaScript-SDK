@@ -13,9 +13,9 @@ class BluetoothLowEnergyConnectionManager
   // FILL
 }
 const isWeb = Capacitor.getPlatform() == "web";
+document.documentElement.toggleAttribute("data-web", isWeb);
 
 class BluetoothLowEnergyScanner extends BW.BaseScanner {
-  // FILL - isScanning
   // FILL - discoveredDevice
   // FILL - connect/disconnect
   // FILL - connectionManager
@@ -31,7 +31,15 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
       const { device } = event;
       console.log("deviceScanned", device);
       const { deviceId, name, manufacturerData, serviceUuids, rssi } = device;
-      // FILL
+      const discoveredDeviceMetadata =
+        this._parseManufacturerData(manufacturerData);
+      console.log("discoveredDeviceMetadata", discoveredDeviceMetadata);
+      this._onDiscoveredDevice({
+        bluetoothId: deviceId,
+        name,
+        rssi,
+        ...discoveredDeviceMetadata,
+      });
     });
     BluetoothLowEnergy.addListener("deviceConnected", (event) => {
       console.log("deviceConnected", event);

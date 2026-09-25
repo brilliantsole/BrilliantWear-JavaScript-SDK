@@ -85,7 +85,7 @@ class DeviceCard extends LitElement {
   get isClient() {
     return (
       this._discoveredDevice?.scanner.isClient ||
-      this._device.connectionType == "client"
+      this._device?.connectionType == "client"
     );
   }
 
@@ -625,7 +625,7 @@ class DeviceCard extends LitElement {
       } else {
         return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
       }
-    } else {
+    } else if (this.isDeviceConnected) {
       switch (this._device.connectionType) {
         case "webBluetooth":
           return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
@@ -639,6 +639,8 @@ class DeviceCard extends LitElement {
           return nothing;
           break;
       }
+    } else {
+      return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
     }
   }
 

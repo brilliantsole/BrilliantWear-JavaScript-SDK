@@ -241,7 +241,7 @@ class DevicesTab extends LitElement {
 
     return html`
       <div class="wa-stack wa-gap-xs">
-        <p data-ios-only data-bluetooth-not-available-only>
+        <p data-ios-only data-bluetooth-not-available-only data-web-only>
           Bluetooth is not available - download the
           <a href="https://ioswebble.com/" target="_blank">ioswebble</a> app
         </p>
