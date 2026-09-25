@@ -72,7 +72,7 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
       return false;
     }
     await BluetoothLowEnergy.startScan({
-      services: BW.Bluetooth.serviceUUIDs,
+      services: BW.BluetoothUUIDs.serviceUUIDs,
       timeout: 0,
       allowDuplicates: true,
     });

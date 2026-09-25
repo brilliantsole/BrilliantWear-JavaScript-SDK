@@ -118,8 +118,8 @@ import { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, Con
 export { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses, };
 import { default as BluetoothConnectionManager } from "./connection/bluetooth/BluetoothConnectionManager.ts";
 export { BluetoothConnectionManager };
-import * as Bluetooth from "./connection/bluetooth/bluetoothUUIDs.ts";
-export { Bluetooth };
+import * as BluetoothUUIDs from "./connection/bluetooth/bluetoothUUIDs.ts";
+export { BluetoothUUIDs };
 import { ConnectionManager, ConnectionManagers } from "./connection/ConnectionManager.ts";
 export { ConnectionManager, ConnectionManagers };
 import { default as DiscoveredDevice, DiscoveredDeviceMetadata } from "./scanner/DiscoveredDevice.ts";

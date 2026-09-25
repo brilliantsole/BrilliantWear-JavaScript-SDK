@@ -489,6 +489,12 @@ html[data-header-hidden] {
   }
 }
 
+@supports not (-webkit-touch-callout: none) {
+  [data-ios-only] {
+    display: none;
+  }
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   @media (orientation: portrait) {
     @supports (-webkit-touch-callout: none) {

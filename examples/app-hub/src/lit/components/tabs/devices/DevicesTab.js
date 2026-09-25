@@ -25,12 +25,22 @@ import { createDisableViewTransitionsContextConsumer } from "../../../contexts/d
 import { availableDeviceBluetoothIdsSignal } from "./DevicesSignals.js";
 import { waitForAnimationFrames } from "../../../../utils/rendering.js";
 
+import {
+  isScanningAvailableSignal,
+  isScanningSignal,
+} from "./scanner/ScannerSignals.js";
+
 /** @typedef {import("../../../../../../../build/brilliantwear.module.js").WebSocketClient} WebSocketClient */
 
 class DevicesTab extends LitElement {
   createRenderRoot() {
     return this;
   }
+
+  static properties = {
+    isScanning: { type: Boolean },
+    isScanningAvailable: { type: Boolean },
+  };
 
   _bluetoothConsumer = createBluetoothContextConsumer(this, true);
   /** @type {import("../../../contexts/bluetoothContext.js").BluetoothContextState} */
@@ -87,6 +97,15 @@ class DevicesTab extends LitElement {
     }
   }
 
+  _onIsScanningAvailableUpdate() {
+    console.log("_onIsScanningAvailableUpdate");
+    this.isScanningAvailable = isScanningAvailableSignal.get();
+  }
+  _onIsScanningUpdate() {
+    console.log("_onIsScanningUpdate");
+    this.isScanning = isScanningSignal.get();
+  }
+
   /** @type {string[]} */
   availableDeviceBluetoothIds = [];
   async _onDeviceBluetoothIdsUpdate(requestUpdate = true) {
@@ -128,13 +147,29 @@ class DevicesTab extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    this._watcher = new Signal.subtle.Watcher(async () => {
+    this._deviceBluetoothIdsWatcher = new Signal.subtle.Watcher(async () => {
       await 0;
       this._onDeviceBluetoothIdsUpdate();
-      this._watcher.watch();
+      this._deviceBluetoothIdsWatcher.watch();
     });
-    this._watcher.watch(availableDeviceBluetoothIdsSignal);
+    this._deviceBluetoothIdsWatcher.watch(availableDeviceBluetoothIdsSignal);
     this._onDeviceBluetoothIdsUpdate(false);
+
+    this._isScanningAvailableWatcher = new Signal.subtle.Watcher(async () => {
+      await 0;
+      this._onIsScanningAvailableUpdate();
+      this._isScanningAvailableWatcher.watch();
+    });
+    this._isScanningAvailableWatcher.watch(isScanningAvailableSignal);
+    this._onIsScanningAvailableUpdate();
+
+    this._isScanningWatcher = new Signal.subtle.Watcher(async () => {
+      await 0;
+      this._onIsScanningUpdate();
+      this._isScanningWatcher.watch();
+    });
+    this._isScanningWatcher.watch(isScanningSignal);
+    this._onIsScanningUpdate();
 
     this._abortController = new AbortController();
     /** @type {AddEventListenerOptions} */
@@ -163,7 +198,7 @@ class DevicesTab extends LitElement {
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._watcher?.unwatch();
+    this._deviceBluetoothIdsWatcher?.unwatch();
     this._abortController.abort();
   }
 
@@ -185,6 +220,11 @@ class DevicesTab extends LitElement {
     const availableDeviceBluetoothIds = this.availableDeviceBluetoothIds;
     console.log({ isAddingClient }, this.clients, availableDeviceBluetoothIds);
 
+    console.log({
+      isScanningAvailable: this.isScanningAvailable,
+      isScanning: this.isScanning,
+    });
+
     const clientsStyles = {
       "--bw-grid-lane-width": "17em",
       "justify-items": "stretch !important",
@@ -196,6 +236,10 @@ class DevicesTab extends LitElement {
 
     return html`
       <div class="wa-stack wa-gap-xs">
+        <p data-ios-only data-bluetooth-not-available-only>
+          Bluetooth is not available - download the
+          <a href="https://ioswebble.com/" target="_blank">ioswebble</a> app
+        </p>
         <div
           data-not-touch-not-portrait-only
           class="wa-cluster wa-gap-xs bw-justify-content"

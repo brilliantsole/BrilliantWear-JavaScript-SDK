@@ -50,9 +50,9 @@ declare abstract class BaseServer<ServerClient extends BaseServerClient> {
     protected get baseConstructor(): typeof BaseServer;
     static get clientMtu(): number;
     get clientMtu(): number;
-    get addEventListener(): <T extends "*" | "clientConnected" | "clientNotConnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void, options?: import("../index.ts").EventDispatcherOptions) => void;
+    get addEventListener(): <T extends "clientConnected" | "clientNotConnected" | "*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void, options?: import("../index.ts").EventDispatcherOptions) => void;
     protected get dispatchEvent(): <T extends "clientConnected" | "clientNotConnected">(type: T, message: BaseServerEventMessages<ServerClient>[T]) => void;
-    get removeEventListener(): <T extends "*" | "clientConnected" | "clientNotConnected">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void) => void;
+    get removeEventListener(): <T extends "clientConnected" | "clientNotConnected" | "*">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseServer<ServerClient>, "clientConnected" | "clientNotConnected", BaseServerEventMessages<ServerClient>, T>) => void) => void;
     get waitForEvent(): <T extends "clientConnected" | "clientNotConnected">(type: T, options?: {
         immediate?: boolean;
         signal?: AbortSignal;

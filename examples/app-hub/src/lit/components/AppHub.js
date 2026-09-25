@@ -1530,6 +1530,7 @@ class AppHub extends LitElement {
     // console.log(event.type, event.relatedTarget);
   }
 
+  _onScrollIgnoreNodeNames = ["WA-INPUT"];
   _onScroll = BW.ThrottleUtils.debounce((event) => {
     if (!isIOS) {
       return;
@@ -1540,6 +1541,15 @@ class AppHub extends LitElement {
     }
     if (window.scrollY == 0 && getIsFullscreen()) {
       return;
+    }
+    if (document.activeElement) {
+      const activeElementNodeName = document.activeElement.nodeName;
+      const ignore = this._onScrollIgnoreNodeNames.includes(
+        activeElementNodeName,
+      );
+      if (ignore) {
+        return;
+      }
     }
     this._resetViewport();
   }, 100);

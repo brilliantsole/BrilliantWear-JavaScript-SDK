@@ -2806,5 +2806,4 @@ import {
   BoundScannerManagerEventListeners,
   ScannerManagerEventMap,
 } from "../scanner/ScannerManager.ts";
-import NullScanner from "../scanner/NullScanner.ts";
 import { ScannerLike } from "../scanner/Scanner.ts";

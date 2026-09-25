@@ -21654,7 +21654,7 @@ const ScannerEventTypes = [
     "scanning",
     "notScanning",
 ];
-let BaseScanner$1 = class BaseScanner {
+class BaseScanner {
     static OnScanner;
     get baseConstructor() {
         return this.constructor;
@@ -21854,8 +21854,8 @@ let BaseScanner$1 = class BaseScanner {
         _console$g.assertWithError(this.canReset, `${this.constructor.name} does not support reset`);
         _console$g.log("resetting...");
     }
-};
-_a$2 = BaseScanner$1;
+}
+_a$2 = BaseScanner;
 
 const _console$f = createConsole("ClientConnectionManager", { log: false });
 [
@@ -22230,7 +22230,7 @@ class BaseClient {
                 break;
             case "pubSub":
                 {
-                    const responseMessage = PubSubManager$1._parsePeerMessage(
+                    const responseMessage = PubSubManager._parsePeerMessage(
                     this, dataView);
                     if (responseMessage) {
                         responseMessages.push({ type: "pubSub", data: responseMessage });
@@ -22615,7 +22615,7 @@ function doesBasePubSubManagerOptionsIncludePeer(options, peer) {
     }
     return true;
 }
-let PubSubManager = (() => {
+let PubSubManager$1 = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
@@ -23078,7 +23078,7 @@ let PubSubManager = (() => {
     });
     return _classThis;
 })();
-var PubSubManager$1 = PubSubManager.shared;
+var PubSubManager = PubSubManager$1.shared;
 
 var _a;
 const RequiredDeviceInformationMessageTypes = [
@@ -24027,7 +24027,7 @@ class BaseServer {
                 break;
             case "pubSub":
                 {
-                    const responseMessage = PubSubManager$1._parsePeerMessage(
+                    const responseMessage = PubSubManager._parsePeerMessage(
                     client, dataView);
                     if (responseMessage) {
                         responseMessages.push(createServerMessage({ type: "pubSub", data: responseMessage }));
@@ -24806,7 +24806,7 @@ let ServerManager = (() => {
     return _classThis;
 })();
 var ServerManager_default = ServerManager.shared;
-PubSubManager$1._init();
+PubSubManager._init();
 
 const _console$8 = createConsole("ScannerManager", { log: false });
 function getScannerManagerScannerEventTypes(scannerEventType) {
@@ -24841,7 +24841,7 @@ let ScannerManager = (() => {
         static shared;
         constructor() {
             _console$8.log("assigning OnScanner");
-            BaseScanner$1.OnScanner = this._onScanner.bind(this);
+            BaseScanner.OnScanner = this._onScanner.bind(this);
             addEventListeners(ClientManager, this.#boundClientManagerListeners);
         }
         #scanners = [];
@@ -24943,7 +24943,7 @@ let NullScanner = (() => {
     let _classDescriptor;
     let _classExtraInitializers = [];
     let _classThis;
-    let _classSuper = BaseScanner$1;
+    let _classSuper = BaseScanner;
     (class extends _classSuper {
         static { _classThis = this; }
         static {
@@ -25236,20 +25236,20 @@ class NobleConnectionManager extends BluetoothConnectionManager {
     }
 }
 
-const _console$3 = createConsole("NobleScanner", { log: false });
+const _console$6 = createConsole("NobleScanner", { log: false });
 let filterManually = true;
 const filterServiceUuid = serviceUUIDs[0].replaceAll("-", "");
 let isLinux = false;
 const platform = os.platform();
 isLinux = platform == "linux";
 filterManually = isLinux;
-_console$3.log({ platform, filterManually, filterServiceUuid });
+_console$6.log({ platform, filterManually, filterServiceUuid });
 let NobleScanner = (() => {
     let _classDecorators = [Singleton];
     let _classDescriptor;
     let _classExtraInitializers = [];
     let _classThis;
-    let _classSuper = BaseScanner$1;
+    let _classSuper = BaseScanner;
     (class extends _classSuper {
         static { _classThis = this; }
         static {
@@ -25266,13 +25266,13 @@ let NobleScanner = (() => {
             return this.#_nobleState;
         }
         set #nobleState(newNobleState) {
-            _console$3.assertTypeWithError(newNobleState, "string");
+            _console$6.assertTypeWithError(newNobleState, "string");
             if (this.#nobleState == newNobleState) {
-                _console$3.log("duplicate nobleState assignment");
+                _console$6.log("duplicate nobleState assignment");
                 return;
             }
             this.#_nobleState = newNobleState;
-            _console$3.log({ newNobleState });
+            _console$6.log({ newNobleState });
             this._isScanningAvailable = this.#isScanningAvailable;
         }
         #boundNobleListeners = {
@@ -25282,28 +25282,28 @@ let NobleScanner = (() => {
             discover: this.#onNobleDiscover.bind(this),
         };
         #onNobleScanStart() {
-            _console$3.log("OnNobleScanStart");
+            _console$6.log("OnNobleScanStart");
             this._isScanning = true;
         }
         #onNobleScanStop() {
-            _console$3.log("OnNobleScanStop");
+            _console$6.log("OnNobleScanStop");
             this._isScanning = false;
         }
         #onNobleStateChange(state) {
-            _console$3.log("onNobleStateChange", state);
+            _console$6.log("onNobleStateChange", state);
             this.#nobleState = state;
         }
         #isBusy = false;
         async #onNobleDiscover(noblePeripheral) {
-            _console$3.log("advertisement", noblePeripheral.advertisement);
+            _console$6.log("advertisement", noblePeripheral.advertisement);
             if (filterManually) {
                 const serviceUuid = noblePeripheral.advertisement.serviceUuids?.[0];
-                _console$3.log("onNobleDiscover.filterManually", { serviceUuid });
+                _console$6.log("onNobleDiscover.filterManually", { serviceUuid });
                 if (serviceUuid != filterServiceUuid) {
                     return;
                 }
             }
-            _console$3.log("onNobleDiscover", noblePeripheral.id);
+            _console$6.log("onNobleDiscover", noblePeripheral.id);
             if (!this.#noblePeripherals[noblePeripheral.id]) {
                 noblePeripheral.scanner = this;
                 this.#noblePeripherals[noblePeripheral.id] = noblePeripheral;
@@ -25316,45 +25316,45 @@ let NobleScanner = (() => {
                     _noblePeripheral.state == "disconnected") {
                     this.#isBusy = true;
                     _noblePeripheral.shouldConnect = false;
-                    _console$3.log("noblePeripheral.connectAsync");
+                    _console$6.log("noblePeripheral.connectAsync");
                     await _noblePeripheral.connectAsync({ mtu: 512 });
-                    _console$3.log("noblePeripheral.connectAsync done");
+                    _console$6.log("noblePeripheral.connectAsync done");
                     this.#isBusy = false;
                 }
             }
-            _console$3.log("advertisement", noblePeripheral.advertisement);
+            _console$6.log("advertisement", noblePeripheral.advertisement);
             let deviceType;
             let ipAddress;
             let isWifiSecure;
             const { manufacturerData, serviceData } = noblePeripheral.advertisement;
             if (manufacturerData) {
-                _console$3.log("manufacturerData", manufacturerData);
+                _console$6.log("manufacturerData", manufacturerData);
                 if (manufacturerData.byteLength >= 3) {
                     const deviceTypeEnum = manufacturerData.readUint8(2);
                     deviceType = DeviceTypes[deviceTypeEnum];
                 }
                 if (manufacturerData.byteLength >= 3 + 4) {
                     ipAddress = new Uint8Array(manufacturerData.buffer.slice(3, 3 + 4)).join(".");
-                    _console$3.log({ ipAddress });
+                    _console$6.log({ ipAddress });
                 }
                 if (manufacturerData.byteLength >= 3 + 4 + 1) {
                     isWifiSecure = manufacturerData.readUint8(3 + 4) != 0;
-                    _console$3.log({ isWifiSecure });
+                    _console$6.log({ isWifiSecure });
                 }
             }
             if (serviceData) {
-                _console$3.log("serviceData", serviceData);
+                _console$6.log("serviceData", serviceData);
                 const deviceTypeServiceData = serviceData.find((serviceDatum) => {
                     return serviceDatum.uuid == serviceDataUUID;
                 });
-                _console$3.log("deviceTypeServiceData", deviceTypeServiceData);
+                _console$6.log("deviceTypeServiceData", deviceTypeServiceData);
                 if (deviceTypeServiceData) {
                     const deviceTypeEnum = deviceTypeServiceData.data.readUint8(0);
                     deviceType = DeviceTypes[deviceTypeEnum];
                 }
             }
             if (deviceType == undefined) {
-                _console$3.log("skipping device - no deviceType");
+                _console$6.log("skipping device - no deviceType");
                 return;
             }
             const discoveredDeviceMetadata = {
@@ -25379,7 +25379,7 @@ let NobleScanner = (() => {
             if (!super.startScan()) {
                 return false;
             }
-            _console$3.log("noble.startScan");
+            _console$6.log("noble.startScan");
             noble__default.startScanningAsync(filterManually ? [] : serviceUUIDs, true);
             return true;
         }
@@ -25387,7 +25387,7 @@ let NobleScanner = (() => {
             if (!super.stopScan()) {
                 return false;
             }
-            _console$3.log("noble.stopScan");
+            _console$6.log("noble.stopScan");
             noble__default.stopScanningAsync();
             return true;
         }
@@ -25410,17 +25410,17 @@ let NobleScanner = (() => {
         }
         #noblePeripherals = {};
         #assertValidNoblePeripheralId(noblePeripheralId) {
-            _console$3.assertTypeWithError(noblePeripheralId, "string");
-            _console$3.assertWithError(this.#noblePeripherals[noblePeripheralId], `no noblePeripheral found with id "${noblePeripheralId}"`);
+            _console$6.assertTypeWithError(noblePeripheralId, "string");
+            _console$6.assertWithError(this.#noblePeripherals[noblePeripheralId], `no noblePeripheral found with id "${noblePeripheralId}"`);
         }
         async connectToDevice(bluetoothId, connectionType) {
             super.connectToDevice(bluetoothId, connectionType);
             this.#assertValidNoblePeripheralId(bluetoothId);
             const noblePeripheral = this.#noblePeripherals[bluetoothId];
-            _console$3.log("connecting to discoveredDevice...", bluetoothId);
+            _console$6.log("connecting to discoveredDevice...", bluetoothId);
             let device = DeviceManager.getAvailableDeviceByBluetoothId(bluetoothId, this.connectionType);
             if (!device) {
-                _console$3.log("creating device for discoveredDevice...", bluetoothId);
+                _console$6.log("creating device for discoveredDevice...", bluetoothId);
                 device = this.#createDevice(noblePeripheral);
             }
             if (device.connectionManager.type != this.connectionType) {
@@ -25465,7 +25465,7 @@ let NobleScanner = (() => {
 })();
 NobleScanner.shared;
 
-const _console$6 = createConsole("DevicePairPressureSensorDataManager", {
+const _console$5 = createConsole("DevicePairPressureSensorDataManager", {
     log: false,
 });
 class DevicePairPressureSensorDataManager {
@@ -25483,14 +25483,14 @@ class DevicePairPressureSensorDataManager {
     onDevicePressureData(event) {
         const { pressure, timestamp } = event.message;
         const { side } = event.target;
-        _console$6.log({ pressure, side });
+        _console$5.log({ pressure, side });
         this.#rawPressure[side] = pressure;
         this.#pressureTimestamps[side] = timestamp;
         if (this.#hasAllPressureData) {
             return this.#updatePressureData();
         }
         else {
-            _console$6.log("doesn't have all pressure data yet...");
+            _console$5.log("doesn't have all pressure data yet...");
         }
     }
     get #hasAllPressureData() {
@@ -25554,12 +25554,12 @@ class DevicePairPressureSensorDataManager {
             pressureData.normalizedCenter =
                 this.#centerOfPressureHelper.updateAndGetNormalization(pressureData.center);
         }
-        _console$6.log({ devicePairPressureData: pressureData });
+        _console$5.log({ devicePairPressureData: pressureData });
         return pressureData;
     }
 }
 
-const _console$5 = createConsole("DevicePairSensorDataManager", { log: false });
+const _console$4 = createConsole("DevicePairSensorDataManager", { log: false });
 const DevicePairSensorTypes = ["pressure", "sensorData"];
 const DevicePairSensorDataEventTypes = DevicePairSensorTypes;
 class DevicePairSensorDataManager {
@@ -25574,7 +25574,7 @@ class DevicePairSensorDataManager {
     }
     onDeviceSensorData(event) {
         const { timestamp, sensorType } = event.message;
-        _console$5.log({ sensorType, timestamp, event });
+        _console$4.log({ sensorType, timestamp, event });
         if (!this.#timestamps[sensorType]) {
             this.#timestamps[sensorType] = {};
         }
@@ -25585,7 +25585,7 @@ class DevicePairSensorDataManager {
                 value = this.pressureSensorDataManager.onDevicePressureData(event);
                 break;
             default:
-                _console$5.log(`uncaught sensorType "${sensorType}"`);
+                _console$4.log(`uncaught sensorType "${sensorType}"`);
                 break;
         }
         if (value) {
@@ -25602,12 +25602,12 @@ class DevicePairSensorDataManager {
             });
         }
         else {
-            _console$5.log("no value received");
+            _console$4.log("no value received");
         }
     }
 }
 
-const _console$4 = createConsole("DevicePair", { log: false });
+const _console$3 = createConsole("DevicePair", { log: false });
 function getDevicePairDeviceEventTypes(deviceEventType) {
     return ["device", ...Sides].map((prefix) => `${prefix}${capitalizeFirstCharacter(deviceEventType)}`);
 }
@@ -25672,7 +25672,7 @@ class DevicePair {
         return this.isPartiallyConnected && !this.isConnected;
     }
     #assertIsConnected() {
-        _console$4.assertWithError(this.isConnected, "devicePair must be connected");
+        _console$3.assertWithError(this.isConnected, "devicePair must be connected");
     }
     #isDeviceCorrectType(device) {
         switch (this.type) {
@@ -25684,13 +25684,13 @@ class DevicePair {
     }
     assignDevice(device) {
         if (!this.#isDeviceCorrectType(device)) {
-            _console$4.log(`device is incorrect type ${device.type} for ${this.type} devicePair`);
+            _console$3.log(`device is incorrect type ${device.type} for ${this.type} devicePair`);
             return;
         }
         const side = device.side;
         const currentDevice = this[side];
         if (device == currentDevice) {
-            _console$4.log("device already assigned");
+            _console$3.log("device already assigned");
             return;
         }
         if (currentDevice) {
@@ -25705,7 +25705,7 @@ class DevicePair {
                 this.#right = device;
                 break;
         }
-        _console$4.log(`assigned ${side} ${this.type} device`, device);
+        _console$3.log(`assigned ${side} ${this.type} device`, device);
         this.resetPressureRange();
         this.#dispatchEvent("isConnected", { isConnected: this.isConnected });
         this.#dispatchEvent("deviceIsConnected", {
@@ -25726,7 +25726,7 @@ class DevicePair {
             if (this[side] != device) {
                 return false;
             }
-            _console$4.log(`removing ${side} ${this.type} device`, device);
+            _console$3.log(`removing ${side} ${this.type} device`, device);
             removeEventListeners(device, this.#boundDeviceEventListeners);
             switch (side) {
                 case "left":
@@ -26279,5 +26279,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { BaseScanner$1 as BaseScanner, bluetoothUUIDs$1 as Bluetooth, BluetoothConnectionManager, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
+export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs$1 as BluetoothUUIDs, ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, Device, DeviceEventTypes, DeviceManager, DevicePair, DevicePairTypes, DiscoveredDevice, DisplayContextCommandTypes, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, LedTypes, LedValueTypes, NullScanner_default as NullScanner, PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, ServerManager_default as ServerManager, Servers, ThrottleUtils, TxRxMessageTypes, UDPServer, WebSocketServer, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, isTensorFlowAvailable, isTensorFlowModelAvailable, listTensorflowModels, parseFont, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wildcardEventType };
 //# sourceMappingURL=brilliantwear.node.module.js.map
