@@ -3,7 +3,7 @@ import { waitForGlobals } from "../../../../../utils/cross-origin-storage-utils.
 const { lit, BW, litRef, litSignals } = await waitForGlobals();
 
 const { ref, createRef } = litRef;
-const { SignalWatcher } = litSignals;
+const { SignalWatcher, Signal } = litSignals;
 
 const { LitElement, html, css } = lit;
 
@@ -57,7 +57,39 @@ class ToggleScannerButton extends SignalWatcher(LitElement) {
 
   async _onClick() {
     const scanner = scannerSignal.get();
-    scanner?.toggleScanner();
+    scanner?.toggleScan();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this._isScanningWatcher = new Signal.subtle.Watcher(async () => {
+      await 0;
+      this._onIsScanningUpdate();
+      this._isScanningWatcher.watch();
+    });
+    this._isScanningWatcher.watch(isScanningSignal);
+    this._onIsScanningUpdate();
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._isScanningWatcher?.unwatch();
+  }
+
+  _onIsScanningUpdate() {
+    const isScanning = isScanningSignal.get();
+    // console.log("_onIsScanningUpdate", { isScanning });
+
+    if (!this.animationRef.value) {
+      return;
+    }
+    if (!this.disableTransitions) {
+      if (isScanning) {
+        this.animationRef.value.play = true;
+      } else {
+        this.animationRef.value.cancel();
+      }
+    }
   }
 
   _directionConsumer = createDirectionContextConsumer(this, true);

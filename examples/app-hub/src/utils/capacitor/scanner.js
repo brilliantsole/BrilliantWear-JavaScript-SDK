@@ -12,6 +12,8 @@ class BluetoothLowEnergyConnectionManager
   extends BW.BluetoothConnectionManager {
   // FILL
 }
+const isWeb = Capacitor.getPlatform() == "web";
+
 class BluetoothLowEnergyScanner extends BW.BaseScanner {
   // FILL - isScanning
   // FILL - discoveredDevice
@@ -20,6 +22,10 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
 
   constructor() {
     super();
+
+    if (isWeb) {
+      return;
+    }
 
     BluetoothLowEnergy.addListener("deviceScanned", (event) => {
       const { device } = event;
@@ -99,7 +105,7 @@ class BleClientScanner extends BW.BaseScanner {
   // FILL
 }
 
-if (true || Capacitor.getPlatform() != "web") {
+if (true || !isWeb) {
   let scanner;
   if (true) {
     scanner = new BluetoothLowEnergyScanner();

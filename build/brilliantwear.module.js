@@ -36517,6 +36517,14 @@ class BaseScanner {
         _console$h.log("stopScan");
         return true;
     }
+    toggleScan() {
+        if (this.isScanning) {
+            return this.stopScan();
+        }
+        else {
+            return this.startScan();
+        }
+    }
     #discoveredDevices = {};
     get discoveredDevices() {
         return this.#discoveredDevices;

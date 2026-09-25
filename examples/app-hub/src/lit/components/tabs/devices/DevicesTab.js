@@ -11,9 +11,12 @@ const { styleMap } = litStyleMap;
 const { LitElement, html, nothing } = lit;
 
 import "./bluetooth/AddDeviceButton.js";
-import "./client/AddClientButton.js";
 
+import "./client/AddClientButton.js";
 import "./client/ClientInput.js";
+
+import "./scanner/ToggleScannerButton.js";
+
 import "./device/DeviceCard.js";
 
 import {
@@ -199,6 +202,8 @@ class DevicesTab extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._deviceBluetoothIdsWatcher?.unwatch();
+    this._isScanningWatcher?.unwatch();
+    this._isScanningAvailableWatcher?.unwatch();
     this._abortController.abort();
   }
 
@@ -248,6 +253,9 @@ class DevicesTab extends LitElement {
           <bw-add-device-button
             data-web-bluetooth-available-only
           ></bw-add-device-button>
+          <bw-toggle-scanner-button
+            data-bluetooth-scanning-available-only
+          ></bw-toggle-scanner-button>
           <bw-add-client-button></bw-add-client-button>
         </div>
 
@@ -294,11 +302,15 @@ class DevicesTab extends LitElement {
             data-portrait-only
             data-touch-only
           >
-            <div class="wa-stack wa-gap-2xs" data-align-items>
+            <div class="wa-stack wa-gap-xs" data-align-items>
               <bw-add-client-button use-handedness></bw-add-client-button>
-              <bw-add-device-button
+              <bw-toggle-scanner-button
+                data-bluetooth-scanning-available-only
                 use-handedness
+              ></bw-toggle-scanner-button>
+              <bw-add-device-button
                 data-web-bluetooth-available-only
+                use-handedness
               ></bw-add-device-button>
             </div>
           </div>

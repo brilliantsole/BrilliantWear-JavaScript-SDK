@@ -207,6 +207,14 @@ abstract class BaseScanner {
     //this.#assertIsScanning();
   }
 
+  toggleScan() {
+    if (this.isScanning) {
+      return this.stopScan();
+    } else {
+      return this.startScan();
+    }
+  }
+
   // DISCOVERED DEVICES
   #discoveredDevices: DiscoveredDevicesMap = {};
   get discoveredDevices(): Readonly<DiscoveredDevicesMap> {
