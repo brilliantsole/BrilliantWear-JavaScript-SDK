@@ -522,6 +522,11 @@ class Device {
 
   // CONNECTION MANAGER
 
+  get #isWebBluetooth() {
+    return (
+      this.#connectionManager?.constructor == WebBluetoothConnectionManager
+    );
+  }
   #connectionManager?: ConnectionManager;
   get connectionManager() {
     return this.#connectionManager;
@@ -1006,7 +1011,7 @@ class Device {
         if (this.#isConnected) {
           if (
             this.#connectionManager?.type == "bluetooth" &&
-            this.#connectionManager.constructor == WebBluetoothConnectionManager
+            this.#isWebBluetooth
           ) {
             // @ts-expect-error
             this.#connectionManager.device.device = this;

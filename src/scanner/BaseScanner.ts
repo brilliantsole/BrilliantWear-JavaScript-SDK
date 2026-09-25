@@ -12,7 +12,7 @@ import DiscoveredDevice, {
 import { default as DeviceManager } from "../DeviceManager.ts";
 import { DeviceType, DeviceTypes } from "../InformationManager.ts";
 
-const _console = createConsole("BaseScanner", { log: true });
+const _console = createConsole("BaseScanner", { log: false });
 
 export const ScannerEventTypes = [
   "isScanningAvailable",
