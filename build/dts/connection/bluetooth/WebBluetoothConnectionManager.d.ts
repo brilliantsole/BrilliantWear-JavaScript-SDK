@@ -11,8 +11,8 @@ declare class WebBluetoothConnectionManager extends BluetoothConnectionManager {
     #private;
     get bluetoothId(): string;
     get canUpdateFirmware(): boolean;
-    static type: "webBluetooth";
-    readonly type: "webBluetooth";
+    static type: "bluetooth";
+    readonly type: "bluetooth";
     get device(): BluetoothDevice | undefined;
     set device(newDevice: BluetoothDevice | undefined);
     get server(): BluetoothRemoteGATTServer | undefined;

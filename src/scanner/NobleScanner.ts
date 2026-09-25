@@ -43,7 +43,7 @@ export type NobleState = (typeof NobleStates)[number];
 class NobleScanner extends BaseScanner {
   static readonly shared: NobleScanner;
 
-  readonly connectionType = "noble";
+  readonly connectionType = "bluetooth";
 
   // NOBLE STATE
   #_nobleState: NobleState = "unknown";

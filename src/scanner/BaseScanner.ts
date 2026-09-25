@@ -67,7 +67,7 @@ abstract class BaseScanner {
     return this.constructor as typeof BaseScanner;
   }
 
-  readonly connectionType: ConnectionType = "other";
+  readonly connectionType: ConnectionType = "bluetooth";
 
   readonly isClient = false;
 

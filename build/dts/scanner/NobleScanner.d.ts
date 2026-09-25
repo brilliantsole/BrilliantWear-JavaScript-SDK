@@ -5,7 +5,7 @@ export type NobleState = (typeof NobleStates)[number];
 declare class NobleScanner extends BaseScanner {
     #private;
     static readonly shared: NobleScanner;
-    readonly connectionType = "noble";
+    readonly connectionType = "bluetooth";
     constructor();
     startScan(): boolean;
     stopScan(): boolean;

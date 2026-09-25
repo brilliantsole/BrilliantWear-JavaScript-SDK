@@ -61,7 +61,7 @@ class NobleConnectionManager extends BluetoothConnectionManager {
     return this.#characteristics.has("smp");
   }
 
-  static type = "noble" as const;
+  static type = "bluetooth" as const;
   readonly type = NobleConnectionManager.type;
 
   get isConnected() {

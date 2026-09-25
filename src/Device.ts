@@ -577,7 +577,9 @@ class Device {
       return;
     }
 
-    _console.log("connect options", options);
+    _console.log("connect options", options, {
+      connectionManagerType: this.connectionManager?.type,
+    });
 
     if (
       options?.reconnect &&
@@ -589,19 +591,28 @@ class Device {
 
     if (options) {
       switch (options.type) {
-        case "webBluetooth":
-          if (this.connectionManager?.type != "webBluetooth") {
+        case "bluetooth":
+          if (this.connectionManager?.type != "bluetooth") {
             this.connectionManager = new WebBluetoothConnectionManager();
           }
-          if (navigator.bluetooth.getDevices) {
+          if (navigator?.bluetooth?.getDevices) {
             const bluetoothDevices = await navigator.bluetooth.getDevices();
             const bluetoothDevice = bluetoothDevices.find(
               (bluetoothDevice) =>
                 bluetoothDevice.id == this.bluetoothId ||
                 DeviceManager.bluetoothDeviceMap[bluetoothDevice.id] == this,
             );
-            if (bluetoothDevice) {
-              console.log("assigning bluetoothDevice", bluetoothDevice);
+            _console.log("bluetoothDevice", bluetoothDevice, {
+              isWebBluetooth:
+                this.connectionManager.constructor ==
+                WebBluetoothConnectionManager,
+            });
+            if (
+              bluetoothDevice &&
+              this.connectionManager.constructor ==
+                WebBluetoothConnectionManager
+            ) {
+              _console.log("assigning bluetoothDevice", bluetoothDevice);
               this.connectionManager.device = bluetoothDevice;
             }
           }
@@ -814,7 +825,7 @@ class Device {
     const numberOfConnectingDevices = getNumberOfConnectingDevices();
 
     const isConnected = await device.connect({
-      type: "webBluetooth",
+      type: "bluetooth",
       useAvailableDevice: true,
       ...options,
     });
@@ -993,7 +1004,10 @@ class Device {
     switch (this.connectionStatus) {
       case "connected":
         if (this.#isConnected) {
-          if (this.#connectionManager?.type == "webBluetooth") {
+          if (
+            this.#connectionManager?.type == "bluetooth" &&
+            this.#connectionManager.constructor == WebBluetoothConnectionManager
+          ) {
             // @ts-expect-error
             this.#connectionManager.device.device = this;
           }

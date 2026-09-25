@@ -22,7 +22,7 @@ toggleConnectionButton.addEventListener("click", () => {
     });
   } else {
     if (isSecure) {
-      device.toggleConnection({ type: "webBluetooth" });
+      device.toggleConnection({ type: "bluetooth" });
     } else {
       device.toggleConnection({ type: "webSocket" });
     }

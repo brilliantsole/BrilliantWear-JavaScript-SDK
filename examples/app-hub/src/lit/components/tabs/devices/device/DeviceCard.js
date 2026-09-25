@@ -522,9 +522,7 @@ class DeviceCard extends LitElement {
                   ></wa-icon>
                 </wa-button>
 
-                <wa-dropdown-item
-                  value=${this.isClient ? "noble" : "webBluetooth"}
-                >
+                <wa-dropdown-item value="bluetooth">
                   <wa-icon name="bluetooth" family="brands"></wa-icon>
                   Bluetooth
                 </wa-dropdown-item>
@@ -627,7 +625,7 @@ class DeviceCard extends LitElement {
       }
     } else if (this.isDeviceConnected) {
       switch (this._device.connectionType) {
-        case "webBluetooth":
+        case "bluetooth":
           return html`<wa-icon name="bluetooth" family="brands"></wa-icon>`;
           break;
         case "webSocket":

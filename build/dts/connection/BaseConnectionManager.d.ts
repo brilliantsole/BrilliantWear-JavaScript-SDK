@@ -1,19 +1,19 @@
-export declare const ConnectionTypes: readonly ["none", "webBluetooth", "noble", "client", "webSocket", "udp", "other"];
+export declare const ConnectionTypes: readonly ["none", "bluetooth", "client", "webSocket", "udp"];
 export type ConnectionType = (typeof ConnectionTypes)[number];
-export declare const ClientConnectionTypes: readonly ["noble", "webSocket", "udp"];
+export declare const ClientConnectionTypes: readonly ["bluetooth", "webSocket", "udp"];
 export type ClientConnectionType = (typeof ClientConnectionTypes)[number];
 interface BaseConnectOptions {
     type?: ConnectionType;
 }
-export interface WebBluetoothConnectOptions extends BaseConnectOptions {
-    type: "webBluetooth";
+export interface BluetoothConnectOptions extends BaseConnectOptions {
+    type: "bluetooth";
 }
 interface BaseWifiConnectOptions extends BaseConnectOptions {
     ipAddress: string;
 }
 export interface ClientConnectOptions extends BaseConnectOptions {
     type: "client";
-    subType?: "noble" | "webSocket" | "udp";
+    subType?: ClientConnectionType;
 }
 export interface WebSocketConnectOptions extends BaseWifiConnectOptions {
     type: "webSocket";
@@ -23,14 +23,11 @@ export interface UDPConnectOptions extends BaseWifiConnectOptions {
     type: "udp";
     receivePort?: number;
 }
-export interface NobleConnectOptions extends BaseConnectOptions {
-    type: "noble";
-}
 export type ConnectOptions = {
     reconnect?: boolean;
     signal?: AbortSignal;
     useAvailableDevice?: boolean;
-} & (WebBluetoothConnectOptions | WebSocketConnectOptions | UDPConnectOptions | ClientConnectOptions | NobleConnectOptions);
+} & (BluetoothConnectOptions | WebSocketConnectOptions | UDPConnectOptions | ClientConnectOptions);
 export type ConnectionManagerConnectOptions = ConnectOptions;
 export declare const ConnectionStatuses: readonly ["notConnected", "connecting", "connected", "disconnecting"];
 export type ConnectionStatus = (typeof ConnectionStatuses)[number];
@@ -80,8 +77,8 @@ declare abstract class BaseConnectionManager {
     get canUpdateFirmware(): boolean;
     static type: ConnectionType;
     abstract readonly type: ConnectionType;
-    get status(): "connecting" | "connected" | "disconnecting" | "notConnected";
-    protected set status(newConnectionStatus: "connecting" | "connected" | "disconnecting" | "notConnected");
+    get status(): "notConnected" | "connecting" | "connected" | "disconnecting";
+    protected set status(newConnectionStatus: "notConnected" | "connecting" | "connected" | "disconnecting");
     get isConnected(): boolean;
     get isAvailable(): boolean;
     /** @throws {Error} if connected */

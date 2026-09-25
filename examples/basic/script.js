@@ -1955,7 +1955,7 @@ connectViaWebSocketsButton.addEventListener("click", async () => {
 const updateConnectViaWebSocketsButton = () => {
   const enabled =
     currentDevice.isConnected &&
-    currentDevice.connectionType == "webBluetooth" &&
+    currentDevice.connectionType == "bluetooth" &&
     currentDevice.isWifiConnected;
   // console.log({ enabled });
   connectViaWebSocketsButton.disabled = !enabled;

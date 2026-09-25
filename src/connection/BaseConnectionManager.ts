@@ -23,29 +23,27 @@ const _console = createConsole("BaseConnectionManager", { log: false });
 
 export const ConnectionTypes = [
   "none",
-  "webBluetooth",
-  "noble",
+  "bluetooth",
   "client",
   "webSocket",
   "udp",
-  "other",
 ] as const;
 export type ConnectionType = (typeof ConnectionTypes)[number];
 
-export const ClientConnectionTypes = ["noble", "webSocket", "udp"] as const;
+export const ClientConnectionTypes = ["bluetooth", "webSocket", "udp"] as const;
 export type ClientConnectionType = (typeof ClientConnectionTypes)[number];
 interface BaseConnectOptions {
   type?: ConnectionType;
 }
-export interface WebBluetoothConnectOptions extends BaseConnectOptions {
-  type: "webBluetooth";
+export interface BluetoothConnectOptions extends BaseConnectOptions {
+  type: "bluetooth";
 }
 interface BaseWifiConnectOptions extends BaseConnectOptions {
   ipAddress: string;
 }
 export interface ClientConnectOptions extends BaseConnectOptions {
   type: "client";
-  subType?: "noble" | "webSocket" | "udp";
+  subType?: ClientConnectionType;
 }
 export interface WebSocketConnectOptions extends BaseWifiConnectOptions {
   type: "webSocket";
@@ -57,20 +55,15 @@ export interface UDPConnectOptions extends BaseWifiConnectOptions {
   receivePort?: number;
 }
 
-export interface NobleConnectOptions extends BaseConnectOptions {
-  type: "noble";
-}
-
 export type ConnectOptions = {
   reconnect?: boolean;
   signal?: AbortSignal;
   useAvailableDevice?: boolean;
 } & (
-  | WebBluetoothConnectOptions
+  | BluetoothConnectOptions
   | WebSocketConnectOptions
   | UDPConnectOptions
   | ClientConnectOptions
-  | NobleConnectOptions
 );
 
 export type ConnectionManagerConnectOptions = ConnectOptions;
