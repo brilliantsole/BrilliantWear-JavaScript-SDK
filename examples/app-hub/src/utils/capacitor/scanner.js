@@ -2,6 +2,8 @@ import { waitForGlobals } from "../../utils/cross-origin-storage-utils.js";
 
 const { BW } = await waitForGlobals();
 
+/** @typedef {import("../../../../../build/brilliantwear.module.js").ConnectionType} ConnectionType */
+
 import { Capacitor } from "@capacitor/core";
 console.log("Capacitor", Capacitor);
 
@@ -41,6 +43,7 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
         ...discoveredDeviceMetadata,
       });
     });
+
     BluetoothLowEnergy.addListener("deviceConnected", (event) => {
       console.log("deviceConnected", event);
       const { deviceId } = event;
@@ -100,6 +103,15 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
     await BluetoothLowEnergy.stopScan();
     this._isScanning = false;
     return true;
+  }
+
+  /**
+   * @param {string} bluetoothId
+   * @param {ConnectionType} connectionType
+   */
+  async connectToDevice(bluetoothId, connectionType) {
+    super.connectToDevice(bluetoothId, connectionType);
+    // FILL
   }
 }
 

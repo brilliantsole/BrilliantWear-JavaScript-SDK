@@ -350,6 +350,15 @@ abstract class BaseScanner {
   }
   async disconnectFromDevice(bluetoothId: string) {
     this.#assertIsAvailable();
+
+    const device = DeviceManager.getAvailableDeviceByBluetoothId(
+      bluetoothId,
+      this.connectionType,
+    );
+
+    if (device) {
+      await device.disconnect();
+    }
   }
 
   // RESET

@@ -5061,7 +5061,7 @@ class DeviceInformationManager {
 }
 
 const _console$K = createConsole("InformationManager", { log: false });
-const DeviceTypes$1 = [
+const DeviceTypes = [
     "leftInsole",
     "rightInsole",
     "leftGlove",
@@ -5159,14 +5159,14 @@ class InformationManager {
         return this.#type;
     }
     get typeEnum() {
-        return DeviceTypes$1.indexOf(this.type);
+        return DeviceTypes.indexOf(this.type);
     }
     #assertValidDeviceType(type) {
-        _console$K.assertEnumWithError(DeviceTypes$1, type);
+        _console$K.assertEnumWithError(DeviceTypes, type);
     }
     #assertValidDeviceTypeEnum(typeEnum) {
         _console$K.assertTypeWithError(typeEnum, "number");
-        _console$K.assertWithError(typeEnum in DeviceTypes$1, `invalid typeEnum ${typeEnum}`);
+        _console$K.assertWithError(typeEnum in DeviceTypes, `invalid typeEnum ${typeEnum}`);
     }
     updateType(updatedType) {
         this.#assertValidDeviceType(updatedType);
@@ -5178,7 +5178,7 @@ class InformationManager {
         this.#assertValidDeviceType(newType);
         const promise = this.waitForEvent("getType");
         this.sendMessages([
-            { type: "setType", data: enumToArrayBuffer(DeviceTypes$1, newType) },
+            { type: "setType", data: enumToArrayBuffer(DeviceTypes, newType) },
         ]);
         await promise;
     }
@@ -5289,7 +5289,7 @@ class InformationManager {
             case "getType":
             case "setType":
                 const typeEnum = dataView.getUint8(0);
-                const type = DeviceTypes$1[typeEnum];
+                const type = DeviceTypes[typeEnum];
                 _console$K.log({ typeEnum, type });
                 this.updateType(type);
                 break;
@@ -36383,7 +36383,7 @@ class DiscoveredDevice {
 }
 
 var _a$2;
-const _console$h = createConsole("BaseScanner", { log: false });
+const _console$h = createConsole("BaseScanner", { log: true });
 const ScannerEventTypes = [
     "isScanningAvailable",
     "isScanning",
@@ -36551,7 +36551,7 @@ class BaseScanner {
         _console$h.log("_parseAdvertisement", dataView);
         if (dataView.byteLength >= 3) {
             const deviceTypeEnum = dataView.getUint8(2);
-            deviceType = DeviceTypes$1[deviceTypeEnum];
+            deviceType = DeviceTypes[deviceTypeEnum];
         }
         if (dataView.byteLength >= 3 + 4) {
             ipAddress = new Uint8Array(dataView.buffer.slice(3, 3 + 4)).join(".");
@@ -36625,6 +36625,10 @@ class BaseScanner {
     }
     async disconnectFromDevice(bluetoothId) {
         this.#assertIsAvailable();
+        const device = DeviceManager$1.getAvailableDeviceByBluetoothId(bluetoothId, this.connectionType);
+        if (device) {
+            await device.disconnect();
+        }
     }
     get canReset() {
         return false;
@@ -41097,5 +41101,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs$1 as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes$1 as DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager$1 as DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
+export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs$1 as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager$1 as DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
 //# sourceMappingURL=brilliantwear.module.js.map

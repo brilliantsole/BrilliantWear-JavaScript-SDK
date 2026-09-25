@@ -207,7 +207,7 @@ class NobleScanner extends BaseScanner {
     bluetoothId: string,
     connectionType?: ClientConnectionType,
   ) {
-    super.connectToDevice(bluetoothId, connectionType);
+    await super.connectToDevice(bluetoothId, connectionType);
     this.#assertValidNoblePeripheralId(bluetoothId);
     const noblePeripheral = this.#noblePeripherals[bluetoothId];
     _console.log("connecting to discoveredDevice...", bluetoothId);
@@ -239,17 +239,8 @@ class NobleScanner extends BaseScanner {
   }
 
   async disconnectFromDevice(bluetoothId: string) {
-    super.disconnectFromDevice(bluetoothId);
     this.#assertValidNoblePeripheralId(bluetoothId);
-
-    let device = DeviceManager.getAvailableDeviceByBluetoothId(
-      bluetoothId,
-      this.connectionType,
-    );
-
-    if (device) {
-      await device.disconnect();
-    }
+    await super.disconnectFromDevice(bluetoothId);
   }
 
   #createDevice(noblePeripheral: NoblePeripheral) {

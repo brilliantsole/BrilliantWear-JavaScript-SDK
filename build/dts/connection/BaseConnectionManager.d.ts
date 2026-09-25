@@ -80,8 +80,8 @@ declare abstract class BaseConnectionManager {
     get canUpdateFirmware(): boolean;
     static type: ConnectionType;
     abstract readonly type: ConnectionType;
-    get status(): "notConnected" | "connecting" | "connected" | "disconnecting";
-    protected set status(newConnectionStatus: "notConnected" | "connecting" | "connected" | "disconnecting");
+    get status(): "connecting" | "connected" | "disconnecting" | "notConnected";
+    protected set status(newConnectionStatus: "connecting" | "connected" | "disconnecting" | "notConnected");
     get isConnected(): boolean;
     get isAvailable(): boolean;
     /** @throws {Error} if connected */
