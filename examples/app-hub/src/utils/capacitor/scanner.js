@@ -11,7 +11,14 @@ import { BluetoothLowEnergy } from "@capgo/capacitor-bluetooth-low-energy";
 console.log("BluetoothLowEnergy", BluetoothLowEnergy);
 
 class BluetoothLowEnergyConnectionManager
-  extends BW.BluetoothConnectionManager {
+  extends BW.BluetoothConnectionManager
+{
+  /** @param {string} bluetoothId */
+  constructor(bluetoothId) {
+    super();
+    this.bluetoothId = bluetoothId;
+  }
+
   // FILL
 }
 const isWeb = Capacitor.getPlatform() == "web";
@@ -104,13 +111,11 @@ class BluetoothLowEnergyScanner extends BW.BaseScanner {
     return true;
   }
 
-  /**
-   * @param {string} bluetoothId
-   * @param {ConnectionType} connectionType
-   */
-  async connectToDevice(bluetoothId, connectionType) {
-    super.connectToDevice(bluetoothId, connectionType);
-    // FILL
+  /** @param { string} bluetoothId */
+  _createConnectionManager(bluetoothId) {
+    const bluetoothLowEnergyConnectionManager =
+      new BluetoothLowEnergyConnectionManager(bluetoothId);
+    return bluetoothLowEnergyConnectionManager;
   }
 }
 

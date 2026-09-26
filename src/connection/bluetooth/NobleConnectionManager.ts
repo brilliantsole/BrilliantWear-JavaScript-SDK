@@ -65,6 +65,11 @@ class NobleConnectionManager extends BluetoothConnectionManager {
     return this.#noblePeripheral?.state == "connected";
   }
 
+  constructor(noblePeripheral?: NoblePeripheral) {
+    super();
+    this.noblePeripheral = noblePeripheral;
+  }
+
   async connect(options?: ConnectionManagerConnectOptions) {
     const canConnect = await super.connect(options);
     _console.log({ canConnect });

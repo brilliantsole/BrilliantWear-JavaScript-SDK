@@ -211,8 +211,7 @@ class NobleScanner extends BaseScanner {
 
   _createConnectionManager(bluetoothId: string) {
     const noblePeripheral = this.#noblePeripherals[bluetoothId];
-    const nobleConnectionManager = new NobleConnectionManager();
-    nobleConnectionManager.noblePeripheral = noblePeripheral;
+    const nobleConnectionManager = new NobleConnectionManager(noblePeripheral);
     return nobleConnectionManager;
   }
 }

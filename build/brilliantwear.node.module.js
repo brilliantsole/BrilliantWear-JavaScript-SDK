@@ -25091,6 +25091,10 @@ class NobleConnectionManager extends BluetoothConnectionManager {
     get isConnected() {
         return this.#noblePeripheral?.state == "connected";
     }
+    constructor(noblePeripheral) {
+        super();
+        this.noblePeripheral = noblePeripheral;
+    }
     async connect(options) {
         const canConnect = await super.connect(options);
         _console$7.log({ canConnect });
@@ -25490,8 +25494,7 @@ let NobleScanner = (() => {
         }
         _createConnectionManager(bluetoothId) {
             const noblePeripheral = this.#noblePeripherals[bluetoothId];
-            const nobleConnectionManager = new NobleConnectionManager();
-            nobleConnectionManager.noblePeripheral = noblePeripheral;
+            const nobleConnectionManager = new NobleConnectionManager(noblePeripheral);
             return nobleConnectionManager;
         }
     });

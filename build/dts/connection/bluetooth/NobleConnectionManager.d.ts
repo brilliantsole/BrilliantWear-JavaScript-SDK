@@ -21,6 +21,7 @@ declare class NobleConnectionManager extends BluetoothConnectionManager {
     get bluetoothId(): string;
     get canUpdateFirmware(): boolean;
     get isConnected(): boolean;
+    constructor(noblePeripheral?: NoblePeripheral);
     connect(options?: ConnectionManagerConnectOptions): Promise<boolean>;
     disconnect(): Promise<boolean>;
     writeCharacteristic(characteristicName: BluetoothCharacteristicName, data: ArrayBuffer): Promise<void>;
