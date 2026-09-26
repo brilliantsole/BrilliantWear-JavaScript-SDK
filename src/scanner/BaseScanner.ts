@@ -11,6 +11,8 @@ import DiscoveredDevice, {
 } from "./DiscoveredDevice.ts";
 import { default as DeviceManager } from "../DeviceManager.ts";
 import { DeviceType, DeviceTypes } from "../InformationManager.ts";
+import { default as Device } from "../Device.ts";
+import { ConnectionManager } from "../connection/ConnectionManager.ts";
 
 const _console = createConsole("BaseScanner", { log: false });
 
@@ -347,6 +349,46 @@ abstract class BaseScanner {
   // DEVICE CONNECTION
   async connectToDevice(bluetoothId: string, connectionType?: ConnectionType) {
     this.#assertIsAvailable();
+
+    if (connectionType == "none") {
+      return;
+    }
+
+    _console.log("connecting to discoveredDevice...", bluetoothId);
+    let device = DeviceManager.getAvailableDeviceByBluetoothId(
+      bluetoothId,
+      this.connectionType,
+    );
+    if (!device) {
+      _console.log("creating device for discoveredDevice...", bluetoothId);
+      device = new Device();
+
+      const discoveredDevice = this.discoveredDevices[bluetoothId];
+      // @ts-expect-error
+      discoveredDevice._device = device;
+    }
+
+    if (
+      !device.connectionManager ||
+      (connectionType == this.connectionType &&
+        device.connectionManager?.type != this.connectionType)
+    ) {
+      _console.log("creating connectionManager for device...", bluetoothId);
+      device.connectionManager = this._createConnectionManager(bluetoothId);
+    }
+
+    const { ipAddress, isWifiSecure } = this.discoveredDevices[bluetoothId];
+    if (connectionType && connectionType != this.connectionType && ipAddress) {
+      await device.connect({
+        type: connectionType,
+        ipAddress,
+        isWifiSecure,
+        reconnect: true,
+      });
+    } else {
+      // @ts-ignore
+      await device.connect({ type: this.connectionType, reconnect: true });
+    }
   }
   async disconnectFromDevice(bluetoothId: string) {
     this.#assertIsAvailable();
@@ -360,6 +402,8 @@ abstract class BaseScanner {
       await device.disconnect();
     }
   }
+
+  abstract _createConnectionManager(bluetoothId: string): ConnectionManager;
 
   // RESET
   get canReset() {

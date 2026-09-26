@@ -1,10 +1,7 @@
 import BaseScanner, { ScannerEventMap } from "./BaseScanner.ts";
 import { createConsole } from "../utils/Console.ts";
 import { addEventListeners } from "../utils/EventUtils.ts";
-import {
-  serviceDataUUID,
-  serviceUUIDs,
-} from "../connection/bluetooth/bluetoothUUIDs.ts";
+import { serviceUUIDs } from "../connection/bluetooth/bluetoothUUIDs.ts";
 import Device from "../Device.ts";
 import NobleConnectionManager, {
   NoblePeripheral,
@@ -23,10 +20,9 @@ isLinux = platform == "linux";
 filterManually = isLinux;
 _console.log({ platform, filterManually, filterServiceUuid });
 
-import { DeviceTypes } from "../InformationManager.ts";
 import DeviceManager from "../DeviceManager.ts";
 import { ClientConnectionType } from "../connection/BaseConnectionManager.ts";
-import { DiscoveredDeviceMetadata } from "../index.ts";
+import { ConnectionManager, DiscoveredDeviceMetadata } from "../index.ts";
 import { Singleton } from "../utils/TypeScriptUtils.ts";
 
 export const NobleStates = [
@@ -207,56 +203,16 @@ class NobleScanner extends BaseScanner {
     bluetoothId: string,
     connectionType?: ClientConnectionType,
   ) {
-    await super.connectToDevice(bluetoothId, connectionType);
     this.#assertValidNoblePeripheralId(bluetoothId);
-    const noblePeripheral = this.#noblePeripherals[bluetoothId];
-    _console.log("connecting to discoveredDevice...", bluetoothId);
-
-    let device = DeviceManager.getAvailableDeviceByBluetoothId(
-      bluetoothId,
-      this.connectionType,
-    );
-    if (!device) {
-      _console.log("creating device for discoveredDevice...", bluetoothId);
-      device = this.#createDevice(noblePeripheral);
-    }
-    if (device.connectionManager!.type != this.connectionType) {
-      device.connectionManager = this.#createConnectionManager(noblePeripheral);
-    }
-
-    const { ipAddress, isWifiSecure } =
-      this.discoveredDevices[device.bluetoothId!];
-    if (connectionType && connectionType != this.connectionType && ipAddress) {
-      await device.connect({
-        type: connectionType,
-        ipAddress,
-        isWifiSecure,
-        reconnect: true,
-      });
-    } else {
-      await device.connect({ type: this.connectionType, reconnect: true });
-    }
+    await super.connectToDevice(bluetoothId, connectionType);
   }
-
   async disconnectFromDevice(bluetoothId: string) {
     this.#assertValidNoblePeripheralId(bluetoothId);
     await super.disconnectFromDevice(bluetoothId);
   }
 
-  #createDevice(noblePeripheral: NoblePeripheral) {
-    const deviceId = noblePeripheral.id;
-    const device = new Device();
-
-    const discoveredDevice = this.discoveredDevices[deviceId];
-    // @ts-expect-error
-    discoveredDevice._device = device;
-
-    device.connectionManager = this.#createConnectionManager(noblePeripheral);
-
-    return device;
-  }
-
-  #createConnectionManager(noblePeripheral: NoblePeripheral) {
+  _createConnectionManager(bluetoothId: string) {
+    const noblePeripheral = this.#noblePeripherals[bluetoothId];
     const nobleConnectionManager = new NobleConnectionManager();
     nobleConnectionManager.noblePeripheral = noblePeripheral;
     return nobleConnectionManager;

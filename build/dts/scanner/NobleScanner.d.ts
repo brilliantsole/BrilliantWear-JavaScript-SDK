@@ -1,4 +1,5 @@
 import BaseScanner from "./BaseScanner.ts";
+import NobleConnectionManager from "../connection/bluetooth/NobleConnectionManager.ts";
 import { ClientConnectionType } from "../connection/BaseConnectionManager.ts";
 export declare const NobleStates: readonly ["unknown", "resetting", "unsupported", "unauthorized", "poweredOff", "poweredOn"];
 export type NobleState = (typeof NobleStates)[number];
@@ -13,6 +14,7 @@ declare class NobleScanner extends BaseScanner {
     reset(): void;
     connectToDevice(bluetoothId: string, connectionType?: ClientConnectionType): Promise<void>;
     disconnectFromDevice(bluetoothId: string): Promise<void>;
+    _createConnectionManager(bluetoothId: string): NobleConnectionManager;
 }
 export { NobleScanner };
 declare const _default: NobleScanner;

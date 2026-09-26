@@ -19682,11 +19682,13 @@ class Device {
             Boolean(this.connectionManager?.isConnected) &&
                 this.#hasRequiredInformation &&
                 this._informationManager.isCurrentTimeSet;
+        _console$l.log("#isConnected", this.#isConnected);
         switch (this.connectionStatus) {
             case "connected":
                 if (this.#isConnected) {
                     if (this.#connectionManager?.type == "bluetooth" &&
                         this.#isWebBluetooth) {
+                        _console$l.log("assigning device to webBluetiothConnectionManager...");
                         this.#connectionManager.device.device = this;
                     }
                     this.#dispatchConnectionEvents(true);
@@ -21904,6 +21906,35 @@ class BaseScanner {
     }
     async connectToDevice(bluetoothId, connectionType) {
         this.#assertIsAvailable();
+        if (connectionType == "none") {
+            return;
+        }
+        _console$g.log("connecting to discoveredDevice...", bluetoothId);
+        let device = DeviceManager.getAvailableDeviceByBluetoothId(bluetoothId, this.connectionType);
+        if (!device) {
+            _console$g.log("creating device for discoveredDevice...", bluetoothId);
+            device = new Device();
+            const discoveredDevice = this.discoveredDevices[bluetoothId];
+            discoveredDevice._device = device;
+        }
+        if (!device.connectionManager ||
+            (connectionType == this.connectionType &&
+                device.connectionManager?.type != this.connectionType)) {
+            _console$g.log("creating connectionManager for device...", bluetoothId);
+            device.connectionManager = this._createConnectionManager(bluetoothId);
+        }
+        const { ipAddress, isWifiSecure } = this.discoveredDevices[bluetoothId];
+        if (connectionType && connectionType != this.connectionType && ipAddress) {
+            await device.connect({
+                type: connectionType,
+                ipAddress,
+                isWifiSecure,
+                reconnect: true,
+            });
+        }
+        else {
+            await device.connect({ type: this.connectionType, reconnect: true });
+        }
     }
     async disconnectFromDevice(bluetoothId) {
         this.#assertIsAvailable();
@@ -23930,7 +23961,7 @@ class BaseServer {
         return clientContext;
     }
     #onClientMessage(messageType, dataView, clientContext) {
-        _console$a.log(`onClientMessage "${messageType}" (${dataView.byteLength} bytes)`, this);
+        _console$a.log(`onClientMessage "${messageType}" (${dataView.byteLength} bytes)`);
         const { client, responseMessages, localBroadcastMessages, broadcastMessages, } = clientContext;
         const message = { type: messageType, data: dataView };
         if (!this.#allowClientToServer(client, message)) {
@@ -24047,13 +24078,14 @@ class BaseServer {
                 break;
             case "requiredDeviceInformation":
                 {
-                    const { string: deviceId } = parseStringFromDataView(dataView);
-                    if (!deviceId) {
+                    const { string: bluetoothId } = parseStringFromDataView(dataView);
+                    if (!bluetoothId) {
+                        _console$a.error("no string found in message");
                         break;
                     }
-                    const device = DeviceManager.connectedDevices.find((device) => device.bluetoothId == deviceId);
+                    const device = DeviceManager.connectedDevices.find((device) => device.bluetoothId == bluetoothId);
                     if (!device) {
-                        _console$a.error(`no device found with id ${deviceId}`);
+                        _console$a.error(`no device found with id ${bluetoothId}`);
                         break;
                     }
                     const messages = [];
@@ -24087,6 +24119,9 @@ class BaseServer {
                     const responseMessage = this.#createDeviceServerMessage(device, ...messages);
                     if (responseMessage) {
                         responseMessages.push(responseMessage);
+                    }
+                    else {
+                        _console$a.log("no responseMessage for requiredDeviceInformation");
                     }
                 }
                 break;
@@ -25448,44 +25483,15 @@ let NobleScanner = (() => {
             _console$6.assertWithError(this.#noblePeripherals[noblePeripheralId], `no noblePeripheral found with id "${noblePeripheralId}"`);
         }
         async connectToDevice(bluetoothId, connectionType) {
-            await super.connectToDevice(bluetoothId, connectionType);
             this.#assertValidNoblePeripheralId(bluetoothId);
-            const noblePeripheral = this.#noblePeripherals[bluetoothId];
-            _console$6.log("connecting to discoveredDevice...", bluetoothId);
-            let device = DeviceManager.getAvailableDeviceByBluetoothId(bluetoothId, this.connectionType);
-            if (!device) {
-                _console$6.log("creating device for discoveredDevice...", bluetoothId);
-                device = this.#createDevice(noblePeripheral);
-            }
-            if (device.connectionManager.type != this.connectionType) {
-                device.connectionManager = this.#createConnectionManager(noblePeripheral);
-            }
-            const { ipAddress, isWifiSecure } = this.discoveredDevices[device.bluetoothId];
-            if (connectionType && connectionType != this.connectionType && ipAddress) {
-                await device.connect({
-                    type: connectionType,
-                    ipAddress,
-                    isWifiSecure,
-                    reconnect: true,
-                });
-            }
-            else {
-                await device.connect({ type: this.connectionType, reconnect: true });
-            }
+            await super.connectToDevice(bluetoothId, connectionType);
         }
         async disconnectFromDevice(bluetoothId) {
             this.#assertValidNoblePeripheralId(bluetoothId);
             await super.disconnectFromDevice(bluetoothId);
         }
-        #createDevice(noblePeripheral) {
-            const deviceId = noblePeripheral.id;
-            const device = new Device();
-            const discoveredDevice = this.discoveredDevices[deviceId];
-            discoveredDevice._device = device;
-            device.connectionManager = this.#createConnectionManager(noblePeripheral);
-            return device;
-        }
-        #createConnectionManager(noblePeripheral) {
+        _createConnectionManager(bluetoothId) {
+            const noblePeripheral = this.#noblePeripherals[bluetoothId];
             const nobleConnectionManager = new NobleConnectionManager();
             nobleConnectionManager.noblePeripheral = noblePeripheral;
             return nobleConnectionManager;

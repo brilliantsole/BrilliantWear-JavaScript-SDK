@@ -1006,6 +1006,8 @@ class Device {
       this.#hasRequiredInformation &&
       this._informationManager.isCurrentTimeSet;
 
+    _console.log("#isConnected", this.#isConnected);
+
     switch (this.connectionStatus) {
       case "connected":
         if (this.#isConnected) {
@@ -1013,6 +1015,9 @@ class Device {
             this.#connectionManager?.type == "bluetooth" &&
             this.#isWebBluetooth
           ) {
+            _console.log(
+              "assigning device to webBluetiothConnectionManager...",
+            );
             // @ts-expect-error
             this.#connectionManager.device.device = this;
           }

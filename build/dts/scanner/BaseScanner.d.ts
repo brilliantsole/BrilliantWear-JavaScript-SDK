@@ -1,6 +1,7 @@
 import { EventDispatcherTypes } from "../utils/EventDispatcher.ts";
 import { ConnectionType } from "../connection/BaseConnectionManager.ts";
 import DiscoveredDevice, { DiscoveredDeviceMetadata, DiscoveredDeviceMetadataKeys, DiscoveredDevicesMap } from "./DiscoveredDevice.ts";
+import { ConnectionManager } from "../connection/ConnectionManager.ts";
 export declare const ScannerEventTypes: readonly ["isScanningAvailable", "isScanning", "discoveredDevice", "discoveredDeviceUpdate", "expiredDiscoveredDevice", "discoveredDevices", "scanningAvailable", "scanningNotAvailable", "scanning", "notScanning"];
 export type ScannerEventType = (typeof ScannerEventTypes)[number];
 export interface ScannerEventMessages {
@@ -65,6 +66,7 @@ declare abstract class BaseScanner {
     static get DiscoveredDeviceExpirationTimeout(): number;
     connectToDevice(bluetoothId: string, connectionType?: ConnectionType): Promise<void>;
     disconnectFromDevice(bluetoothId: string): Promise<void>;
+    abstract _createConnectionManager(bluetoothId: string): ConnectionManager;
     get canReset(): boolean;
     reset(): void;
 }

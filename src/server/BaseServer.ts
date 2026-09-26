@@ -1371,7 +1371,6 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
   ) {
     _console.log(
       `onClientMessage "${messageType}" (${dataView.byteLength} bytes)`,
-      this,
     );
 
     const {
@@ -1532,15 +1531,16 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
         break;
       case "requiredDeviceInformation":
         {
-          const { string: deviceId } = parseStringFromDataView(dataView);
-          if (!deviceId) {
+          const { string: bluetoothId } = parseStringFromDataView(dataView);
+          if (!bluetoothId) {
+            _console.error("no string found in message");
             break;
           }
           const device = DeviceManager.connectedDevices.find(
-            (device) => device.bluetoothId == deviceId,
+            (device) => device.bluetoothId == bluetoothId,
           );
           if (!device) {
-            _console.error(`no device found with id ${deviceId}`);
+            _console.error(`no device found with id ${bluetoothId}`);
             break;
           }
 
@@ -1604,6 +1604,8 @@ abstract class BaseServer<ServerClient extends BaseServerClient> {
           );
           if (responseMessage) {
             responseMessages.push(responseMessage);
+          } else {
+            _console.log("no responseMessage for requiredDeviceInformation");
           }
         }
         break;
