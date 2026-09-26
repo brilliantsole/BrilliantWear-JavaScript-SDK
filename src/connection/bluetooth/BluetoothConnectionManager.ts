@@ -13,9 +13,12 @@ abstract class BluetoothConnectionManager extends BaseConnectionManager {
 
   isInRange = true;
 
+  static type = "bluetooth" as const;
+  readonly type = BluetoothConnectionManager.type;
+
   protected onCharacteristicValueChanged(
     characteristicName: BluetoothCharacteristicName,
-    dataView: DataView<ArrayBuffer>
+    dataView: DataView<ArrayBuffer>,
   ) {
     if (characteristicName == "rx") {
       this.parseRxMessage(dataView);
@@ -26,7 +29,7 @@ abstract class BluetoothConnectionManager extends BaseConnectionManager {
 
   protected async writeCharacteristic(
     characteristicName: BluetoothCharacteristicName,
-    data: ArrayBuffer
+    data: ArrayBuffer,
   ) {
     _console.log("writeCharacteristic", ...arguments);
   }

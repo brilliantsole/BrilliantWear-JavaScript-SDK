@@ -6,8 +6,10 @@ import NobleConnectionManager from "./bluetooth/NobleConnectionManager.ts";
 import ClientConnectionManager from "./ClientConnectionManager.ts";
 import WebBluetoothConnectionManager from "./bluetooth/WebBluetoothConnectionManager.ts";
 import WebSocketConnectionManager from "./websocket/WebSocketConnectionManager.ts";
+import BluetoothConnectionManager from "./bluetooth/BluetoothConnectionManager.ts";
 
 export const ConnectionManagers = [
+  BluetoothConnectionManager,
   WebBluetoothConnectionManager,
   WebSocketConnectionManager,
   ClientConnectionManager,

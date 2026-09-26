@@ -17235,6 +17235,8 @@ class BluetoothConnectionManager extends BaseConnectionManager {
         return true;
     }
     isInRange = true;
+    static type = "bluetooth";
+    type = BluetoothConnectionManager.type;
     onCharacteristicValueChanged(characteristicName, dataView) {
         if (characteristicName == "rx") {
             this.parseRxMessage(dataView);
@@ -17277,8 +17279,6 @@ class WebBluetoothConnectionManager extends BluetoothConnectionManager {
     #boundBluetoothDeviceEventListeners = {
         gattserverdisconnected: this.#onGattserverdisconnected.bind(this),
     };
-    static type = "bluetooth";
-    type = WebBluetoothConnectionManager.type;
     #device;
     get device() {
         return this.#device;
@@ -25088,8 +25088,6 @@ class NobleConnectionManager extends BluetoothConnectionManager {
     get canUpdateFirmware() {
         return this.#characteristics.has("smp");
     }
-    static type = "bluetooth";
-    type = NobleConnectionManager.type;
     get isConnected() {
         return this.#noblePeripheral?.state == "connected";
     }
@@ -25924,6 +25922,7 @@ function debounce(fn, interval, callImmediately = false) {
 }
 
 const ConnectionManagers = [
+    BluetoothConnectionManager,
     WebBluetoothConnectionManager,
     WebSocketConnectionManager,
     ClientConnectionManager,
