@@ -3,9 +3,7 @@ import EventDispatcher, {
 } from "../utils/EventDispatcher.ts";
 import { createConsole } from "../utils/Console.ts";
 import { Timer } from "../utils/Timer.ts";
-import BaseConnectionManager, {
-  ConnectionType,
-} from "../connection/BaseConnectionManager.ts";
+import { ConnectionType } from "../connection/BaseConnectionManager.ts";
 import DiscoveredDevice, {
   DiscoveredDeviceMetadata,
   DiscoveredDeviceMetadataKeys,
@@ -14,6 +12,7 @@ import DiscoveredDevice, {
 import { default as DeviceManager } from "../DeviceManager.ts";
 import { DeviceType, DeviceTypes } from "../InformationManager.ts";
 import { default as Device } from "../Device.ts";
+import { ConnectionManager } from "../connection/ConnectionManager.ts";
 
 const _console = createConsole("BaseScanner", { log: false });
 
@@ -404,7 +403,7 @@ abstract class BaseScanner {
     }
   }
 
-  abstract _createConnectionManager(bluetoothId: string): BaseConnectionManager;
+  abstract _createConnectionManager(bluetoothId: string): ConnectionManager;
 
   // RESET
   get canReset() {

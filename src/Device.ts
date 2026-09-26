@@ -2,7 +2,7 @@ import { createConsole } from "./utils/Console.ts";
 import EventDispatcher, {
   EventDispatcherTypes,
 } from "./utils/EventDispatcher.ts";
-import BaseConnectionManager, {
+import {
   TxMessage,
   TxRxMessageType,
   ConnectionStatus,
@@ -13,6 +13,7 @@ import BaseConnectionManager, {
   ConnectionStatusEventMessages,
   ConnectOptions,
 } from "./connection/BaseConnectionManager.ts";
+import { ConnectionManager } from "./connection/ConnectionManager.ts";
 import { isInBrowser, isInNode } from "./utils/environment.ts";
 import WebBluetoothConnectionManager from "./connection/bluetooth/WebBluetoothConnectionManager.ts";
 import SensorConfigurationManager, {
@@ -351,7 +352,7 @@ class Device {
     }
   }
 
-  static #DefaultConnectionManager(): BaseConnectionManager {
+  static #DefaultConnectionManager(): ConnectionManager {
     return new WebBluetoothConnectionManager();
   }
 
@@ -526,7 +527,7 @@ class Device {
       this.#connectionManager?.constructor == WebBluetoothConnectionManager
     );
   }
-  #connectionManager?: BaseConnectionManager;
+  #connectionManager?: ConnectionManager;
   get connectionManager() {
     return this.#connectionManager;
   }
