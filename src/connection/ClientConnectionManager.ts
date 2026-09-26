@@ -1,5 +1,4 @@
 import { createConsole } from "../utils/Console.ts";
-import { isInBrowser } from "../utils/environment.ts";
 import BaseConnectionManager, {
   ConnectionMessageType,
   ClientConnectionType,

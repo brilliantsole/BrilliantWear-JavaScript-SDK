@@ -18,7 +18,6 @@ const isWeb = Capacitor.getPlatform() == "web";
 document.documentElement.toggleAttribute("data-web", isWeb);
 
 class BluetoothLowEnergyScanner extends BW.BaseScanner {
-  // FILL - discoveredDevice
   // FILL - connect/disconnect
   // FILL - connectionManager
 
