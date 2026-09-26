@@ -1,7 +1,6 @@
 import { EventDispatcherTypes } from "../utils/EventDispatcher.ts";
-import { ConnectionType } from "../connection/BaseConnectionManager.ts";
+import BaseConnectionManager, { ConnectionType } from "../connection/BaseConnectionManager.ts";
 import DiscoveredDevice, { DiscoveredDeviceMetadata, DiscoveredDeviceMetadataKeys, DiscoveredDevicesMap } from "./DiscoveredDevice.ts";
-import { ConnectionManager } from "../connection/ConnectionManager.ts";
 export declare const ScannerEventTypes: readonly ["isScanningAvailable", "isScanning", "discoveredDevice", "discoveredDeviceUpdate", "expiredDiscoveredDevice", "discoveredDevices", "scanningAvailable", "scanningNotAvailable", "scanning", "notScanning"];
 export type ScannerEventType = (typeof ScannerEventTypes)[number];
 export interface ScannerEventMessages {
@@ -42,12 +41,12 @@ declare abstract class BaseScanner {
     readonly connectionType: ConnectionType;
     readonly isClient = false;
     constructor();
-    get addEventListener(): <T extends "*" | "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
-    get removeEventListener(): <T extends "*" | "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>) => void) => void;
-    get waitForEvent(): <T extends "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, options?: {
+    get addEventListener(): <T extends "*" | "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>) => void, options?: import("../utils/EventDispatcher.ts").EventDispatcherOptions) => void;
+    get removeEventListener(): <T extends "*" | "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, listener: (event: import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>) => void) => void;
+    get waitForEvent(): <T extends "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning">(type: T, options?: {
         immediate?: boolean;
         signal?: AbortSignal;
-    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDeviceUpdate" | "expiredDiscoveredDevice" | "discoveredDevices" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>>;
+    }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<BaseScanner, "isScanningAvailable" | "isScanning" | "discoveredDevice" | "discoveredDevices" | "expiredDiscoveredDevice" | "discoveredDeviceUpdate" | "scanningAvailable" | "scanningNotAvailable" | "scanning" | "notScanning", ScannerEventMessages, T>>;
     get isScanningAvailable(): boolean;
     protected set _isScanningAvailable(newIsScanningAvailable: boolean);
     get isScanning(): boolean;
@@ -66,7 +65,7 @@ declare abstract class BaseScanner {
     static get DiscoveredDeviceExpirationTimeout(): number;
     connectToDevice(bluetoothId: string, connectionType?: ConnectionType): Promise<void>;
     disconnectFromDevice(bluetoothId: string): Promise<void>;
-    abstract _createConnectionManager(bluetoothId: string): ConnectionManager;
+    abstract _createConnectionManager(bluetoothId: string): BaseConnectionManager;
     get canReset(): boolean;
     reset(): void;
 }

@@ -120,8 +120,6 @@ import { default as BluetoothConnectionManager } from "./connection/bluetooth/Bl
 export { BluetoothConnectionManager };
 import * as BluetoothUUIDs from "./connection/bluetooth/bluetoothUUIDs.ts";
 export { BluetoothUUIDs };
-import { ConnectionManager, ConnectionManagers } from "./connection/ConnectionManager.ts";
-export { ConnectionManager, ConnectionManagers };
 import { default as DiscoveredDevice, DiscoveredDeviceMetadata } from "./scanner/DiscoveredDevice.ts";
 export { DiscoveredDevice, DiscoveredDeviceMetadata };
 /** NODE_START */

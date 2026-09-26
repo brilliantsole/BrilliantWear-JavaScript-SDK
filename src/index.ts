@@ -578,12 +578,6 @@ import * as BluetoothUUIDs from "./connection/bluetooth/bluetoothUUIDs.ts";
 export { BluetoothUUIDs };
 
 import {
-  ConnectionManager,
-  ConnectionManagers,
-} from "./connection/ConnectionManager.ts";
-export { ConnectionManager, ConnectionManagers };
-
-import {
   default as DiscoveredDevice,
   DiscoveredDeviceMetadata,
 } from "./scanner/DiscoveredDevice.ts";
