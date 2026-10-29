@@ -313,6 +313,7 @@ class SensorDataManager {
     }
   }
 
+  allSensorTypes: SensorType[] = [];
   #parseData(dataView: DataView<ArrayBuffer>) {
     const context = parseSensorData(
       dataView,
@@ -379,7 +380,7 @@ class SensorDataManager {
         sensorData = this.motionSensorDataManager.parseEuler(
           dataView,
           scalar,
-          true,
+          this.allSensorTypes.includes("magnetometer"),
         );
         break;
       case "stepCounter":

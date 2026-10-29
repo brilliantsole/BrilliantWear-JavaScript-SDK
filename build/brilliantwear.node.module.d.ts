@@ -991,7 +991,7 @@ interface Activity {
     vehicle: boolean;
     tilting: boolean;
 }
-declare const DeviceOrientations: readonly ["portraitUpright", "landscapeLeft", "portraitUpsideDown", "landscapeRight", "unknown"];
+declare const DeviceOrientations: readonly ["portraitUpright", "landscapeLeft", "portraitUpsideDown", "landscapeRight", "faceUp", "faceDown", "unknown"];
 type DeviceOrientation = (typeof DeviceOrientations)[number];
 interface MotionSensorDataEventMessages {
     acceleration: {
@@ -2665,6 +2665,7 @@ declare class Device {
     get connectionStatus(): ConnectionStatus;
     get isConnectionBusy(): boolean;
     get connectionAbortSignal(): AbortSignal;
+    get connectionAbortOptions(): EventDispatcherOptions;
     _onRemoteConnectionMessageSent(messageType: ConnectionMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     latestConnectionMessages: Map<ConnectionMessageType, DataView>;
     get deviceInformation(): DeviceInformation;

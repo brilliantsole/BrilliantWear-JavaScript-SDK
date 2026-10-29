@@ -63,6 +63,8 @@ export const DeviceOrientations = [
   "landscapeLeft",
   "portraitUpsideDown",
   "landscapeRight",
+  "faceUp",
+  "faceDown",
   "unknown",
 ] as const;
 export type DeviceOrientation = (typeof DeviceOrientations)[number];

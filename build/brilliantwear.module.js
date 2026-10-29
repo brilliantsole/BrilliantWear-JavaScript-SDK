@@ -2456,6 +2456,8 @@ const DeviceOrientations = [
     "landscapeLeft",
     "portraitUpsideDown",
     "landscapeRight",
+    "faceUp",
+    "faceDown",
     "unknown",
 ];
 class MotionSensorDataManager {
@@ -4137,6 +4139,7 @@ class SensorDataManager {
             }
         }
     }
+    allSensorTypes = [];
     #parseData(dataView) {
         const context = parseSensorData(dataView, this.#parseDataCallback.bind(this));
         const { messages, timestamp, euler } = context;
@@ -4173,7 +4176,7 @@ class SensorDataManager {
                 sensorDataEuler = this.motionSensorDataManager.quaternionToEuler(sensorData, sensorType == "rotation");
                 break;
             case "orientation":
-                sensorData = this.motionSensorDataManager.parseEuler(dataView, scalar, true);
+                sensorData = this.motionSensorDataManager.parseEuler(dataView, scalar, this.allSensorTypes.includes("magnetometer"));
                 break;
             case "stepCounter":
                 sensorData = this.motionSensorDataManager.parseStepCounter(dataView);
@@ -32258,7 +32261,7 @@ if (typeof BluetoothUUID == "undefined") {
 function generateBluetoothUUID(value) {
     _console$t.assertTypeWithError(value, "string");
     _console$t.assertWithError(value.length == 4, "value must be 4 characters long");
-    return `ea6d${value}-a725-4f9b-893d-c3913e33b39f`;
+    return `4272${value}-696c-6c69-616e-742057656172`;
 }
 function stringToCharacteristicUUID(identifier) {
     return BluetoothUUID?.getCharacteristic?.(identifier);
@@ -32683,6 +32686,8 @@ class WebBluetoothConnectionManager extends BluetoothConnectionManager {
         _console$r.log("writing characteristic", characteristic, data);
         const characteristicProperties = characteristic.properties ||
             getCharacteristicProperties(characteristicName);
+        _console$r.assertWithError(characteristicProperties.write ||
+            characteristicProperties.writeWithoutResponse, `characteristic doesn't have "write" or "writeWithoutResponse" properties`);
         if (characteristicProperties.writeWithoutResponse) {
             _console$r.log("writing without response");
             await characteristic.writeValueWithoutResponse(data);
@@ -34091,6 +34096,7 @@ class Device {
             if (this.connectionStatus != "connecting") {
                 return;
             }
+            this.#sensorDataManager.allSensorTypes = this.sensorTypes;
             if (this.sensorTypes.includes("pressure")) {
                 _console$m.log("requesting required pressure information");
                 const messages = RequiredPressureMessageTypes.map((messageType) => ({
@@ -34597,6 +34603,9 @@ class Device {
     get connectionAbortSignal() {
         return this.#connectionAbortController.signal;
     }
+    get connectionAbortOptions() {
+        return { signal: this.connectionAbortSignal };
+    }
     #dispatchConnectionEvents(includeIsConnected = false) {
         if (includeIsConnected) {
             if (!this.isConnected) {
@@ -34709,7 +34718,7 @@ class Device {
                     this.#ledManager.parseMessage(messageType, dataView, isSending);
                 }
                 else {
-                    throw Error(`uncaught messageType ${messageType}`);
+                    throw Error(`uncaught messageType "${messageType}"`);
                 }
         }
         if (isSending) {

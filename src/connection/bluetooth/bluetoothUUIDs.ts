@@ -78,7 +78,9 @@ function generateBluetoothUUID(value: string): BluetoothServiceUUID {
     value.length == 4,
     "value must be 4 characters long",
   );
-  return `ea6d${value}-a725-4f9b-893d-c3913e33b39f`;
+
+  return `4272${value}-696c-6c69-616e-742057656172`; // Brilliant Wear
+  // return `ea6d${value}-a725-4f9b-893d-c3913e33b39f`; // legacy uuid
 }
 
 function stringToCharacteristicUUID(

@@ -1,5 +1,6 @@
 import { createConsole } from "./utils/Console.ts";
 import EventDispatcher, {
+  EventDispatcherOptions,
   EventDispatcherTypes,
 } from "./utils/EventDispatcher.ts";
 import {
@@ -398,6 +399,7 @@ class Device {
       if (this.connectionStatus != "connecting") {
         return;
       }
+      this.#sensorDataManager.allSensorTypes = this.sensorTypes;
       if (this.sensorTypes.includes("pressure")) {
         _console.log("requesting required pressure information");
         const messages = RequiredPressureMessageTypes.map((messageType) => ({
@@ -1001,6 +1003,9 @@ class Device {
   get connectionAbortSignal() {
     return this.#connectionAbortController.signal;
   }
+  get connectionAbortOptions(): EventDispatcherOptions {
+    return { signal: this.connectionAbortSignal };
+  }
   #dispatchConnectionEvents(includeIsConnected: boolean = false) {
     if (includeIsConnected) {
       if (!this.isConnected) {
@@ -1201,7 +1206,7 @@ class Device {
             isSending,
           );
         } else {
-          throw Error(`uncaught messageType ${messageType}`);
+          throw Error(`uncaught messageType "${messageType}"`);
         }
     }
 

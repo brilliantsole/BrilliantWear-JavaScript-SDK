@@ -17,7 +17,7 @@ export interface Activity {
     vehicle: boolean;
     tilting: boolean;
 }
-export declare const DeviceOrientations: readonly ["portraitUpright", "landscapeLeft", "portraitUpsideDown", "landscapeRight", "unknown"];
+export declare const DeviceOrientations: readonly ["portraitUpright", "landscapeLeft", "portraitUpsideDown", "landscapeRight", "faceUp", "faceDown", "unknown"];
 export type DeviceOrientation = (typeof DeviceOrientations)[number];
 export interface MotionSensorDataEventMessages {
     acceleration: {
@@ -70,6 +70,6 @@ declare class MotionSensorDataManager {
     parseEuler(dataView: DataView<ArrayBuffer>, scalar: number, absolute?: boolean): Euler;
     parseStepCounter(dataView: DataView<ArrayBuffer>): number;
     parseActivity(dataView: DataView<ArrayBuffer>): Activity;
-    parseDeviceOrientation(dataView: DataView<ArrayBuffer>): "portraitUpright" | "landscapeLeft" | "portraitUpsideDown" | "landscapeRight" | "unknown";
+    parseDeviceOrientation(dataView: DataView<ArrayBuffer>): "portraitUpright" | "landscapeLeft" | "portraitUpsideDown" | "landscapeRight" | "faceUp" | "faceDown" | "unknown";
 }
 export default MotionSensorDataManager;

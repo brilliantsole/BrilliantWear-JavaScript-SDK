@@ -352,6 +352,11 @@ class WebBluetoothConnectionManager extends BluetoothConnectionManager {
     const characteristicProperties =
       characteristic.properties ||
       getCharacteristicProperties(characteristicName);
+    _console.assertWithError(
+      characteristicProperties.write ||
+        characteristicProperties.writeWithoutResponse,
+      `characteristic doesn't have "write" or "writeWithoutResponse" properties`,
+    );
     if (characteristicProperties.writeWithoutResponse) {
       _console.log("writing without response");
       await characteristic.writeValueWithoutResponse(data);
