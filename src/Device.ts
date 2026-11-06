@@ -1003,7 +1003,7 @@ class Device {
   get connectionAbortSignal() {
     return this.#connectionAbortController.signal;
   }
-  get connectionAbortOptions(): EventDispatcherOptions {
+  get connectionAbortSignalObject(): EventDispatcherOptions {
     return { signal: this.connectionAbortSignal };
   }
   #dispatchConnectionEvents(includeIsConnected: boolean = false) {
@@ -1359,6 +1359,9 @@ class Device {
   }
   get hasSensorType() {
     return this.#sensorConfigurationManager.hasSensorType;
+  }
+  get hasSensorTypes() {
+    return this.#sensorConfigurationManager.hasSensorTypes;
   }
 
   get getLatestMessage() {

@@ -15,7 +15,6 @@ import {
 import { rgbToHex, stringToRGB } from "./utils/ColorUtils.ts";
 import DisplayContextStateHelper from "./utils/DisplayContextStateHelper.ts";
 import {
-  assertValidDisplayBrightness,
   assertValidSegmentCap,
   DisplayScaleDirection,
   DisplayBitmapScaleDirectionToCommandType,
@@ -150,15 +149,6 @@ export type DisplayType = (typeof DisplayTypes)[number];
 export const DisplayPixelDepths = ["1", "2", "4"] as const;
 export type DisplayPixelDepth = (typeof DisplayPixelDepths)[number];
 
-export const DisplayBrightnesses = [
-  "veryLow",
-  "low",
-  "medium",
-  "high",
-  "veryHigh",
-] as const;
-export type DisplayBrightness = (typeof DisplayBrightnesses)[number];
-
 export const DisplayMessageTypes = [
   "isDisplayAvailable",
   "displayStatus",
@@ -273,7 +263,7 @@ export interface DisplayEventMessages {
     displayInformation: DisplayInformation;
   };
   getDisplayBrightness: {
-    displayBrightness: DisplayBrightness;
+    displayBrightness: number;
   };
   displayContextState: {
     displayContextState: DisplayContextState;
@@ -656,15 +646,13 @@ class DisplayManager implements DisplayManagerInterface {
   }
 
   // DISPLAY BRIGHTNESS
-  #brightness!: DisplayBrightness;
+  #brightness!: number;
   get brightness() {
     return this.#brightness;
   }
 
   #parseDisplayBrightness(dataView: DataView<ArrayBuffer>) {
-    const newDisplayBrightnessEnum = dataView.getUint8(0);
-    const newDisplayBrightness = DisplayBrightnesses[newDisplayBrightnessEnum];
-    assertValidDisplayBrightness(newDisplayBrightness);
+    const newDisplayBrightness = dataView.getUint8(0);
 
     this.#brightness = newDisplayBrightness;
     _console.log({ displayBrightness: this.#brightness });
@@ -674,21 +662,17 @@ class DisplayManager implements DisplayManagerInterface {
   }
   @ForwardToHelper
   async setBrightness(
-    newDisplayBrightness: DisplayBrightness,
+    newDisplayBrightness: number,
     sendImmediately?: boolean,
     displayCanvasHelper?: DisplayCanvasHelper,
   ) {
     this.#assertDisplayIsAvailable();
-    assertValidDisplayBrightness(newDisplayBrightness);
     if (this.brightness == newDisplayBrightness) {
       _console.log(`redundant displayBrightness ${newDisplayBrightness}`);
       return;
     }
-    const newDisplayBrightnessEnum =
-      DisplayBrightnesses.indexOf(newDisplayBrightness);
-    const newDisplayBrightnessData = valueToUInt8ArrayBuffer(
-      newDisplayBrightnessEnum,
-    );
+    const newDisplayBrightnessData =
+      valueToUInt8ArrayBuffer(newDisplayBrightness);
 
     const promise = this.waitForEvent("getDisplayBrightness");
     this.sendMessages(
@@ -4533,7 +4517,7 @@ class DisplayManager implements DisplayManagerInterface {
     if (this.#drawCallback) {
       await this.#drawCallback(this);
     } else {
-      _console.error("no drawCallback defined");
+      _console.log("no drawCallback defined");
     }
     await this.show(true, true);
     _console.log("finished draw");

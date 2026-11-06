@@ -75,11 +75,11 @@ export type LedEventDispatcher = EventDispatcher<
   LedEventMessages
 >;
 
-interface LedColorConfiguration {
+export interface LedColorConfiguration {
   index: number;
   color: DisplayColorRGBOrString;
 }
-interface LedBrightnessConfiguration {
+export interface LedBrightnessConfiguration {
   index: number;
   brightness: number;
 }

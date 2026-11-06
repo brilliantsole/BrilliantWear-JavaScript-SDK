@@ -64,8 +64,8 @@ import { CameraConfiguration, CameraCommand, CameraCommands, CameraConfiguration
 export { CameraConfiguration, CameraCommand, CameraCommands, CameraConfigurationType, CameraConfigurationTypes, };
 import { MicrophoneConfiguration, MicrophoneCommand, MicrophoneCommands, MicrophoneConfigurationType, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneBitDepth, MicrophoneBitDepths, MicrophoneSampleRate, MicrophoneSampleRates } from "./MicrophoneManager.ts";
 export { MicrophoneConfiguration, MicrophoneCommand, MicrophoneCommands, MicrophoneConfigurationType, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneBitDepth, MicrophoneBitDepths, MicrophoneSampleRate, MicrophoneSampleRates, };
-import { DisplayBrightness, DisplayBrightnesses, DisplaySize, DisplayBitmapColorPair, DisplayPixelDepths, DefaultNumberOfDisplayColors, MinSpriteSheetNameLength, MaxSpriteSheetNameLength, DisplayBitmap, DisplaySpriteColorPair, DisplayWireframeEdge, DisplayWireframe, DisplayBezierCurveType, DisplayBezierCurveTypes } from "./DisplayManager.ts";
-export { DisplayBrightness, DisplayBrightnesses, DisplaySize, DisplayBitmapColorPair, DisplayPixelDepths, DefaultNumberOfDisplayColors, MinSpriteSheetNameLength, MaxSpriteSheetNameLength, DisplayBitmap, DisplaySpriteColorPair, DisplayWireframeEdge, DisplayWireframe, DisplayBezierCurveType, DisplayBezierCurveTypes, };
+import { DisplaySize, DisplayBitmapColorPair, DisplayPixelDepths, DefaultNumberOfDisplayColors, MinSpriteSheetNameLength, MaxSpriteSheetNameLength, DisplayBitmap, DisplaySpriteColorPair, DisplayWireframeEdge, DisplayWireframe, DisplayBezierCurveType, DisplayBezierCurveTypes } from "./DisplayManager.ts";
+export { DisplaySize, DisplayBitmapColorPair, DisplayPixelDepths, DefaultNumberOfDisplayColors, MinSpriteSheetNameLength, MaxSpriteSheetNameLength, DisplayBitmap, DisplaySpriteColorPair, DisplayWireframeEdge, DisplayWireframe, DisplayBezierCurveType, DisplayBezierCurveTypes, };
 import { DisplayManagerInterface } from "./utils/DisplayManagerInterface.ts";
 export { DisplayManagerInterface };
 import { wait, Timer } from "./utils/Timer.ts";
@@ -114,8 +114,8 @@ export declare const ThrottleUtils: {
     throttle: typeof throttle;
     debounce: typeof debounce;
 };
-import { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, Led } from "./led/LedManager.ts";
-export { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, Led, };
+import { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, LedColorConfiguration, LedBrightnessConfiguration, Led } from "./led/LedManager.ts";
+export { LedType, LedTypes, LedValue, LedValueType, LedValueTypes, LedConfiguration, LedColorConfiguration, LedBrightnessConfiguration, Led, };
 import { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses, ConnectionManagerConnectOptions } from "./connection/BaseConnectionManager.ts";
 export { ConnectionMessageType, ConnectionMessageTypes, ConnectionEventType, ConnectionEventTypes, TxRxMessageType, TxRxMessageTypes, ConnectionStatus, ConnectionStatuses, ConnectionManagerConnectOptions, };
 import { default as BluetoothConnectionManager } from "./connection/bluetooth/BluetoothConnectionManager.ts";

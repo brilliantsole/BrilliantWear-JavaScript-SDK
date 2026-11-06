@@ -157,8 +157,8 @@ interface DisplayManagerInterface {
     setContextState(newState: PartialDisplayContextState, sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     parseContextCommands(dataView: DataView): Promise<void>;
     flushContextCommands(isSending?: boolean): Promise<void>;
-    get brightness(): DisplayBrightness;
-    setBrightness(newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean): Promise<void>;
+    get brightness(): number;
+    setBrightness(newDisplayBrightness: number, sendImmediately?: boolean): Promise<void>;
     setDrawCallback(drawCallback?: DisplayDrawCallback): void;
     get drawCallback(): DisplayDrawCallback | undefined;
     draw(): Promise<void>;
@@ -1411,7 +1411,7 @@ interface DisplayCanvasHelperEventMessages {
         numberOfColors: number;
     };
     brightness: {
-        brightness: DisplayBrightness;
+        brightness: number;
     };
     color: {
         colorIndex: number;
@@ -1624,8 +1624,8 @@ declare class DisplayCanvasHelper implements DisplayManagerInterface {
     drawSpritesString(offsetX: number, offsetY: number, string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     stringToSpriteLines(string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], isSending?: boolean): DisplaySpriteLines;
     stringToSpriteLinesMetrics(string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], isSending?: boolean): DisplaySpriteLinesMetrics;
-    get brightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
-    setBrightness(newBrightness: DisplayBrightness, sendImmediately?: boolean): Promise<void>;
+    get brightness(): number;
+    setBrightness(newBrightness: number, sendImmediately?: boolean): Promise<void>;
     runContextCommand(command: DisplayContextCommand, sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     runContextCommands(commands: DisplayContextCommand[], sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     parseContextCommands(dataView: DataView, sendImmediately?: boolean, isSending?: boolean): Promise<void>;
@@ -1670,8 +1670,6 @@ declare const DisplayTypes: readonly ["none", "generic", "monocularLeft", "monoc
 type DisplayType = (typeof DisplayTypes)[number];
 declare const DisplayPixelDepths: readonly ["1", "2", "4"];
 type DisplayPixelDepth = (typeof DisplayPixelDepths)[number];
-declare const DisplayBrightnesses: readonly ["veryLow", "low", "medium", "high", "veryHigh"];
-type DisplayBrightness = (typeof DisplayBrightnesses)[number];
 declare const DisplayMessageTypes: readonly ["isDisplayAvailable", "displayStatus", "displayInformation", "displayCommand", "getDisplayBrightness", "setDisplayBrightness", "displayContextCommands", "displayReady", "getDisplaySpriteSheetName", "setDisplaySpriteSheetName", "displaySpriteSheetIndex"];
 type DisplayMessageType = (typeof DisplayMessageTypes)[number];
 type DisplaySize = {
@@ -1720,7 +1718,7 @@ interface DisplayEventMessages {
         displayInformation: DisplayInformation;
     };
     getDisplayBrightness: {
-        displayBrightness: DisplayBrightness;
+        displayBrightness: number;
     };
     displayContextState: {
         displayContextState: DisplayContextState;
@@ -1808,8 +1806,8 @@ declare class DisplayManager implements DisplayManagerInterface {
         height: number;
     };
     get type(): "none" | "generic" | "monocularLeft" | "monocularRight" | "binocular";
-    get brightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
-    setBrightness(newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
+    get brightness(): number;
+    setBrightness(newDisplayBrightness: number, sendImmediately?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
     getMaxCommandDataLength(single?: boolean): number;
     flushContextCommands(isSending?: boolean): Promise<void>;
     show(sendImmediately?: boolean, waitUntilReady?: boolean, isSending?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
@@ -2665,7 +2663,7 @@ declare class Device {
     get connectionStatus(): ConnectionStatus;
     get isConnectionBusy(): boolean;
     get connectionAbortSignal(): AbortSignal;
-    get connectionAbortOptions(): EventDispatcherOptions;
+    get connectionAbortSignalObject(): EventDispatcherOptions;
     _onRemoteConnectionMessageSent(messageType: ConnectionMessageType, dataView: DataView<ArrayBuffer>, isSending?: boolean): void;
     latestConnectionMessages: Map<ConnectionMessageType, DataView>;
     get deviceInformation(): DeviceInformation;
@@ -2692,6 +2690,7 @@ declare class Device {
     get toggleSensor(): (sensorType: SensorType, sensorRate: number, clearRest?: boolean, sendImmediately?: boolean) => Promise<void>;
     get availableSensorTypes(): ("pressure" | "acceleration" | "gravity" | "linearAcceleration" | "gyroscope" | "magnetometer" | "gameRotation" | "rotation" | "orientation" | "activity" | "stepCounter" | "stepDetector" | "deviceOrientation" | "tapDetector" | "barometer" | "buttons" | "touches" | "microphone" | "light" | "camera")[];
     get hasSensorType(): (sensorType: SensorType) => boolean;
+    get hasSensorTypes(): (sensorTypes: SensorType[]) => boolean;
     get getLatestMessage(): <K extends "pressureAutoRangeEnabled" | "pressureAutoRangeDisabled" | "pressureAutoRange" | "pressureMotionAutoRangeEnabled" | "pressureMotionAutoRangeDisabled" | "pressureMotionAutoRange" | "isRecordingPressureCalibrationData" | "pressureCalibrationDataRecordStart" | "pressureCalibrationDataRecordStop" | "pressureCalibrationDataRecordingProgress" | "isTrainingPressureCalibration" | "pressureCalibrationTrainStart" | "pressureCalibrationTrainEnd" | "pressureCalibrationTrainProgress" | "calibratedPressureModel" | "pressure" | "acceleration" | "gravity" | "linearAcceleration" | "gyroscope" | "magnetometer" | "gameRotation" | "rotation" | "orientation" | "activity" | "stepCounter" | "stepDetector" | "deviceOrientation" | "tapDetector" | "barometer" | "buttons" | "numberOfButtons" | "button" | "buttonDown" | "buttonUp" | "touches" | "numberOfTouches" | "touch" | "touchDown" | "touchUp" | "microphone" | "microphoneStatus" | "microphoneCommand" | "getMicrophoneConfiguration" | "setMicrophoneConfiguration" | "microphoneData" | "isRecordingMicrophone" | "startRecordingMicrophone" | "stopRecordingMicrophone" | "microphoneRecording" | "light" | "camera" | "getPressurePositions" | "getSensorScalars" | "sensorData" | "getSensorCounts" | "getSensorConfiguration" | "setSensorConfiguration" | "getTfliteName" | "setTfliteName" | "getTfliteTask" | "setTfliteTask" | "getTfliteSampleRate" | "setTfliteSampleRate" | "getTfliteSensorTypes" | "setTfliteSensorTypes" | "tfliteIsReady" | "getTfliteCaptureDelay" | "setTfliteCaptureDelay" | "getTfliteThreshold" | "setTfliteThreshold" | "getTfliteInferencingEnabled" | "setTfliteInferencingEnabled" | "tfliteInference" | "cameraImage" | "isConnected" | "connectionMessage" | "notConnected" | "connecting" | "connected" | "disconnecting" | "connectionStatus" | "rx" | "tx" | "batteryLevel" | "isCharging" | "getBatteryCurrent" | "getMtu" | "getId" | "getName" | "setName" | "getType" | "setType" | "getCurrentTime" | "setCurrentTime" | "manufacturerName" | "modelNumber" | "hardwareRevision" | "firmwareRevision" | "softwareRevision" | "pnpId" | "serialNumber" | "deviceInformation" | "getVibrationLocations" | "triggerVibration" | "getFileTypes" | "maxFileLength" | "getFileType" | "setFileType" | "getFileLength" | "setFileLength" | "getFileChecksum" | "setFileChecksum" | "setFileTransferCommand" | "fileTransferStatus" | "getFileBlock" | "setFileBlock" | "fileBytesTransferred" | "fileTransferProgress" | "fileTransferComplete" | "fileReceived" | "fileSent" | "isWifiAvailable" | "getWifiSSID" | "setWifiSSID" | "getWifiPassword" | "setWifiPassword" | "getWifiConnectionEnabled" | "setWifiConnectionEnabled" | "isWifiConnected" | "ipAddress" | "isWifiSecure" | "cameraStatus" | "cameraCommand" | "getCameraConfiguration" | "setCameraConfiguration" | "cameraData" | "cameraImageProgress" | "isRecordingCamera" | "startRecordingCamera" | "stopRecordingCamera" | "cameraRecording" | "autoPicture" | "isDisplayAvailable" | "displayStatus" | "displayInformation" | "displayCommand" | "getDisplayBrightness" | "setDisplayBrightness" | "displayContextCommands" | "displayReady" | "getDisplaySpriteSheetName" | "setDisplaySpriteSheetName" | "displaySpriteSheetIndex" | "displayContextState" | "displayColor" | "displayColorOpacity" | "displayOpacity" | "displaySpriteSheetUploadStart" | "displaySpriteSheetUploadProgress" | "displaySpriteSheetUploadComplete" | "displayDraw" | "getLedInformation" | "setLeds" | "clearLeds" | "setLed" | "smp" | "firmwareImages" | "firmwareUploadProgress" | "firmwareStatus" | "firmwareUploadComplete">(type: K) => DeviceEventMessages[K] | undefined;
     clearSensorConfiguration(): Promise<void>;
     static get ClearSensorConfigurationOnLeave(): boolean;
@@ -2834,8 +2833,8 @@ declare class Device {
     get displayBitmapColorIndices(): number[];
     get displayColorOpacities(): number[];
     get displayStatus(): "awake" | "asleep";
-    get displayBrightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
-    get setDisplayBrightness(): (newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean, displayCanvasHelper?: undefined) => Promise<void>;
+    get displayBrightness(): number;
+    get setDisplayBrightness(): (newDisplayBrightness: number, sendImmediately?: boolean, displayCanvasHelper?: undefined) => Promise<void>;
     get pendingDisplaySpriteSheetName(): string | undefined;
     get parseDisplaySpriteSheet(): (dataView: DataView<ArrayBuffer>, name?: string, includesHeader?: boolean, displayCanvasHelper?: undefined) => DisplaySpriteSheet;
     get displayInformation(): DisplayInformation;
@@ -3546,5 +3545,5 @@ declare const ThrottleUtils: {
     debounce: typeof debounce;
 };
 
-export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs_d as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, _default$2 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, _default$4 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment_d as Environment, EventUtils, FileTransferDirections, FileTypes, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, _default$5 as NullScanner, _default$1 as PubSubManager, RangeHelper, RangeHelper2, _default as ScannerManager, SensorRateStep, SensorTypes, _default$3 as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, UDPServer, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketServer, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wait, wildcardEventType };
-export type { BoundDeviceEventListeners, BoundDeviceManagerEventListeners, BoundDevicePairEventListeners, BoundServerEventListeners, CameraCommand, CameraConfiguration, CameraConfigurationType, CenterOfPressure, Client, ConnectionEventType, ConnectionManager, ConnectionManagerConnectOptions, ConnectionMessageType, ConnectionStatus, ContinuousSensorType, DeviceEvent, DeviceEventListenerMap, DeviceEventMap, DeviceEventType, DeviceInformation, DeviceManagerEvent, DeviceManagerEventListenerMap, DeviceManagerEventMap, DevicePairEvent, DevicePairEventListenerMap, DevicePairEventMap, DevicePairType, DeviceType, DiscoveredDeviceMetadata, DisplayAlignment, DisplayBezierCurveType, DisplayBitmap, DisplayBitmapColorPair, DisplayBrightness, DisplayColorRGB, DisplayColorRGBOrString, DisplayContextCommand, DisplayContextCommandType, DisplayDirection, DisplayManagerInterface, DisplaySegmentCap, DisplaySize, DisplaySprite, DisplaySpriteColorPair, DisplaySpriteContextCommandType, DisplaySpriteLine, DisplaySpriteLines, DisplaySpritePaletteSwap, DisplaySpriteSheet, DisplaySpriteSheetPalette, DisplaySpriteSubLine, DisplayWireframe, DisplayWireframeEdge, Euler, EventDispatcherOptions, FileTransferDirection, FileType, FontMetrics, FontToSpriteSheetOptions, Guard, GuardManagerObject, GuardManagerOptions, Led, LedConfiguration, LedType, LedValue, LedValueType, LocalStorageDeviceInformation, MicrophoneBitDepth, MicrophoneCommand, MicrophoneConfiguration, MicrophoneConfigurationType, MicrophoneSampleRate, PressureData, PressureSensorPosition, PressureSensorValue, Quaternion, Range, ScannerLike, SensorConfiguration, SensorType, Server, ServerClient, ServerEvent, ServerEventDispatcher, ServerEventDispatcherTypes, ServerEventListenerMap, ServerEventMap, Side, TfliteFileConfiguration, TfliteSensorType, TfliteTask, TxRxMessageType, Vector2, Vector3, VibrationConfiguration, VibrationLocation, VibrationType, VibrationWaveformConfiguration, VibrationWaveformEffect, VibrationWaveformEffectConfiguration, VibrationWaveformEffectSegment, VibrationWaveformSegment, WildcardEventType };
+export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs_d as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, _default$2 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, _default$4 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment_d as Environment, EventUtils, FileTransferDirections, FileTypes, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, _default$5 as NullScanner, _default$1 as PubSubManager, RangeHelper, RangeHelper2, _default as ScannerManager, SensorRateStep, SensorTypes, _default$3 as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, UDPServer, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketServer, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getTensorFlowModel, hexToRGB, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, wait, wildcardEventType };
+export type { BoundDeviceEventListeners, BoundDeviceManagerEventListeners, BoundDevicePairEventListeners, BoundServerEventListeners, CameraCommand, CameraConfiguration, CameraConfigurationType, CenterOfPressure, Client, ConnectionEventType, ConnectionManager, ConnectionManagerConnectOptions, ConnectionMessageType, ConnectionStatus, ContinuousSensorType, DeviceEvent, DeviceEventListenerMap, DeviceEventMap, DeviceEventType, DeviceInformation, DeviceManagerEvent, DeviceManagerEventListenerMap, DeviceManagerEventMap, DevicePairEvent, DevicePairEventListenerMap, DevicePairEventMap, DevicePairType, DeviceType, DiscoveredDeviceMetadata, DisplayAlignment, DisplayBezierCurveType, DisplayBitmap, DisplayBitmapColorPair, DisplayColorRGB, DisplayColorRGBOrString, DisplayContextCommand, DisplayContextCommandType, DisplayDirection, DisplayManagerInterface, DisplaySegmentCap, DisplaySize, DisplaySprite, DisplaySpriteColorPair, DisplaySpriteContextCommandType, DisplaySpriteLine, DisplaySpriteLines, DisplaySpritePaletteSwap, DisplaySpriteSheet, DisplaySpriteSheetPalette, DisplaySpriteSubLine, DisplayWireframe, DisplayWireframeEdge, Euler, EventDispatcherOptions, FileTransferDirection, FileType, FontMetrics, FontToSpriteSheetOptions, Guard, GuardManagerObject, GuardManagerOptions, Led, LedBrightnessConfiguration, LedColorConfiguration, LedConfiguration, LedType, LedValue, LedValueType, LocalStorageDeviceInformation, MicrophoneBitDepth, MicrophoneCommand, MicrophoneConfiguration, MicrophoneConfigurationType, MicrophoneSampleRate, PressureData, PressureSensorPosition, PressureSensorValue, Quaternion, Range, ScannerLike, SensorConfiguration, SensorType, Server, ServerClient, ServerEvent, ServerEventDispatcher, ServerEventDispatcherTypes, ServerEventListenerMap, ServerEventMap, Side, TfliteFileConfiguration, TfliteSensorType, TfliteTask, TxRxMessageType, Vector2, Vector3, VibrationConfiguration, VibrationLocation, VibrationType, VibrationWaveformConfiguration, VibrationWaveformEffect, VibrationWaveformEffectConfiguration, VibrationWaveformEffectSegment, VibrationWaveformSegment, WildcardEventType };

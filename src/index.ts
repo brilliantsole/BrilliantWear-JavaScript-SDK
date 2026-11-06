@@ -279,8 +279,6 @@ export {
 };
 
 import {
-  DisplayBrightness,
-  DisplayBrightnesses,
   DisplaySize,
   DisplayBitmapColorPair,
   DisplayPixelDepths,
@@ -295,8 +293,6 @@ import {
   DisplayBezierCurveTypes,
 } from "./DisplayManager.ts";
 export {
-  DisplayBrightness,
-  DisplayBrightnesses,
   DisplaySize,
   DisplayBitmapColorPair,
   DisplayPixelDepths,
@@ -543,6 +539,8 @@ import {
   LedValueType,
   LedValueTypes,
   LedConfiguration,
+  LedColorConfiguration,
+  LedBrightnessConfiguration,
   Led,
 } from "./led/LedManager.ts";
 export {
@@ -552,6 +550,8 @@ export {
   LedValueType,
   LedValueTypes,
   LedConfiguration,
+  LedColorConfiguration,
+  LedBrightnessConfiguration,
   Led,
 };
 

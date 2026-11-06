@@ -31,11 +31,11 @@ export interface LedEventMessages {
 }
 export type SendLedMessagesCallback = SendMessagesCallback<LedMessageType>;
 export type LedEventDispatcher = EventDispatcher<Device, LedEventType, LedEventMessages>;
-interface LedColorConfiguration {
+export interface LedColorConfiguration {
     index: number;
     color: DisplayColorRGBOrString;
 }
-interface LedBrightnessConfiguration {
+export interface LedBrightnessConfiguration {
     index: number;
     brightness: number;
 }

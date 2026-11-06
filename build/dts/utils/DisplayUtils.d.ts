@@ -1,4 +1,4 @@
-import { DisplayBezierCurve, DisplayBezierCurveType, DisplayBrightness, DisplayPixelDepth, DisplayPointDataType, DisplayWireframe } from "../DisplayManager.ts";
+import { DisplayBezierCurve, DisplayBezierCurveType, DisplayPixelDepth, DisplayPointDataType, DisplayWireframe } from "../DisplayManager.ts";
 import { DisplayContextCommandType } from "./DisplayContextCommand.ts";
 import { DisplayAlignment, DisplayAlignmentDirection, DisplayDirection, DisplaySegmentCap } from "./DisplayContextState.ts";
 import { Vector2 } from "./MathUtils.ts";
@@ -12,7 +12,6 @@ export declare function formatScale(scale: number): number;
 export declare function parseScale(scale: number): number;
 export declare function roundScale(scale: number): number;
 export declare function assertValidSegmentCap(segmentCap: DisplaySegmentCap): void;
-export declare function assertValidDisplayBrightness(displayBrightness: DisplayBrightness): void;
 export declare function assertValidColorValue(name: string, value: number): void;
 export declare function assertValidColor(color: DisplayColorRGB): void;
 export declare function assertValidOpacity(value: number): void;

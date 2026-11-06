@@ -3988,7 +3988,7 @@ class LightSensorDataManager {
     parseData(dataView, scalar) {
         const light = dataView.getFloat32(0, true) * scalar;
         _console$P.log({ light });
-        return { light };
+        return light;
     }
 }
 
@@ -4313,6 +4313,9 @@ class SensorConfigurationManager {
     }
     hasSensorType(sensorType) {
         return this.availableSensorTypes.includes(sensorType);
+    }
+    hasSensorTypes(sensorTypes) {
+        return sensorTypes.every((sensorType) => this.hasSensorType(sensorType));
     }
     #configuration = {};
     get configuration() {
@@ -7229,9 +7232,6 @@ function roundScale(scale) {
 }
 function assertValidSegmentCap(segmentCap) {
     _console$F.assertEnumWithError(DisplaySegmentCaps, segmentCap);
-}
-function assertValidDisplayBrightness(displayBrightness) {
-    _console$F.assertEnumWithError(DisplayBrightnesses, displayBrightness);
 }
 function assertValidColorValue(name, value) {
     _console$F.assertRangeWithError(name, value, 0, 255);
@@ -28011,19 +28011,12 @@ let DisplayCanvasHelper = (() => {
         stringToSpriteLinesMetrics(string, requireAll, maxLineBreadth, separators, isSending) {
             return stringToSpriteLinesMetrics(string, this.spriteSheets, this.contextState, requireAll, maxLineBreadth, separators);
         }
-        #brightness = "medium";
+        #brightness = 50;
         get brightness() {
             return this.#brightness;
         }
-        #brightnessOpacities = {
-            veryLow: 0.5,
-            low: 0.7,
-            medium: 0.9,
-            high: 0.95,
-            veryHigh: 1,
-        };
         get #brightnessOpacity() {
-            return this.#brightnessOpacities[this.brightness];
+            return this.brightness / 100;
         }
         #didSetBrightness = false;
         #flushBrightness() {
@@ -28051,7 +28044,7 @@ let DisplayCanvasHelper = (() => {
             this.#dispatchEvent("brightness", { brightness: this.brightness });
         }
         async #resetBrightness() {
-            await this.setBrightness("medium");
+            await this.setBrightness(50);
         }
         async #updateDeviceDrawCallback(updateSelf) {
             if (!this.device?.isConnected) {
@@ -28396,7 +28389,7 @@ let DisplayCanvasHelper = (() => {
                 await this.#drawCallback(this);
             }
             else {
-                _console$z.error("no drawCallback defined");
+                _console$z.log("no drawCallback defined");
             }
             await this.show(true, true);
             _console$z.log("finished draw");
@@ -29087,13 +29080,6 @@ const DisplayTypes = [
     "binocular",
 ];
 const DisplayPixelDepths = ["1", "2", "4"];
-const DisplayBrightnesses = [
-    "veryLow",
-    "low",
-    "medium",
-    "high",
-    "veryHigh",
-];
 const DisplayMessageTypes = [
     "isDisplayAvailable",
     "displayStatus",
@@ -29624,9 +29610,7 @@ let DisplayManager = (() => {
             return this.#brightness;
         }
         #parseDisplayBrightness(dataView) {
-            const newDisplayBrightnessEnum = dataView.getUint8(0);
-            const newDisplayBrightness = DisplayBrightnesses[newDisplayBrightnessEnum];
-            assertValidDisplayBrightness(newDisplayBrightness);
+            const newDisplayBrightness = dataView.getUint8(0);
             this.#brightness = newDisplayBrightness;
             _console$x.log({ displayBrightness: this.#brightness });
             this.#dispatchEvent("getDisplayBrightness", {
@@ -29635,13 +29619,11 @@ let DisplayManager = (() => {
         }
         async setBrightness(newDisplayBrightness, sendImmediately, displayCanvasHelper) {
             this.#assertDisplayIsAvailable();
-            assertValidDisplayBrightness(newDisplayBrightness);
             if (this.brightness == newDisplayBrightness) {
                 _console$x.log(`redundant displayBrightness ${newDisplayBrightness}`);
                 return;
             }
-            const newDisplayBrightnessEnum = DisplayBrightnesses.indexOf(newDisplayBrightness);
-            const newDisplayBrightnessData = valueToUInt8ArrayBuffer(newDisplayBrightnessEnum);
+            const newDisplayBrightnessData = valueToUInt8ArrayBuffer(newDisplayBrightness);
             const promise = this.waitForEvent("getDisplayBrightness");
             this.sendMessages([{ type: "setDisplayBrightness", data: newDisplayBrightnessData }], sendImmediately);
             await promise;
@@ -31621,7 +31603,7 @@ let DisplayManager = (() => {
                 await this.#drawCallback(this);
             }
             else {
-                _console$x.error("no drawCallback defined");
+                _console$x.log("no drawCallback defined");
             }
             await this.show(true, true);
             _console$x.log("finished draw");
@@ -34603,7 +34585,7 @@ class Device {
     get connectionAbortSignal() {
         return this.#connectionAbortController.signal;
     }
-    get connectionAbortOptions() {
+    get connectionAbortSignalObject() {
         return { signal: this.connectionAbortSignal };
     }
     #dispatchConnectionEvents(includeIsConnected = false) {
@@ -34836,6 +34818,9 @@ class Device {
     }
     get hasSensorType() {
         return this.#sensorConfigurationManager.hasSensorType;
+    }
+    get hasSensorTypes() {
+        return this.#sensorConfigurationManager.hasSensorTypes;
     }
     get getLatestMessage() {
         return this.#eventDispatcher.getLatestMessage;
@@ -41399,5 +41384,5 @@ const ThrottleUtils = {
     debounce,
 };
 
-export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs$1 as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayBrightnesses, DisplayCanvasHelper, DisplayCanvasHelperManager$1 as DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
+export { BaseScanner, BluetoothConnectionManager, bluetoothUUIDs$1 as BluetoothUUIDs, CameraCommands, CameraConfigurationTypes, CenterOfPressureModel, ClientManager$1 as ClientManager, Clients, ConnectionEventTypes, ConnectionManagers, ConnectionMessageTypes, ConnectionStatuses, ContinuousSensorTypes, DefaultGuardManagerOptions, DefaultNumberOfDisplayColors, DefaultNumberOfPressureSensors, Device, DeviceEventTypes, DeviceManager$1 as DeviceManager, DevicePair, DevicePairTypes, DeviceTypes, DiscoveredDevice, DisplayAlignments, DisplayBezierCurveTypes, DisplayCanvasHelper, DisplayCanvasHelperManager$1 as DisplayCanvasHelperManager, DisplayContextCommandTypes, DisplayDirections, DisplayPixelDepths, DisplaySegmentCaps, DisplaySpriteContextCommandTypes, environment as Environment, EventUtils, FileTransferDirections, FileTypes, Font, Glyph, GuardManager, LedTypes, LedValueTypes, MaxNameLength, MaxNumberOfVibrationWaveformEffectSegments, MaxNumberOfVibrationWaveformSegments, MaxSensorRate, MaxSpriteSheetNameLength, MaxVibrationWaveformEffectSegmentDelay, MaxVibrationWaveformEffectSegmentLoopCount, MaxVibrationWaveformEffectSequenceLoopCount, MaxVibrationWaveformSegmentDuration, MaxWifiPasswordLength, MaxWifiSSIDLength, MicrophoneBitDepths, MicrophoneCommands, MicrophoneConfigurationTypes, MicrophoneConfigurationValues, MicrophoneSampleRates, MinNameLength, MinSpriteSheetNameLength, MinWifiPasswordLength, MinWifiSSIDLength, NullScanner_default as NullScanner, PubSubManager$1 as PubSubManager, RangeHelper, RangeHelper2, ScannerManager_default as ScannerManager, SensorRateStep, SensorTypes, ServerManager_default as ServerManager, Servers, Sides, TfliteSensorTypes, TfliteTasks, ThrottleUtils, Timer, TxRxMessageTypes, VibrationLocations, VibrationTypes, VibrationWaveformEffects, WebSocketClient, WindowClient_default as WindowClient, WindowManagerClient$1 as WindowManagerClient, WindowManagerServer_default as WindowManagerServer, WindowServer$1 as WindowServer, canvasToBitmaps, canvasToSprite, canvasToSpriteSheet, concatenateArrayBuffers, displayCurveTypeToNumberOfControlPoints, englishRegex, fontToSpriteSheet, getFontMaxHeight, getFontMetrics, getFontUnicodeRange, getMaxSpriteSheetSize, getSvgStringFromDataUrl, getTensorFlowModel, hexToRGB, imageToBitmaps, imageToSprite, imageToSpriteSheet, intersectWireframes, isTensorFlowAvailable, isTensorFlowModelAvailable, isValidSVG, isWireframePolygon, listTensorflowModels, maxDisplayScale, mergeWireframes, parseFont, pixelDepthToNumberOfColors, projectColor, quantizeImage, resizeAndQuantizeImage, resizeImage, rgbToHex, setAllConsoleLevelFlags, setConsoleLevelFlagsForType, simplifyCurves, simplifyPoints, simplifyPointsAsCubicCurveControlPoints, stringToSprites, svgToDisplayContextCommands, svgToSprite, svgToSpriteSheet, wait, wildcardEventType };
 //# sourceMappingURL=brilliantwear.module.js.map

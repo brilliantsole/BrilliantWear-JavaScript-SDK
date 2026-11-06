@@ -169,6 +169,7 @@ const bluetoothUUIDs: BluetoothServicesInformation = Object.freeze({
         smp: { uuid: "da2e7828-fbce-4e01-ae9e-261174997c48" },
       },
     },
+    // TODO: - dfu
   },
 });
 

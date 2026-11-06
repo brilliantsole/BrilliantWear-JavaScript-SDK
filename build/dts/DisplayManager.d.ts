@@ -20,8 +20,6 @@ export declare const DisplayTypes: readonly ["none", "generic", "monocularLeft",
 export type DisplayType = (typeof DisplayTypes)[number];
 export declare const DisplayPixelDepths: readonly ["1", "2", "4"];
 export type DisplayPixelDepth = (typeof DisplayPixelDepths)[number];
-export declare const DisplayBrightnesses: readonly ["veryLow", "low", "medium", "high", "veryHigh"];
-export type DisplayBrightness = (typeof DisplayBrightnesses)[number];
 export declare const DisplayMessageTypes: readonly ["isDisplayAvailable", "displayStatus", "displayInformation", "displayCommand", "getDisplayBrightness", "setDisplayBrightness", "displayContextCommands", "displayReady", "getDisplaySpriteSheetName", "setDisplaySpriteSheetName", "displaySpriteSheetIndex"];
 export type DisplayMessageType = (typeof DisplayMessageTypes)[number];
 export type DisplaySize = {
@@ -88,7 +86,7 @@ export interface DisplayEventMessages {
         displayInformation: DisplayInformation;
     };
     getDisplayBrightness: {
-        displayBrightness: DisplayBrightness;
+        displayBrightness: number;
     };
     displayContextState: {
         displayContextState: DisplayContextState;
@@ -176,8 +174,8 @@ declare class DisplayManager implements DisplayManagerInterface {
         height: number;
     };
     get type(): "none" | "generic" | "monocularLeft" | "monocularRight" | "binocular";
-    get brightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
-    setBrightness(newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
+    get brightness(): number;
+    setBrightness(newDisplayBrightness: number, sendImmediately?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;
     getMaxCommandDataLength(single?: boolean): number;
     flushContextCommands(isSending?: boolean): Promise<void>;
     show(sendImmediately?: boolean, waitUntilReady?: boolean, isSending?: boolean, displayCanvasHelper?: DisplayCanvasHelper): Promise<void>;

@@ -1,6 +1,5 @@
 import DisplayManager, {
   DisplayBitmapColorPair,
-  DisplayBrightness,
   DisplaySpriteColorPair,
   DisplayBitmap,
   DisplayBezierCurve,
@@ -65,9 +64,9 @@ export interface DisplayManagerInterface {
 
   flushContextCommands(isSending?: boolean): Promise<void>;
 
-  get brightness(): DisplayBrightness;
+  get brightness(): number;
   setBrightness(
-    newDisplayBrightness: DisplayBrightness,
+    newDisplayBrightness: number,
     sendImmediately?: boolean,
   ): Promise<void>;
 

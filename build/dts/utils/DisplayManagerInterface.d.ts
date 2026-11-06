@@ -1,4 +1,4 @@
-import { DisplayBitmapColorPair, DisplayBrightness, DisplaySpriteColorPair, DisplayBitmap, DisplayBezierCurve, DisplayBezierCurveType, DisplayWireframe } from "../DisplayManager.ts";
+import { DisplayBitmapColorPair, DisplaySpriteColorPair, DisplayBitmap, DisplayBezierCurve, DisplayBezierCurveType, DisplayWireframe } from "../DisplayManager.ts";
 import { DisplayContextCommand } from "./DisplayContextCommand.ts";
 import { DisplayAlignment, DisplayAlignmentDirection, DisplayContextState, DisplayDirection, DisplaySegmentCap, PartialDisplayContextState } from "./DisplayContextState.ts";
 import { DisplaySprite, DisplaySpriteLines, DisplaySpriteLinesMetrics, DisplaySpritePaletteSwap, DisplaySpriteSheet, DisplaySpriteSheetPalette, DisplaySpriteSheetPaletteSwap } from "./DisplaySpriteSheetUtils.ts";
@@ -14,8 +14,8 @@ export interface DisplayManagerInterface {
     setContextState(newState: PartialDisplayContextState, sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     parseContextCommands(dataView: DataView): Promise<void>;
     flushContextCommands(isSending?: boolean): Promise<void>;
-    get brightness(): DisplayBrightness;
-    setBrightness(newDisplayBrightness: DisplayBrightness, sendImmediately?: boolean): Promise<void>;
+    get brightness(): number;
+    setBrightness(newDisplayBrightness: number, sendImmediately?: boolean): Promise<void>;
     setDrawCallback(drawCallback?: DisplayDrawCallback): void;
     get drawCallback(): DisplayDrawCallback | undefined;
     draw(): Promise<void>;

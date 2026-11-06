@@ -3020,9 +3020,9 @@ const setDisplayBrightnessSelect = document.getElementById(
 /** @type {HTMLOptGroupElement} */
 const setDisplayBrightnessSelectOptgroup =
   setDisplayBrightnessSelect.querySelector("optgroup");
-BW.DisplayBrightnesses.forEach((displayBrightness) => {
-  setDisplayBrightnessSelectOptgroup.appendChild(new Option(displayBrightness));
-});
+// BW.DisplayBrightnesses.forEach((displayBrightness) => {
+//   setDisplayBrightnessSelectOptgroup.appendChild(new Option(displayBrightness));
+// });
 
 onCurrentDevice(() => {
   currentDevice.addEventListener(
@@ -4480,10 +4480,12 @@ onCurrentDevice(() => {
             console.log("mousedown", input);
             input.isChanging = true;
           });
-          input?.addEventListener("change", (event) => {
-            console.log("change", input);
-            input.isChanging = false;
-          });
+          if (input?.type != "color") {
+            input?.addEventListener("change", (event) => {
+              console.log("change", input);
+              input.isChanging = false;
+            });
+          }
         });
 
         setLedContainers[index] = { range, colorInput, checkbox };

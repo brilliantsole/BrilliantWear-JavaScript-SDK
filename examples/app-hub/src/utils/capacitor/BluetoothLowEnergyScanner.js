@@ -65,7 +65,11 @@ class BluetoothLowEnergyConnectionManager
         if (characteristicName == "smp") {
           return true;
         }
-        return this.#characteristics.has(characteristicName);
+        const hasCharacteristic = this.#characteristics.has(characteristicName);
+        if (!hasCharacteristic) {
+          console.log(`missing characteristic "${characteristicName}"`);
+        }
+        return hasCharacteristic;
       },
     );
   }
@@ -159,7 +163,7 @@ class BluetoothLowEnergyConnectionManager
           }
         }
       } else {
-        console.error(`no serviceName found for ${service.uuid}`, service);
+        console.log(`no serviceName found for ${service.uuid}`, service);
       }
     }
     if (!this.#hasAllCharacteristics) {

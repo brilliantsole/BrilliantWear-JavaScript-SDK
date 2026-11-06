@@ -19,7 +19,7 @@ class LightSensorDataManager {
   parseData(dataView: DataView<ArrayBuffer>, scalar: number) {
     const light = dataView.getFloat32(0, true) * scalar;
     _console.log({ light });
-    return { light };
+    return light;
   }
 }
 

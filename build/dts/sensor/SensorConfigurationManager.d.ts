@@ -32,6 +32,7 @@ declare class SensorConfigurationManager {
     }) => Promise<import("../utils/EventDispatcher.ts").ListenerEvent<Device, "getSensorConfiguration" | "setSensorConfiguration", SensorConfigurationEventMessages, T>>;
     get availableSensorTypes(): ("pressure" | "acceleration" | "gravity" | "linearAcceleration" | "gyroscope" | "magnetometer" | "gameRotation" | "rotation" | "orientation" | "activity" | "stepCounter" | "stepDetector" | "deviceOrientation" | "tapDetector" | "barometer" | "buttons" | "touches" | "microphone" | "light" | "camera")[];
     hasSensorType(sensorType: SensorType): boolean;
+    hasSensorTypes(sensorTypes: SensorType[]): boolean;
     get configuration(): SensorConfiguration;
     clear(): void;
     setConfiguration(newSensorConfiguration: SensorConfiguration, clearRest?: boolean, sendImmediately?: boolean): Promise<void>;

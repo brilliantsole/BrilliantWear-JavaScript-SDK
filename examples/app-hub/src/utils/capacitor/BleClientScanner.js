@@ -175,7 +175,7 @@ class BleClientConnectionManager extends BW.BluetoothConnectionManager {
           }
         }
       } else {
-        console.error(`no serviceName found for ${service.uuid}`, service);
+        console.log(`no serviceName found for ${service.uuid}`, service);
       }
     }
 

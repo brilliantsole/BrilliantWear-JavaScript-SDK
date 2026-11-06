@@ -1,5 +1,5 @@
 import Device from "../Device.ts";
-import { DisplayBitmapColorPair, DisplayBrightness, DisplaySpriteColorPair, DisplayBitmap, DisplayBezierCurve, DisplayBezierCurveType, DisplayWireframe } from "../DisplayManager.ts";
+import { DisplayBitmapColorPair, DisplaySpriteColorPair, DisplayBitmap, DisplayBezierCurve, DisplayBezierCurveType, DisplayWireframe } from "../DisplayManager.ts";
 import { DisplayAlignment, DisplayAlignmentDirection, DisplayContextState, DisplayContextStateKey, DisplayDirection, DisplaySegmentCap, PartialDisplayContextState } from "./DisplayContextState.ts";
 import { DisplayDrawCallback, DisplayManagerInterface } from "./DisplayManagerInterface.ts";
 import { DisplayScaleDirection, DisplayColorRGB, DisplayCropDirection, DisplayColorRGBOrString } from "./DisplayUtils.ts";
@@ -18,7 +18,7 @@ export interface DisplayCanvasHelperEventMessages {
         numberOfColors: number;
     };
     brightness: {
-        brightness: DisplayBrightness;
+        brightness: number;
     };
     color: {
         colorIndex: number;
@@ -243,8 +243,8 @@ declare class DisplayCanvasHelper implements DisplayManagerInterface {
     drawSpritesString(offsetX: number, offsetY: number, string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     stringToSpriteLines(string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], isSending?: boolean): DisplaySpriteLines;
     stringToSpriteLinesMetrics(string: string, requireAll?: boolean, maxLineBreadth?: number, separators?: string[], isSending?: boolean): import("./DisplaySpriteSheetUtils.ts").DisplaySpriteLinesMetrics;
-    get brightness(): "veryLow" | "low" | "medium" | "high" | "veryHigh";
-    setBrightness(newBrightness: DisplayBrightness, sendImmediately?: boolean): Promise<void>;
+    get brightness(): number;
+    setBrightness(newBrightness: number, sendImmediately?: boolean): Promise<void>;
     runContextCommand(command: DisplayContextCommand, sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     runContextCommands(commands: DisplayContextCommand[], sendImmediately?: boolean, isSending?: boolean): Promise<void>;
     parseContextCommands(dataView: DataView, sendImmediately?: boolean, isSending?: boolean): Promise<void>;

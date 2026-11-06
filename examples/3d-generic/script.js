@@ -271,7 +271,7 @@ onCurrentDevice((device) => {
     const acceleration = event.message.acceleration;
     updatePosition(acceleration);
   });
-  device.addEventListener("gravity", () => {
+  device.addEventListener("gravity", (event) => {
     const gravity = event.message.gravity;
     updatePosition(gravity);
   });

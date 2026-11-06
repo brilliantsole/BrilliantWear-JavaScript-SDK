@@ -4,7 +4,6 @@ import Device, {
 } from "../Device.ts";
 import {
   DisplayBitmapColorPair,
-  DisplayBrightness,
   DisplaySpriteColorPair,
   DisplayBitmap,
   DisplaySegment,
@@ -154,7 +153,7 @@ export interface DisplayCanvasHelperEventMessages {
     numberOfColors: number;
   };
   brightness: {
-    brightness: DisplayBrightness;
+    brightness: number;
   };
   color: {
     colorIndex: number;
@@ -4963,19 +4962,12 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
   }
 
   // BRIGHTNESS
-  #brightness: DisplayBrightness = "medium";
+  #brightness: number = 50;
   get brightness() {
     return this.#brightness;
   }
-  #brightnessOpacities: Record<DisplayBrightness, number> = {
-    veryLow: 0.5,
-    low: 0.7,
-    medium: 0.9,
-    high: 0.95,
-    veryHigh: 1,
-  };
   get #brightnessOpacity() {
-    return this.#brightnessOpacities[this.brightness];
+    return this.brightness / 100;
   }
   #didSetBrightness = false;
   #flushBrightness() {
@@ -4986,10 +4978,7 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
     this.#didSetBrightness = false;
     return true;
   }
-  async setBrightness(
-    newBrightness: DisplayBrightness,
-    sendImmediately?: boolean,
-  ) {
+  async setBrightness(newBrightness: number, sendImmediately?: boolean) {
     if (this.#brightness == newBrightness) {
       // _console.log(`redundant brightness ${newBrightness}`);
       return;
@@ -5011,7 +5000,7 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
     this.#dispatchEvent("brightness", { brightness: this.brightness });
   }
   async #resetBrightness() {
-    await this.setBrightness("medium");
+    await this.setBrightness(50);
   }
   async #updateDeviceDrawCallback(updateSelf?: boolean) {
     if (!this.device?.isConnected) {
@@ -5607,7 +5596,7 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
     if (this.#drawCallback) {
       await this.#drawCallback(this);
     } else {
-      _console.error("no drawCallback defined");
+      _console.log("no drawCallback defined");
     }
     await this.show(true, true);
     _console.log("finished draw");

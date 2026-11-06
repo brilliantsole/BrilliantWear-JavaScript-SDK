@@ -8,8 +8,6 @@ export interface LightSensorDataEventMessages {
     };
 }
 declare class LightSensorDataManager {
-    parseData(dataView: DataView<ArrayBuffer>, scalar: number): {
-        light: number;
-    };
+    parseData(dataView: DataView<ArrayBuffer>, scalar: number): number;
 }
 export default LightSensorDataManager;

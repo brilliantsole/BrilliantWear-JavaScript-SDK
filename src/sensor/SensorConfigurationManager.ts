@@ -134,6 +134,9 @@ class SensorConfigurationManager {
   hasSensorType(sensorType: SensorType) {
     return this.availableSensorTypes.includes(sensorType);
   }
+  hasSensorTypes(sensorTypes: SensorType[]) {
+    return sensorTypes.every((sensorType) => this.hasSensorType(sensorType));
+  }
 
   #configuration: SensorConfiguration = {};
   get configuration() {

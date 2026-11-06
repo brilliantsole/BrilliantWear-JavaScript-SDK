@@ -1,8 +1,6 @@
 import {
   DisplayBezierCurve,
   DisplayBezierCurveType,
-  DisplayBrightness,
-  DisplayBrightnesses,
   DisplayPixelDepth,
   DisplayPixelDepths,
   DisplayPointDataType,
@@ -120,12 +118,6 @@ export function roundScale(scale: number) {
 
 export function assertValidSegmentCap(segmentCap: DisplaySegmentCap) {
   _console.assertEnumWithError(DisplaySegmentCaps, segmentCap);
-}
-
-export function assertValidDisplayBrightness(
-  displayBrightness: DisplayBrightness,
-) {
-  _console.assertEnumWithError(DisplayBrightnesses, displayBrightness);
 }
 
 export function assertValidColorValue(name: string, value: number) {
