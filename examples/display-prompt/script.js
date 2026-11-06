@@ -51,9 +51,9 @@ const setDisplayBrightnessSelect = document.getElementById(
 /** @type {HTMLOptGroupElement} */
 const setDisplayBrightnessSelectOptgroup =
   setDisplayBrightnessSelect.querySelector("optgroup");
-BS.DisplayBrightnesses.forEach((displayBrightness) => {
-  setDisplayBrightnessSelectOptgroup.appendChild(new Option(displayBrightness));
-});
+// BS.DisplayBrightnesses.forEach((displayBrightness) => {
+//   setDisplayBrightnessSelectOptgroup.appendChild(new Option(displayBrightness));
+// });
 setDisplayBrightnessSelect.addEventListener("input", () => {
   displayCanvasHelper.setBrightness(setDisplayBrightnessSelect.value);
 });
