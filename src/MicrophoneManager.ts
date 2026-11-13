@@ -262,15 +262,10 @@ class MicrophoneManager {
           samples[i] = sample / 2 ** 15; // Normalize to [-1, 1]
           break;
         case "8":
-          if (true) {
-            // mu-law compression
-            sample = dataView.getUint8(i);
-            sample = mulaw.decodeSample(sample);
-            sample = sample / 2 ** 15; // Normalize to [-1, 1]
-          } else {
-            sample = dataView.getInt8(i);
-            sample = sample / 2 ** 7; // Normalize to [-1, 1]
-          }
+          // mu-law compression
+          sample = dataView.getUint8(i);
+          sample = mulaw.decodeSample(sample);
+          sample = sample / 2 ** 15; // Normalize to [-1, 1]
           samples[i] = sample;
           break;
       }
