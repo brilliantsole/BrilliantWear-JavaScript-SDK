@@ -3536,9 +3536,6 @@ class MicrophoneManager {
         const previousMicrophoneStatus = this.#microphoneStatus;
         this.#microphoneStatus = newMicrophoneStatus;
         _console$P.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
-        if (this.microphoneStatus == "streaming") {
-            this.#playbackTime = 0;
-        }
         this.#dispatchEvent("microphoneStatus", {
             microphoneStatus: this.microphoneStatus,
             previousMicrophoneStatus,
@@ -3647,8 +3644,7 @@ class MicrophoneManager {
                         (channelData.length - i) / (this.#fadeDuration * sampleRate);
                 }
                 bufferSource.connect(this.#gainNode);
-                const bufferTimeOffset = this.#playbackTime - this.#audioContext.currentTime;
-                if (bufferTimeOffset < 0) {
+                if (this.#playbackTime < this.#audioContext.currentTime) {
                     this.#playbackTime = this.#audioContext.currentTime;
                 }
                 bufferSource.start(this.#playbackTime);
