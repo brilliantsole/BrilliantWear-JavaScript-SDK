@@ -21,10 +21,9 @@ import * as noble from '@stoprocent/noble';
 import noble__default from '@stoprocent/noble';
 import os from 'os';
 
-const __BRILLIANTWEAR__ENVIRONMENT__ = "__BRILLIANTWEAR__DEV__";
 const isInProduction =
-__BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__PROD__";
-const isInDev = __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__DEV__";
+"__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__PROD__";
+const isInDev = "__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__DEV__";
 const isInBrowser = typeof window !== "undefined" && typeof window?.document !== "undefined";
 let isInIframe = false;
 try {
@@ -158,9 +157,6 @@ class Console {
     }
     static create(type, levelFlags) {
         const console = this.#consoles[type] || new Console(type);
-        if (levelFlags) {
-            console.setLevelFlags(levelFlags);
-        }
         return console;
     }
     get log() {
@@ -3540,6 +3536,9 @@ class MicrophoneManager {
         const previousMicrophoneStatus = this.#microphoneStatus;
         this.#microphoneStatus = newMicrophoneStatus;
         _console$P.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
+        if (this.microphoneStatus == "streaming") {
+            this.#playbackTime = 0;
+        }
         this.#dispatchEvent("microphoneStatus", {
             microphoneStatus: this.microphoneStatus,
             previousMicrophoneStatus,
@@ -3634,6 +3633,9 @@ class MicrophoneManager {
                 const audioBuffer = this.#audioContext.createBuffer(1, samples.length, Number(this.sampleRate));
                 audioBuffer.getChannelData(0).set(samples);
                 const bufferSource = this.#audioContext.createBufferSource();
+                bufferSource.onended = () => {
+                    bufferSource.disconnect();
+                };
                 bufferSource.buffer = audioBuffer;
                 const channelData = audioBuffer.getChannelData(0);
                 const sampleRate = Number(this.sampleRate);
@@ -3645,7 +3647,8 @@ class MicrophoneManager {
                         (channelData.length - i) / (this.#fadeDuration * sampleRate);
                 }
                 bufferSource.connect(this.#gainNode);
-                if (this.#playbackTime < this.#audioContext.currentTime) {
+                const bufferTimeOffset = this.#playbackTime - this.#audioContext.currentTime;
+                if (bufferTimeOffset < 0) {
                     this.#playbackTime = this.#audioContext.currentTime;
                 }
                 bufferSource.start(this.#playbackTime);

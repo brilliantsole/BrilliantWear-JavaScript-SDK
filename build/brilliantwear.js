@@ -3632,6 +3632,9 @@
 	        const previousMicrophoneStatus = this.#microphoneStatus;
 	        this.#microphoneStatus = newMicrophoneStatus;
 	        _console$Q.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
+	        if (this.microphoneStatus == "streaming") {
+	            this.#playbackTime = 0;
+	        }
 	        this.#dispatchEvent("microphoneStatus", {
 	            microphoneStatus: this.microphoneStatus,
 	            previousMicrophoneStatus,
@@ -3710,11 +3713,9 @@
 	                    samples[i] = sample / 2 ** 15;
 	                    break;
 	                case "8":
-	                    {
-	                        sample = dataView.getUint8(i);
-	                        sample = mulaw.decodeSample(sample);
-	                        sample = sample / 2 ** 15;
-	                    }
+	                    sample = dataView.getUint8(i);
+	                    sample = mulaw.decodeSample(sample);
+	                    sample = sample / 2 ** 15;
 	                    samples[i] = sample;
 	                    break;
 	            }
@@ -3728,6 +3729,9 @@
 	                const audioBuffer = this.#audioContext.createBuffer(1, samples.length, Number(this.sampleRate));
 	                audioBuffer.getChannelData(0).set(samples);
 	                const bufferSource = this.#audioContext.createBufferSource();
+	                bufferSource.onended = () => {
+	                    bufferSource.disconnect();
+	                };
 	                bufferSource.buffer = audioBuffer;
 	                const channelData = audioBuffer.getChannelData(0);
 	                const sampleRate = Number(this.sampleRate);
@@ -3739,7 +3743,8 @@
 	                        (channelData.length - i) / (this.#fadeDuration * sampleRate);
 	                }
 	                bufferSource.connect(this.#gainNode);
-	                if (this.#playbackTime < this.#audioContext.currentTime) {
+	                const bufferTimeOffset = this.#playbackTime - this.#audioContext.currentTime;
+	                if (bufferTimeOffset < 0) {
 	                    this.#playbackTime = this.#audioContext.currentTime;
 	                }
 	                bufferSource.start(this.#playbackTime);
