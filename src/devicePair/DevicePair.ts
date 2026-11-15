@@ -97,7 +97,7 @@ export type DevicePairEventDispatcher =
 export type BoundDevicePairEventListeners =
   DevicePairEventDispatcherTypes["BoundEventListeners"];
 
-export const DevicePairTypes = ["insoles", "gloves"] as const;
+export const DevicePairTypes = ["insoles", "gloves", "rings"] as const;
 export type DevicePairType = (typeof DevicePairTypes)[number];
 
 class DevicePair {
@@ -169,6 +169,8 @@ class DevicePair {
         return device.isInsole;
       case "gloves":
         return device.isGlove;
+      case "rings":
+        return device.isRing;
     }
   }
 
@@ -356,6 +358,10 @@ class DevicePair {
   static get gloves() {
     return this.#gloves;
   }
+  static #rings = new DevicePair("rings");
+  static get rings() {
+    return this.#rings;
+  }
   static {
     DeviceManager.addEventListener("deviceConnected", (event) => {
       const { device } = event.message;
@@ -364,6 +370,9 @@ class DevicePair {
       }
       if (device.isGlove) {
         this.#gloves.assignDevice(device);
+      }
+      if (device.isRing) {
+        this.#rings.assignDevice(device);
       }
     });
   }

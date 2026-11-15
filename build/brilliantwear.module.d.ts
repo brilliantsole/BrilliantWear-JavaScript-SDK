@@ -2139,7 +2139,7 @@ type ServerMessageOrMessageType = MessageOrMessageType<ServerMessageType>;
 type DeviceMessage = Message<DeviceEventType>;
 type ClientDeviceMessage = Message<ConnectionMessageType>;
 
-declare const DeviceTypes: readonly ["leftInsole", "rightInsole", "leftGlove", "rightGlove", "glasses", "generic"];
+declare const DeviceTypes: readonly ["leftInsole", "rightInsole", "leftGlove", "rightGlove", "glasses", "generic", "leftRing", "rightRing"];
 type DeviceType = (typeof DeviceTypes)[number];
 declare const Sides: readonly ["left", "right"];
 type Side = (typeof Sides)[number];
@@ -2239,7 +2239,7 @@ declare class DiscoveredDevice {
     scanner: ScannerLike;
     get bluetoothId(): string;
     get name(): string | undefined;
-    get deviceType(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+    get deviceType(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
     get rssi(): number | undefined;
     get ipAddress(): string | undefined;
     get isWifiSecure(): boolean | undefined;
@@ -2261,7 +2261,7 @@ declare class DiscoveredDevice {
     toJSON(): {
         bluetoothId: string;
         name: string | undefined;
-        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
         rssi: number | undefined;
         ipAddress: string | undefined;
         isWifiSecure: boolean | undefined;
@@ -2321,7 +2321,7 @@ declare abstract class BaseScanner {
     get discoveredDevices(): Readonly<DiscoveredDevicesMap>;
     get discoveredDevicesArray(): DiscoveredDevice[];
     protected _parseManufacturerData(dataView: DataView | string): {
-        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
         ipAddress: string | undefined;
         isWifiSecure: boolean | undefined;
     };
@@ -2729,7 +2729,7 @@ declare class Device {
     get getBatteryCurrent(): () => Promise<void>;
     get name(): string;
     get setName(): (newName: string) => Promise<void>;
-    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses";
+    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing";
     get setType(): (newType: DeviceType) => Promise<void>;
     get isInsole(): boolean;
     get isGlove(): boolean;

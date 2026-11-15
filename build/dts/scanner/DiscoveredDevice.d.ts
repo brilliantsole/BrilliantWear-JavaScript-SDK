@@ -65,7 +65,7 @@ declare class DiscoveredDevice {
     scanner: ScannerLike;
     get bluetoothId(): string;
     get name(): string | undefined;
-    get deviceType(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+    get deviceType(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
     get rssi(): number | undefined;
     get ipAddress(): string | undefined;
     get isWifiSecure(): boolean | undefined;
@@ -87,7 +87,7 @@ declare class DiscoveredDevice {
     toJSON(): {
         bluetoothId: string;
         name: string | undefined;
-        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
         rssi: number | undefined;
         ipAddress: string | undefined;
         isWifiSecure: boolean | undefined;

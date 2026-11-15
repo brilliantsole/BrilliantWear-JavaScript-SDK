@@ -15,6 +15,8 @@ export const DeviceTypes = [
   "rightGlove",
   "glasses",
   "generic",
+  "leftRing",
+  "rightRing",
 ] as const;
 export type DeviceType = (typeof DeviceTypes)[number];
 
@@ -211,6 +213,16 @@ class InformationManager {
     }
   }
 
+  get isRing() {
+    switch (this.type) {
+      case "leftRing":
+      case "rightRing":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   get isGeneric() {
     switch (this.type) {
       case "generic":
@@ -224,9 +236,11 @@ class InformationManager {
     switch (this.type) {
       case "leftInsole":
       case "leftGlove":
+      case "leftRing":
         return "left";
       case "rightInsole":
       case "rightGlove":
+      case "rightRing":
         return "right";
       default:
         return "left";

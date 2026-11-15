@@ -5109,6 +5109,8 @@
 	    "rightGlove",
 	    "glasses",
 	    "generic",
+	    "leftRing",
+	    "rightRing",
 	];
 	const Sides = ["left", "right"];
 	const MinNameLength = 2;
@@ -5249,6 +5251,15 @@
 	                return false;
 	        }
 	    }
+	    get isRing() {
+	        switch (this.type) {
+	            case "leftRing":
+	            case "rightRing":
+	                return true;
+	            default:
+	                return false;
+	        }
+	    }
 	    get isGeneric() {
 	        switch (this.type) {
 	            case "generic":
@@ -5261,9 +5272,11 @@
 	        switch (this.type) {
 	            case "leftInsole":
 	            case "leftGlove":
+	            case "leftRing":
 	                return "left";
 	            case "rightInsole":
 	            case "rightGlove":
+	            case "rightRing":
 	                return "right";
 	            default:
 	                return "left";
@@ -34790,6 +34803,9 @@
 	    get isGlove() {
 	        return this._informationManager.isGlove;
 	    }
+	    get isRing() {
+	        return this._informationManager.isRing;
+	    }
 	    get isGlasses() {
 	        return this._informationManager.isGlasses;
 	    }
@@ -40923,7 +40939,7 @@
 	    ...DevicePairSensorDataEventTypes,
 	    ...DevicePairDeviceEventTypes,
 	];
-	const DevicePairTypes = ["insoles", "gloves"];
+	const DevicePairTypes = ["insoles", "gloves", "rings"];
 	class DevicePair {
 	    constructor(type) {
 	        this.#type = type;
@@ -40982,6 +40998,8 @@
 	                return device.isInsole;
 	            case "gloves":
 	                return device.isGlove;
+	            case "rings":
+	                return device.isRing;
 	        }
 	    }
 	    assignDevice(device) {
@@ -41127,6 +41145,10 @@
 	    static get gloves() {
 	        return this.#gloves;
 	    }
+	    static #rings = new DevicePair("rings");
+	    static get rings() {
+	        return this.#rings;
+	    }
 	    static {
 	        DeviceManager$1.addEventListener("deviceConnected", (event) => {
 	            const { device } = event.message;
@@ -41135,6 +41157,9 @@
 	            }
 	            if (device.isGlove) {
 	                this.#gloves.assignDevice(device);
+	            }
+	            if (device.isRing) {
+	                this.#rings.assignDevice(device);
 	            }
 	        });
 	    }

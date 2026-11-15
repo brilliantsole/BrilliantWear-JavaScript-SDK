@@ -1314,6 +1314,9 @@ class Device {
   get isGlove() {
     return this._informationManager.isGlove;
   }
+  get isRing() {
+    return this._informationManager.isRing;
+  }
   get isGlasses() {
     return this._informationManager.isGlasses;
   }

@@ -1,7 +1,7 @@
 import { ConnectionType } from "./connection/BaseConnectionManager.ts";
 import Device, { SendMessagesCallback } from "./Device.ts";
 import EventDispatcher from "./utils/EventDispatcher.ts";
-export declare const DeviceTypes: readonly ["leftInsole", "rightInsole", "leftGlove", "rightGlove", "glasses", "generic"];
+export declare const DeviceTypes: readonly ["leftInsole", "rightInsole", "leftGlove", "rightGlove", "glasses", "generic", "leftRing", "rightRing"];
 export type DeviceType = (typeof DeviceTypes)[number];
 export declare const Sides: readonly ["left", "right"];
 export type Side = (typeof Sides)[number];
@@ -52,13 +52,14 @@ declare class InformationManager {
     get name(): string;
     updateName(updatedName: string): void;
     setName(newName: string): Promise<void>;
-    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses";
+    get type(): "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing";
     get typeEnum(): number;
     updateType(updatedType: DeviceType): void;
     setType(newType: DeviceType): Promise<void>;
     get isInsole(): boolean;
     get isGlove(): boolean;
     get isGlasses(): boolean;
+    get isRing(): boolean;
     get isGeneric(): boolean;
     get side(): Side;
     get mtu(): number;

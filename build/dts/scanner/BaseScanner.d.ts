@@ -58,7 +58,7 @@ declare abstract class BaseScanner {
     get discoveredDevices(): Readonly<DiscoveredDevicesMap>;
     get discoveredDevicesArray(): DiscoveredDevice[];
     protected _parseManufacturerData(dataView: DataView | string): {
-        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | undefined;
+        deviceType: "generic" | "leftInsole" | "rightInsole" | "leftGlove" | "rightGlove" | "glasses" | "leftRing" | "rightRing" | undefined;
         ipAddress: string | undefined;
         isWifiSecure: boolean | undefined;
     };
