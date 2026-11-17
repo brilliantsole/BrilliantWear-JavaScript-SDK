@@ -85,6 +85,10 @@
           id="glassesModel"
           src="../../assets/3d/glasses.glb"
         ></a-asset-item>
+        <!-- <a-asset-item
+          id="glassesModel"
+          src="../../assets/3d/ring.glb"
+        ></a-asset-item> -->
       </a-assets>
       <a-light type="directional" position="2 2 -2" target=".target"></a-light>
       <a-light type="directional" position="-2 2 2" target=".target"></a-light>
@@ -109,7 +113,7 @@
       "
       ></a-camera>
 
-      <a-sky color="black"></a-sky>
+      <a-sky color="grey"></a-sky>
 
       <a-entity class="target">
         <a-entity class="rotation">
@@ -134,6 +138,32 @@
               visible="false"
               data-type="glasses"
             ></a-entity>
+            <a-entity visible="true" data-type="rightRing">
+              <a-torus
+                rotation="0 90 0"
+                radius="0.030"
+                radius-tubular="0.002"
+                color="tan"
+                scale="1 1 2.5"
+              ></a-torus>
+              <a-cylinder
+                color="black"
+                material="side: double; shader: flat;"
+                open-ended="true"
+                height="0.015"
+                radius="0.035"
+                theta-length="70"
+                rotation="-10 0 90"
+              ></a-cylinder>
+            </a-entity>
+            <a-entity visible="false" data-type="leftRing">
+              <a-torus
+                rotation="0 90 0"
+                radius="0.030"
+                radius-tubular="0.005"
+                color="gold"
+              ></a-torus>
+            </a-entity>
             <a-entity
               gltf-model="#rightHandModel"
               visible="false"

@@ -99,7 +99,7 @@ const scene = document.querySelector("a-scene");
 const targetEntity = scene.querySelector(".target");
 const targetPositionEntity = targetEntity.querySelector(".position");
 const targetRotationEntity = targetEntity.querySelector(".rotation");
-const modelEntities = Array.from(targetEntity.querySelectorAll("[gltf-model]"));
+const modelEntities = Array.from(targetEntity.querySelectorAll("[data-type]"));
 
 onCurrentDevice((device) => {
   modelEntities.forEach((entity) => {

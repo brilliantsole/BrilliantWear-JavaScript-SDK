@@ -21,9 +21,10 @@ import * as noble from '@stoprocent/noble';
 import noble__default from '@stoprocent/noble';
 import os from 'os';
 
+const __BRILLIANTWEAR__ENVIRONMENT__ = "__BRILLIANTWEAR__DEV__";
 const isInProduction =
-"__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__PROD__";
-const isInDev = "__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__DEV__";
+__BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__PROD__";
+const isInDev = __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__DEV__";
 const isInBrowser = typeof window !== "undefined" && typeof window?.document !== "undefined";
 let isInIframe = false;
 try {
@@ -157,6 +158,9 @@ class Console {
     }
     static create(type, levelFlags) {
         const console = this.#consoles[type] || new Console(type);
+        if (levelFlags) {
+            console.setLevelFlags(levelFlags);
+        }
         return console;
     }
     get log() {
