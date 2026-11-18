@@ -299,6 +299,9 @@ const updateQuaternion = (quaternion, applyOffset = false) => {
   if (applyOffset) {
     targetQuaternion.multiply(offsetQuaternion);
   }
+
+  targetQuaternion.copy(permuteQuaternion(targetQuaternion));
+
   targetRotationEntity.object3D.quaternion.slerp(
     targetQuaternion,
     window.interpolationSmoothing,
@@ -450,3 +453,111 @@ let vibrate = (vibrationConfiguration) => {
   currentDevice.triggerVibration(vibrationConfiguration);
 };
 vibrate = BS.ThrottleUtils.throttle(vibrate, vibrationInterval, true);
+
+// permutation testing
+const quaternionPermutations = (() => {
+  const permutations = [];
+
+  function generate(arr, remaining) {
+    if (remaining.length === 0) {
+      permutations.push(arr);
+      return;
+    }
+
+    for (let i = 0; i < remaining.length; i++) {
+      generate(
+        [...arr, remaining[i]],
+        remaining.filter((_, j) => j !== i),
+      );
+    }
+  }
+
+  generate([], [0, 1, 2, 3]);
+
+  return permutations;
+})();
+
+const quaternionSigns = [
+  [1, 1, 1, 1],
+  [-1, 1, 1, 1],
+  [1, -1, 1, 1],
+  [1, 1, -1, 1],
+  [1, 1, 1, -1],
+  [-1, -1, 1, 1],
+  [-1, 1, -1, 1],
+  [-1, 1, 1, -1],
+  [1, -1, -1, 1],
+  [1, -1, 1, -1],
+  [1, 1, -1, -1],
+  [-1, -1, -1, 1],
+  [-1, -1, 1, -1],
+  [-1, 1, -1, -1],
+  [1, -1, -1, -1],
+  [-1, -1, -1, -1],
+];
+
+let permutationIndex = 0;
+
+/**
+ * Applies a permutation to a Three.js quaternion.
+ * @param {THREE.Quaternion} quaternion
+ * @param {number} index Permutation index (0-383)
+ * @returns {THREE.Quaternion}
+ */
+function permuteQuaternion(quaternion, index = permutationIndex) {
+  const permutation = quaternionPermutations[Math.floor(index / 16)];
+
+  const signs = quaternionSigns[index % 16];
+
+  const values = [quaternion.x, quaternion.y, quaternion.z, quaternion.w];
+
+  return new THREE.Quaternion(
+    values[permutation[0]] * signs[0],
+    values[permutation[1]] * signs[1],
+    values[permutation[2]] * signs[2],
+    values[permutation[3]] * signs[3],
+  );
+}
+
+/**
+ * Advances to the next permutation and logs the transformation.
+ * Wraps around after all 384 permutations.
+ */
+function incrementQuaternionPermutation(offset = 1) {
+  permutationIndex += offset;
+  if (permutationIndex < 0) {
+    permutationIndex += 384;
+  }
+  permutationIndex %= 384;
+
+  const permutation = quaternionPermutations[Math.floor(permutationIndex / 16)];
+
+  const signs = quaternionSigns[permutationIndex % 16];
+
+  const components = ["x", "y", "z", "w"];
+
+  const description = components.map((component, i) => {
+    const sign = signs[i] === -1 ? "-" : "+";
+    return `${sign}${components[permutation[i]]}`;
+  });
+
+  console.log(
+    `Permutation ${permutationIndex + 1}/384: [${description.join(", ")}]`,
+  );
+
+  return permutationIndex;
+}
+
+window.incrementQuaternionPermutation = incrementQuaternionPermutation;
+
+document.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case ".":
+      incrementQuaternionPermutation(-1);
+      break;
+    case "/":
+      incrementQuaternionPermutation(1);
+      break;
+  }
+  event.preventDefault();
+});

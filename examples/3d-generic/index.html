@@ -138,7 +138,7 @@
               visible="false"
               data-type="glasses"
             ></a-entity>
-            <a-entity visible="true" data-type="rightRing">
+            <a-entity visible="false" data-type="rightRing">
               <a-torus
                 rotation="0 90 0"
                 radius="0.030"
@@ -147,6 +147,7 @@
                 scale="1 1 2.5"
               ></a-torus>
               <a-cylinder
+                class="touchpad"
                 color="black"
                 material="side: double; shader: flat;"
                 open-ended="true"
@@ -155,14 +156,37 @@
                 theta-length="70"
                 rotation="-10 0 90"
               ></a-cylinder>
+              <a-sphere
+                class="mic"
+                color="black"
+                radius="0.003"
+                position="0 0.032 -0.007"
+              ></a-sphere>
             </a-entity>
             <a-entity visible="false" data-type="leftRing">
               <a-torus
                 rotation="0 90 0"
                 radius="0.030"
-                radius-tubular="0.005"
-                color="gold"
+                radius-tubular="0.002"
+                color="tan"
+                scale="1 1 2.5"
               ></a-torus>
+              <a-cylinder
+                class="touchpad"
+                color="black"
+                material="side: double; shader: flat;"
+                open-ended="true"
+                height="0.015"
+                radius="0.035"
+                theta-length="70"
+                rotation="-10 0 90"
+              ></a-cylinder>
+              <a-sphere
+                class="mic"
+                color="black"
+                radius="0.003"
+                position="0 0.032 -0.007"
+              ></a-sphere>
             </a-entity>
             <a-entity
               gltf-model="#rightHandModel"
