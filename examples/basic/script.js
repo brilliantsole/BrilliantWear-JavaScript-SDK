@@ -2800,7 +2800,6 @@ onCurrentDevice(() => {
 });
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)({
-  sampleRate: 16_000,
   latencyHint: "interactive",
 });
 const checkAudioContextState = () => {

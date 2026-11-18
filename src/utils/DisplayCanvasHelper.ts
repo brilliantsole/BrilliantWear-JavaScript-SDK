@@ -664,7 +664,7 @@ class DisplayCanvasHelper implements DisplayManagerInterface {
     await this.#updateDeviceOpacity(false, updateSelf);
     await this.#updateDeviceContextState(false, false, updateSelf);
     await this.#updateDeviceBrightness(false, updateSelf);
-    await this.#updateDeviceDrawCallback(updateSelf);
+    await this.#updateDeviceDrawCallback(false); // favor the displayManager over the device
     await this.#updateDeviceSpriteSheets(updateSelf);
     await this.#updateDeviceSelectedSpriteSheet(false, false, updateSelf);
     _console.log("deviceUpdated");
