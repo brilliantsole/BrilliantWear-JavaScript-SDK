@@ -38,7 +38,7 @@ export declare const DisplayAlignmentDirectionToStateKey: Record<DisplayAlignmen
 export declare function pixelDepthToNumberOfColors(pixelDepth: DisplayPixelDepth): number;
 export declare function pixelDepthToPixelsPerByte(pixelDepth: DisplayPixelDepth): number;
 export declare function pixelDepthToPixelBitWidth(pixelDepth: DisplayPixelDepth): number;
-export declare function numberOfColorsToPixelDepth(numberOfColors: number): "1" | "2" | "4" | undefined;
+export declare function numberOfColorsToPixelDepth(numberOfColors: number): "1" | "4" | "2" | undefined;
 export declare const DisplayScaleDirections: readonly ["x", "y", "all"];
 export type DisplayScaleDirection = (typeof DisplayScaleDirections)[number];
 export declare const DisplayBitmapScaleDirectionToCommandType: Record<DisplayScaleDirection, DisplayContextCommandType>;

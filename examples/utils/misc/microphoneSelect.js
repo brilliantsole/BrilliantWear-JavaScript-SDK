@@ -49,7 +49,7 @@ window.addEventListener("load", () => {
         return [];
       }
       let devices = await navigator.mediaDevices.enumerateDevices();
-      devices = devices.filter((device) => device.kind == "videoinput");
+      devices = devices.filter((device) => device.kind == "audioinput");
       //console.log("devices", devices);
       return devices;
     };
@@ -76,7 +76,7 @@ window.addEventListener("load", () => {
       }
       stream = await navigator.mediaDevices.getUserMedia({
         target: select,
-        video: {
+        audio: {
           ...properties,
           deviceId: { exact: deviceId },
         },

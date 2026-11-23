@@ -42,7 +42,7 @@ declare class TouchSensorDataManager {
     parseData(dataView: DataView<ArrayBuffer>): Touch[];
     get numberOfTouches(): number;
     set numberOfTouches(newNumberOfTouches: number);
-    touches: InternalTouch[];
+    get touches(): Touch[];
     clear(): void;
 }
 export default TouchSensorDataManager;

@@ -199,3 +199,8 @@ export function getSetBitIndices(mask: number): number[] {
 
   return indices;
 }
+
+export interface Size2 {
+  width: number;
+  height: number;
+}

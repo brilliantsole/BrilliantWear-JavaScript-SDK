@@ -1,13 +1,13 @@
-import * as BS from "../../build/brilliantwear.module.js";
-//import BS.Device from "../../src/BS.Device.js";
-window.BS = BS;
-console.log(BS);
+import * as BW from "../../build/brilliantwear.module.js";
+//import BW.Device from "../../src/BW.Device.js";
+window.BW = BW;
+console.log(BW);
 
-BS.setAllConsoleLevelFlags({ log: false });
+BW.setAllConsoleLevelFlags({ log: false });
 
 // DEVICE
 
-const device = new BS.Device();
+const device = new BW.Device();
 console.log({ device });
 window.device = device;
 
@@ -18,7 +18,7 @@ const availableDeviceTemplate = document.getElementById(
   "availableDeviceTemplate",
 );
 const availableDevicesContainer = document.getElementById("availableDevices");
-/** @param {BS.Device[]} availableDevices */
+/** @param {BW.Device[]} availableDevices */
 function onAvailableDevices(availableDevices) {
   availableDevicesContainer.innerHTML = "";
   if (availableDevices.length == 0) {
@@ -52,14 +52,14 @@ function onAvailableDevices(availableDevices) {
   }
 }
 async function getDevices() {
-  const availableDevices = await BS.DeviceManager.getDevices();
+  const availableDevices = await BW.DeviceManager.getDevices();
   if (!availableDevices) {
     return;
   }
   onAvailableDevices(availableDevices);
 }
 
-BS.DeviceManager.addEventListener("availableDevices", (event) => {
+BW.DeviceManager.addEventListener("availableDevices", (event) => {
   const devices = event.message.availableDevices;
   onAvailableDevices(devices);
 });
@@ -277,9 +277,9 @@ window.addEventListener("load", () => {
 
 // SENSOR TYPES
 
-/** @type {BS.TfliteSensorType[]} */
+/** @type {BW.TfliteSensorType[]} */
 let sensorTypes = [];
-/** @param {BS.TfliteSensorType[]} newSensorTypes */
+/** @param {BW.TfliteSensorType[]} newSensorTypes */
 function setSensorTypes(newSensorTypes) {
   sensorTypes = newSensorTypes;
   console.log("sensorTypes", sensorTypes);
@@ -292,14 +292,7 @@ const sensorTypeTemplate = document.getElementById("sensorTypeTemplate");
 /** @type {Object.<string, HTMLElement>} */
 const sensorTypeContainers = {};
 
-const TfliteSensorTypes = BS.TfliteSensorTypes.slice();
-const includeAcceleration = false;
-if (includeAcceleration) {
-  // for testing with Frame
-  TfliteSensorTypes.push("acceleration");
-}
-
-TfliteSensorTypes.forEach((sensorType) => {
+BW.TfliteSensorTypes.forEach((sensorType) => {
   const sensorTypeContainer = sensorTypeTemplate.content
     .cloneNode(true)
     .querySelector(".sensorType");
@@ -321,7 +314,7 @@ TfliteSensorTypes.forEach((sensorType) => {
 });
 
 function onSensorTypesInput() {
-  const sensorTypes = TfliteSensorTypes.filter((sensorType) => {
+  const sensorTypes = BW.TfliteSensorTypes.filter((sensorType) => {
     /** @type {HTMLInputElement} */
     const input = sensorTypeContainers[sensorType].querySelector(".enabled");
     return input.checked;
@@ -463,7 +456,7 @@ device.addEventListener("isConnected", () => {
 });
 
 async function sampleAndUpload() {
-  /** @type {BS.SensorConfiguration} */
+  /** @type {BW.SensorConfiguration} */
   const sensorConfiguration = {};
   sensorTypes.forEach((sensorType) => {
     sensorConfiguration[sensorType] = samplingInterval;
@@ -688,7 +681,7 @@ async function connectToRemoteManagement() {
 
       let cameraResolution;
 
-      /** @type {BS.TfliteSensorType[]} */
+      /** @type {BW.TfliteSensorType[]} */
       const sensorTypes = samplingDetails.sensor
         .split(sensorCombinationSeparator)
         .map((sensorType) => {
@@ -708,9 +701,6 @@ async function connectToRemoteManagement() {
       console.log("samplingDetails sensorTypes", sensorTypes);
 
       const allowedTfliteSensorTypes = device.allowedTfliteSensorTypes;
-      if (includeAcceleration) {
-        allowedTfliteSensorTypes.push("acceleration");
-      }
       const invalidSensors = sensorTypes.filter(
         (sensorType) => !allowedTfliteSensorTypes.includes(sensorType),
       );
@@ -736,7 +726,7 @@ async function connectToRemoteManagement() {
       } else if (isMicrophone) {
         microphoneSamplingDetails = samplingDetails;
         setSamplingInterval(20);
-        /** @type {BS.MicrophoneSampleRate} */
+        /** @type {BW.MicrophoneSampleRate} */
         const sampleRate = 1000 / samplingDetails.interval;
         console.log({ sampleRate });
         await device.setMicrophoneConfiguration({ sampleRate });
@@ -841,10 +831,10 @@ device.addEventListener("microphoneStatus", async (event) => {
   switch (microphoneStatus) {
     case "streaming":
       if (microphoneSamplingDetails) {
-        await BS.wait(200);
+        await BW.wait(200);
         setIsSampling(true);
         device.startRecordingMicrophone();
-        await BS.wait(microphoneSamplingDetails.length);
+        await BW.wait(microphoneSamplingDetails.length);
         device.stopRecordingMicrophone();
         microphoneSamplingDetails = undefined;
         await device.stopMicrophone();
@@ -921,9 +911,6 @@ const getDeviceId = () => `${device.name}.${device.type}.${device.id}`;
 
 function remoteManagementHelloMessage() {
   const allowedTfliteSensorTypes = device.allowedTfliteSensorTypes.slice();
-  if (includeAcceleration) {
-    allowedTfliteSensorTypes.push("acceleration");
-  }
   const sensorCombinations = generateSubarrays(
     allowedTfliteSensorTypes.filter((sensorType) => {
       switch (sensorType) {
@@ -970,7 +957,7 @@ function remoteManagementHelloMessage() {
           case "microphone":
             return {
               name: "Microphone",
-              frequencies: BS.MicrophoneSampleRates,
+              frequencies: BW.MicrophoneSampleRates,
               maxSampleLengthS: 1 * 60,
               units: "wav",
             };
@@ -1071,7 +1058,7 @@ const scalars = {
 /** @typedef {Object.<string, SensorData[]>} DeviceData */
 
 /**
- * @param {BS.TfliteSensorType[]} sensorTypes
+ * @param {BW.TfliteSensorType[]} sensorTypes
  * @param {number} numberOfSamples
  * @returns {Promise<DeviceData>}
  */
@@ -1087,7 +1074,7 @@ async function collectData(sensorTypes, numberOfSamples) {
     console.log("deviceData", deviceData);
 
     const onDeviceSensorData = (event) => {
-      /** @type {BS.TfliteSensorType} */
+      /** @type {BW.TfliteSensorType} */
       const sensorType = event.message.sensorType;
 
       if (!(sensorType in deviceData)) {
@@ -1123,7 +1110,7 @@ async function collectData(sensorTypes, numberOfSamples) {
 const emptySignature = Array(64).fill("0").join("");
 
 /**
- * @param {BS.TfliteSensorType[]} sensorTypes
+ * @param {BW.TfliteSensorType[]} sensorTypes
  * @param {DeviceData} deviceData
  */
 async function uploadMotionData(sensorTypes, deviceData) {
@@ -1514,7 +1501,7 @@ const cameraConfigurationContainer = document.getElementById(
 const cameraConfigurationTypeTemplate = document.getElementById(
   "cameraConfigurationTypeTemplate",
 );
-BS.CameraConfigurationTypes.forEach((cameraConfigurationType) => {
+BW.CameraConfigurationTypes.forEach((cameraConfigurationType) => {
   const cameraConfigurationTypeContainer =
     cameraConfigurationTypeTemplate.content
       .cloneNode(true)
@@ -1600,7 +1587,7 @@ takePictureAfterUpdateCheckbox.addEventListener("input", () => {
 
 /** @type {HTMLInputElement} */
 const cameraWhiteBalanceInput = document.getElementById("cameraWhiteBalance");
-const updateWhiteBalance = BS.ThrottleUtils.throttle(
+const updateWhiteBalance = BW.ThrottleUtils.throttle(
   (config) => {
     if (device.cameraStatus != "idle") {
       return;
@@ -1699,7 +1686,7 @@ const microphoneConfigurationContainer = document.getElementById(
 const microphoneConfigurationTypeTemplate = document.getElementById(
   "microphoneConfigurationTypeTemplate",
 );
-BS.MicrophoneConfigurationTypes.forEach((microphoneConfigurationType) => {
+BW.MicrophoneConfigurationTypes.forEach((microphoneConfigurationType) => {
   const microphoneConfigurationTypeContainer =
     microphoneConfigurationTypeTemplate.content
       .cloneNode(true)
@@ -1718,7 +1705,7 @@ BS.MicrophoneConfigurationTypes.forEach((microphoneConfigurationType) => {
   const optgroup = select.querySelector("optgroup");
   optgroup.label = microphoneConfigurationType;
 
-  BS.MicrophoneConfigurationValues[microphoneConfigurationType].forEach(
+  BW.MicrophoneConfigurationValues[microphoneConfigurationType].forEach(
     (value) => {
       optgroup.appendChild(new Option(value));
     },

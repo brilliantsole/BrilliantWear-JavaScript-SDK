@@ -166,7 +166,7 @@ declare class DisplayManager implements DisplayManagerInterface {
     toggle(): Promise<void>;
     get numberOfColors(): number;
     get displayInformation(): DisplayInformation;
-    get pixelDepth(): "1" | "2" | "4";
+    get pixelDepth(): "1" | "4" | "2";
     get width(): number;
     get height(): number;
     get size(): {

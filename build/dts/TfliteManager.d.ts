@@ -50,7 +50,7 @@ export interface TfliteInference {
 }
 export type TfliteEventDispatcher = EventDispatcher<Device, TfliteEventType, TfliteEventMessages>;
 export type SendTfliteMessagesCallback = SendMessagesCallback<TfliteMessageType>;
-export declare const TfliteSensorTypes: readonly ["pressure", "linearAcceleration", "gyroscope", "magnetometer", "microphone", "camera"];
+export declare const TfliteSensorTypes: readonly ["pressure", "acceleration", "linearAcceleration", "gyroscope", "magnetometer", "microphone", "camera"];
 export type TfliteSensorType = (typeof TfliteSensorTypes)[number];
 export interface BaseTfliteFileConfiguration {
     fileType: "tflite";
@@ -88,7 +88,7 @@ declare class TfliteManager {
     get sampleRate(): number;
     setSampleRate(newSampleRate: number, sendImmediately?: boolean): Promise<void>;
     static AssertValidSensorType(sensorType: SensorType): void;
-    get sensorTypes(): ("pressure" | "linearAcceleration" | "gyroscope" | "magnetometer" | "microphone" | "camera")[];
+    get sensorTypes(): ("pressure" | "acceleration" | "linearAcceleration" | "gyroscope" | "magnetometer" | "microphone" | "camera")[];
     setSensorTypes(newSensorTypes: SensorType[], sendImmediately?: boolean): Promise<void>;
     get isReady(): boolean;
     onFileConfiguration(fileConfiguration: ExtendedTfliteFileConfiguration): void;

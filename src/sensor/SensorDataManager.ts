@@ -54,6 +54,14 @@ import LightSensorDataManager, {
   LightSensorDataEventMessages,
   LightSensorTypes,
 } from "./LightSensorDataManager.ts";
+import TrackpadSensorDataManager, {
+  TrackpadMessageType,
+  TrackpadSensorDataEventMessages,
+  TrackpadSensorEventDispatcher,
+  TrackpadSensorEventMessages,
+  TrackpadSensorEventTypes,
+  TrackpadSensorTypes,
+} from "./TrackpadSensorDataManager.ts";
 
 const _console = createConsole("SensorDataManager", { log: false });
 
@@ -66,6 +74,7 @@ export const SensorTypes = [
   ...ButtonSensorTypes,
   ...TouchSensorTypes,
   ...LightSensorTypes,
+  ...TrackpadSensorTypes,
 ] as const;
 export type SensorType = (typeof SensorTypes)[number];
 
@@ -94,6 +103,7 @@ export const SensorDataEventTypes = [
   ...PressureSensorEventTypes,
   ...ButtonSensorEventTypes,
   ...TouchSensorEventTypes,
+  ...TrackpadSensorEventTypes,
 ] as const;
 export type SensorDataEventType = (typeof SensorDataEventTypes)[number];
 
@@ -107,7 +117,8 @@ export type BaseSensorDataEventMessages = BarometerSensorDataEventMessages &
   PressureDataEventMessages &
   ButtonSensorDataEventMessages &
   TouchSensorDataEventMessages &
-  LightSensorDataEventMessages;
+  LightSensorDataEventMessages &
+  TrackpadSensorDataEventMessages;
 type _SensorDataEventMessages = ExtendInterfaceValues<
   AddKeysAsPropertyToInterface<BaseSensorDataEventMessages, "sensorType">,
   BaseSensorDataEventMessage
@@ -121,7 +132,8 @@ export type SensorDataEventMessages = (_SensorDataEventMessages &
   AnySensorDataEventMessages) &
   PressureSensorEventMessages &
   ButtonSensorEventMessages &
-  TouchSensorEventMessages;
+  TouchSensorEventMessages &
+  TrackpadSensorEventMessages;
 
 export type SensorDataEventDispatcher = EventDispatcher<
   Device,
@@ -200,6 +212,7 @@ class SensorDataManager {
   buttonSensorDataManager = new ButtonSensorDataManager();
   touchSensorDataManager = new TouchSensorDataManager();
   lightSensorDataManager = new LightSensorDataManager();
+  trackpadSensorDataManager = new TrackpadSensorDataManager();
 
   #scalars: Map<SensorType, number> = new Map();
   #counts: Map<SensorType, number> = new Map();
@@ -234,6 +247,8 @@ class SensorDataManager {
       eventDispatcher as ButtonSensorEventDispatcher;
     this.touchSensorDataManager.eventDispatcher =
       eventDispatcher as TouchSensorEventDispatcher;
+    this.trackpadSensorDataManager.eventDispatcher =
+      eventDispatcher as TrackpadSensorEventDispatcher;
   }
 
   get dispatchEvent() {
@@ -241,7 +256,10 @@ class SensorDataManager {
   }
 
   parseMessage(
-    messageType: SensorDataMessageType | SensorMetaDataMessageType,
+    messageType:
+      | SensorDataMessageType
+      | SensorMetaDataMessageType
+      | TrackpadMessageType,
     dataView: DataView<ArrayBuffer>,
     isSending?: boolean,
   ) {
@@ -259,6 +277,9 @@ class SensorDataManager {
         break;
       case "getSensorCounts":
         this.#parseCounts(dataView);
+        break;
+      case "trackpadsInformation":
+        this.trackpadSensorDataManager.parseInformation(dataView);
         break;
       default:
         throw Error(`uncaught messageType ${messageType}`);
@@ -420,6 +441,42 @@ class SensorDataManager {
       case "light":
         sensorData = this.lightSensorDataManager.parseData(dataView, scalar);
         break;
+      case "trackpadBitmaps":
+        sensorData = this.trackpadSensorDataManager.parseBitmaps(dataView);
+        break;
+      case "trackpadTouches":
+        sensorData = this.trackpadSensorDataManager.parseTouches(dataView);
+        break;
+      case "trackpadTouchMovements":
+        sensorData = this.trackpadSensorDataManager.parseTouchMovements(
+          dataView,
+          scalar,
+        );
+        break;
+      case "trackpadTouchPositions":
+        sensorData = this.trackpadSensorDataManager.parseTouchPositions(
+          dataView,
+          scalar,
+        );
+        break;
+      case "trackpadGestures":
+        sensorData = this.trackpadSensorDataManager.parseGestures(
+          dataView,
+          scalar,
+        );
+        break;
+      case "trackpadTouchStrengths":
+        sensorData = this.trackpadSensorDataManager.parseTouchStrengths(
+          dataView,
+          scalar,
+        );
+        break;
+      case "trackpadTouchAreas":
+        sensorData = this.trackpadSensorDataManager.parseTouchAreas(
+          dataView,
+          scalar,
+        );
+        break;
       default:
         _console.error(`uncaught sensorType "${sensorType}"`);
     }
@@ -458,6 +515,7 @@ class SensorDataManager {
     // this.pressureSensorDataManager.resetRange();
     this.buttonSensorDataManager.clear();
     this.touchSensorDataManager.clear();
+    this.trackpadSensorDataManager.clear();
   }
 }
 

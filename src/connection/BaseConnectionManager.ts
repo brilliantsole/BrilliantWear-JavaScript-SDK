@@ -18,6 +18,7 @@ import { MicrophoneMessageTypes } from "../MicrophoneManager.ts";
 import { DisplayMessageTypes } from "../DisplayManager.ts";
 import { LedMessageTypes } from "../led/LedManager.ts";
 import { createMessage } from "../server/ServerUtils.ts";
+import { TrackpadMessageTypes } from "../sensor/TrackpadSensorDataManager.ts";
 
 const _console = createConsole("BaseConnectionManager", { log: false });
 
@@ -110,6 +111,7 @@ export const TxRxMessageTypes = [
   ...DisplayMessageTypes,
   ...SensorMetaDataMessageTypes,
   ...LedMessageTypes,
+  ...TrackpadMessageTypes,
 ] as const;
 export type TxRxMessageType = (typeof TxRxMessageTypes)[number];
 

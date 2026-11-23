@@ -32,8 +32,6 @@ import SensorDataManager, {
   SensorDataMessageType,
   SensorDataMessageTypes,
   SensorType,
-  BaseSensorDataEventMessages,
-  BaseSensorDataEventMessage,
   ContinuousSensorTypes,
   SensorDataEventDispatcher,
   RequiredPressureMessageTypes,
@@ -153,6 +151,12 @@ import LedManager, {
   SendLedMessagesCallback,
 } from "./led/LedManager.ts";
 import { DeviceManager } from "./index.ts";
+import {
+  RequiredTrackpadMessageTypes,
+  TrackpadMessageType,
+  TrackpadMessageTypes,
+  TrackpadSensorTypes,
+} from "./sensor/TrackpadSensorDataManager.ts";
 
 const _console = createConsole("Device", { log: false });
 
@@ -443,6 +447,20 @@ class Device {
         this.sendTxMessages(messages, false);
       } else {
         _console.log("don't need to request number of buttons/touches");
+      }
+
+      if (
+        TrackpadSensorTypes.some((trackpadSensorType) =>
+          this.sensorTypes.includes(trackpadSensorType),
+        )
+      ) {
+        _console.log("requesting required trackpad information");
+        const messages = RequiredTrackpadMessageTypes.map((messageType) => ({
+          type: messageType,
+        }));
+        this.sendTxMessages(messages, false);
+      } else {
+        _console.log("don't need to request trackpad infomration");
       }
     });
     this.addEventListener("getSensorConfiguration", (event) => {
@@ -1122,6 +1140,14 @@ class Device {
         ) {
           this.#sensorDataManager.parseMessage(
             messageType as SensorMetaDataMessageType,
+            dataView,
+            isSending,
+          );
+        } else if (
+          TrackpadMessageTypes.includes(messageType as TrackpadMessageType)
+        ) {
+          this.#sensorDataManager.parseMessage(
+            messageType as TrackpadMessageType,
             dataView,
             isSending,
           );
@@ -2526,6 +2552,19 @@ class Device {
   }
   get clearLeds() {
     return this.#ledManager.clearLeds;
+  }
+
+  // TRACKPAD
+  get hasTrackpad() {
+    return (
+      this.#sensorDataManager.trackpadSensorDataManager.numberOfTrackPads > 0
+    );
+  }
+  get trackpadsInformation() {
+    return this.#sensorDataManager.trackpadSensorDataManager.information;
+  }
+  get trackpadTouches() {
+    return this.#sensorDataManager.trackpadSensorDataManager.touches;
   }
 }
 

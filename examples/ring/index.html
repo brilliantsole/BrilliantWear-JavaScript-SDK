@@ -1,0 +1,281 @@
+<html>
+  <head>
+    <title>Ring | BrilliantWear JavaScript SDK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script>
+      // FIX for aframe-orbit-controls-component
+      THREE.Math = {};
+      THREE.Math.radToDeg = THREE.MathUtils.radToDeg;
+
+      THREE.Quaternion.prototype.inverse = THREE.Quaternion.prototype.invert;
+      THREE.Math = THREE.MathUtils;
+    </script>
+    <script src="https://cdn.rawgit.com/tizzle/aframe-orbit-controls-component/v0.1.14/dist/aframe-orbit-controls-component.min.js"></script>
+    <script type="module" src="./script.js"></script>
+  </head>
+
+  <style>
+    a-scene {
+      width: 500px;
+      height: 500px;
+      margin: auto;
+      border-radius: 2rem;
+      overflow: hidden;
+      border: solid black;
+      box-sizing: border-box;
+    }
+
+    canvas {
+      background-color: black;
+    }
+  </style>
+
+  <body>
+    <nav>
+      <a href="../../">home</a>
+    </nav>
+
+    <h1>Ring | BrilliantWear JavaScript SDK</h1>
+
+    <button id="addDevice">add device</button>
+
+    <br /><br />
+    <label>
+      orientation
+      <select id="orientationSelect" disabled>
+        <optgroup label="select orientation type">
+          <option value="none">no orientation</option>
+          <option value="gameRotation">game rotation</option>
+          <option value="orientation">orientation</option>
+          <option value="gyroscope">gyroscope</option>
+        </optgroup>
+      </select>
+    </label>
+    <br />
+    <label>
+      gameRotation data:
+      <pre id="gameRotationData"></pre>
+    </label>
+    <label>
+      orientation data:
+      <pre id="orientationData"></pre>
+    </label>
+    <label>
+      gyroscope data:
+      <pre id="gyroscopeData"></pre>
+    </label>
+    <br />
+
+    <label>
+      position
+      <select id="positionSelect" disabled>
+        <optgroup label="select position type">
+          <option value="none">no position</option>
+          <option>linearAcceleration</option>
+          <option>acceleration</option>
+          <option>gravity</option>
+        </optgroup>
+      </select>
+    </label>
+    <br />
+    <label>
+      linear acceleration data:
+      <pre id="linearAccelerationData"></pre>
+    </label>
+    <label>
+      acceleration data:
+      <pre id="accelerationData"></pre>
+    </label>
+    <label>
+      gravity data:
+      <pre id="gravityData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTapDetector" disabled>enable tap detector</button>
+    <br />
+    <label>
+      tap detector data:
+      <pre id="tapDetectorData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleStepDetector" disabled>enable step detector</button>
+    <br />
+    <label>
+      step detector data:
+      <pre id="stepDetectorData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleStepCounter" disabled>enable step counter</button>
+    <br />
+    <label>
+      step counter data:
+      <pre id="stepCounterData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleActivity" disabled>enable activity recognition</button>
+    <br />
+    <label>
+      activity recognition data:
+      <pre id="activityData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadBitmap" disabled>enable trackpad bitmap</button>
+    <br />
+    <canvas id="trackpadBitmap"></canvas>
+    <br />
+    <label hidden>
+      trackpad bitmap data:
+      <pre id="trackpadBitmapData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadTouch" disabled>enable trackpad touch</button>
+    <br />
+    <label>
+      trackpad touch data:
+      <pre id="trackpadTouchData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadTouchPosition" disabled>
+      enable trackpad position
+    </button>
+    <br />
+    <canvas id="trackpadTouchPosition"></canvas>
+    <br />
+    <label>
+      trackpad touch position data:
+      <pre id="trackpadTouchPositionData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadTouchMovement" disabled>
+      enable trackpad movement
+    </button>
+    <br />
+    <canvas id="trackpadTouchMovement"></canvas>
+    <br />
+    <label>
+      trackpad touch movement data:
+      <pre id="trackpadTouchMovementData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadGesture" disabled>
+      enable trackpad gestures
+    </button>
+    <br />
+    <canvas id="trackpadGesture"></canvas>
+    <br />
+    <label>
+      trackpad gesture data:
+      <pre id="trackpadGestureData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadTouchStrength" disabled>
+      enable trackpad touch strength
+    </button>
+    <br />
+    <label>
+      trackpad touch strength data:
+      <pre id="trackpadTouchStrengthData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleTrackpadTouchArea" disabled>
+      enable trackpad touch area
+    </button>
+    <br />
+    <label>
+      trackpad touch area data:
+      <pre id="trackpadTouchAreaData"></pre>
+    </label>
+    <br />
+
+    <button id="toggleMicrophoneRecording" disabled>record microphone</button>
+    <br />
+    <label>
+      toggle microphone recording on touch
+      <input type="checkbox" id="toggleMicrophoneRecordingOnTouch" />
+    </label>
+    <br />
+    <audio id="microphoneRecording" controls></audio>
+
+    <br />
+
+    <a-scene
+      embedded
+      xr-mode-ui="enabled: false;"
+      device-orientation-permission-ui="enabled: false"
+      renderer="colorManagement: true;"
+    >
+      <a-assets></a-assets>
+
+      <a-light type="directional" position="2 2 -2" target=".target"></a-light>
+      <a-light type="directional" position="-2 2 2" target=".target"></a-light>
+      <a-light type="directional" position="2 -2 2" target=".target"></a-light>
+
+      <a-entity light="color: #BBB; type: ambient;"></a-entity>
+
+      <a-camera
+        class="camera"
+        camera="fov: 50; zoom: 3.2;"
+        position="0 0 0.5"
+        orbit-controls="
+        enableZoom: true;
+        autoRotate: false;
+        
+        target: .target;
+        enableDamping: true;
+        dampingFactor: 0.125;
+        rotateSpeed:0.25;
+        minDistance:0.35;
+        maxDistance:2;
+      "
+      ></a-camera>
+
+      <a-sky color="grey"></a-sky>
+
+      <a-entity class="target">
+        <a-entity class="rotation">
+          <a-entity class="position" position="0 0 0.005">
+            <a-entity data-type="rightRing">
+              <a-torus
+                rotation="0 90 0"
+                radius="0.030"
+                radius-tubular="0.002"
+                color="tan"
+                scale="1 1 2.5"
+              ></a-torus>
+              <a-cylinder
+                class="touchpad"
+                color="black"
+                material="side: double; shader: flat;"
+                open-ended="true"
+                height="0.015"
+                radius="0.035"
+                theta-length="70"
+                rotation="-10 0 90"
+              ></a-cylinder>
+              <a-sphere
+                class="mic"
+                color="black"
+                radius="0.003"
+                position="0 0.032 -0.007"
+              ></a-sphere>
+            </a-entity>
+          </a-entity>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

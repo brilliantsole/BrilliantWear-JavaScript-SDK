@@ -10,7 +10,7 @@ export declare const MicrophoneConfigurationTypes: readonly ["sampleRate", "bitD
 export type MicrophoneConfigurationType = (typeof MicrophoneConfigurationTypes)[number];
 export declare const MicrophoneSampleRates: readonly ["8000", "16000"];
 export type MicrophoneSampleRate = (typeof MicrophoneSampleRates)[number];
-export declare const MicrophoneBitDepths: readonly ["8", "16"];
+export declare const MicrophoneBitDepths: readonly ["8", "16", "4"];
 export type MicrophoneBitDepth = (typeof MicrophoneBitDepths)[number];
 export declare const MicrophoneMessageTypes: readonly ["microphoneStatus", "microphoneCommand", "getMicrophoneConfiguration", "setMicrophoneConfiguration", "microphoneData"];
 export type MicrophoneMessageType = (typeof MicrophoneMessageTypes)[number];
@@ -20,7 +20,7 @@ export type MicrophoneConfiguration = {
 };
 export declare const MicrophoneConfigurationValues: {
     sampleRate: readonly ["8000", "16000"];
-    bitDepth: readonly ["8", "16"];
+    bitDepth: readonly ["8", "16", "4"];
 };
 export declare const RequiredMicrophoneMessageTypes: MicrophoneMessageType[];
 export declare const MicrophoneEventTypes: readonly ["microphoneStatus", "microphoneCommand", "getMicrophoneConfiguration", "setMicrophoneConfiguration", "microphoneData", "isRecordingMicrophone", "startRecordingMicrophone", "stopRecordingMicrophone", "microphoneRecording"];
@@ -70,7 +70,7 @@ declare class MicrophoneManager {
     toggle(sendImmediately?: boolean): Promise<void>;
     get microphoneConfiguration(): MicrophoneConfiguration;
     get availableMicrophoneConfigurationTypes(): ("sampleRate" | "bitDepth")[];
-    get bitDepth(): "8" | "16" | undefined;
+    get bitDepth(): "8" | "16" | "4" | undefined;
     get sampleRate(): "8000" | "16000" | undefined;
     setMicrophoneConfiguration(newMicrophoneConfiguration: MicrophoneConfiguration): Promise<void>;
     static AssertValidMicrophoneConfigurationType(microphoneConfigurationType: MicrophoneConfigurationType): void;

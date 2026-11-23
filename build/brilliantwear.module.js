@@ -2,10 +2,9 @@
  * @copyright Zack Qattan 2024
  * @license MIT
  */
-const __BRILLIANTWEAR__ENVIRONMENT__ = "__BRILLIANTWEAR__DEV__";
 const isInProduction =
-__BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__PROD__";
-const isInDev = __BRILLIANTWEAR__ENVIRONMENT__ == "__BRILLIANTWEAR__DEV__";
+"__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__PROD__";
+const isInDev = "__BRILLIANTWEAR__PROD__" == "__BRILLIANTWEAR__DEV__";
 const isInBrowser = typeof window !== "undefined" && typeof window?.document !== "undefined";
 let isInIframe = false;
 try {
@@ -139,9 +138,6 @@ class Console {
     }
     static create(type, levelFlags) {
         const console = this.#consoles[type] || new Console(type);
-        if (levelFlags) {
-            console.setLevelFlags(levelFlags);
-        }
         return console;
     }
     get log() {
@@ -215,7 +211,7 @@ function autoBind(self, {include, exclude} = {}) {
 	return self;
 }
 
-const _console$11 = createConsole("EventDispatcher", { log: false });
+const _console$12 = createConsole("EventDispatcher", { log: false });
 const wildcardEventType = "*";
 const DefaultEventDispatcherOptions = {
     once: false,
@@ -236,7 +232,7 @@ class EventDispatcher {
         autoBind(this);
         this.#target = target;
         this.#validEventTypes = validEventTypes;
-        _console$11.assertWithError(
+        _console$12.assertWithError(
         !validEventTypes.includes(wildcardEventType), `eventTypes cannot include the wildcardSymbol "${wildcardEventType}"`);
     }
     #isValidEventType(type) {
@@ -257,7 +253,7 @@ class EventDispatcher {
         }
         if (!this.#listeners[type]) {
             this.#listeners[type] = [];
-            _console$11.log(`creating "${type}" listeners array`, this.#listeners[type]);
+            _console$12.log(`creating "${type}" listeners array`, this.#listeners[type]);
         }
         const alreadyAdded = this.#listeners[type].find((listenerObject) => {
             return (listenerObject.listener === listener &&
@@ -266,15 +262,15 @@ class EventDispatcher {
             );
         });
         if (alreadyAdded) {
-            _console$11.log("already added listener");
+            _console$12.log("already added listener");
             return;
         }
         let signalAbortController;
         if (options.signal) {
             signalAbortController = new AbortController();
-            _console$11.log(`listening to "abort" signal`);
+            _console$12.log(`listening to "abort" signal`);
             options.signal.addEventListener("abort", () => {
-                _console$11.log(`removing "${type}" listener after receiving "abort" signal`);
+                _console$12.log(`removing "${type}" listener after receiving "abort" signal`);
                 this.removeEventListener(type, listener);
             }, { once: true, signal: signalAbortController.signal });
         }
@@ -285,9 +281,9 @@ class EventDispatcher {
             signal: options.signal,
             signalAbortController,
         };
-        _console$11.log(`adding "${type}" listener`, listenerObject);
+        _console$12.log(`adding "${type}" listener`, listenerObject);
         this.#listeners[type].push(listenerObject);
-        _console$11.log(`currently have ${this.#listeners[type].length} "${type}" listeners`);
+        _console$12.log(`currently have ${this.#listeners[type].length} "${type}" listeners`);
         if (options.immediate && type != wildcardEventType) {
             const latestEvent = this.#latestEvents[type];
             if (latestEvent) {
@@ -302,12 +298,12 @@ class EventDispatcher {
         }
         if (!this.#listeners[type])
             return;
-        _console$11.log(`removing "${type}" listener...`, listener);
+        _console$12.log(`removing "${type}" listener...`, listener);
         let foundListener = false;
         this.#listeners[type].forEach((listenerObj) => {
             const isListenerToRemove = listenerObj.listener === listener;
             if (isListenerToRemove) {
-                _console$11.log(`flagging "${type}" listener for removal`, listener);
+                _console$12.log(`flagging "${type}" listener for removal`, listener);
                 listenerObj.shouldRemove = true;
                 listenerObj?.signalAbortController?.abort();
                 foundListener = true;
@@ -323,11 +319,11 @@ class EventDispatcher {
         }
         if (!this.#listeners[type])
             return;
-        _console$11.log(`removing "${type}" listeners...`);
+        _console$12.log(`removing "${type}" listeners...`);
         this.#listeners[type] = [];
     }
     removeAllEventListeners() {
-        _console$11.log(`removing listeners...`);
+        _console$12.log(`removing listeners...`);
         this.#listeners = {};
     }
     dispatchEvent(type, message) {
@@ -343,15 +339,15 @@ class EventDispatcher {
         this.#dispatchEvent(type, message, true);
     }
     #invokeListener(listenerObject, type, message) {
-        _console$11.log(`dispatching "${type}" listener`, listenerObject);
+        _console$12.log(`dispatching "${type}" listener`, listenerObject);
         try {
             listenerObject.listener({ type, target: this.#target, message });
         }
         catch (error) {
-            _console$11.error(error);
+            _console$12.error(error);
         }
         if (listenerObject.once) {
-            _console$11.log(`flagging "${type}" listener`, listenerObject);
+            _console$12.log(`flagging "${type}" listener`, listenerObject);
             listenerObject.shouldRemove = true;
         }
     }
@@ -382,12 +378,12 @@ class EventDispatcher {
     }
 }
 
-const _console$10 = createConsole("Timer", { log: false });
+const _console$11 = createConsole("Timer", { log: false });
 async function wait(delay, signal) {
-    _console$10.log(`waiting for ${delay}ms`);
+    _console$11.log(`waiting for ${delay}ms`);
     return new Promise((resolve) => {
         if (signal) {
-            _console$10.log("aborting out of wait early");
+            _console$11.log("aborting out of wait early");
             signal.onabort = () => resolve();
         }
         setTimeout(() => resolve(), delay);
@@ -399,8 +395,8 @@ class Timer {
         return this.#callback;
     }
     set callback(newCallback) {
-        _console$10.assertTypeWithError(newCallback, "function");
-        _console$10.log({ newCallback });
+        _console$11.assertTypeWithError(newCallback, "function");
+        _console$11.log({ newCallback });
         this.#callback = newCallback;
         if (this.isRunning) {
             this.restart();
@@ -411,9 +407,9 @@ class Timer {
         return this.#interval;
     }
     set interval(newInterval) {
-        _console$10.assertTypeWithError(newInterval, "number");
-        _console$10.assertWithError(newInterval > 0, "interval must be above 0");
-        _console$10.log({ newInterval });
+        _console$11.assertTypeWithError(newInterval, "number");
+        _console$11.assertWithError(newInterval > 0, "interval must be above 0");
+        _console$11.log({ newInterval });
         this.#interval = newInterval;
         if (this.isRunning) {
             this.restart();
@@ -429,10 +425,10 @@ class Timer {
     }
     start(immediately = false) {
         if (this.isRunning) {
-            _console$10.log("interval already running");
+            _console$11.log("interval already running");
             return;
         }
-        _console$10.log(`starting interval every ${this.#interval}ms`);
+        _console$11.log(`starting interval every ${this.#interval}ms`);
         this.#intervalId = setInterval(this.#callback, this.#interval);
         if (immediately) {
             this.#callback();
@@ -440,10 +436,10 @@ class Timer {
     }
     stop() {
         if (!this.isRunning) {
-            _console$10.log("interval already not running");
+            _console$11.log("interval already not running");
             return;
         }
-        _console$10.log("stopping interval");
+        _console$11.log("stopping interval");
         clearInterval(this.#intervalId);
         this.#intervalId = undefined;
     }
@@ -508,7 +504,7 @@ else {
 const textEncoder = new _TextEncoder();
 const textDecoder = new _TextDecoder();
 
-const _console$$ = createConsole("ArrayBufferUtils", { log: false });
+const _console$10 = createConsole("ArrayBufferUtils", { log: false });
 function concatenateArrayBuffers(...arrayBuffers) {
     arrayBuffers = arrayBuffers.filter((arrayBuffer) => arrayBuffer != undefined || arrayBuffer != null);
     arrayBuffers = arrayBuffers.map((arrayBuffer) => {
@@ -582,7 +578,7 @@ function sliceDataView(dataView, begin, length) {
     if (length != undefined) {
         end = dataView.byteOffset + begin + length;
     }
-    _console$$.log({ dataView, begin, end, length });
+    _console$10.log({ dataView, begin, end, length });
     return new DataView(dataView.buffer.slice(dataView.byteOffset + begin, end));
 }
 async function getFileBuffer(file) {
@@ -620,7 +616,7 @@ function valueToUInt8ArrayBuffer(value) {
     return valueToUInt8DataView(value).buffer;
 }
 
-const _console$_ = createConsole("ParseUtils", { log: false });
+const _console$$ = createConsole("ParseUtils", { log: false });
 function parseStringFromDataView(dataView, byteOffset = 0) {
     const stringLength = dataView.getUint8(byteOffset++);
     const string = textDecoder.decode(dataView.buffer.slice(dataView.byteOffset + byteOffset, dataView.byteOffset + byteOffset + stringLength));
@@ -631,7 +627,7 @@ function parseMessage(dataView, messageTypes, callback, context, parseMessageLen
     let byteOffset = 0;
     while (byteOffset < dataView.byteLength) {
         const messageTypeEnum = dataView.getUint8(byteOffset++);
-        _console$_.assertWithError(messageTypeEnum in messageTypes, `invalid messageTypeEnum ${messageTypeEnum}`);
+        _console$$.assertWithError(messageTypeEnum in messageTypes, `invalid messageTypeEnum ${messageTypeEnum}`);
         const messageType = messageTypes[messageTypeEnum];
         let messageLength;
         if (parseMessageLengthAsUint16) {
@@ -641,7 +637,7 @@ function parseMessage(dataView, messageTypes, callback, context, parseMessageLen
         else {
             messageLength = dataView.getUint8(byteOffset++);
         }
-        _console$_.log({
+        _console$$.log({
             messageTypeEnum,
             messageType,
             messageLength,
@@ -649,14 +645,14 @@ function parseMessage(dataView, messageTypes, callback, context, parseMessageLen
             byteOffset,
         });
         const _dataView = sliceDataView(dataView, byteOffset, messageLength);
-        _console$_.log({ _dataView });
+        _console$$.log({ _dataView });
         byteOffset += messageLength;
         const isLast = byteOffset >= dataView.byteLength;
         callback(messageType, _dataView, context, isLast);
     }
 }
 function enumToArrayBuffer(enumeration, value) {
-    _console$_.assertEnumWithError(enumeration, value);
+    _console$$.assertEnumWithError(enumeration, value);
     const valueEnum = enumeration.indexOf(value);
     return valueToUInt8ArrayBuffer(valueEnum);
 }
@@ -675,7 +671,7 @@ function valueToUInt32DataView(value, littleEndian) {
 }
 
 var _a$8;
-const _console$Z = createConsole("FileTransferManager", { log: false });
+const _console$_ = createConsole("FileTransferManager", { log: false });
 const emptyHeaderDataView = new DataView(new ArrayBuffer(2));
 emptyHeaderDataView.setUint16(0, 2, true);
 const FileTransferMessageTypes = [
@@ -745,19 +741,19 @@ class FileTransferManager {
         return this.eventDispatcher.waitForEvent;
     }
     #assertValidType(type) {
-        _console$Z.assertEnumWithError(FileTypes, type);
+        _console$_.assertEnumWithError(FileTypes, type);
     }
     #isValidType(type) {
         return FileTypes.includes(type);
     }
     #assertValidTypeEnum(typeEnum) {
-        _console$Z.assertWithError(typeEnum in FileTypes, `invalid typeEnum ${typeEnum}`);
+        _console$_.assertWithError(typeEnum in FileTypes, `invalid typeEnum ${typeEnum}`);
     }
     #assertValidStatusEnum(statusEnum) {
-        _console$Z.assertWithError(statusEnum in FileTransferStatuses, `invalid statusEnum ${statusEnum}`);
+        _console$_.assertWithError(statusEnum in FileTransferStatuses, `invalid statusEnum ${statusEnum}`);
     }
     #assertValidCommand(command) {
-        _console$Z.assertEnumWithError(FileTransferCommands, command);
+        _console$_.assertEnumWithError(FileTransferCommands, command);
     }
     #fileTypes = [];
     get fileTypes() {
@@ -771,7 +767,7 @@ class FileTransferManager {
             .map((index) => FileTypes[index])
             .filter(Boolean);
         this.#fileTypes = fileTypes;
-        _console$Z.log("fileTypes", fileTypes);
+        _console$_.log("fileTypes", fileTypes);
         this.#dispatchEvent("getFileTypes", {
             fileTypes: this.#fileTypes,
         });
@@ -788,18 +784,18 @@ class FileTransferManager {
         if (isSending) {
             return;
         }
-        _console$Z.log("parseFileMaxLength", dataView);
+        _console$_.log("parseFileMaxLength", dataView);
         const maxLength = dataView.getUint32(0, true);
-        _console$Z.log(`maxLength: ${maxLength / 1024}kB`);
+        _console$_.log(`maxLength: ${maxLength / 1024}kB`);
         this.#updateMaxLength(maxLength);
     }
     #updateMaxLength(maxLength) {
-        _console$Z.log({ maxLength });
+        _console$_.log({ maxLength });
         this.#maxLength = maxLength;
         this.#dispatchEvent("maxFileLength", { maxFileLength: maxLength });
     }
     #assertValidLength(length) {
-        _console$Z.assertWithError(length <= this.maxLength, `file length ${length}kB too large - must be ${this.maxLength}kB or less`);
+        _console$_.assertWithError(length <= this.maxLength, `file length ${length}kB too large - must be ${this.maxLength}kB or less`);
     }
     #type;
     get type() {
@@ -809,21 +805,21 @@ class FileTransferManager {
         if (isSending) {
             return;
         }
-        _console$Z.log("parseFileType", dataView);
+        _console$_.log("parseFileType", dataView);
         const typeEnum = dataView.getUint8(0);
         this.#assertValidTypeEnum(typeEnum);
         const type = FileTypes[typeEnum];
         this.#updateType(type);
     }
     #updateType(type) {
-        _console$Z.log({ fileTransferType: type });
+        _console$_.log({ fileTransferType: type });
         this.#type = type;
         this.#dispatchEvent("getFileType", { fileType: type });
     }
     async #setType(newType, sendImmediately) {
         this.#assertValidType(newType);
         if (this.type == newType && !this.isClientConnectionType) {
-            _console$Z.log(`redundant type assignment ${newType}`);
+            _console$_.log(`redundant type assignment ${newType}`);
             return;
         }
         let promise;
@@ -837,7 +833,7 @@ class FileTransferManager {
                         resolve();
                     }
                     else {
-                        _console$Z.log(`different fileType "${fileType}" - waiting for "${newType}"`);
+                        _console$_.log(`different fileType "${fileType}" - waiting for "${newType}"`);
                     }
                 }, { signal: abortController.signal });
             });
@@ -853,21 +849,21 @@ class FileTransferManager {
         if (isSending) {
             return;
         }
-        _console$Z.log("parseFileLength", dataView, { isSending });
+        _console$_.log("parseFileLength", dataView, { isSending });
         const length = dataView.getUint32(0, true);
         this.#updateLength(length);
     }
     #updateLength(length) {
-        _console$Z.log(`length: ${length / 1024}kB (${length} bytes)`);
+        _console$_.log(`length: ${length / 1024}kB (${length} bytes)`);
         this.#length = length;
         this.#dispatchEvent("getFileLength", { fileLength: length });
     }
     async #setLength(newLength, sendImmediately) {
-        _console$Z.assertTypeWithError(newLength, "number");
+        _console$_.assertTypeWithError(newLength, "number");
         this.#assertValidLength(newLength);
-        _console$Z.log("#setLength", { newLength, sendImmediately });
+        _console$_.log("#setLength", { newLength, sendImmediately });
         if (this.length == newLength && !this.isClientConnectionType) {
-            _console$Z.log(`redundant length assignment ${newLength}`);
+            _console$_.log(`redundant length assignment ${newLength}`);
             return;
         }
         let promise;
@@ -881,7 +877,7 @@ class FileTransferManager {
                         resolve();
                     }
                     else {
-                        _console$Z.log(`different fileLength "${fileLength}" - waiting for "${newLength}"`);
+                        _console$_.log(`different fileLength "${fileLength}" - waiting for "${newLength}"`);
                     }
                 }, { signal: abortController.signal });
             });
@@ -899,20 +895,20 @@ class FileTransferManager {
         if (isSending) {
             return;
         }
-        _console$Z.log("checksum", dataView);
+        _console$_.log("checksum", dataView);
         const checksum = dataView.getUint32(0, true);
         this.#updateChecksum(checksum);
     }
     #updateChecksum(checksum) {
-        _console$Z.log({ checksum });
+        _console$_.log({ checksum });
         this.#checksum = checksum;
         this.#dispatchEvent("getFileChecksum", { fileChecksum: checksum });
     }
     async #setChecksum(newChecksum, sendImmediately) {
-        _console$Z.assertTypeWithError(newChecksum, "number");
-        _console$Z.log("#setChecksum", { newChecksum, sendImmediately });
+        _console$_.assertTypeWithError(newChecksum, "number");
+        _console$_.log("#setChecksum", { newChecksum, sendImmediately });
         if (this.checksum == newChecksum && !this.isClientConnectionType) {
-            _console$Z.log(`redundant checksum assignment ${newChecksum}`);
+            _console$_.log(`redundant checksum assignment ${newChecksum}`);
             return;
         }
         let promise;
@@ -926,7 +922,7 @@ class FileTransferManager {
                         resolve();
                     }
                     else {
-                        _console$Z.log(`different fileChecksum "${fileChecksum}" - waiting for "${newChecksum}"`);
+                        _console$_.log(`different fileChecksum "${fileChecksum}" - waiting for "${newChecksum}"`);
                     }
                 }, { signal: abortController.signal });
             });
@@ -950,12 +946,12 @@ class FileTransferManager {
                         resolve();
                     }
                     else {
-                        _console$Z.log(`different fileTransferStatus "${fileTransferStatus}" - waiting for "${expectedStatus}"`);
+                        _console$_.log(`different fileTransferStatus "${fileTransferStatus}" - waiting for "${expectedStatus}"`);
                     }
                 }, { signal: abortController.signal });
             });
         }
-        _console$Z.log(`setting command ${command}`);
+        _console$_.log(`setting command ${command}`);
         this.sendMessages([
             {
                 type: "setFileTransferCommand",
@@ -965,11 +961,11 @@ class FileTransferManager {
         await promise;
     }
     #parseFileTransferCommand(dataView) {
-        _console$Z.log("parseFileTransferCommand", dataView);
+        _console$_.log("parseFileTransferCommand", dataView);
         const commandEnum = dataView.getUint8(0);
         const command = FileTransferCommands[commandEnum];
-        _console$Z.assertEnumWithError(FileTransferCommands, command);
-        _console$Z.log({ command });
+        _console$_.assertEnumWithError(FileTransferCommands, command);
+        _console$_.log({ command });
     }
     #status = "idle";
     get status() {
@@ -979,14 +975,14 @@ class FileTransferManager {
         if (isSending) {
             return;
         }
-        _console$Z.log("parseFileTransferStatus", dataView);
+        _console$_.log("parseFileTransferStatus", dataView);
         const statusEnum = dataView.getUint8(0);
         this.#assertValidStatusEnum(statusEnum);
         const status = FileTransferStatuses[statusEnum];
         this.#updateStatus(status);
     }
     #updateStatus(status) {
-        _console$Z.log({ status });
+        _console$_.log({ status });
         this.#status = status;
         this.#receivedBlocks.length = 0;
         this.#isCancelling = false;
@@ -1004,18 +1000,18 @@ class FileTransferManager {
         }
     }
     #assertIsIdle() {
-        _console$Z.assertWithError(this.#status == "idle", "status is not idle");
+        _console$_.assertWithError(this.#status == "idle", "status is not idle");
     }
     #assertIsNotIdle() {
-        _console$Z.assertWithError(this.#status != "idle", "status is idle");
+        _console$_.assertWithError(this.#status != "idle", "status is idle");
     }
     #receivedBlocks = [];
     async #parseFileBlock(dataView, isSending) {
-        _console$Z.log("parseFileBlock", dataView, { isSending });
+        _console$_.log("parseFileBlock", dataView, { isSending });
         if (this.#receivedBlocks.length == 0) {
             if (this.isClientConnectionType) {
                 const headerLength = dataView.getUint16(0, true);
-                _console$Z.log({ headerLength });
+                _console$_.log({ headerLength });
                 this.#headerLength = headerLength;
             }
             else {
@@ -1033,20 +1029,20 @@ class FileTransferManager {
             ? this.#length + this.#headerLength
             : this.#length;
         const progress = bytesReceived / length;
-        _console$Z.log(`received ${bytesReceived}/${length}} bytes (${progress * 100}%) - ${length - bytesReceived} bytes remaining`);
+        _console$_.log(`received ${bytesReceived}/${length}} bytes (${progress * 100}%) - ${length - bytesReceived} bytes remaining`);
         const direction = "receiving";
         const indirectly = !this.#isRequestingReceive;
         const fileType = this.type;
         let file;
         const isComplete = progress == 1;
-        _console$Z.log({ isComplete });
+        _console$_.log({ isComplete });
         let buffer;
         let fileConfiguration;
         if (isComplete) {
             buffer = concatenateArrayBuffers(this.#receivedBlocks);
             file = this.#createFile(buffer);
-            _console$Z.assertWithError(file, "file not created");
-            _console$Z.log("received file", file);
+            _console$_.assertWithError(file, "file not created");
+            _console$_.log("received file", file);
             file = file;
             buffer = buffer;
             const checksum = this.#checksum;
@@ -1080,18 +1076,18 @@ class FileTransferManager {
                 (this.isClientConnectionType && !isSending)) {
                 const dataView = new DataView(new ArrayBuffer(4));
                 dataView.setUint32(0, bytesReceived, true);
-                _console$Z.log("sending fileBytesTransferred", { bytesReceived });
+                _console$_.log("sending fileBytesTransferred", { bytesReceived });
                 await this.sendMessages([
                     { type: "fileBytesTransferred", data: dataView.buffer },
                 ]);
             }
             else {
-                _console$Z.log("not sending fileBytesTransferred (not requesting)");
+                _console$_.log("not sending fileBytesTransferred (not requesting)");
             }
         }
     }
     parseMessage(messageType, dataView, isSending) {
-        _console$Z.log({ messageType, isSending }, dataView);
+        _console$_.log({ messageType, isSending }, dataView);
         switch (messageType) {
             case "getFileTypes":
                 this.#parseFileTypes(dataView, isSending);
@@ -1132,7 +1128,7 @@ class FileTransferManager {
     }
     #file;
     async send(type, file, includesHeader) {
-        _console$Z.log("send", { type, includesHeader }, file);
+        _console$_.log("send", { type, includesHeader }, file);
         {
             this.#assertIsIdle();
             this.#assertValidType(type);
@@ -1144,7 +1140,7 @@ class FileTransferManager {
             const fileDataView = new DataView(fileBufferWithHeader);
             let offset = 0;
             headerLength = fileDataView.getUint16(offset, true);
-            _console$Z.log({ headerLength });
+            _console$_.log({ headerLength });
             offset += headerLength;
             fileBuffer = fileBufferWithHeader.slice(offset);
         }
@@ -1154,25 +1150,25 @@ class FileTransferManager {
             fileBufferWithHeader = concatenateArrayBuffers(emptyHeaderDataView.buffer, fileBuffer);
         }
         this.#headerLength = headerLength;
-        _console$Z.log({
+        _console$_.log({
             fileBufferWithHeader,
             fileBuffer,
         });
         const fileLength = fileBuffer.byteLength;
         const checksum = crc32(fileBuffer);
-        _console$Z.log({ checksum, fileLength });
+        _console$_.log({ checksum, fileLength });
         this.#assertValidLength(fileLength);
         if (type != this.type) {
-            _console$Z.log("different fileTypes - sending");
+            _console$_.log("different fileTypes - sending");
         }
         else if (fileLength != this.length) {
-            _console$Z.log("different fileLengths - sending");
+            _console$_.log("different fileLengths - sending");
         }
         else if (checksum != this.checksum) {
-            _console$Z.log("different fileChecksums - sending");
+            _console$_.log("different fileChecksums - sending");
         }
         else {
-            _console$Z.log("attempted sending similar file");
+            _console$_.log("attempted sending similar file");
         }
         const promises = [];
         this.#pendingBufferWithHeader = fileBufferWithHeader;
@@ -1184,26 +1180,26 @@ class FileTransferManager {
         this.sendMessages();
         await Promise.all(promises);
         if (this.#pendingBufferWithHeader != fileBufferWithHeader) {
-            _console$Z.log("file uploaded early - exiting");
+            _console$_.log("file uploaded early - exiting");
             return;
         }
         this.#pendingBufferWithHeader = undefined;
         if (this.#status != "sending") {
-            _console$Z.log(`status is not "sending" - not gonna send file`);
+            _console$_.log(`status is not "sending" - not gonna send file`);
             return false;
         }
         if (this.#buffer) {
-            _console$Z.log("existing buffer");
+            _console$_.log("existing buffer");
             await this.cancel();
             return false;
         }
         if (this.#length != fileLength) {
-            _console$Z.log(`wrong fileLength - expected ${fileLength}, got ${this.#length}`);
+            _console$_.log(`wrong fileLength - expected ${fileLength}, got ${this.#length}`);
             await this.cancel();
             return false;
         }
         if (this.#checksum != checksum) {
-            _console$Z.log(`wrong checksum - expected ${checksum}, got ${this.#checksum}`);
+            _console$_.log(`wrong checksum - expected ${checksum}, got ${this.#checksum}`);
             await this.cancel();
             return false;
         }
@@ -1217,24 +1213,24 @@ class FileTransferManager {
     }
     onFileConfiguration;
     async onParseFile(partialFileConfiguration) {
-        _console$Z.log("onParseFile", partialFileConfiguration);
-        _console$Z.assertWithError(this.#type == partialFileConfiguration.fileType, `wrong fileType - expected "${this.#type}", received "${partialFileConfiguration.fileType}"`);
+        _console$_.log("onParseFile", partialFileConfiguration);
+        _console$_.assertWithError(this.#type == partialFileConfiguration.fileType, `wrong fileType - expected "${this.#type}", received "${partialFileConfiguration.fileType}"`);
         let fileConfiguration = this.getCurrentFileConfiguration();
         if (fileConfiguration) {
-            _console$Z.log("fileConfiguration - assigning", partialFileConfiguration);
+            _console$_.log("fileConfiguration - assigning", partialFileConfiguration);
             Object.assign(fileConfiguration, partialFileConfiguration);
         }
         else {
-            _console$Z.log("no fileConfiguration - checking #pendingBufferWithHeader");
+            _console$_.log("no fileConfiguration - checking #pendingBufferWithHeader");
             if (!this.#pendingBufferWithHeader) {
-                _console$Z.log("no pendingBuffer - skipping");
+                _console$_.log("no pendingBuffer - skipping");
                 return;
             }
             const file = this.#createFile(this.#pendingBufferWithHeader);
             const buffer = this.#pendingBufferWithHeader;
             this.#pendingBufferWithHeader = undefined;
             if (!file) {
-                _console$Z.error("no file defined");
+                _console$_.error("no file defined");
                 return;
             }
             const fileType = partialFileConfiguration.fileType;
@@ -1280,7 +1276,7 @@ class FileTransferManager {
                             break;
                     }
                     if (remove) {
-                        _console$Z.log("removing fileConfiguration", _fileConfiguration);
+                        _console$_.log("removing fileConfiguration", _fileConfiguration);
                         _fileConfiguration.removed = true;
                         this.fileConfigurations.splice(i, 1);
                     }
@@ -1288,7 +1284,7 @@ class FileTransferManager {
                 break;
         }
         const { indirectly, fileType, file } = fileConfiguration;
-        _console$Z.log("onParseFile", {
+        _console$_.log("onParseFile", {
             fileConfiguration,
             indirectly,
         });
@@ -1326,7 +1322,7 @@ class FileTransferManager {
     async #send(buffer, bufferWithHeader) {
         this.#buffer = buffer;
         this.#bufferWithHeader = bufferWithHeader;
-        _console$Z.log("#buffer", this.#buffer);
+        _console$_.log("#buffer", this.#buffer);
         return this.#sendBlock();
     }
     mtu;
@@ -1335,28 +1331,28 @@ class FileTransferManager {
             return;
         }
         if (this.#isCancelling) {
-            _console$Z.error("not sending block - busy cancelling");
+            _console$_.error("not sending block - busy cancelling");
             return;
         }
         if (!this.#buffer) {
-            _console$Z.log("can't send block - no buffer defined");
+            _console$_.log("can't send block - no buffer defined");
             return;
         }
         const buffer = this.#buffer;
         let offset = this.#bytesTransferred;
-        _console$Z.log("sending block", { buffer, offset, mtu: this.mtu });
+        _console$_.log("sending block", { buffer, offset, mtu: this.mtu });
         const slicedBuffer = buffer.slice(offset, offset + (this.mtu - 3 - 3));
-        _console$Z.log("slicedBuffer", slicedBuffer);
+        _console$_.log("slicedBuffer", slicedBuffer);
         const bytesLeft = buffer.byteLength - offset;
         const progress = 1 - bytesLeft / buffer.byteLength;
-        _console$Z.log(`sending bytes ${offset}-${offset + slicedBuffer.byteLength} of ${buffer.byteLength} bytes (currently ${progress * 100}%)`);
+        _console$_.log(`sending bytes ${offset}-${offset + slicedBuffer.byteLength} of ${buffer.byteLength} bytes (currently ${progress * 100}%)`);
         const isComplete = progress == 1;
         const fileType = this.type;
         const file = this.#file;
         const direction = "sending";
         let fileConfiguration;
         if (isComplete) {
-            _console$Z.log("finished sending buffer");
+            _console$_.log("finished sending buffer");
             fileConfiguration = {
                 file,
                 fileType,
@@ -1365,7 +1361,7 @@ class FileTransferManager {
                 buffer: this.#bufferWithHeader,
                 direction,
             };
-            _console$Z.log("sent file directly", fileConfiguration);
+            _console$_.log("sent file directly", fileConfiguration);
             this.fileConfigurations.push(fileConfiguration);
         }
         this.#dispatchEvent("fileTransferProgress", {
@@ -1395,17 +1391,17 @@ class FileTransferManager {
         const arrayBufferWithHeader = buffer;
         const arrayBuffer = arrayBufferWithHeader.slice(headerLength);
         const checksum = crc32(arrayBuffer);
-        _console$Z.log({
+        _console$_.log({
             arrayBufferWithHeader,
             arrayBuffer,
             checksum,
             headerLength,
         });
         if (checksum != this.#checksum) {
-            _console$Z.error(`wrong checksum - expected ${this.#checksum}, got ${checksum}`);
+            _console$_.error(`wrong checksum - expected ${this.#checksum}, got ${checksum}`);
             return;
         }
-        _console$Z.log("created file", file);
+        _console$_.log("created file", file);
         return file;
     }
     #indirectSentBlocks = [];
@@ -1419,7 +1415,7 @@ class FileTransferManager {
                 checksum == this.checksum &&
                 length == this.length);
         });
-        _console$Z.log("currentFileConfiguration", currentFileConfiguration, this.fileConfigurations);
+        _console$_.log("currentFileConfiguration", currentFileConfiguration, this.fileConfigurations);
         return currentFileConfiguration;
     }
     #headerLength;
@@ -1427,13 +1423,13 @@ class FileTransferManager {
         return this.#headerLength;
     }
     async #parseSentFileBlock(dataView, isSending) {
-        _console$Z.log("parseFileBlock", dataView, { isSending });
+        _console$_.log("parseFileBlock", dataView, { isSending });
         if (!isSending) {
             return;
         }
         if (this.#indirectSentBlocks.length == 0) {
             const headerLength = dataView.getUint16(0, true);
-            _console$Z.log({ headerLength });
+            _console$_.log({ headerLength });
             this.#headerLength = headerLength;
         }
         this.#indirectSentBlocks.push(dataView);
@@ -1442,15 +1438,15 @@ class FileTransferManager {
         const lengthPlusHeader = this.#length + (this.headerLength ?? 0);
         const progress = bytesReceived / lengthPlusHeader;
         const isComplete = progress == 1;
-        _console$Z.log(`sent ${bytesReceived}/${lengthPlusHeader} bytes indirectly (${progress * 100}%) - ${lengthPlusHeader - bytesReceived} bytes remaining`);
+        _console$_.log(`sent ${bytesReceived}/${lengthPlusHeader} bytes indirectly (${progress * 100}%) - ${lengthPlusHeader - bytesReceived} bytes remaining`);
         let file;
         const fileType = this.type;
         const indirectly = true;
         const bufferWithHeader = concatenateArrayBuffers(this.#indirectSentBlocks.map((dataView) => dataView.buffer));
         if (isComplete) {
             file = this.#createFile(bufferWithHeader);
-            _console$Z.assertWithError(file, "file not created");
-            _console$Z.log("file transfer complete", file);
+            _console$_.assertWithError(file, "file not created");
+            _console$_.log("file transfer complete", file);
         }
         const direction = "sending";
         let fileConfiguration;
@@ -1468,11 +1464,11 @@ class FileTransferManager {
             };
             const currentSentFileConfiguration = this.getCurrentFileConfiguration();
             if (currentSentFileConfiguration) {
-                _console$Z.log("replacing currentSentFileConfiguration...", currentSentFileConfiguration);
+                _console$_.log("replacing currentSentFileConfiguration...", currentSentFileConfiguration);
                 this.fileConfigurations.splice(this.fileConfigurations.indexOf(currentSentFileConfiguration), 1);
             }
             this.fileConfigurations.push(fileConfiguration);
-            _console$Z.log("sent file indirectly", fileConfiguration);
+            _console$_.log("sent file indirectly", fileConfiguration);
         }
         this.#dispatchEvent("fileTransferProgress", {
             isComplete,
@@ -1487,24 +1483,24 @@ class FileTransferManager {
         this.#dispatchEvent("setFileBlock", { fileTransferBlock: dataView });
     }
     async #parseBytesTransferred(dataView, isSending) {
-        _console$Z.log("parseBytesTransferred", dataView);
+        _console$_.log("parseBytesTransferred", dataView);
         const bytesTransferred = dataView.getUint32(0, true);
-        _console$Z.log({ bytesTransferred });
+        _console$_.log({ bytesTransferred });
         this.#dispatchEvent("fileBytesTransferred", { bytesTransferred });
         if (isSending) {
-            _console$Z.log("skipping parseBytesTransferred (isSending)");
+            _console$_.log("skipping parseBytesTransferred (isSending)");
             return;
         }
         if (this.status != "sending") {
-            _console$Z.log("skipping parseBytesTransferred (not currently sending file)");
+            _console$_.log("skipping parseBytesTransferred (not currently sending file)");
             return;
         }
         if (!this.#buffer) {
-            _console$Z.log("skipping parseBytesTransferred (no buffer defined)");
+            _console$_.log("skipping parseBytesTransferred (no buffer defined)");
             return;
         }
         if (this.#bytesTransferred != bytesTransferred) {
-            _console$Z.error(`bytesTransferred are not equal - got ${bytesTransferred}, expected ${this.#bytesTransferred}`);
+            _console$_.error(`bytesTransferred are not equal - got ${bytesTransferred}, expected ${this.#bytesTransferred}`);
             this.cancel();
             return;
         }
@@ -1522,12 +1518,12 @@ class FileTransferManager {
     #isCancelling = false;
     async cancel() {
         this.#assertIsNotIdle();
-        _console$Z.log("cancelling file transfer...");
+        _console$_.log("cancelling file transfer...");
         this.#isCancelling = true;
         await this.#setCommand("cancel");
     }
     requestRequiredInformation() {
-        _console$Z.log("requesting required fileTransfer information");
+        _console$_.log("requesting required fileTransfer information");
         const messages = RequiredFileTransferMessageTypes.map((messageType) => ({
             type: messageType,
         }));
@@ -1560,7 +1556,7 @@ class FileTransferManager {
 }
 _a$8 = FileTransferManager;
 
-const _console$Y = createConsole("MathUtils", { log: false });
+const _console$Z = createConsole("MathUtils", { log: false });
 function getInterpolation(value, min, max, span) {
     if (span == undefined) {
         span = max - min;
@@ -1581,10 +1577,10 @@ function parseTimestamp(dataView, byteOffset) {
     let timestamp = nowWithoutLower2Bytes + lower2Bytes;
     const timestampDifference = Math.abs(now - timestamp);
     if (timestampDifference > timestampThreshold) {
-        _console$Y.log("correcting timestamp delta");
+        _console$Z.log("correcting timestamp delta");
         timestamp += Uint16Max * Math.sign(now - timestamp);
     }
-    _console$Y.log({
+    _console$Z.log({
         now,
         nowWithoutLower2Bytes,
         lower2Bytes,
@@ -1809,7 +1805,7 @@ async function isTensorFlowModelAvailable(url) {
     return Boolean(model);
 }
 
-const _console$X = createConsole("CenterOfPressureModel", { log: false });
+const _console$Y = createConsole("CenterOfPressureModel", { log: false });
 class CenterOfPressureModel {
     constructor() {
         autoBind(this);
@@ -1832,23 +1828,23 @@ class CenterOfPressureModel {
             return;
         }
         this.#numberOfSensors = newNumberOfSensors;
-        _console$X.log({ numberOfSensors: this.numberOfSensors });
+        _console$Y.log({ numberOfSensors: this.numberOfSensors });
         this.#createModel();
     }
     async #createModel() {
         if (!isTensorFlowAvailable()) {
-            _console$X.warn("tensorflow is not available");
+            _console$Y.warn("tensorflow is not available");
             return;
         }
         if (this.#model) {
-            _console$X.log("disposing model", this.#model);
+            _console$Y.log("disposing model", this.#model);
             this.#model.dispose();
             this.#data.inputs.length = this.#data.outputs.length = 0;
             this.#model = undefined;
             this.#isTrained;
         }
         if (this.numberOfSensors == 0) {
-            _console$X.log("zero numberOfSensors - no model needed");
+            _console$Y.log("zero numberOfSensors - no model needed");
             return;
         }
         await tf.ready();
@@ -1868,7 +1864,7 @@ class CenterOfPressureModel {
             loss: "meanSquaredError",
         });
         this.#model = model;
-        _console$X.log("created model", this.#model);
+        _console$Y.log("created model", this.#model);
     }
     #maxDataLength = 2000;
     #data = { inputs: [], outputs: [] };
@@ -1876,7 +1872,7 @@ class CenterOfPressureModel {
         return this.#data;
     }
     clearData() {
-        _console$X.log("clearData");
+        _console$Y.log("clearData");
         this.#data.outputs.length = 0;
         this.#data.inputs.length = 0;
         this.#dispatchRecordingProgress();
@@ -1935,7 +1931,7 @@ class CenterOfPressureModel {
             this.#data.inputs.shift();
             this.#data.outputs.shift();
         }
-        _console$X.log({
+        _console$Y.log({
             numberOfSamples: this.numberOfSamples,
         });
         this.#dispatchRecordingProgress();
@@ -1953,20 +1949,20 @@ class CenterOfPressureModel {
             return;
         }
         if (!this.#model) {
-            _console$X.error("no model defined");
+            _console$Y.error("no model defined");
             return;
         }
         if (this.isTraining) {
-            _console$X.warn("already training");
+            _console$Y.warn("already training");
             return;
         }
         await tf.nextFrame();
         const { inputs, outputs } = this.#data;
         if (inputs.length == 0) {
-            _console$X.log("no data to train on");
+            _console$Y.log("no data to train on");
             return;
         }
-        _console$X.log("train");
+        _console$Y.log("train");
         const xs = tf.tensor2d(inputs);
         const ys = tf.tidy(() => {
             const ys = tf.tensor2d(outputs);
@@ -1989,16 +1985,16 @@ class CenterOfPressureModel {
                 shuffle: true,
                 callbacks: {
                     onTrainBegin: (logs) => {
-                        _console$X.log("onTrainBegin", logs);
+                        _console$Y.log("onTrainBegin", logs);
                     },
                     onTrainEnd: (logs) => {
-                        _console$X.log("onTrainEnd", logs);
+                        _console$Y.log("onTrainEnd", logs);
                     },
                     onEpochBegin: (epoch, logs) => {
                     },
                     onEpochEnd: (epoch, logs) => {
                         const { loss } = logs;
-                        _console$X.log("onEpochEnd", { epoch, loss }, logs);
+                        _console$Y.log("onEpochEnd", { epoch, loss }, logs);
                         this.dispatchEvent("pressureCalibrationTrainProgress", {
                             pressureCalibrationTrainProgress: (epoch + 1) / epochs,
                             epoch,
@@ -2013,18 +2009,18 @@ class CenterOfPressureModel {
                         const { size, loss } = logs;
                     },
                     onYield: (epoch, batch, logs) => {
-                        _console$X.log("onYield", { epoch, batch }, logs);
+                        _console$Y.log("onYield", { epoch, batch }, logs);
                     },
                 },
             });
         }
         catch (error) {
-            _console$X.error("error training", error);
+            _console$Y.error("error training", error);
         }
         xs.dispose();
         ys.dispose();
         this.#isTraining = false;
-        _console$X.log("finished training");
+        _console$Y.log("finished training");
         this.#onTrainedModel();
     }
     #onTrainedModel(wasLoaded = false) {
@@ -2039,18 +2035,18 @@ class CenterOfPressureModel {
             return;
         }
         if (!this.#model) {
-            _console$X.log("no model defined");
+            _console$Y.log("no model defined");
             return;
         }
         if (!this.#isTrained) {
             return;
         }
         const inputs = this.#getInputs(pressureData);
-        _console$X.log("predict", inputs);
+        _console$Y.log("predict", inputs);
         const input = tf.tensor2d([inputs]);
         const prediction = this.#model.predict(input);
         const [x, y] = prediction.dataSync().map((value) => clamp(value, 0, 1));
-        _console$X.log({ x, y });
+        _console$Y.log({ x, y });
         input.dispose();
         prediction.dispose();
         return { x, y };
@@ -2061,18 +2057,18 @@ class CenterOfPressureModel {
         }
         await tf.ready();
         if (!this.model) {
-            _console$X.error("model not found");
+            _console$Y.error("model not found");
             return false;
         }
         if (!this.isTrained) {
-            _console$X.error("model not trained");
+            _console$Y.error("model not trained");
             return false;
         }
         try {
             await this.model.save(handlerOrURL, config);
         }
         catch (error) {
-            _console$X.error("failed to save model", error);
+            _console$Y.error("failed to save model", error);
             return false;
         }
         return true;
@@ -2083,7 +2079,7 @@ class CenterOfPressureModel {
         }
         await tf.ready();
         if (!this.model) {
-            _console$X.error("model not found");
+            _console$Y.error("model not found");
             return false;
         }
         let pathOrIOHandler;
@@ -2092,11 +2088,11 @@ class CenterOfPressureModel {
             const jsonFile = fileList.find((f) => f.name.endsWith(".json"));
             const weightsFile = fileList.find((f) => f.name.endsWith(".bin"));
             if (!jsonFile) {
-                _console$X.error("no model.json found");
+                _console$Y.error("no model.json found");
                 return false;
             }
             if (!weightsFile) {
-                _console$X.error("no weights.bin found");
+                _console$Y.error("no weights.bin found");
                 return false;
             }
             pathOrIOHandler = tf.io.browserFiles([jsonFile, weightsFile]);
@@ -2107,7 +2103,7 @@ class CenterOfPressureModel {
         let loadedModel;
         try {
             loadedModel = await tf.loadLayersModel(pathOrIOHandler, options);
-            _console$X.log("loadedModel", loadedModel);
+            _console$Y.log("loadedModel", loadedModel);
             if (this.model.layers.length != loadedModel.layers.length) {
                 throw Error("layer count mismatch");
             }
@@ -2126,11 +2122,11 @@ class CenterOfPressureModel {
                 }
             }
             this.model.setWeights(loadedModel.getWeights());
-            _console$X.log("weights successfully loaded into model");
+            _console$Y.log("weights successfully loaded into model");
             this.#onTrainedModel(true);
         }
         catch (error) {
-            _console$X.error("error loading model", error);
+            _console$Y.error("error loading model", error);
             loadedModel?.dispose();
             return false;
         }
@@ -2141,7 +2137,7 @@ class CenterOfPressureModel {
     }
 }
 
-const _console$W = createConsole("PressureSensorDataManager", { log: false });
+const _console$X = createConsole("PressureSensorDataManager", { log: false });
 const PressureSensorTypes = ["pressure"];
 const ContinuousPressureSensorTypes = PressureSensorTypes;
 const PressureSensorEventTypes = [
@@ -2174,7 +2170,7 @@ class PressureSensorDataManager {
         if (this.#eventDispatcher == eventDispatcher) {
             return;
         }
-        _console$W.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
+        _console$X.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
         this.#eventDispatcher = eventDispatcher;
         this.#centerOfPressureModel.eventDispatcher =
             eventDispatcher;
@@ -2197,7 +2193,7 @@ class PressureSensorDataManager {
                 y: dataView.getUint8(byteOffset + 1) / 2 ** 8,
             });
         }
-        _console$W.log({ positions });
+        _console$X.log({ positions });
         this.#positions = positions;
         this.#centerOfPressureModel.numberOfSensors = this.numberOfSensors;
         this.#sensorRangeHelpers = createArray(this.numberOfSensors, () => new RangeHelper());
@@ -2223,7 +2219,7 @@ class PressureSensorDataManager {
             return;
         }
         this.#autoRange = newAutoRange;
-        _console$W.log({ autoRange: this.autoRange });
+        _console$X.log({ autoRange: this.autoRange });
         this.dispatchEvent("pressureAutoRange", {
             pressureAutoRange: this.autoRange,
         });
@@ -2246,7 +2242,7 @@ class PressureSensorDataManager {
             return;
         }
         this.#motionAutoRange = newMotionAutoRange;
-        _console$W.log({ motionAutoRange: this.motionAutoRange });
+        _console$X.log({ motionAutoRange: this.motionAutoRange });
         this.dispatchEvent("pressureMotionAutoRange", {
             pressureMotionAutoRange: this.motionAutoRange,
         });
@@ -2301,7 +2297,7 @@ class PressureSensorDataManager {
             return;
         }
         this.#isRecordingCalibrationData = newIsRecordingCalibrationData;
-        _console$W.log({
+        _console$X.log({
             isRecordingCalibrationData: this.isRecordingCalibrationData,
         });
         this.dispatchEvent("isRecordingPressureCalibrationData", {
@@ -2319,7 +2315,7 @@ class PressureSensorDataManager {
     }
     startRecordingCalibrationData() {
         if (!this.canCalibrate) {
-            _console$W.error("cannot calibrate pressure - tensorflow is not available");
+            _console$X.error("cannot calibrate pressure - tensorflow is not available");
             return;
         }
         this.#setIsRecordingCalibrationData(true);
@@ -2421,7 +2417,7 @@ class PressureSensorDataManager {
     }
 }
 
-const _console$V = createConsole("MotionSensorDataManager", { log: false });
+const _console$W = createConsole("MotionSensorDataManager", { log: false });
 const MotionSensorTypes = [
     "acceleration",
     "gravity",
@@ -2472,7 +2468,7 @@ class MotionSensorDataManager {
             dataView.getInt16(4, true),
         ].map((value) => value * scalar);
         const vector = { x, y, z };
-        _console$V.log({ vector });
+        _console$W.log({ vector });
         return vector;
     }
     parseQuaternion(dataView, scalar) {
@@ -2483,7 +2479,7 @@ class MotionSensorDataManager {
             dataView.getInt16(6, true),
         ].map((value) => value * scalar);
         const quaternion = { x, y, z, w };
-        _console$V.log({ quaternion });
+        _console$W.log({ quaternion });
         return quaternion;
     }
     quaternionToEuler(quaternion, absolute) {
@@ -2507,39 +2503,39 @@ class MotionSensorDataManager {
             heading += 360;
         }
         const euler = { heading, pitch, roll, absolute };
-        _console$V.log({ euler });
+        _console$W.log({ euler });
         return euler;
     }
     parseStepCounter(dataView) {
-        _console$V.log("parseStepCounter", dataView);
+        _console$W.log("parseStepCounter", dataView);
         const stepCount = dataView.getUint32(0, true);
-        _console$V.log({ stepCount });
+        _console$W.log({ stepCount });
         return stepCount;
     }
     parseActivity(dataView) {
-        _console$V.log("parseActivity", dataView);
+        _console$W.log("parseActivity", dataView);
         const activity = {};
         const activityBitfield = dataView.getUint8(0);
-        _console$V.log("activityBitfield", activityBitfield.toString(2));
+        _console$W.log("activityBitfield", activityBitfield.toString(2));
         ActivityTypes.forEach((activityType, index) => {
             activity[activityType] = Boolean(activityBitfield & (1 << index));
         });
-        _console$V.log("activity", activity);
+        _console$W.log("activity", activity);
         return activity;
     }
     parseDeviceOrientation(dataView) {
-        _console$V.log("parseDeviceOrientation", dataView);
+        _console$W.log("parseDeviceOrientation", dataView);
         const index = dataView.getUint8(0);
         const deviceOrientation = DeviceOrientations[index];
-        _console$V.assertWithError(deviceOrientation, "undefined deviceOrientation");
-        _console$V.log({ deviceOrientation });
+        _console$W.assertWithError(deviceOrientation, "undefined deviceOrientation");
+        _console$W.log({ deviceOrientation });
         return deviceOrientation;
     }
 }
 
 const BarometerSensorTypes = ["barometer"];
 const ContinuousBarometerSensorTypes = BarometerSensorTypes;
-const _console$U = createConsole("BarometerSensorDataManager", { log: false });
+const _console$V = createConsole("BarometerSensorDataManager", { log: false });
 class BarometerSensorDataManager {
     #calculcateAltitude(pressure) {
         const P0 = 101325;
@@ -2555,7 +2551,7 @@ class BarometerSensorDataManager {
     parseData(dataView, scalar) {
         const pressure = dataView.getUint32(0, true) * scalar;
         const altitude = this.#calculcateAltitude(pressure);
-        _console$U.log({ pressure, altitude });
+        _console$V.log({ pressure, altitude });
         return { pressure };
     }
 }
@@ -2567,7 +2563,7 @@ const ButtonSensorEventTypes = [
     "buttonDown",
     "buttonUp",
 ];
-const _console$T = createConsole("ButtonSensorDataManager", { log: false });
+const _console$U = createConsole("ButtonSensorDataManager", { log: false });
 class ButtonSensorDataManager {
     constructor() {
         autoBind(this);
@@ -2580,7 +2576,7 @@ class ButtonSensorDataManager {
         if (this.#eventDispatcher == eventDispatcher) {
             return;
         }
-        _console$T.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
+        _console$U.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
         this.#eventDispatcher = eventDispatcher;
     }
     get dispatchEvent() {
@@ -2594,11 +2590,11 @@ class ButtonSensorDataManager {
             const value = dataView.getUint8(offset++);
             const isDown = value > 0;
             const button = { index, isDown, value };
-            _console$T.log("button", button);
+            _console$U.log("button", button);
             buttons.push(button);
         }
         buttons.forEach((button) => {
-            _console$T.assertRangeWithError("button.index", button.index, 0, this.numberOfButtons - 1);
+            _console$U.assertRangeWithError("button.index", button.index, 0, this.numberOfButtons - 1);
             this.dispatchEvent("button", { button });
             const internalButton = this.buttons[button.index];
             if (button.isDown) {
@@ -2621,7 +2617,7 @@ class ButtonSensorDataManager {
     }
     set numberOfButtons(newNumberOfButtons) {
         this.#numberOfButtons = newNumberOfButtons;
-        _console$T.log({ numberOfButtons: this.numberOfButtons });
+        _console$U.log({ numberOfButtons: this.numberOfButtons });
         this.buttons = Array.from({ length: this.numberOfButtons }, (_, index) => ({
             index,
             value: 0,
@@ -2633,7 +2629,7 @@ class ButtonSensorDataManager {
     }
     buttons = [];
     clear() {
-        _console$T.log("clear");
+        _console$U.log("clear");
     }
 }
 
@@ -2644,7 +2640,7 @@ const TouchSensorEventTypes = [
     "touchDown",
     "touchUp",
 ];
-const _console$S = createConsole("TouchSensorDataManager", { log: false });
+const _console$T = createConsole("TouchSensorDataManager", { log: false });
 class TouchSensorDataManager {
     constructor() {
         autoBind(this);
@@ -2657,7 +2653,7 @@ class TouchSensorDataManager {
         if (this.#eventDispatcher == eventDispatcher) {
             return;
         }
-        _console$S.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
+        _console$T.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
         this.#eventDispatcher = eventDispatcher;
     }
     get dispatchEvent() {
@@ -2671,13 +2667,13 @@ class TouchSensorDataManager {
             const value = dataView.getUint8(offset++);
             const isDown = value > 0;
             const touch = { index, isDown, value };
-            _console$S.log("touch", touch);
+            _console$T.log("touch", touch);
             touches.push(touch);
         }
         touches.forEach((touch) => {
-            _console$S.assertRangeWithError("touch.index", touch.index, 0, this.numberOfTouches - 1);
+            _console$T.assertRangeWithError("touch.index", touch.index, 0, this.numberOfTouches - 1);
             this.dispatchEvent("touch", { touch });
-            const internalTouch = this.touches[touch.index];
+            const internalTouch = this.#touches[touch.index];
             if (touch.isDown) {
                 internalTouch.lastTimeDown = Date.now();
                 this.dispatchEvent("touchDown", { touch });
@@ -2698,8 +2694,8 @@ class TouchSensorDataManager {
     }
     set numberOfTouches(newNumberOfTouches) {
         this.#numberOfTouches = newNumberOfTouches;
-        _console$S.log({ numberOfTouches: this.numberOfTouches });
-        this.touches = Array.from({ length: this.numberOfTouches }, (_, index) => ({
+        _console$T.log({ numberOfTouches: this.numberOfTouches });
+        this.#touches = Array.from({ length: this.numberOfTouches }, (_, index) => ({
             index,
             value: 0,
             isDown: false,
@@ -2708,14 +2704,17 @@ class TouchSensorDataManager {
             numberOfTouches: this.numberOfTouches,
         });
     }
-    touches = [];
+    #touches = [];
+    get touches() {
+        return this.#touches;
+    }
     clear() {
-        _console$S.log("clear");
+        _console$T.log("clear");
     }
 }
 
 var _a$7;
-const _console$R = createConsole("CameraManager", { log: false });
+const _console$S = createConsole("CameraManager", { log: false });
 const CameraSensorTypes = ["camera"];
 const CameraCommands = [
     "focus",
@@ -2792,7 +2791,7 @@ class CameraManager {
         return this.eventDispatcher.waitForEvent;
     }
     requestRequiredInformation(sendImmediately) {
-        _console$R.log("requesting required camera information");
+        _console$S.log("requesting required camera information");
         const messages = RequiredCameraMessageTypes.map((messageType) => ({
             type: messageType,
         }));
@@ -2809,14 +2808,14 @@ class CameraManager {
     }
     #latestTakingPictureTimestamp = 0;
     #updateCameraStatus(newCameraStatus) {
-        _console$R.assertEnumWithError(CameraStatuses, newCameraStatus);
+        _console$S.assertEnumWithError(CameraStatuses, newCameraStatus);
         if (newCameraStatus == this.#cameraStatus) {
-            _console$R.log(`redundant cameraStatus ${newCameraStatus}`);
+            _console$S.log(`redundant cameraStatus ${newCameraStatus}`);
             return;
         }
         const previousCameraStatus = this.#cameraStatus;
         this.#cameraStatus = newCameraStatus;
-        _console$R.log(`updated cameraStatus to "${this.cameraStatus}"`);
+        _console$S.log(`updated cameraStatus to "${this.cameraStatus}"`);
         this.#dispatchEvent("cameraStatus", {
             cameraStatus: this.cameraStatus,
             previousCameraStatus,
@@ -2831,10 +2830,10 @@ class CameraManager {
         }
     }
     async #sendCameraCommand(command, sendImmediately) {
-        _console$R.assertEnumWithError(CameraCommands, command);
-        _console$R.log(`sending camera command "${command}"`);
+        _console$S.assertEnumWithError(CameraCommands, command);
+        _console$S.log(`sending camera command "${command}"`);
         const promise = this.waitForEvent("cameraStatus");
-        _console$R.log(`setting command "${command}"`);
+        _console$S.log(`setting command "${command}"`);
         this.sendMessages([
             {
                 type: "cameraCommand",
@@ -2844,13 +2843,13 @@ class CameraManager {
         await promise;
     }
     #assertIsAsleep() {
-        _console$R.assertWithError(this.#cameraStatus == "asleep", `camera is not asleep - currently ${this.#cameraStatus}`);
+        _console$S.assertWithError(this.#cameraStatus == "asleep", `camera is not asleep - currently ${this.#cameraStatus}`);
     }
     #assertIsAwake() {
-        _console$R.assertWithError(this.#cameraStatus != "asleep", `camera is not awake - currently ${this.#cameraStatus}`);
+        _console$S.assertWithError(this.#cameraStatus != "asleep", `camera is not awake - currently ${this.#cameraStatus}`);
     }
     #assertIsNotDisabled() {
-        _console$R.assertWithError(this.#cameraStatus != "disabled", `camera is not awake - currently ${this.#cameraStatus}`);
+        _console$S.assertWithError(this.#cameraStatus != "disabled", `camera is not awake - currently ${this.#cameraStatus}`);
     }
     async focus(sendImmediately) {
         this.#assertIsAwake();
@@ -2881,10 +2880,10 @@ class CameraManager {
             return;
         }
         this.#sensorRate = newSensorRate;
-        _console$R.log({ sensorRate: this.sensorRate });
+        _console$S.log({ sensorRate: this.sensorRate });
     }
     #parseCameraData(dataView, isFile) {
-        _console$R.log("parsing camera data", dataView, { isFile });
+        _console$S.log("parsing camera data", dataView, { isFile });
         parseMessage(dataView, CameraDataTypes, this.#onCameraData.bind(this), { isFile }, true);
     }
     #buildImageTimeout;
@@ -2892,7 +2891,7 @@ class CameraManager {
         if (this.#buildImageTimeout == undefined) {
             return;
         }
-        _console$R.log("clearBuildImageTimeout", this.#buildImageTimeout);
+        _console$S.log("clearBuildImageTimeout", this.#buildImageTimeout);
         clearTimeout(this.#buildImageTimeout);
         this.#buildImageTimeout = undefined;
     }
@@ -2902,13 +2901,13 @@ class CameraManager {
             return;
         }
         const timeoutInterval = Math.max(4 * this.sensorRate, 300);
-        _console$R.log("setBuildImageTimeout", {
+        _console$S.log("setBuildImageTimeout", {
             timeoutInterval,
         });
         const now = Date.now();
         this.#buildImageTimeout = setTimeout(() => {
             const _now = Date.now();
-            _console$R.log("buildImageTimeout triggered", {
+            _console$S.log("buildImageTimeout triggered", {
                 now: _now,
                 span: _now - now,
             });
@@ -2918,46 +2917,46 @@ class CameraManager {
     }
     #onCameraData(cameraDataType, dataView, context = { isFile: false }) {
         const { isFile } = context;
-        _console$R.log("#onCameraData", { cameraDataType, dataView, isFile });
+        _console$S.log("#onCameraData", { cameraDataType, dataView, isFile });
         this.#clearBuildImageTimeout();
         switch (cameraDataType) {
             case "headerSize":
                 this.#headerSize = dataView.getUint16(0, true);
-                _console$R.log({ headerSize: this.#headerSize });
+                _console$S.log({ headerSize: this.#headerSize });
                 this.#headerData = undefined;
                 this.#headerProgress == 0;
                 break;
             case "header":
                 this.#headerData = concatenateArrayBuffers(this.#headerData, dataView);
-                _console$R.log({ headerData: this.#headerData });
+                _console$S.log({ headerData: this.#headerData });
                 this.#headerProgress = this.#headerData?.byteLength / this.#headerSize;
-                _console$R.log({ headerProgress: this.#headerProgress });
+                _console$S.log({ headerProgress: this.#headerProgress });
                 this.#dispatchEvent("cameraImageProgress", {
                     progress: this.#headerProgress,
                     type: "header",
                 });
                 if (this.#headerProgress == 1) {
-                    _console$R.log("finished getting header data");
+                    _console$S.log("finished getting header data");
                 }
                 break;
             case "imageSize":
                 this.#imageSize = dataView.getUint32(0, true);
-                _console$R.log({ imageSize: this.#imageSize });
+                _console$S.log({ imageSize: this.#imageSize });
                 this.#imageData = undefined;
                 this.#imageProgress == 0;
                 this.#didBuildImage = false;
                 break;
             case "image":
                 this.#imageData = concatenateArrayBuffers(this.#imageData, dataView);
-                _console$R.log({ imageData: this.#imageData });
+                _console$S.log({ imageData: this.#imageData });
                 this.#imageProgress = this.#imageData?.byteLength / this.#imageSize;
-                _console$R.log({ imageProgress: this.#imageProgress });
+                _console$S.log({ imageProgress: this.#imageProgress });
                 this.#dispatchEvent("cameraImageProgress", {
                     progress: this.#imageProgress,
                     type: "image",
                 });
                 if (this.#imageProgress == 1) {
-                    _console$R.log("finished getting image data");
+                    _console$S.log("finished getting image data");
                     if (this.#headerProgress == 1 && this.#footerProgress == 1) {
                         this.#buildImage(isFile);
                     }
@@ -2968,21 +2967,21 @@ class CameraManager {
                 break;
             case "footerSize":
                 this.#footerSize = dataView.getUint16(0, true);
-                _console$R.log({ footerSize: this.#footerSize });
+                _console$S.log({ footerSize: this.#footerSize });
                 this.#footerData = undefined;
                 this.#footerProgress == 0;
                 break;
             case "footer":
                 this.#footerData = concatenateArrayBuffers(this.#footerData, dataView);
-                _console$R.log({ footerData: this.#footerData });
+                _console$S.log({ footerData: this.#footerData });
                 this.#footerProgress = this.#footerData?.byteLength / this.#footerSize;
-                _console$R.log({ footerProgress: this.#footerProgress });
+                _console$S.log({ footerProgress: this.#footerProgress });
                 this.#dispatchEvent("cameraImageProgress", {
                     progress: this.#footerProgress,
                     type: "footer",
                 });
                 if (this.#footerProgress == 1) {
-                    _console$R.log("finished getting footer data");
+                    _console$S.log("finished getting footer data");
                     if (this.#imageProgress == 1) {
                         this.#buildImage(isFile);
                     }
@@ -3001,14 +3000,14 @@ class CameraManager {
     #footerProgress = 0;
     #didBuildImage = false;
     #buildImage(isFile) {
-        _console$R.log("building image...", { isFile });
+        _console$S.log("building image...", { isFile });
         const now = Date.now();
         const timestamp = this.#latestTakingPictureTimestamp;
         const imageData = concatenateArrayBuffers(this.#headerData, this.#imageData, this.#footerData);
-        _console$R.log({ imageData });
+        _console$S.log({ imageData });
         this.#didBuildImage = true;
         const blob = new Blob([imageData], { type: "image/jpg" });
-        _console$R.log("created blob", blob);
+        _console$S.log("created blob", blob);
         const cameraImage = {
             get url() {
                 if (!this._url) {
@@ -3045,7 +3044,7 @@ class CameraManager {
                     });
                 }
                 else {
-                    _console$R.error("camera recording failed - recording image/canvas/context not found");
+                    _console$S.error("camera recording failed - recording image/canvas/context not found");
                     this.stopRecording();
                 }
             }
@@ -3119,8 +3118,8 @@ class CameraManager {
         while (byteOffset < dataView.byteLength) {
             const cameraConfigurationTypeIndex = dataView.getUint8(byteOffset++);
             const cameraConfigurationType = CameraConfigurationTypes[cameraConfigurationTypeIndex];
-            _console$R.assertWithError(cameraConfigurationType, `invalid cameraConfigurationTypeIndex ${cameraConfigurationTypeIndex}`);
-            _console$R.log({ cameraConfigurationType });
+            _console$S.assertWithError(cameraConfigurationType, `invalid cameraConfigurationTypeIndex ${cameraConfigurationTypeIndex}`);
+            _console$S.log({ cameraConfigurationType });
             let value;
             switch (cameraConfigurationType) {
                 case "autoExposureLevel":
@@ -3134,12 +3133,12 @@ class CameraManager {
                     value = dataView.getUint16(byteOffset, true);
                     break;
             }
-            _console$R.log({ [cameraConfigurationType]: value });
-            _console$R.assertTypeWithError(value, "number");
+            _console$S.log({ [cameraConfigurationType]: value });
+            _console$S.assertTypeWithError(value, "number");
             parsedCameraConfiguration[cameraConfigurationType] = value;
             byteOffset += size;
         }
-        _console$R.log({ parsedCameraConfiguration });
+        _console$S.log({ parsedCameraConfiguration });
         this.#availableCameraConfigurationTypes = Object.keys(parsedCameraConfiguration);
         this.#cameraConfiguration = parsedCameraConfiguration;
         this.#dispatchEvent("getCameraConfiguration", {
@@ -3154,13 +3153,13 @@ class CameraManager {
         });
     }
     async setCameraConfiguration(newCameraConfiguration, sendImmediately) {
-        _console$R.log({ newCameraConfiguration });
+        _console$S.log({ newCameraConfiguration });
         if (this.#isCameraConfigurationRedundant(newCameraConfiguration)) {
-            _console$R.log("redundant camera configuration");
+            _console$S.log("redundant camera configuration");
             return;
         }
         const setCameraConfigurationData = this.#createData(newCameraConfiguration);
-        _console$R.log({ setCameraConfigurationData });
+        _console$S.log({ setCameraConfigurationData });
         const promise = this.waitForEvent("getCameraConfiguration");
         this.sendMessages([
             {
@@ -3171,17 +3170,17 @@ class CameraManager {
         await promise;
     }
     #assertAvailableCameraConfigurationType(cameraConfigurationType) {
-        _console$R.assertWithError(this.#availableCameraConfigurationTypes, "must get initial cameraConfiguration");
+        _console$S.assertWithError(this.#availableCameraConfigurationTypes, "must get initial cameraConfiguration");
         const isCameraConfigurationTypeAvailable = this.#availableCameraConfigurationTypes?.includes(cameraConfigurationType);
-        _console$R.assertWithError(isCameraConfigurationTypeAvailable, `unavailable camera configuration type "${cameraConfigurationType}"`);
+        _console$S.assertWithError(isCameraConfigurationTypeAvailable, `unavailable camera configuration type "${cameraConfigurationType}"`);
         return isCameraConfigurationTypeAvailable;
     }
     static AssertValidCameraConfigurationType(cameraConfigurationType) {
-        _console$R.assertEnumWithError(CameraConfigurationTypes, cameraConfigurationType);
+        _console$S.assertEnumWithError(CameraConfigurationTypes, cameraConfigurationType);
     }
     static AssertValidCameraConfigurationTypeEnum(cameraConfigurationTypeEnum) {
-        _console$R.assertTypeWithError(cameraConfigurationTypeEnum, "number");
-        _console$R.assertWithError(cameraConfigurationTypeEnum in CameraConfigurationTypes, `invalid cameraConfigurationTypeEnum ${cameraConfigurationTypeEnum}`);
+        _console$S.assertTypeWithError(cameraConfigurationTypeEnum, "number");
+        _console$S.assertWithError(cameraConfigurationTypeEnum in CameraConfigurationTypes, `invalid cameraConfigurationTypeEnum ${cameraConfigurationTypeEnum}`);
     }
     #createData(cameraConfiguration) {
         let cameraConfigurationTypes = Object.keys(cameraConfiguration);
@@ -3202,7 +3201,7 @@ class CameraManager {
                     break;
             }
         });
-        _console$R.log({ sensorConfigurationData: dataView });
+        _console$S.log({ sensorConfigurationData: dataView });
         return dataView;
     }
     #isRecording = false;
@@ -3221,11 +3220,11 @@ class CameraManager {
     #recordingChunks;
     startRecording(audioStream) {
         if (!this.isRecordingAvailable) {
-            _console$R.error("camera recording is not available");
+            _console$S.error("camera recording is not available");
             return;
         }
         if (this.isRecording) {
-            _console$R.log("already recording camera");
+            _console$S.log("already recording camera");
             return;
         }
         this.#cameraRecordingData = [];
@@ -3248,7 +3247,7 @@ class CameraManager {
             });
             this.#recordingChunks = [];
             this.#recordingMediaRecorder.ondataavailable = (e) => {
-                _console$R.log("adding chunk", e.data);
+                _console$S.log("adding chunk", e.data);
                 this.#recordingChunks.push(e.data);
             };
             this.#recordingMediaRecorder.start();
@@ -3261,7 +3260,7 @@ class CameraManager {
     }
     async stopRecording() {
         if (!this.isRecording) {
-            _console$R.log("already not recording");
+            _console$S.log("already not recording");
             return;
         }
         if (this.#cameraRecordingData && this.#cameraRecordingData.length > 0) {
@@ -3281,7 +3280,7 @@ class CameraManager {
                 });
                 if (isInBrowser) {
                     this.#recordingMediaRecorder.onstop = () => {
-                        _console$R.log("recordingMediaRecorder onstop");
+                        _console$S.log("recordingMediaRecorder onstop");
                         const blob = new Blob(this.#recordingChunks, {
                             type: this.#recordingMediaRecorder?.mimeType,
                         });
@@ -3394,11 +3393,11 @@ class CameraManager {
             return;
         }
         this.#autoPicture = newAutoPicture;
-        _console$R.log({ autoPicture: this.#autoPicture });
+        _console$S.log({ autoPicture: this.#autoPicture });
         this.#dispatchEvent("autoPicture", { autoPicture: this.autoPicture });
     }
     parseMessage(messageType, dataView, isSending) {
-        _console$R.log({ messageType, isSending }, dataView);
+        _console$S.log({ messageType, isSending }, dataView);
         switch (messageType) {
             case "cameraStatus":
                 this.#parseCameraStatus(dataView);
@@ -3429,7 +3428,7 @@ class CameraManager {
         }
     }
     async onFileConfiguration(fileConfiguration) {
-        _console$R.log("onFileConfiguration", fileConfiguration);
+        _console$S.log("onFileConfiguration", fileConfiguration);
         const dataView = new DataView(fileConfiguration.buffer.slice(emptyHeaderDataView.byteLength));
         this.#parseCameraData(dataView, true);
         const { message: cameraImage } = await this.waitForEvent("cameraImage", {
@@ -3553,7 +3552,7 @@ var _alawmulaw = /*#__PURE__*/Object.freeze({
 var _a$6;
 const alawmulaw = _alawmulaw;
 const { mulaw } = alawmulaw;
-const _console$Q = createConsole("MicrophoneManager", { log: false });
+const _console$R = createConsole("MicrophoneManager", { log: false });
 const MicrophoneSensorTypes = ["microphone"];
 const MicrophoneCommands = [
     "start",
@@ -3570,7 +3569,7 @@ const MicrophoneStatuses = [
 ];
 const MicrophoneConfigurationTypes = ["sampleRate", "bitDepth"];
 const MicrophoneSampleRates = ["8000", "16000"];
-const MicrophoneBitDepths = ["8", "16"];
+const MicrophoneBitDepths = ["8", "16", "4"];
 const MicrophoneMessageTypes = [
     "microphoneStatus",
     "microphoneCommand",
@@ -3606,7 +3605,7 @@ class MicrophoneManager {
         return this.eventDispatcher.waitForEvent;
     }
     requestRequiredInformation() {
-        _console$Q.log("requesting required microphone information");
+        _console$R.log("requesting required microphone information");
         const messages = RequiredMicrophoneMessageTypes.map((messageType) => ({
             type: messageType,
         }));
@@ -3622,24 +3621,29 @@ class MicrophoneManager {
         this.#updateMicrophoneStatus(newMicrophoneStatus);
     }
     #updateMicrophoneStatus(newMicrophoneStatus) {
-        _console$Q.assertEnumWithError(MicrophoneStatuses, newMicrophoneStatus);
+        _console$R.assertEnumWithError(MicrophoneStatuses, newMicrophoneStatus);
         if (newMicrophoneStatus == this.#microphoneStatus) {
-            _console$Q.log(`redundant microphoneStatus ${newMicrophoneStatus}`);
+            _console$R.log(`redundant microphoneStatus ${newMicrophoneStatus}`);
             return;
         }
         const previousMicrophoneStatus = this.#microphoneStatus;
         this.#microphoneStatus = newMicrophoneStatus;
-        _console$Q.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
+        _console$R.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
+        this.#pendingBufferSources.forEach((bufferSource) => {
+            bufferSource.stop();
+            bufferSource.disconnect();
+        });
+        this.#pendingBufferSources.length = 0;
         this.#dispatchEvent("microphoneStatus", {
             microphoneStatus: this.microphoneStatus,
             previousMicrophoneStatus,
         });
     }
     async #sendMicrophoneCommand(command, sendImmediately) {
-        _console$Q.assertEnumWithError(MicrophoneCommands, command);
-        _console$Q.log(`sending microphone command "${command}"`);
+        _console$R.assertEnumWithError(MicrophoneCommands, command);
+        _console$R.log(`sending microphone command "${command}"`);
         const promise = this.waitForEvent("microphoneStatus");
-        _console$Q.log(`setting command "${command}"`);
+        _console$R.log(`setting command "${command}"`);
         this.sendMessages([
             {
                 type: "microphoneCommand",
@@ -3649,30 +3653,30 @@ class MicrophoneManager {
         await promise;
     }
     #parseMicrophoneCommand(dataView) {
-        _console$Q.log("parseMicrophoneCommand", dataView);
+        _console$R.log("parseMicrophoneCommand", dataView);
         const commandEnum = dataView.getUint8(0);
         const command = MicrophoneCommands[commandEnum];
-        _console$Q.assertEnumWithError(MicrophoneCommands, command);
-        _console$Q.log({ command });
+        _console$R.assertEnumWithError(MicrophoneCommands, command);
+        _console$R.log({ command });
     }
     #assertIsIdle() {
-        _console$Q.assertWithError(this.#microphoneStatus == "idle", `microphone is not idle - currently ${this.#microphoneStatus}`);
+        _console$R.assertWithError(this.#microphoneStatus == "idle", `microphone is not idle - currently ${this.#microphoneStatus}`);
     }
     #assertIsNotIdle() {
-        _console$Q.assertWithError(this.#microphoneStatus != "idle", `microphone is idle`);
+        _console$R.assertWithError(this.#microphoneStatus != "idle", `microphone is idle`);
     }
     #assertIsNotDisabled() {
-        _console$Q.assertWithError(this.#microphoneStatus != "disabled", `microphone is disabled`);
+        _console$R.assertWithError(this.#microphoneStatus != "disabled", `microphone is disabled`);
     }
     #assertIsStreaming() {
-        _console$Q.assertWithError(this.#microphoneStatus == "streaming", `microphone is not recording - currently ${this.#microphoneStatus}`);
+        _console$R.assertWithError(this.#microphoneStatus == "streaming", `microphone is not recording - currently ${this.#microphoneStatus}`);
     }
     async start(sendImmediately) {
         await this.#sendMicrophoneCommand("start", sendImmediately);
     }
     async stop(sendImmediately) {
         if (this.microphoneStatus == "idle") {
-            _console$Q.log("microphone is already idle");
+            _console$R.log("microphone is already idle");
             return;
         }
         await this.#sendMicrophoneCommand("stop", sendImmediately);
@@ -3691,13 +3695,18 @@ class MicrophoneManager {
         }
     }
     #assertValidBitDepth() {
-        _console$Q.assertEnumWithError(MicrophoneBitDepths, this.bitDepth);
+        _console$R.assertEnumWithError(MicrophoneBitDepths, this.bitDepth);
     }
     #fadeDuration = 0.01;
+    #applyFade = false;
     #playbackTime = 0;
+    #minLead = 0.02;
+    #targetLead = 0.12;
+    #maxLead = 0.6;
+    #pendingBufferSources = [];
     #parseMicrophoneData(dataView) {
         this.#assertValidBitDepth();
-        _console$Q.log("parsing microphone data", dataView);
+        _console$R.log("parsing microphone data", dataView);
         const numberOfSamples = dataView.byteLength / this.#bytesPerSample;
         const samples = new Float32Array(numberOfSamples);
         for (let i = 0; i < numberOfSamples; i++) {
@@ -3715,7 +3724,7 @@ class MicrophoneManager {
                     break;
             }
         }
-        _console$Q.log("samples", samples);
+        _console$R.log("samples", samples);
         if (this.#isRecording && this.#microphoneRecordingData) {
             this.#microphoneRecordingData.push(samples);
         }
@@ -3726,22 +3735,28 @@ class MicrophoneManager {
                 const bufferSource = this.#audioContext.createBufferSource();
                 bufferSource.onended = () => {
                     bufferSource.disconnect();
+                    this.#pendingBufferSources.splice(this.#pendingBufferSources.indexOf(bufferSource), 1);
                 };
                 bufferSource.buffer = audioBuffer;
                 const channelData = audioBuffer.getChannelData(0);
                 const sampleRate = Number(this.sampleRate);
-                for (let i = 0; i < this.#fadeDuration * sampleRate; i++) {
-                    channelData[i] *= i / (this.#fadeDuration * sampleRate);
-                }
-                for (let i = channelData.length - 1; i >= channelData.length - this.#fadeDuration * sampleRate; i--) {
-                    channelData[i] *=
-                        (channelData.length - i) / (this.#fadeDuration * sampleRate);
+                if (this.#applyFade) {
+                    for (let i = 0; i < this.#fadeDuration * sampleRate; i++) {
+                        channelData[i] *= i / (this.#fadeDuration * sampleRate);
+                    }
+                    for (let i = channelData.length - 1; i >= channelData.length - this.#fadeDuration * sampleRate; i--) {
+                        channelData[i] *=
+                            (channelData.length - i) / (this.#fadeDuration * sampleRate);
+                    }
                 }
                 bufferSource.connect(this.#gainNode);
-                if (this.#playbackTime < this.#audioContext.currentTime) {
-                    this.#playbackTime = this.#audioContext.currentTime;
+                const now = this.#audioContext.currentTime;
+                if (this.#playbackTime < now + this.#minLead ||
+                    this.#playbackTime > now + this.#maxLead) {
+                    this.#playbackTime = now + this.#targetLead;
                 }
                 bufferSource.start(this.#playbackTime);
+                this.#pendingBufferSources.push(bufferSource);
                 this.#playbackTime += audioBuffer.duration;
             }
         }
@@ -3753,6 +3768,8 @@ class MicrophoneManager {
     }
     get #bytesPerSample() {
         switch (this.bitDepth) {
+            case "4":
+                return 0.5;
             case "8":
                 return 1;
             case "16":
@@ -3779,15 +3796,15 @@ class MicrophoneManager {
         while (byteOffset < dataView.byteLength) {
             const microphoneConfigurationTypeIndex = dataView.getUint8(byteOffset++);
             const microphoneConfigurationType = MicrophoneConfigurationTypes[microphoneConfigurationTypeIndex];
-            _console$Q.assertWithError(microphoneConfigurationType, `invalid microphoneConfigurationTypeIndex ${microphoneConfigurationTypeIndex}`);
+            _console$R.assertWithError(microphoneConfigurationType, `invalid microphoneConfigurationTypeIndex ${microphoneConfigurationTypeIndex}`);
             let rawValue = dataView.getUint8(byteOffset++);
             const values = MicrophoneConfigurationValues[microphoneConfigurationType];
             const value = values[rawValue];
-            _console$Q.assertEnumWithError(values, value);
-            _console$Q.log({ microphoneConfigurationType, value });
+            _console$R.assertEnumWithError(values, value);
+            _console$R.log({ microphoneConfigurationType, value });
             parsedMicrophoneConfiguration[microphoneConfigurationType] = value;
         }
-        _console$Q.log({ parsedMicrophoneConfiguration });
+        _console$R.log({ parsedMicrophoneConfiguration });
         this.#availableMicrophoneConfigurationTypes = Object.keys(parsedMicrophoneConfiguration);
         this.#microphoneConfiguration = parsedMicrophoneConfiguration;
         this.#dispatchEvent("getMicrophoneConfiguration", {
@@ -3802,13 +3819,13 @@ class MicrophoneManager {
         });
     }
     async setMicrophoneConfiguration(newMicrophoneConfiguration) {
-        _console$Q.log({ newMicrophoneConfiguration });
+        _console$R.log({ newMicrophoneConfiguration });
         if (this.#isMicrophoneConfigurationRedundant(newMicrophoneConfiguration)) {
-            _console$Q.log("redundant microphone configuration");
+            _console$R.log("redundant microphone configuration");
             return;
         }
         const setMicrophoneConfigurationData = this.#createData(newMicrophoneConfiguration);
-        _console$Q.log({ setMicrophoneConfigurationData });
+        _console$R.log({ setMicrophoneConfigurationData });
         const promise = this.waitForEvent("getMicrophoneConfiguration");
         this.sendMessages([
             {
@@ -3819,17 +3836,17 @@ class MicrophoneManager {
         await promise;
     }
     #assertAvailableMicrophoneConfigurationType(microphoneConfigurationType) {
-        _console$Q.assertWithError(this.#availableMicrophoneConfigurationTypes, "must get initial microphoneConfiguration");
+        _console$R.assertWithError(this.#availableMicrophoneConfigurationTypes, "must get initial microphoneConfiguration");
         const isMicrophoneConfigurationTypeAvailable = this.#availableMicrophoneConfigurationTypes?.includes(microphoneConfigurationType);
-        _console$Q.assertWithError(isMicrophoneConfigurationTypeAvailable, `unavailable microphone configuration type "${microphoneConfigurationType}"`);
+        _console$R.assertWithError(isMicrophoneConfigurationTypeAvailable, `unavailable microphone configuration type "${microphoneConfigurationType}"`);
         return isMicrophoneConfigurationTypeAvailable;
     }
     static AssertValidMicrophoneConfigurationType(microphoneConfigurationType) {
-        _console$Q.assertEnumWithError(MicrophoneConfigurationTypes, microphoneConfigurationType);
+        _console$R.assertEnumWithError(MicrophoneConfigurationTypes, microphoneConfigurationType);
     }
     static AssertValidMicrophoneConfigurationTypeEnum(microphoneConfigurationTypeEnum) {
-        _console$Q.assertTypeWithError(microphoneConfigurationTypeEnum, "number");
-        _console$Q.assertWithError(microphoneConfigurationTypeEnum in MicrophoneConfigurationTypes, `invalid microphoneConfigurationTypeEnum ${microphoneConfigurationTypeEnum}`);
+        _console$R.assertTypeWithError(microphoneConfigurationTypeEnum, "number");
+        _console$R.assertWithError(microphoneConfigurationTypeEnum in MicrophoneConfigurationTypes, `invalid microphoneConfigurationTypeEnum ${microphoneConfigurationTypeEnum}`);
     }
     #createData(microphoneConfiguration) {
         let microphoneConfigurationTypes = Object.keys(microphoneConfiguration);
@@ -3844,15 +3861,15 @@ class MicrophoneManager {
                 value = value.toString();
             }
             const values = MicrophoneConfigurationValues[microphoneConfigurationType];
-            _console$Q.assertEnumWithError(values, value);
+            _console$R.assertEnumWithError(values, value);
             const rawValue = values.indexOf(value);
             dataView.setUint8(index * 2 + 1, rawValue);
         });
-        _console$Q.log({ sensorConfigurationData: dataView });
+        _console$R.log({ sensorConfigurationData: dataView });
         return dataView;
     }
     parseMessage(messageType, dataView, isSending) {
-        _console$Q.log({ messageType, isSending }, dataView);
+        _console$R.log({ messageType, isSending }, dataView);
         switch (messageType) {
             case "microphoneStatus":
                 this.#parseMicrophoneStatus(dataView);
@@ -3877,11 +3894,11 @@ class MicrophoneManager {
     }
     set audioContext(newAudioContext) {
         if (this.#audioContext == newAudioContext) {
-            _console$Q.log("redundant audioContext assignment", this.#audioContext);
+            _console$R.log("redundant audioContext assignment", this.#audioContext);
             return;
         }
         this.#audioContext = newAudioContext;
-        _console$Q.log("assigned new audioContext", this.#audioContext);
+        _console$R.log("assigned new audioContext", this.#audioContext);
         if (this.#audioContext) {
             this.#playbackTime = this.#audioContext.currentTime;
         }
@@ -3898,23 +3915,23 @@ class MicrophoneManager {
     }
     #gainNode;
     get gainNode() {
-        _console$Q.assertWithError(this.#audioContext, "audioContext assignment required for gainNode");
+        _console$R.assertWithError(this.#audioContext, "audioContext assignment required for gainNode");
         if (!this.#gainNode) {
-            _console$Q.log("creating gainNode...");
+            _console$R.log("creating gainNode...");
             this.#gainNode = this.#audioContext.createGain();
-            _console$Q.log("created gainNode", this.#gainNode);
+            _console$R.log("created gainNode", this.#gainNode);
         }
         return this.#gainNode;
     }
     #mediaStreamDestination;
     get mediaStreamDestination() {
-        _console$Q.assertWithError(this.#audioContext, "audioContext assignment required for mediaStreamDestination");
+        _console$R.assertWithError(this.#audioContext, "audioContext assignment required for mediaStreamDestination");
         if (!this.#mediaStreamDestination) {
-            _console$Q.log("creating mediaStreamDestination...");
+            _console$R.log("creating mediaStreamDestination...");
             this.#mediaStreamDestination =
                 this.#audioContext.createMediaStreamDestination();
             this.gainNode?.connect(this.#mediaStreamDestination);
-            _console$Q.log("created mediaStreamDestination", this.#mediaStreamDestination);
+            _console$R.log("created mediaStreamDestination", this.#mediaStreamDestination);
         }
         return this.#mediaStreamDestination;
     }
@@ -3925,7 +3942,7 @@ class MicrophoneManager {
     #microphoneRecordingData;
     startRecording() {
         if (this.isRecording) {
-            _console$Q.log("already recording microphone");
+            _console$R.log("already recording microphone");
             return;
         }
         this.#microphoneRecordingData = [];
@@ -3937,13 +3954,13 @@ class MicrophoneManager {
     }
     stopRecording() {
         if (!this.isRecording) {
-            _console$Q.log("already not recording");
+            _console$R.log("already not recording");
             return;
         }
         this.#isRecording = false;
         if (this.#microphoneRecordingData &&
             this.#microphoneRecordingData.length > 0) {
-            _console$Q.log("parsing microphone data...", this.#microphoneRecordingData.length);
+            _console$R.log("parsing microphone data...", this.#microphoneRecordingData.length);
             const arrayBuffer = concatenateArrayBuffers(...this.#microphoneRecordingData);
             const samples = new Float32Array(arrayBuffer);
             const blob = float32ArrayToWav(samples, Number(this.sampleRate), 1);
@@ -3988,12 +4005,391 @@ _a$6 = MicrophoneManager;
 
 const LightSensorTypes = ["light"];
 const ContinuousLightSensorTypes = LightSensorTypes;
-const _console$P = createConsole("LightSensorDataManager", { log: false });
+const _console$Q = createConsole("LightSensorDataManager", { log: false });
 class LightSensorDataManager {
     parseData(dataView, scalar) {
         const light = dataView.getFloat32(0, true) * scalar;
-        _console$P.log({ light });
+        _console$Q.log({ light });
         return light;
+    }
+}
+
+const TrackpadSensorTypes = [
+    "trackpadBitmaps",
+    "trackpadTouches",
+    "trackpadTouchMovements",
+    "trackpadTouchPositions",
+    "trackpadGestures",
+    "trackpadTouchStrengths",
+    "trackpadTouchAreas",
+];
+const TrackpadTapGestures = ["tap"];
+const TrackpadSwipeGestures = [
+    "swipeLeft",
+    "swipeRight",
+    "swipeUp",
+    "swipeDown",
+];
+const TrackpadGestures = [
+    ...TrackpadTapGestures,
+    ...TrackpadSwipeGestures,
+];
+const TrackpadInformationTypes = ["actualSize", "bitmapSize"];
+const TrackpadMessageTypes = ["trackpadsInformation"];
+const RequiredTrackpadMessageTypes = [
+    "trackpadsInformation",
+];
+const TrackpadSensorEventTypes = [
+    ...TrackpadSensorTypes,
+    "trackpadsInformation",
+    "trackpadInformation",
+    "trackpadBitmap",
+    "trackpadTouch",
+    "trackpadTouchMovement",
+    "trackpadTouchPosition",
+    "trackpadGesture",
+    "trackpadTouchStrength",
+    "trackpadTouchArea",
+    "trackpadTouchDown",
+    "trackpadTouchUp",
+    "trackpadTap",
+    "trackpadSwipe",
+    "trackpadSwipeLeft",
+    "trackpadSwipeRight",
+    "trackpadSwipeUp",
+    "trackpadSwipeDown",
+];
+const _console$P = createConsole("TrackpadSensorDataManager", { log: true });
+class TrackpadSensorDataManager {
+    constructor() {
+        autoBind(this);
+    }
+    #eventDispatcher;
+    get eventDispatcher() {
+        return this.#eventDispatcher;
+    }
+    set eventDispatcher(eventDispatcher) {
+        if (this.#eventDispatcher == eventDispatcher) {
+            return;
+        }
+        _console$P.assertWithError(!this.#eventDispatcher, "eventDispatcher already defined");
+        this.#eventDispatcher = eventDispatcher;
+    }
+    get dispatchEvent() {
+        return this.eventDispatcher.dispatchEvent;
+    }
+    #information = [];
+    get information() {
+        return this.#information;
+    }
+    get numberOfTrackPads() {
+        return this.information.length;
+    }
+    parseInformation(dataView) {
+        const trackpadsInformation = [];
+        _console$P.log("parseInformation", dataView);
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadInformationLength = dataView.getUint8(offset++);
+            const _finalOffset = offset + trackpadInformationLength;
+            _console$P.assertWithError(_finalOffset <= dataView.byteLength, `invalid _finalOffset ${_finalOffset} (max ${dataView.byteLength})`);
+            let actualSize;
+            let bitmapSize;
+            while (offset < _finalOffset) {
+                const typeIndex = dataView.getUint8(offset++);
+                const type = TrackpadInformationTypes[typeIndex];
+                _console$P.log({ type, typeIndex });
+                _console$P.assertEnumWithError(TrackpadInformationTypes, type);
+                switch (type) {
+                    case "actualSize":
+                        {
+                            const width = dataView.getUint16(offset, true);
+                            offset += 2;
+                            const height = dataView.getUint16(offset, true);
+                            offset += 2;
+                            actualSize = { width, height };
+                        }
+                        break;
+                    case "bitmapSize":
+                        {
+                            const width = dataView.getUint16(offset, true);
+                            offset += 2;
+                            const height = dataView.getUint16(offset, true);
+                            offset += 2;
+                            bitmapSize = { width, height };
+                        }
+                        break;
+                    default:
+                        _console$P.log(`uncaught information type "${type}"`);
+                        break;
+                }
+            }
+            _console$P.assertWithError(actualSize, "actualSize is not included");
+            const trackpadInformation = {
+                index: trackpadsInformation.length,
+                actualSize,
+                bitmapSize,
+            };
+            trackpadsInformation.push(trackpadInformation);
+        }
+        this.touches.length = 0;
+        trackpadsInformation.forEach((_) => {
+            this.touches.push([]);
+        });
+        _console$P.log("trackpadsInformation", ...trackpadsInformation);
+        this.#information = trackpadsInformation.slice();
+        trackpadsInformation.forEach((trackpadInformation) => {
+            this.#eventDispatcher.dispatchEvent("trackpadInformation", {
+                trackpadInformation,
+            });
+        });
+        this.#eventDispatcher.dispatchEvent("trackpadsInformation", {
+            trackpadsInformation,
+        });
+    }
+    #touches = [];
+    get touches() {
+        return this.#touches;
+    }
+    #assertValidTrackpadIndex(trackpadIndex) {
+        _console$P.assertWithError(this.numberOfTrackPads > 0, "no trackpads defined");
+        _console$P.assertRangeWithError("trackpadIndex", trackpadIndex, 0, this.numberOfTrackPads - 1);
+    }
+    parseBitmaps(dataView) {
+        const bitmaps = [];
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const rawBitmap = dataView.getUint32(offset, true);
+            offset += 4;
+            _console$P.log({ trackpadIndex, rawBitmap });
+            const { width, height } = this.information[trackpadIndex].bitmapSize;
+            const rows = [];
+            let bitOffset = 0;
+            for (let y = 0; y < height; y++) {
+                rows.push([]);
+                for (let x = 0; x < width; x++) {
+                    rows[y][x] = Boolean(rawBitmap & (1 << bitOffset++));
+                }
+                if (bitOffset >= 32) {
+                    _console$P.log(`max bitOffset 32 reached (${bitOffset})`);
+                    break;
+                }
+            }
+            const bitmap = {
+                width,
+                height,
+                rows,
+            };
+            _console$P.log("bitmap", bitmap);
+            const bitmapMessage = { trackpadIndex, bitmap };
+            bitmaps.push(bitmapMessage);
+        }
+        bitmaps.forEach((bitmapMessage) => {
+            this.#eventDispatcher.dispatchEvent("trackpadBitmap", bitmapMessage);
+        });
+        return bitmaps;
+    }
+    parseTouches(dataView) {
+        const touchMessages = [];
+        const touches = [];
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const touchIndex = dataView.getUint8(offset++);
+            const value = dataView.getUint8(offset++);
+            const isDown = value > 0;
+            const touch = { trackpadIndex, touchIndex, value, isDown };
+            _console$P.log("touch", touch);
+            touches.push(touch);
+        }
+        touches.forEach((touch) => {
+            const touchMessage = { ...touch };
+            touchMessages.push(touchMessage);
+            const { touchIndex, trackpadIndex } = touch;
+            const trackpadTouches = this.#touches[trackpadIndex];
+            const existingTouch = trackpadTouches.find((_touch) => _touch.touchIndex == touchIndex);
+            if (existingTouch) {
+                if (!touch.isDown) {
+                    _console$P.log("removing touch", existingTouch);
+                    trackpadTouches.splice(trackpadTouches.indexOf(existingTouch), 1);
+                    this.#eventDispatcher.dispatchEvent("trackpadTouchUp", touchMessage);
+                }
+            }
+            else {
+                if (touch.isDown) {
+                    _console$P.log("adding touch", touch);
+                    trackpadTouches.push(touch);
+                    this.#eventDispatcher.dispatchEvent("trackpadTouchUp", touchMessage);
+                }
+            }
+        });
+        touchMessages.forEach((touchMessage) => {
+            this.#eventDispatcher.dispatchEvent("trackpadTouch", touchMessage);
+        });
+        return touchMessages;
+    }
+    parseTouchMovements(dataView, scalar) {
+        const touchMovements = [];
+        _console$P.log("parseTouchMovements", dataView, { scalar });
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const touchIndex = dataView.getUint8(offset++);
+            const x = dataView.getInt16(offset, true) * scalar;
+            offset += 2;
+            const y = dataView.getInt16(offset, true) * scalar;
+            offset += 2;
+            const delta = { x, y };
+            _console$P.log({ trackpadIndex, touchIndex, ...delta });
+            touchMovements.push({ trackpadIndex, touchIndex, delta });
+        }
+        touchMovements.forEach((touchMovement) => {
+            const touch = this.touches[touchMovement.trackpadIndex].find((touch) => touch.touchIndex == touchMovement.touchIndex);
+            if (touch) {
+                touch.delta = touchMovement.delta;
+            }
+            this.#eventDispatcher.dispatchEvent("trackpadTouchMovement", touchMovement);
+        });
+        return touchMovements;
+    }
+    parseTouchPositions(dataView, scalar) {
+        const touchPositions = [];
+        _console$P.log("parseTouchPositions", dataView, { scalar });
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const touchIndex = dataView.getUint8(offset++);
+            const x = dataView.getUint16(offset, true) * scalar;
+            offset += 2;
+            const y = dataView.getUint16(offset, true) * scalar;
+            offset += 2;
+            const position = { x, y };
+            _console$P.log({ trackpadIndex, touchIndex, ...position });
+            touchPositions.push({ trackpadIndex, touchIndex, position });
+        }
+        touchPositions.forEach((touchPosition) => {
+            const touch = this.touches[touchPosition.trackpadIndex].find((touch) => touch.touchIndex == touchPosition.touchIndex);
+            if (touch) {
+                touch.position = touchPosition.position;
+            }
+            this.#eventDispatcher.dispatchEvent("trackpadTouchPosition", touchPosition);
+        });
+        return touchPositions;
+    }
+    parseGestures(dataView, scalar) {
+        const gestureMessage = [];
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const gestureIndex = dataView.getUint8(offset++);
+            _console$P.log({ trackpadIndex, gestureIndex });
+            const gesture = TrackpadGestures[gestureIndex];
+            _console$P.assertEnumWithError(TrackpadGestures, gesture);
+            _console$P.log({ gesture });
+            if (TrackpadTapGestures.includes(gesture)) {
+                const x = dataView.getUint16(offset, true) * scalar;
+                offset += 2;
+                const y = dataView.getUint16(offset, true) * scalar;
+                offset += 2;
+                gestureMessage.push({
+                    trackpadIndex,
+                    gesture: gesture,
+                    position: { x, y },
+                });
+            }
+            else if (TrackpadSwipeGestures.includes(gesture)) {
+                const x = dataView.getInt16(offset, true) * scalar;
+                offset += 2;
+                const y = dataView.getInt16(offset, true) * scalar;
+                offset += 2;
+                gestureMessage.push({
+                    trackpadIndex,
+                    gesture: gesture,
+                    delta: { x, y },
+                });
+            }
+            else {
+                throw `uncaught gesture "${gesture}"`;
+            }
+        }
+        gestureMessage.forEach((gestureMessage) => {
+            this.#eventDispatcher.dispatchEvent("trackpadGesture", gestureMessage);
+            switch (gestureMessage.gesture) {
+                case "tap":
+                    this.#eventDispatcher.dispatchEvent("trackpadTap", gestureMessage);
+                    break;
+                case "swipeLeft":
+                    this.#eventDispatcher.dispatchEvent("trackpadSwipeLeft", gestureMessage);
+                    break;
+                case "swipeRight":
+                    this.#eventDispatcher.dispatchEvent("trackpadSwipeRight", gestureMessage);
+                    break;
+                case "swipeUp":
+                    this.#eventDispatcher.dispatchEvent("trackpadSwipeUp", gestureMessage);
+                    break;
+                case "swipeDown":
+                    this.#eventDispatcher.dispatchEvent("trackpadSwipeDown", gestureMessage);
+                    break;
+            }
+            if (TrackpadSwipeGestures.includes(gestureMessage.gesture)) {
+                this.#eventDispatcher.dispatchEvent("trackpadSwipe", gestureMessage);
+            }
+        });
+        return gestureMessage;
+    }
+    parseTouchStrengths(dataView, scalar) {
+        const touchStrengths = [];
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const touchIndex = dataView.getUint8(offset++);
+            _console$P.log({ trackpadIndex, touchIndex });
+            const strength = dataView.getUint16(offset, true) * scalar;
+            offset += 2;
+            _console$P.log({ trackpadIndex, touchIndex, strength });
+            touchStrengths.push({ trackpadIndex, touchIndex, strength });
+        }
+        touchStrengths.forEach((touchStrength) => {
+            const touch = this.touches[touchStrength.trackpadIndex].find((touch) => touch.touchIndex == touchStrength.touchIndex);
+            if (touch) {
+                touch.strength = touchStrength.strength;
+            }
+            this.#eventDispatcher.dispatchEvent("trackpadTouchStrength", touchStrength);
+        });
+        return touchStrengths;
+    }
+    parseTouchAreas(dataView, scalar) {
+        const touchAreas = [];
+        let offset = 0;
+        while (offset < dataView.byteLength) {
+            const trackpadIndex = dataView.getUint8(offset++);
+            this.#assertValidTrackpadIndex(trackpadIndex);
+            const touchIndex = dataView.getUint8(offset++);
+            _console$P.log({ trackpadIndex, touchIndex });
+            const area = dataView.getUint16(offset, true) * scalar;
+            offset += 2;
+            _console$P.log({ trackpadIndex, touchIndex, area });
+            touchAreas.push({ trackpadIndex, touchIndex, area });
+        }
+        touchAreas.forEach((touchArea) => {
+            const touch = this.touches[touchArea.trackpadIndex].find((touch) => touch.touchIndex == touchArea.touchIndex);
+            if (touch) {
+                touch.area = touchArea.area;
+            }
+            this.#eventDispatcher.dispatchEvent("trackpadTouchArea", touchArea);
+        });
+        return touchAreas;
+    }
+    clear() {
+        _console$P.log("clear");
+        this.#information.length = 0;
     }
 }
 
@@ -4007,6 +4403,7 @@ const SensorTypes = [
     ...ButtonSensorTypes,
     ...TouchSensorTypes,
     ...LightSensorTypes,
+    ...TrackpadSensorTypes,
 ];
 const ContinuousSensorTypes = [
     ...ContinuousPressureSensorTypes,
@@ -4028,6 +4425,7 @@ const SensorDataEventTypes = [
     ...PressureSensorEventTypes,
     ...ButtonSensorEventTypes,
     ...TouchSensorEventTypes,
+    ...TrackpadSensorEventTypes,
 ];
 const SensorMetaDataMessageTypes = ["getSensorCounts"];
 const RequiredSensorMetaDataMessageTypes = [
@@ -4059,6 +4457,7 @@ class SensorDataManager {
     buttonSensorDataManager = new ButtonSensorDataManager();
     touchSensorDataManager = new TouchSensorDataManager();
     lightSensorDataManager = new LightSensorDataManager();
+    trackpadSensorDataManager = new TrackpadSensorDataManager();
     #scalars = new Map();
     #counts = new Map();
     static AssertValidSensorType(sensorType) {
@@ -4084,6 +4483,8 @@ class SensorDataManager {
             eventDispatcher;
         this.touchSensorDataManager.eventDispatcher =
             eventDispatcher;
+        this.trackpadSensorDataManager.eventDispatcher =
+            eventDispatcher;
     }
     get dispatchEvent() {
         return this.eventDispatcher.dispatchEvent;
@@ -4102,6 +4503,9 @@ class SensorDataManager {
                 break;
             case "getSensorCounts":
                 this.#parseCounts(dataView);
+                break;
+            case "trackpadsInformation":
+                this.trackpadSensorDataManager.parseInformation(dataView);
                 break;
             default:
                 throw Error(`uncaught messageType ${messageType}`);
@@ -4215,6 +4619,27 @@ class SensorDataManager {
             case "light":
                 sensorData = this.lightSensorDataManager.parseData(dataView, scalar);
                 break;
+            case "trackpadBitmaps":
+                sensorData = this.trackpadSensorDataManager.parseBitmaps(dataView);
+                break;
+            case "trackpadTouches":
+                sensorData = this.trackpadSensorDataManager.parseTouches(dataView);
+                break;
+            case "trackpadTouchMovements":
+                sensorData = this.trackpadSensorDataManager.parseTouchMovements(dataView, scalar);
+                break;
+            case "trackpadTouchPositions":
+                sensorData = this.trackpadSensorDataManager.parseTouchPositions(dataView, scalar);
+                break;
+            case "trackpadGestures":
+                sensorData = this.trackpadSensorDataManager.parseGestures(dataView, scalar);
+                break;
+            case "trackpadTouchStrengths":
+                sensorData = this.trackpadSensorDataManager.parseTouchStrengths(dataView, scalar);
+                break;
+            case "trackpadTouchAreas":
+                sensorData = this.trackpadSensorDataManager.parseTouchAreas(dataView, scalar);
+                break;
             default:
                 _console$O.error(`uncaught sensorType "${sensorType}"`);
         }
@@ -4243,6 +4668,7 @@ class SensorDataManager {
         _console$O.log("clear");
         this.buttonSensorDataManager.clear();
         this.touchSensorDataManager.clear();
+        this.trackpadSensorDataManager.clear();
     }
 }
 
@@ -4463,6 +4889,7 @@ const RequiredTfliteMessageTypes = [
 const TfliteTasks = ["classification", "regression"];
 const TfliteSensorTypes = [
     "pressure",
+    "acceleration",
     "linearAcceleration",
     "gyroscope",
     "magnetometer",
@@ -25580,7 +26007,7 @@ let DisplayCanvasHelper = (() => {
             await this.#updateDeviceOpacity(false, updateSelf);
             await this.#updateDeviceContextState(false, false, updateSelf);
             await this.#updateDeviceBrightness(false, updateSelf);
-            await this.#updateDeviceDrawCallback(updateSelf);
+            await this.#updateDeviceDrawCallback(false);
             await this.#updateDeviceSpriteSheets(updateSelf);
             await this.#updateDeviceSelectedSpriteSheet(false, false, updateSelf);
             _console$z.log("deviceUpdated");
@@ -31948,6 +32375,7 @@ const TxRxMessageTypes = [
     ...DisplayMessageTypes,
     ...SensorMetaDataMessageTypes,
     ...LedMessageTypes,
+    ...TrackpadMessageTypes,
 ];
 const SMPMessageTypes = ["smp"];
 const BatteryLevelMessageTypes = ["batteryLevel"];
@@ -34138,6 +34566,16 @@ class Device {
             else {
                 _console$m.log("don't need to request number of buttons/touches");
             }
+            if (TrackpadSensorTypes.some((trackpadSensorType) => this.sensorTypes.includes(trackpadSensorType))) {
+                _console$m.log("requesting required trackpad information");
+                const messages = RequiredTrackpadMessageTypes.map((messageType) => ({
+                    type: messageType,
+                }));
+                this.sendTxMessages(messages, false);
+            }
+            else {
+                _console$m.log("don't need to request trackpad infomration");
+            }
         });
         this.addEventListener("getSensorConfiguration", (event) => {
             const { sensorConfiguration } = event.message;
@@ -34685,6 +35123,9 @@ class Device {
                     this.#sensorDataManager.parseMessage(messageType, dataView, isSending);
                 }
                 else if (SensorMetaDataMessageTypes.includes(messageType)) {
+                    this.#sensorDataManager.parseMessage(messageType, dataView, isSending);
+                }
+                else if (TrackpadMessageTypes.includes(messageType)) {
                     this.#sensorDataManager.parseMessage(messageType, dataView, isSending);
                 }
                 else if (FirmwareMessageTypes.includes(messageType)) {
@@ -35873,6 +36314,15 @@ class Device {
     }
     get clearLeds() {
         return this.#ledManager.clearLeds;
+    }
+    get hasTrackpad() {
+        return (this.#sensorDataManager.trackpadSensorDataManager.numberOfTrackPads > 0);
+    }
+    get trackpadsInformation() {
+        return this.#sensorDataManager.trackpadSensorDataManager.information;
+    }
+    get trackpadTouches() {
+        return this.#sensorDataManager.trackpadSensorDataManager.touches;
     }
 }
 _a$3 = Device;

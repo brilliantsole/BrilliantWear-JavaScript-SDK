@@ -39,7 +39,7 @@ export type MicrophoneConfigurationType =
 export const MicrophoneSampleRates = ["8000", "16000"] as const;
 export type MicrophoneSampleRate = (typeof MicrophoneSampleRates)[number];
 
-export const MicrophoneBitDepths = ["8", "16"] as const;
+export const MicrophoneBitDepths = ["8", "16", "4"] as const;
 export type MicrophoneBitDepth = (typeof MicrophoneBitDepths)[number];
 
 export const MicrophoneMessageTypes = [
@@ -152,6 +152,13 @@ class MicrophoneManager {
     const previousMicrophoneStatus = this.#microphoneStatus;
     this.#microphoneStatus = newMicrophoneStatus;
     _console.log(`updated microphoneStatus to "${this.microphoneStatus}"`);
+
+    this.#pendingBufferSources.forEach((bufferSource) => {
+      bufferSource.stop();
+      bufferSource.disconnect();
+    });
+    this.#pendingBufferSources.length = 0;
+
     this.#dispatchEvent("microphoneStatus", {
       microphoneStatus: this.microphoneStatus,
       previousMicrophoneStatus,
@@ -245,7 +252,12 @@ class MicrophoneManager {
     _console.assertEnumWithError(MicrophoneBitDepths, this.bitDepth!);
   }
   #fadeDuration = 0.01;
+  #applyFade = false;
   #playbackTime = 0;
+  #minLead = 0.02;
+  #targetLead = 0.12;
+  #maxLead = 0.6;
+  #pendingBufferSources: AudioBufferSourceNode[] = [];
   #parseMicrophoneData(dataView: DataView<ArrayBuffer>) {
     this.#assertValidBitDepth();
 
@@ -268,6 +280,9 @@ class MicrophoneManager {
           sample = sample / 2 ** 15; // Normalize to [-1, 1]
           samples[i] = sample;
           break;
+        case "4":
+          // FILL
+          break;
       }
     }
 
@@ -289,31 +304,43 @@ class MicrophoneManager {
         const bufferSource = this.#audioContext.createBufferSource();
         bufferSource.onended = () => {
           bufferSource.disconnect();
+          this.#pendingBufferSources.splice(
+            this.#pendingBufferSources.indexOf(bufferSource),
+            1,
+          );
         };
         bufferSource.buffer = audioBuffer;
 
         const channelData = audioBuffer.getChannelData(0);
         const sampleRate = Number(this.sampleRate!);
 
-        for (let i = 0; i < this.#fadeDuration * sampleRate; i++) {
-          channelData[i] *= i / (this.#fadeDuration * sampleRate);
-        }
+        if (this.#applyFade) {
+          for (let i = 0; i < this.#fadeDuration * sampleRate; i++) {
+            channelData[i] *= i / (this.#fadeDuration * sampleRate);
+          }
 
-        for (
-          let i = channelData.length - 1;
-          i >= channelData.length - this.#fadeDuration * sampleRate;
-          i--
-        ) {
-          channelData[i] *=
-            (channelData.length - i) / (this.#fadeDuration * sampleRate);
+          for (
+            let i = channelData.length - 1;
+            i >= channelData.length - this.#fadeDuration * sampleRate;
+            i--
+          ) {
+            channelData[i] *=
+              (channelData.length - i) / (this.#fadeDuration * sampleRate);
+          }
         }
 
         bufferSource.connect(this.#gainNode!);
 
-        if (this.#playbackTime < this.#audioContext.currentTime) {
-          this.#playbackTime = this.#audioContext.currentTime;
+        const now = this.#audioContext.currentTime;
+
+        if (
+          this.#playbackTime < now + this.#minLead ||
+          this.#playbackTime > now + this.#maxLead
+        ) {
+          this.#playbackTime = now + this.#targetLead;
         }
         bufferSource.start(this.#playbackTime);
+        this.#pendingBufferSources.push(bufferSource);
         this.#playbackTime += audioBuffer.duration;
       }
     }
@@ -326,6 +353,8 @@ class MicrophoneManager {
   }
   get #bytesPerSample() {
     switch (this.bitDepth) {
+      case "4":
+        return 0.5;
       case "8":
         return 1;
       case "16":

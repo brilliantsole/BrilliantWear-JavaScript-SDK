@@ -88,7 +88,7 @@ class TouchSensorDataManager {
 
       this.dispatchEvent("touch", { touch });
 
-      const internalTouch = this.touches[touch.index];
+      const internalTouch = this.#touches[touch.index];
       if (touch.isDown) {
         internalTouch.lastTimeDown = Date.now();
         this.dispatchEvent("touchDown", { touch });
@@ -111,17 +111,23 @@ class TouchSensorDataManager {
   set numberOfTouches(newNumberOfTouches) {
     this.#numberOfTouches = newNumberOfTouches;
     _console.log({ numberOfTouches: this.numberOfTouches });
-    this.touches = Array.from({ length: this.numberOfTouches }, (_, index) => ({
-      index,
-      value: 0,
-      isDown: false,
-    }));
+    this.#touches = Array.from(
+      { length: this.numberOfTouches },
+      (_, index) => ({
+        index,
+        value: 0,
+        isDown: false,
+      }),
+    );
     this.dispatchEvent("numberOfTouches", {
       numberOfTouches: this.numberOfTouches,
     });
   }
 
-  touches: InternalTouch[] = [];
+  #touches: InternalTouch[] = [];
+  get touches() {
+    return this.#touches as Touch[];
+  }
 
   clear() {
     _console.log("clear");

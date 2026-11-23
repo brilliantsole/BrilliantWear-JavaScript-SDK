@@ -91,6 +91,7 @@ export type SendTfliteMessagesCallback =
 
 export const TfliteSensorTypes = [
   "pressure",
+  "acceleration",
   "linearAcceleration",
   "gyroscope",
   "magnetometer",
